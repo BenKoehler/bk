@@ -1,0 +1,7 @@
+@PACKAGE_INIT@
+
+find_package(Eigen3 REQUIRED NO_MODULE)
+
+if(NOT TARGET bk::bkMath)
+    include(${CMAKE_CURRENT_LIST_DIR}/bkMathTargets.cmake)
+endif()

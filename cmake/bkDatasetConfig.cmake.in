@@ -1,0 +1,34 @@
+@PACKAGE_INIT@
+
+include(GNUInstallDirs)
+
+find_package(bkTypeTraits QUIET)
+if (NOT bkTypeTraits_FOUND AND NOT TARGET bk::bkTypeTraits)
+set(bkTypeTraits_DIR "${CMAKE_CURRENT_LIST_DIR}/../bkTypeTraits")
+find_package(bkTypeTraits REQUIRED)
+endif ()
+
+find_package(bkTools QUIET)
+if (NOT bkTools_FOUND AND NOT TARGET bk::bkTools)
+set(bkTools_DIR "${CMAKE_CURRENT_LIST_DIR}/../bkTools")
+find_package(bkTools REQUIRED)
+endif ()
+
+find_package(bkMath QUIET)
+if (NOT bkMath_FOUND AND NOT TARGET bk::bkMath)
+set(bkMath_DIR "${CMAKE_CURRENT_LIST_DIR}/../bkMath")
+find_package(bkMath REQUIRED)
+endif ()
+
+find_package(bkAlgorithm QUIET)
+if (NOT bkAlgorithm_FOUND AND NOT TARGET bk::bkAlgorithm)
+set(bkAlgorithm_DIR "${CMAKE_CURRENT_LIST_DIR}/../bkAlgorithm")
+find_package(bkAlgorithm REQUIRED)
+endif ()
+
+find_package(PNG QUIET)
+find_package(OpenMP QUIET)
+
+if(NOT TARGET bk::bkDataset)
+    include(${CMAKE_CURRENT_LIST_DIR}/bkDatasetTargets.cmake)
+endif()

@@ -1,0 +1,9 @@
+@PACKAGE_INIT@
+
+# PTHREAD
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
+if(NOT TARGET bk::bkTools)
+    include(${CMAKE_CURRENT_LIST_DIR}/bkToolsTargets.cmake)
+endif()

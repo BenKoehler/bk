@@ -1,0 +1,58 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018 Benjamin Köhler
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+#include "image/Image.h"
+
+#include "image/filter/ConvolutionFFTImageFilter.h"
+#include "image/filter/AverageSmoothingImageFilter.h"
+#include "image/filter/BinomialSmoothingImageFilter.h"
+#include "image/filter/ConnectedComponentsAnalysisImageFilter.h"
+#include "image/filter/ConnectedComponentsAnalysisKeepLargestRegionImageFilter.h"
+#include "image/filter/DistanceMapImageFilter.h"
+#include "image/filter/FFTAbsLogRealImageFilter.h"
+#include "image/filter/FFTImageFilter.h"
+#include "image/filter/FFTShiftImageFilter.h"
+#include "image/filter/GradientImageFilter.h"
+#include "image/filter/GradientStrengthImageFilter.h"
+#include "image/filter/HistogramEqualizationImageFilter.h"
+#include "image/filter/IFFTImageFilter.h"
+#include "image/filter/IFFTShiftImageFilter.h"
+#include "image/filter/IntervalThresholdImageFilter.h"
+#include "image/filter/InvertIntensityImageFilter.h"
+#include "image/filter/LaplaceBinomialImageFilter.h"
+#include "image/filter/LaplaceImageFilter.h"
+#include "image/filter/MaximumImageFilter.h"
+#include "image/filter/MedianImageFilter.h"
+#include "image/filter/MinimumImageFilter.h"
+#include "image/filter/MorphologicalOperationImageFilter.h"
+#include "image/filter/MorphologicalDilationImageFilter.h"
+#include "image/filter/MorphologicalErosionImageFilter.h"
+#include "image/filter/MorphologicalClosingImageFilter.h"
+#include "image/filter/MorphologicalOpeningImageFilter.h"
+#include "image/filter/MorphologicalClosingAndOpeningImageFilter.h"
+#include "image/filter/MorphologicalOpeningAndClosingImageFilter.h"
+#include "image/filter/NormalizeIntensityImageFilter.h"
+#include "image/filter/SobelImageFilter.h"
+#include "image/filter/ThresholdImageFilter.h"
+#include "image/filter/UnsharpMaskingImageFilter.h"

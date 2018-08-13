@@ -1,0 +1,55 @@
+@PACKAGE_INIT@
+
+include(GNUInstallDirs)
+
+find_package(bkTypeTraits QUIET)
+if (NOT bkTypeTraits_FOUND AND NOT TARGET bk::bkTypeTraits)
+set(bkTypeTraits_DIR "${CMAKE_CURRENT_LIST_DIR}/../bkTypeTraits")
+find_package(bkTypeTraits REQUIRED)
+endif ()
+
+find_package(bkTools QUIET)
+if (NOT bkTools_FOUND AND NOT TARGET bk::bkTools)
+set(bkTools_DIR "${CMAKE_CURRENT_LIST_DIR}/../bkTools")
+find_package(bkTools REQUIRED)
+endif ()
+
+find_package(bkMath QUIET)
+if (NOT bkMath_FOUND AND NOT TARGET bk::bkMath)
+set(bkMath_DIR "${CMAKE_CURRENT_LIST_DIR}/../bkMath")
+find_package(bkMath REQUIRED)
+endif ()
+
+find_package(bkAlgorithm QUIET)
+if (NOT bkAlgorithm_FOUND AND NOT TARGET bk::bkAlgorithm)
+    set(bkAlgorithm_DIR "${CMAKE_CURRENT_LIST_DIR}/../bkAlgorithm")
+    find_package(bkAlgorithm REQUIRED)
+endif ()
+
+find_package(bkDataset QUIET)
+if (NOT bkDataset_FOUND AND NOT TARGET bk::bkDataset)
+    set(bkDataset_DIR "${CMAKE_CURRENT_LIST_DIR}/../bkDataset")
+    find_package(bkDataset REQUIRED)
+endif ()
+
+find_package(bkDicom QUIET)
+if (NOT bkDicom_FOUND AND NOT TARGET bk::bkDicom)
+    set(bkDicom_DIR "${CMAKE_CURRENT_LIST_DIR}/../bkDicom")
+    find_package(bkDicom REQUIRED)
+endif ()
+
+find_package(bkGL QUIET)
+if (NOT bkGL_FOUND AND NOT TARGET bk::bkGL)
+    set(bkGL_DIR "${CMAKE_CURRENT_LIST_DIR}/../bkGL")
+    find_package(bkGL REQUIRED)
+endif ()
+
+find_package(bkCMR QUIET)
+if (NOT bkCMR_FOUND AND NOT TARGET bk::bkCMR)
+set(bkCMR_DIR "${CMAKE_CURRENT_LIST_DIR}/../bkCMR")
+find_package(bkCMR REQUIRED)
+endif ()
+
+if(NOT TARGET bk::bk)
+    include(${CMAKE_CURRENT_LIST_DIR}/bkTargets.cmake)
+endif()

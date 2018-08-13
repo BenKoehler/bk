@@ -1,0 +1,81 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018 Benjamin Köhler
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+// buffer
+#include "gl/buffer/Buffer.h"
+#include "gl/buffer/FBO.h"
+#include "gl/buffer/IBO.h"
+#include "gl/buffer/SSBO.h"
+#include "gl/buffer/VBO.h"
+
+#include "gl/buffer/UBO.h"
+#include "gl/UBODVR.h"
+#include "gl/UBOGlobal.h"
+#include "gl/UBOLine.h"
+#include "gl/UBOPhong.h"
+#include "gl/UBOSelectionSphere.h"
+#include "gl/UBOSliceView.h"
+#include "gl/UBOText.h"
+
+// renderable
+#include "gl/renderable/background/GradientBackground.h"
+#include "gl/renderable/background/UniformBackground.h"
+#include "gl/renderable/image/dvr/DVRImage3DView.h"
+#include "gl/renderable/image/dvr/DVRImage4DView.h"
+#include "gl/renderable/line/LineView.h"
+#include "gl/renderable/mesh/TriangularMesh3DView.h"
+#include "gl/renderable/mesh/TriangularMesh3DCenterlineExtractionView.h"
+#include "gl/renderable/text/TextView.h"
+#include "gl/renderable/ColorBarView.h"
+#include "gl/renderable/ScreenQuad.h"
+
+// shader
+#include "gl/shader/ComputeShader.h"
+#include "gl/shader/Shader.h"
+#include "gl/shader/ShaderLibrary.h"
+
+// texture
+#include "gl/texture/Texture2D.h"
+#include "gl/texture/Texture3D.h"
+#include "gl/texture/TextureCubeMap.h"
+
+// trackball
+#include "gl/trackball/TrackBall.h"
+
+// VAO
+#include "gl/vao/VAO.h"
+#include "gl/vao/VertexAttributePointer.h"
+#include "gl/AbstractBindable.h"
+#include "gl/AbstractObject.h"
+#include "gl/Animator.h"
+#include "gl/Camera.h"
+#include "gl/EMouseButton.h"
+#include "gl/gl_definitions.h"
+#include "gl/gl_error.h"
+#include "gl/Interactor.h"
+#include "gl/Mouse.h"
+#include "gl/OrderIndependentTransparency.h"
+#include "gl/Renderer.h"
+#include "gl/SuperSampler.h"
+#include "gl/WindowGeometry.h"

@@ -19,3 +19,20 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+--------------------------------------------------------------------
+
+The FFT implementation is based on the one by Paul Bourke, which was
+published in 1993 and can be freely used.
+
+http://paulbourke.net/miscellaneous/dft/
+http://paulbourke.net/miscellaneous/
+
+"The contents of this web site are © Copyright Paul Bourke or a third party
+contributor where indicated. You may print or save an electronic copy of
+parts of this web site for your own personal use. Permission must be sought
+for any other use. Any source code found here may be freely used provided
+credits are given to the author. Purchase of credit free licenses of material
+found on this site can be negotiated with the author. The author can also
+quote for unique variations and/or higher resolution versions of the images
+found on this site."

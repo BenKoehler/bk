@@ -1,0 +1,39 @@
+@PACKAGE_INIT@
+
+include(GNUInstallDirs)
+
+find_package(bkTypeTraits QUIET)
+if (NOT bkTypeTraits_FOUND AND NOT TARGET bk::bkTypeTraits)
+set(bkTypeTraits_DIR "${CMAKE_CURRENT_LIST_DIR}/../bkTypeTraits")
+find_package(bkTypeTraits REQUIRED)
+endif ()
+
+find_package(bkTools QUIET)
+if (NOT bkTools_FOUND AND NOT TARGET bk::bkTools)
+set(bkTools_DIR "${CMAKE_CURRENT_LIST_DIR}/../bkTools")
+find_package(bkTools REQUIRED)
+endif ()
+
+find_package(bkMath QUIET)
+if (NOT bkMath_FOUND AND NOT TARGET bk::bkMath)
+set(bkMath_DIR "${CMAKE_CURRENT_LIST_DIR}/../bkMath")
+find_package(bkMath REQUIRED)
+endif ()
+
+# GDCM
+find_package(GDCM QUIET)
+if (GDCM_FOUND AND NOT TARGET GDCM::GDCM)
+    add_library(GDCM::GDCM INTERFACE IMPORTED)
+
+set_target_properties(GDCM::GDCM PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${GDCM_INCLUDE_DIRS}"
+        INTERFACE_LINK_DIRECTORIES "${GDCM_LIBRARY_DIRS}"
+        INTERFACE_LINK_LIBRARIES "gdcmCommon;gdcmDICT;gdcmDSED;gdcmIOD;gdcmMSFF;gdcmMEXD;gdcmjpeg8;gdcmjpeg12;gdcmjpeg16;gdcmexpat;gdcmcharls;gdcmzlib;gdcmuuid")
+endif ()
+
+# OpenMP
+find_package(OpenMP QUIET)
+
+if(NOT TARGET bk::bkDicom)
+    include(${CMAKE_CURRENT_LIST_DIR}/bkDicomTargets.cmake)
+endif()

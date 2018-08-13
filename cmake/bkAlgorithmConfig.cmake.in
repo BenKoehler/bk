@@ -1,0 +1,13 @@
+@PACKAGE_INIT@
+
+include(GNUInstallDirs)
+
+find_package(bkMath QUIET)
+if (NOT bkMath_FOUND AND NOT TARGET bk::bkMath)
+    set(bkMath_DIR "${CMAKE_CURRENT_LIST_DIR}/../bkMath")
+    find_package(bkMath REQUIRED)
+endif ()
+
+if(NOT TARGET bk::bkAlgorithm)
+    include(${CMAKE_CURRENT_LIST_DIR}/bkAlgorithmTargets.cmake)
+endif()
