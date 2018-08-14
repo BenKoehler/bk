@@ -36,5 +36,3 @@ namespace bk
 } // namespace bk
 
 #endif //BKCMR_ROTATION_DIRECTION_2D_H
-
-

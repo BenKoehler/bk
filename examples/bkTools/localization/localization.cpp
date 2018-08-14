@@ -47,29 +47,30 @@ void myPrint(std::string_view s)
 //------------------------------------------------------------------------------------------------------
 // main
 //------------------------------------------------------------------------------------------------------
+void print_stuff_to_translate()
+{
+    std::cout << ___(Text_button_cancel) << std::endl;
+    std::cout << ___(Text_calculation_time, ___(Text_calculation_name_pathlines), 5) << std::endl;
+    logic_class_function();
+    std::cout << ___("repeat me @0 times @1 @1 @1 (was @0x repeated)", 3, "bla") << std::endl;
+}
+
 int main(int, char**)
 {
     s_string.connect(&myPrint);
 
     std::cout << "german translation:" << std::endl;
+    std::cout << "-------------------" << std::endl;
 
-    //
     set_localization_german();
-
-    std::cout << ___(Text_button_cancel) << std::endl;
-    std::cout << ___(Text_calculation_time, ___(Text_calculation_name_pathlines), 5) << std::endl;
-    logic_class_function();
-    std::cout << ___("repeat me @0 times @1 @1 @1 (was @0x repeated)", 3, "bla") << std::endl;
+    print_stuff_to_translate();
 
     std::cout << std::endl;
     std::cout << "english translation:" << std::endl;
+    std::cout << "--------------------" << std::endl;
 
     set_localization_english();
-
-    std::cout << ___(Text_button_cancel) << std::endl;
-    std::cout << ___(Text_calculation_time, ___(Text_calculation_name_pathlines), 5) << std::endl;
-    logic_class_function();
-    std::cout << ___("repeat me @0 times @1 @1 @1 (was @0x repeated)", 3, "bla") << std::endl;
+    print_stuff_to_translate();
 
     return EXIT_SUCCESS;
 }
