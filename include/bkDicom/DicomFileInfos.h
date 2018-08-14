@@ -35,7 +35,7 @@
 
 #include "../bkMath/Matrix"
 
-#include "cmake-build-debug/include/bk/dicom/lib/export.h"
+#include "lib/export.h"
 
 namespace bk
 {

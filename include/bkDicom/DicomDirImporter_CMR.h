@@ -34,7 +34,7 @@
 
 #include "DicomDirImporter.h"
 #include "EDicomImageClass.h"
-#include "cmake-build-debug/include/bk/dicom/lib/export.h"
+#include "lib/export.h"
 
 namespace bk
 {
