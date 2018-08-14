@@ -15,8 +15,8 @@ option(ENABLE_SUPERBUILD "Pull dependencies' source code if not found." ON)
 option(ENABLE_PROGRESS "Algorithms emit progress using bkProgress library" ON)
 option(GL_USE_QT "All GL classes work with Qt and require a QtOpenGLFunctions object in the constructor" OFF)
 #option(GL_USE_QT "All GL classes work with Qt and require a QtOpenGLFunctions object in the constructor" ON)
-option(BUILD_EXAMPLES "Build examples" OFF)
-#option(BUILD_EXAMPLES "Build examples" ON)
+#option(BUILD_EXAMPLES "Build examples" OFF)
+option(BUILD_EXAMPLES "Build examples" ON)
 
 if (${ENABLE_PROGRESS})
     add_definitions(-DBK_EMIT_PROGRESS)
@@ -407,6 +407,9 @@ set(SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkTools/color/WindowingTransferFunction.cpp
         # io
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkTools/io/read_text_file.cpp
+        # localization
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkTools/localization/LocalizationManager.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkTools/localization/GlobalLocalizationManager.cpp
         # progress
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkTools/progress/Progress.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkTools/progress/ProgressManager.cpp
@@ -420,6 +423,14 @@ add_library(bkTools ${SOURCE_FILES})
 _bk_make_lib(tools Tools)
 target_link_libraries(bkTools Threads::Threads)
 _bk_install_lib(tools Tools TOOLS)
+
+# add localization crawler tool
+add_executable(localization_crawler ${CMAKE_CURRENT_SOURCE_DIR}/src/bkTools/localization/localization_crawler.cpp)
+target_link_libraries(localization_crawler PRIVATE bk::bkTools)
+target_link_libraries(localization_crawler PRIVATE stdc++fs)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/localization_crawler
+        PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
+        DESTINATION ${CMAKE_INSTALL_BINDIR}/bkTools)
 
 if (BUILD_EXAMPLES)
     set(BK_CURRENT_LIBRARY bkTools)
@@ -453,6 +464,13 @@ if (BUILD_EXAMPLES)
     add_executable(kdtree_example ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/kdtree.cpp)
     _bk_make_example(kdtree_example ${BK_CURRENT_LIBRARY})
 
+    # localization
+    add_executable(localization_example
+            ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/localization/localization.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/localization/my_custom_localization.cpp)
+    _bk_make_example(localization_example ${BK_CURRENT_LIBRARY})
+    target_compile_definitions(localization_example PRIVATE BK_LOCALIZATION)
+        
     # ndcontainer
     add_executable(ndcontainer_example ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/ndcontainer.cpp)
     _bk_make_example(ndcontainer_example ${BK_CURRENT_LIBRARY})
