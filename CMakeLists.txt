@@ -151,7 +151,14 @@ set(SOURCE_FILES
 
 add_library(bkCMR ${SOURCE_FILES})
 _bk_make_lib(cmr CMR)
-target_link_libraries(bkCMR Threads::Threads)
+target_link_libraries(bkCMR PUBLIC Threads::Threads)
+target_link_libraries(bkCMR PUBLIC bk::bkAlgorithm)
+target_link_libraries(bkCMR PUBLIC bk::bkDataset)
+target_link_libraries(bkCMR PUBLIC bk::bkDicom)
+target_link_libraries(bkCMR PUBLIC bk::bkTools)
+target_link_libraries(bkCMR PUBLIC bk::bkMath)
+target_link_libraries(bkCMR PUBLIC bk::bkTypeTraits)
+target_link_libraries(bkCMR PUBLIC bk::bkGL)
 _bk_install_lib(cmr CMR CMR)
 
 # ------------------------------------------------------------------------------------------------------------------------------------
