@@ -27,6 +27,7 @@
 #include <cstdint>
 #include <utility>
 
+#include "../../include/bkTools/Localization"
 #include "../../include/bkTools/Progress"
 #include "../../include/bkTools/ThreadPool"
 
@@ -388,7 +389,7 @@ namespace bk
       for (unsigned int i = 0; i < num_image_3d_plus_time_groups(); ++i)
       { maxProg += 1 /*other*/ + static_cast<int>(image_3d_plus_time_group(i).size()) /*1 for each corner scan*/; }
 
-      Progress& prog = bk_progress.emplace_task(std::max(1, maxProg), "Searching flow images");
+      Progress& prog = bk_progress.emplace_task(std::max(1, maxProg), ___("searching flow images"));
       #endif
 
       //------------------------------------------------------------------------------------------------------

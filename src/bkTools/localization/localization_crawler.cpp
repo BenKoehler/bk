@@ -67,50 +67,43 @@ int main(int argc, const char** argv)
 {
     if (argc <= 1)
     {
-        std::cerr << "specify path argument with \"crawler path\"" << std::endl;
+        std::cerr << "specify path argument with \"localization_crawler <path0> OPTIONAL: <path1> ... <pathN>\"" << std::endl;
         return EXIT_FAILURE;
     }
     std::set<std::string> string_to_translate;
 
-    for (auto p: std::filesystem::recursive_directory_iterator(argv[1]))
+    for (unsigned int i = 1; i < argc; ++i)
     {
-        if (is_source_file(p.path().filename().string()))
+        for (auto p: std::filesystem::recursive_directory_iterator(argv[i]))
         {
-            //std::cout << p.path().string() << std::endl;
-            std::string content = read_text_file(p.path().string());
-
-            for (unsigned int i = 0; i < content.length() - 5; ++i)
+            if (is_source_file(p.path().filename().string()))
             {
-                if (content[i] == '_' && content[i + 1] == '_' && content[i + 2] == '_' && content[i + 3] == '(' && content[i + 4] == '"')
+                //std::cout << p.path().string() << std::endl;
+                std::string content = read_text_file(p.path().string());
+
+                for (unsigned int i = 0; i < content.length() - 5; ++i)
                 {
-                    i += 5; // skip opening
-
-                    for (unsigned int k = i; k < content.length(); ++k)
+                    if (content[i] == '_' && content[i + 1] == '_' && content[i + 2] == '_' && content[i + 3] == '(' && content[i + 4] == '"')
                     {
-                        if (content[k] == '"' && content[k - 1] != '\\')
+                        i += 5; // skip opening
+
+                        for (unsigned int k = i; k < content.length(); ++k)
                         {
-                            std::cout << "\"" << content.substr(i, k - i) << "\" (" << p.path().filename().string() << ")" << std::endl;
+                            if (content[k] == '"' && content[k - 1] != '\\')
+                            {
+                                std::cout << "\"" << content.substr(i, k - i) << "\" (" << p.path().filename().string() << ")" << std::endl;
 
-                            string_to_translate.insert(content.substr(i, k - i));
-                            i = k + 1;
-                            break;
-                        }
-                    } // for k
+                                string_to_translate.insert(content.substr(i, k - i));
+                                i = k + 1;
+                                break;
+                            }
+                        } // for k
 
-                } // if opening
-            } // for i
-        } // if source file
-    } // for files
-
-    //------------------------------------------------------------------------------------------------------
-    // print results
-    //------------------------------------------------------------------------------------------------------
-    std::cout << std::endl;
-    std::cout << string_to_translate.size() << " strings found:" << std::endl;
-    std::cout << "-----------" << std::endl;
-    unsigned int i  = 0;
-    for (auto    it = string_to_translate.begin(); it != string_to_translate.end(); ++i, ++it)
-    { std::cout << "\"" << *it << "\"" << std::endl; }
+                    } // if opening
+                } // for i
+            } // if source file
+        } // for files
+    } // for input paths
 
     //------------------------------------------------------------------------------------------------------
     // save
@@ -126,10 +119,16 @@ int main(int argc, const char** argv)
 
     std::ofstream file(path, std::ios_base::out);
 
+    unsigned int i  = 0;
     for (auto it = string_to_translate.begin(); it != string_to_translate.end(); ++i, ++it)
     { file << "\"" << *it << "\"" << std::endl; }
 
     file.close();
+
+    std::cout << std::endl;
+    std::cout << "-----------------------------------------------------------------" << std::endl;
+    std::cout << string_to_translate.size() << " strings saved to \""<<path<<"\"" << std::endl;
+    std::cout << "-----------------------------------------------------------------" << std::endl;
 
     return EXIT_SUCCESS;
 }

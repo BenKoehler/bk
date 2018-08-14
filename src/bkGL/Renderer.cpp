@@ -30,6 +30,7 @@
 
 #include "../../include/bkAlgorithm/Algorithm"
 #include "../../include/bkTools/Clock"
+#include "../../include/bkTools/Localization"
 #include "../../include/bkTools/Signal"
 #include "../../include/bkTools/ThreadPool"
 #include "../../include/bkMath/functions/equals_approx.h"
@@ -687,7 +688,7 @@ namespace bk
       constexpr const unsigned int fileIndexLength = 5;
 
       #ifdef BK_EMIT_PROGRESS
-      Progress& prog = bk_progress.emplace_task(N, "Rendering Video Frames");
+      Progress& prog = bk_progress.emplace_task(N, ___("rendering video frames"));
       #endif
 
       std::vector<std::future<void>> tasks_save_img;

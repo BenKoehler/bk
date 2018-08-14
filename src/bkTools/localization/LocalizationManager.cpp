@@ -42,10 +42,8 @@ namespace bk
   {
       const auto it = entries_tag.find(key);
 
-      #ifdef BK_DEBUG_MODE
       if (it == entries_tag.end())
-    { std::cerr << "tag " << key << " was not found in the database!" << std::endl; }
-      #endif
+      { std::cerr << "tag " << key << " was not found in the database!" << std::endl; }
 
       return it != entries_tag.end() ? it->second : "UNKNOWN-TAG";
   }
@@ -54,10 +52,8 @@ namespace bk
   {
       const auto it = entries_text.find(std::string(referenceTextInEnglish));
 
-      #ifdef BK_DEBUG_MODE
       if (it == entries_text.end())
-    { std::cerr << "text \"" << referenceTextInEnglish << "\" was not found in the database!" << std::endl; }
-      #endif
+      { std::cerr << "text \"" << referenceTextInEnglish << "\" was not found in the database!" << std::endl; }
 
       return it != entries_text.end() ? it->second : referenceTextInEnglish.data();
   }
@@ -101,8 +97,6 @@ namespace bk
   //====================================================================================================
   //===== FUNCTIONS
   //====================================================================================================
-  #ifdef BK_DEBUG_MODE
-
   unsigned int LocalizationManager::count_parameter_placeholders(const std::string& text)
   {
       std::unordered_set<std::string> placeholders;
@@ -123,6 +117,4 @@ namespace bk
 
       return placeholders.size();
   }
-
-  #endif
 } // namespace bk

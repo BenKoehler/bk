@@ -857,21 +857,8 @@ namespace bk
       const std::string frag_opaque = SL::frag_opaque(_pdata->lines_have_time_attribute, this->animation_is_enabled(), useColor);
       const std::string frag_transparent = SL::frag_transparent(_pdata->lines_have_time_attribute, this->animation_is_enabled(), useColor, this->oit_is_available());
 
-      /*std::cout << vert << std::endl;
-      std::cout << geom << std::endl;
-      std::cout << frag_opaque << std::endl;
-      std::cout << frag_transparent << std::endl;*/
-
       _pdata->shader_opaque.init_from_sources(vert, frag_opaque, geom);
       _pdata->shader_transparent.init_from_sources(vert, frag_transparent, geom);
-
-      /*using SL = details::ShaderLibrary::lines::debug;
-
-      const std::string vert = SL::vert_passthrough(_pdata->lines_have_time_attribute, useColor);
-      const std::string frag = SL::frag_passthrough(_pdata->lines_have_time_attribute, useColor);
-
-      _pdata->shader_opaque.init_from_sources(vert, frag);
-      _pdata->shader_transparent.init_from_sources(vert, frag);*/
   }
 
   void LineView::init_lineao_shader()

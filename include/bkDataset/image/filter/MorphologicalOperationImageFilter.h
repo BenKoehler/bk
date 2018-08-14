@@ -35,6 +35,7 @@
 
 #endif
 
+#include <bkTools/Localization>
 #include "../../../bkMath/matrix/MatrixFactory.h"
 #include "../../../bkMath/functions/list_grid_id_conversion.h"
 #include "../../lib/export.h"
@@ -97,7 +98,7 @@ namespace bk
           const value_type structel = *itMinVal + (*itMaxVal - *itMinVal) * kernel[kernel.num_values() / 2];
 
           #ifdef BK_EMIT_PROGRESS
-          Progress& prog = bk_progress.emplace_task(img.num_values(), "Morphological Image Filtering");
+          Progress& prog = bk_progress.emplace_task(img.num_values(), ___("morphological image filtering"));
           #endif
 
           #pragma omp parallel for

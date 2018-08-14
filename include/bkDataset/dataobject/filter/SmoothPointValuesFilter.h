@@ -33,6 +33,7 @@
     #include "../../../bkTools/Progress"
 #endif
 
+#include <bkTools/Localization>
 #include "bkDataset/lib/export.h"
 
 namespace bk
@@ -116,7 +117,7 @@ namespace bk
           { return std::vector<T>(); }
 
           #ifdef BK_EMIT_PROGRESS
-          Progress& prog = bk_progress.emplace_task(1 + _num_iterations, "Smoothing");
+          Progress& prog = bk_progress.emplace_task(1 + _num_iterations, ___("smoothing point values"));
           #endif
 
           // determine neighbor ids of each point

@@ -79,9 +79,7 @@ namespace bk
       //===== FUNCTIONS
       //====================================================================================================
     private:
-      #ifdef BK_DEBUG_MODE
       [[nodiscard]] static unsigned int count_parameter_placeholders(const std::string& text);
-      #endif
 
       template<typename T, typename... Args>
       [[nodiscard]] static std::string _replace_parameters_impl(std::string_view text, unsigned int cnt, T&& arg0, Args&& ... args);

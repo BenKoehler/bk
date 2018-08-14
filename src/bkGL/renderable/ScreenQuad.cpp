@@ -121,34 +121,7 @@ namespace bk
            0 ------ 1
        */
 
-      //const GLfloat texcoord_xmin = _pdata->flip_x_axis ? 1 : 0;
-      //const GLfloat texcoord_xmax = _pdata->flip_x_axis ? 0 : 1;
-      //const GLfloat texcoord_ymin = _pdata->flip_y_axis ? 1 : 0;
-      //const GLfloat texcoord_ymax = _pdata->flip_y_axis ? 0 : 1;
-      //
-      //std::cout << "texcoord_xmin " << texcoord_xmin << std::endl;
-      //std::cout << "texcoord_xmax " << texcoord_xmax << std::endl;
-      //std::cout << "texcoord_ymin " << texcoord_ymin << std::endl;
-      //std::cout << "texcoord_ymax " << texcoord_ymax << std::endl;
-
       constexpr unsigned int N = 16;
-      //const GLfloat vertices_texCoords_interleaved[N] = {
-      //    // vert0
-      //    -1, -1,
-      //    // texCoord0
-      //    texcoord_xmin, texcoord_ymin,
-      //    // vert1
-      //    1, -1,
-      //    // texCoord1
-      //    texcoord_xmax, texcoord_ymin,
-      //    // vert2
-      //    -1, 1,
-      //    // texCoord2
-      //    texcoord_xmin, texcoord_ymax,
-      //    // vert3
-      //    1, 1,
-      //    // texCoord3
-      //    texcoord_xmax, texcoord_ymax};
       constexpr GLfloat vertices_texCoords_interleaved[N] = {
           // vert0
           -1, -1,

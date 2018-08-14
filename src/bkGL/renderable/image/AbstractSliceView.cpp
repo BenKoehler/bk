@@ -33,6 +33,7 @@
 #include "../../../include/bkTools/color/WindowingTransferFunction.h"
 #include "../../../include/bkMath/Matrix"
 #include "../../../include/bkTools/Signal"
+#include "../../../include/bkTools/Localization"
 
 #ifdef BK_EMIT_PROGRESS
 
@@ -475,7 +476,7 @@ namespace bk::details
   void AbstractSliceView::init_image()
   {
       #ifdef BK_EMIT_PROGRESS
-      Progress& prog = bk_progress.emplace_task(5, "Initializing slice viewer");
+      Progress& prog = bk_progress.emplace_task(5, ___("initializing slice viewer"));
       #endif
       clear_imageBuffers();
 

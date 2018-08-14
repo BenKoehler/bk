@@ -35,6 +35,8 @@
 
 #endif
 
+#include <bkTools/Localization>
+
 #include "FFTImageFilter.h"
 #include "IFFTImageFilter.h"
 #include "FFTShiftImageFilter.h"
@@ -108,7 +110,7 @@ namespace bk
           { return img; }
 
           #ifdef BK_EMIT_PROGRESS
-          Progress& prog = bk_progress.emplace_task(numIterations + 2 * 3, "Image Convolution Filtering");
+          Progress& prog = bk_progress.emplace_task(numIterations + 2 * 3, ___("image convolution filtering"));
           #endif
 
           FFTImageFilter filter_fft;

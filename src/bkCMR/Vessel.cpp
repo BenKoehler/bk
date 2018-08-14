@@ -30,6 +30,7 @@
 //#include <bkCMR/rotation_angle_2d.h>
 //#include <bkTools/BitVector>
 //#include <bkTools/Clock>
+//#include <bkTools/Localization>
 //#include <bkDataset/Line>
 //#include <bkDataset/Image>
 //#include <bkDataset/Mesh>
@@ -344,7 +345,7 @@
 //        { numPointsTotal += _pdata->pathlines.line(pid)->geometry().num_points(); }
 //
 //        #ifdef BK_EMIT_PROGRESS
-//        Progress& prog = bk_progress.emplace_task(0, numPointsTotal, "Analyzing Pathlines/Centerlines Relations");
+//        Progress& prog = bk_progress.emplace_task(0, numPointsTotal, ___("analyzing pathlines/centerlines relations"));
 //        #endif
 //
 //        /*
@@ -534,7 +535,7 @@
 //    bool Vessel::save_segmentation3D(const std::string& filepath) const
 //    {
 //        #ifdef BK_EMIT_PROGRESS
-//        Progress& prog           = bk_progress.emplace_task(0, 5, "Saving 3D Segmentation");
+//        Progress& prog           = bk_progress.emplace_task(0, 5, ___("saving 3d segmentation"));
 //        #endif
 //
 //        //------------------------------------------------------------------------------------------------------
@@ -642,7 +643,7 @@
 //    bool Vessel::load_segmentation3D(const std::string& filepath)
 //    {
 //        #ifdef BK_EMIT_PROGRESS
-//        Progress& prog = bk_progress.emplace_task(0, 5, "Loading 3D Segmentation");
+//        Progress& prog = bk_progress.emplace_task(0, 5, ___("loading 3d segmentation"));
 //        #endif
 //
 //        clear_segmentation();
@@ -759,7 +760,7 @@
 //    bool Vessel::save_centerline_ids(const std::string& filepath) const
 //    {
 //        #ifdef BK_EMIT_PROGRESS
-//        Progress& prog           = bk_progress.emplace_task(0, 3, "Saving Centerline End Points");
+//        Progress& prog           = bk_progress.emplace_task(0, 3, ___("saving centerline end points"));
 //        #endif
 //
 //        //------------------------------------------------------------------------------------------------------
@@ -823,7 +824,7 @@
 //    bool Vessel::load_centerline_ids(const std::string& filepath)
 //    {
 //        #ifdef BK_EMIT_PROGRESS
-//        Progress& prog = bk_progress.emplace_task(0, 3, "Loading Centerline End Points");
+//        Progress& prog = bk_progress.emplace_task(0, 3, ___("loading centerline end points"));
 //        #endif
 //
 //        _pdata->centerline_target_ids.clear();
@@ -892,7 +893,7 @@
 //    bool Vessel::save_centerlines(const std::string& filepath) const
 //    {
 //        #ifdef BK_EMIT_PROGRESS
-//        Progress& prog           = bk_progress.emplace_task(0, 3, "Saving Centerlines");
+//        Progress& prog           = bk_progress.emplace_task(0, 3, ___("saving centerlines"));
 //        #endif
 //
 //        //------------------------------------------------------------------------------------------------------
@@ -969,7 +970,7 @@
 //    bool Vessel::load_centerlines(const std::string& filepath)
 //    {
 //        #ifdef BK_EMIT_PROGRESS
-//        Progress& prog = bk_progress.emplace_task(0, 3, "Loading Centerlines");
+//        Progress& prog = bk_progress.emplace_task(0, 3, ___("loading centerlines"));
 //        #endif
 //
 //        //------------------------------------------------------------------------------------------------------
@@ -1066,7 +1067,7 @@
 //    bool Vessel::save_measuringplanes(const std::string& filepath) const
 //    {
 //        #ifdef BK_EMIT_PROGRESS
-//        Progress& prog           = bk_progress.emplace_task(0, 3, "Saving Measuring Planes");
+//        Progress& prog           = bk_progress.emplace_task(0, 3, ___("saving measuring planes"));
 //        #endif
 //
 //        //------------------------------------------------------------------------------------------------------
@@ -1198,7 +1199,7 @@
 //    bool Vessel::load_measuringplanes(const std::string& filepath)
 //    {
 //        #ifdef BK_EMIT_PROGRESS
-//        Progress& prog = bk_progress.emplace_task(0, 3, "Loading Measuring Planes");
+//        Progress& prog = bk_progress.emplace_task(0, 3, ___("loading measuring planes"));
 //        #endif
 //
 //        //------------------------------------------------------------------------------------------------------
@@ -1322,7 +1323,7 @@
 //    bool Vessel::save_flowjets(const std::string& filepath) const
 //    {
 //        #ifdef BK_EMIT_PROGRESS
-//        Progress& prog           = bk_progress.emplace_task(0, 3, "Saving Flow Jets");
+//        Progress& prog           = bk_progress.emplace_task(0, 3, ___("saving flow jets"));
 //        #endif
 //
 //        //------------------------------------------------------------------------------------------------------
@@ -1459,7 +1460,7 @@
 //    bool Vessel::load_flowjets(const std::string& filepath)
 //    {
 //        #ifdef BK_EMIT_PROGRESS
-//        Progress& prog = bk_progress.emplace_task(0, 3, "Loading Flow Jets");
+//        Progress& prog = bk_progress.emplace_task(0, 3, ___("loading flow jets"));
 //        #endif
 //
 //        //------------------------------------------------------------------------------------------------------

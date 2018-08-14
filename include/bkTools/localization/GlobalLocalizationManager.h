@@ -74,9 +74,6 @@ namespace bk
 #else
 namespace bk::details
 {
-  std::string bk_print(std::string_view text)
-  {      return text.data();  }
-
   template<typename... Args>
   std::string bk_print(std::string_view text, Args&& ... args)
   {

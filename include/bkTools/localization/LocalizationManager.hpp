@@ -85,15 +85,7 @@ namespace bk
   {
       constexpr unsigned int numArgs = sizeof...(Args);
 
-      #ifdef BK_DEBUG_MODE
-      const unsigned int numParameterPlaceholders = count_parameter_placeholders(textInLanguage);
-
-    if (numParameterPlaceholders != numArgs)
-    {
-        std::cerr << "invalid number of arguments for localization string (" << numParameterPlaceholders << " required, " << numArgs << " given, text \"" << textInLanguage << "\")" << std::endl;
-        assert(numParameterPlaceholders == numArgs);
-    }
-      #endif
+      assert(numArgs == count_parameter_placeholders(textInLanguage) && "invalid number of placeholders");
 
       if constexpr (numArgs == 0)
       { return textInLanguage; }
