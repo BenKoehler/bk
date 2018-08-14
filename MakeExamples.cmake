@@ -3,5 +3,5 @@ function(_bk_make_example name libname)
 
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${name}
             PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
-            DESTINATION ${CMAKE_INSTALL_BINDIR}/${libname})
+            DESTINATION ${CMAKE_INSTALL_BINDIR}/${libname}/examples)
 endfunction()

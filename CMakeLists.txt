@@ -135,8 +135,8 @@ if (BUILD_EXAMPLES)
     _bk_make_example(statistics_example ${BK_CURRENT_LIBRARY})
 
     # threshold
-    add_executable(threshold ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/threshold.cpp)
-    _bk_make_example(threshold ${BK_CURRENT_LIBRARY})
+    add_executable(threshold_example ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/threshold.cpp)
+    _bk_make_example(threshold_example ${BK_CURRENT_LIBRARY})
 endif()
 
 # ------------------------------------------------------------------------------------------------------------------------------------
@@ -455,7 +455,7 @@ if (BUILD_EXAMPLES)
                 ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/graphcut_input_image.png
                 ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/graphcut_input_inside.png
                 ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/graphcut_input_outside.png
-                DESTINATION ${CMAKE_INSTALL_BINDIR}/${BK_CURRENT_LIBRARY})
+                DESTINATION ${CMAKE_INSTALL_BINDIR}/${BK_CURRENT_LIBRARY}/examples)
     else ()
         message(WARNING "LIBPNG NOT FOUND! SKIPPING GRAPH CUT EXAMPLE!")
     endif ()
