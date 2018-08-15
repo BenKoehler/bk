@@ -64,7 +64,7 @@ namespace bk
       explicit FBO(qt_gl_functions* gl);
       #endif
       FBO(const self_type& other) = delete;
-      FBO(self_type&& other);
+      FBO(self_type&& other) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -148,7 +148,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type& = delete;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET/ADD TEXTURE

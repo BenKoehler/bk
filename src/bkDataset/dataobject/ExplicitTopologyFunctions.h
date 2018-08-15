@@ -51,7 +51,7 @@ namespace bk::details
       /// @{ -------------------------------------------------- CONSTRUCTORS
       constexpr TopologyFunctions() = default;
       constexpr TopologyFunctions(const self_type&) = default;
-      constexpr TopologyFunctions(self_type&&) = default;
+      constexpr TopologyFunctions(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DESTRUCTOR
@@ -151,7 +151,7 @@ namespace bk::details
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       constexpr self_type& operator=(const self_type&) = default;
-      constexpr self_type& operator=(self_type&&) = default;
+      constexpr self_type& operator=(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- ADD CELL ATTRIBUTE VECTOR

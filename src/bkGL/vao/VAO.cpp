@@ -57,7 +57,7 @@ namespace bk
         _pdata(std::make_unique<Impl>())
   { /* do nothing */ }
 
-  VAO::VAO(self_type&&) = default;
+  VAO::VAO(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -87,7 +87,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto VAO::operator=(self_type&& other) -> self_type& = default;
+  auto VAO::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- ADD ATTRIBUTES

@@ -35,7 +35,7 @@ namespace bk
   /// @{ -------------------------------------------------- CONSTRUCTORS
   Clock::Clock() = default;
   Clock::Clock(const self_type&) = default;
-  Clock::Clock(self_type&&) = default;
+  Clock::Clock(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DESTRUCTOR
@@ -88,7 +88,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto Clock::operator=(const self_type&) -> self_type& = default;
-  auto Clock::operator=(self_type&&) -> self_type& = default;
+  auto Clock::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

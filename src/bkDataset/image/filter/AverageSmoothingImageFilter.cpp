@@ -35,7 +35,7 @@ namespace bk
   { /* do nothing */ }
 
   AverageSmoothingImageFilter::AverageSmoothingImageFilter(const self_type& other) = default;
-  AverageSmoothingImageFilter::AverageSmoothingImageFilter(self_type&& other) = default;
+  AverageSmoothingImageFilter::AverageSmoothingImageFilter(self_type&& other) noexcept = default;
 
   AverageSmoothingImageFilter::AverageSmoothingImageFilter(unsigned int numIterations, unsigned int nDims, unsigned int size)
       : _num_iterations(numIterations),
@@ -65,7 +65,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto AverageSmoothingImageFilter::operator=(const self_type& other) -> self_type& = default;
-  auto AverageSmoothingImageFilter::operator=(self_type&& other) -> self_type& = default;
+  auto AverageSmoothingImageFilter::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET NUM ITERATIONS

@@ -49,7 +49,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       Cell() = default;
       Cell(const self_type&) = default;
-      Cell(self_type&&) = default;
+      Cell(self_type&&) noexcept = default;
 
       template<int _N>
       Cell(const Cell<_N>& other)
@@ -75,7 +75,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR=
       self_type& operator=(const self_type&) = default;
-      self_type& operator=(self_type&&) = default;
+      self_type& operator=(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- SET SIZE

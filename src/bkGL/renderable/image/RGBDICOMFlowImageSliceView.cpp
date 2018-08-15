@@ -96,7 +96,7 @@ namespace bk
   {
   }
 
-  RGBDICOMFlowImageSliceView::RGBDICOMFlowImageSliceView(self_type&&) = default;
+  RGBDICOMFlowImageSliceView::RGBDICOMFlowImageSliceView(self_type&&) noexcept = default;
 
   RGBDICOMFlowImageSliceView::~RGBDICOMFlowImageSliceView()
   { /* do nothing */ }
@@ -164,7 +164,7 @@ namespace bk
       _pdata->col_image_b = col_image_b;
   }
 
-  auto RGBDICOMFlowImageSliceView::operator=(self_type&& other) -> self_type& = default;
+  auto RGBDICOMFlowImageSliceView::operator=(self_type&& other) noexcept -> self_type& = default;
 
   //====================================================================================================
   //===== FUNCTIONS

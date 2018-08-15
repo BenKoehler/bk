@@ -61,7 +61,7 @@ namespace bk::details
       /// @{ -------------------------------------------------- CTOR
       constexpr BitRef() = delete;
       constexpr BitRef(const self_type&) = default;
-      constexpr BitRef(self_type&&) = default;
+      constexpr BitRef(self_type&&) noexcept = default;
 
       explicit constexpr BitRef(value_type& bit, std::decay_t<value_type> pos)
           : _b(bit),
@@ -122,7 +122,7 @@ namespace bk::details
           return *this;
       }
 
-      [[maybe_unused]] constexpr self_type& operator=(self_type&& other)
+      [[maybe_unused]] constexpr self_type& operator=(self_type&& other) noexcept
       {
           _set(std::move(other));
           return *this;

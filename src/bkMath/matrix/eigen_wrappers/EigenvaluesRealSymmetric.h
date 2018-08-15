@@ -50,7 +50,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       EigenvaluesRealSymmetric() = delete;
       EigenvaluesRealSymmetric(const self_type&) = default;
-      EigenvaluesRealSymmetric(self_type&&) = default;
+      EigenvaluesRealSymmetric(self_type&&) noexcept = default;
 
       EigenvaluesRealSymmetric(const matrix_type& A)
           : base_type(A, false)
@@ -73,7 +73,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
   }; // class EigenvaluesRealSymmetric
 } //namespace bk

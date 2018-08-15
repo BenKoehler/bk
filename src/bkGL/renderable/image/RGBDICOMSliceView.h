@@ -56,113 +56,96 @@ namespace bk
 
   class BKGL_EXPORT RGBDICOMSliceView
 
-  : public details::AbstractRGBSliceView
-{
-  //====================================================================================================
-  //===== DEFINITIONS
-  //====================================================================================================
-  using self_type = RGBDICOMSliceView;
-  using base_type = details::AbstractRGBSliceView;
-  public:
-  using rgb_type = typename base_type::rgb_type;
-  using image_type = RegularImage<rgb_type, 2>;
+      : public details::AbstractRGBSliceView
+  {
+      //====================================================================================================
+      //===== DEFINITIONS
+      //====================================================================================================
+      using self_type = RGBDICOMSliceView;
+      using base_type = details::AbstractRGBSliceView;
+    public:
+      using rgb_type = typename base_type::rgb_type;
+      using image_type = RegularImage<rgb_type, 2>;
 
-  //====================================================================================================
-  //===== MEMBERS
-  //====================================================================================================
-  protected:
+      //====================================================================================================
+      //===== MEMBERS
+      //====================================================================================================
+    protected:
 
-  class Impl;
+      class Impl;
 
-  std::unique_ptr<Impl> _pdata;
+      std::unique_ptr<Impl> _pdata;
 
-  //====================================================================================================
-  //===== CONSTRUCTORS & DESTRUCTOR
-  //====================================================================================================
-  public:
-  /// @{ -------------------------------------------------- CONSTRUCTORS
-  #ifndef BK_LIB_QT_AVAILABLE
+      //====================================================================================================
+      //===== CONSTRUCTORS & DESTRUCTOR
+      //====================================================================================================
+    public:
+      /// @{ -------------------------------------------------- CONSTRUCTORS
+      #ifndef BK_LIB_QT_AVAILABLE
 
-  RGBDICOMSliceView();
-  #else
-  RGBDICOMSliceView(bk::qt_gl_functions* gl);
-  #endif
-  RGBDICOMSliceView(const self_type& other) = delete;
+      RGBDICOMSliceView();
+      #else
+      RGBDICOMSliceView(bk::qt_gl_functions* gl);
+      #endif
+      RGBDICOMSliceView(const self_type& other) = delete;
 
-  RGBDICOMSliceView(self_type
+      RGBDICOMSliceView(self_type&& other) noexcept;
+      /// @}
 
-  && other);
-  /// @}
+      /// @{ -------------------------------------------------- DESTRUCTOR
+      virtual ~RGBDICOMSliceView();
+      /// @}
 
-  /// @{ -------------------------------------------------- DESTRUCTOR
-  virtual ~RGBDICOMSliceView();
-  /// @}
+      //====================================================================================================
+      //===== GETTER
+      //====================================================================================================
+      /// @{ -------------------------------------------------- GET DICOMDIR IMPORTER
+      const DicomDirImporter* dicom_dir_importer() const;
+      /// @}
 
-  //====================================================================================================
-  //===== GETTER
-  //====================================================================================================
-  /// @{ -------------------------------------------------- GET DICOMDIR IMPORTER
-  const DicomDirImporter* dicom_dir_importer() const;
-  /// @}
+      /// @{ -------------------------------------------------- GET IMAGE SIZE
+      GLuint image_size(GLuint id) const final;
+      /// @}
 
-  /// @{ -------------------------------------------------- GET IMAGE SIZE
-  GLuint image_size(GLuint id) const
+      /// @{ -------------------------------------------------- GET IMAGE SCALE
+      GLfloat image_scale(GLuint id) const final;
+      /// @}
 
-                        final;
-  /// @}
+      //====================================================================================================
+      //===== SETTER
+      //====================================================================================================
+      /// @{ -------------------------------------------------- SET DICOMDIR IMPORTER
+      void set_dicom_dir_importer(DicomDirImporter* d);
+      /// @}
 
-  /// @{ -------------------------------------------------- GET IMAGE SCALE
-  GLfloat image_scale(GLuint id) const
+      /// @{ -------------------------------------------------- SET IMAGE
+      bool set_images(unsigned int dcm_image_r_id, unsigned int dcm_image_g_id, unsigned int dcm_image_b_id);
+      /// @}
 
-                        final;
-  /// @}
+      /// @{ -------------------------------------------------- OPERATOR =
+      self_type& operator=(const self_type& other) = delete;
+      auto operator=(self_type&& other) noexcept -> self_type&;
+      /// @}
 
-  //====================================================================================================
-  //===== SETTER
-  //====================================================================================================
-  /// @{ -------------------------------------------------- SET DICOMDIR IMPORTER
-  void set_dicom_dir_importer(DicomDirImporter* d);
-  /// @}
+      //====================================================================================================
+      //===== FUNCTIONS
+      //====================================================================================================
+      /// @{ -------------------------------------------------- CLEAR
+      void clear_image() final;
+      /// @}
 
-  /// @{ -------------------------------------------------- SET IMAGE
-  bool set_images(unsigned int dcm_image_r_id, unsigned int dcm_image_g_id, unsigned int dcm_image_b_id);
-  /// @}
+      /// @{ -------------------------------------------------- UPDATE SSBO INTENSITY
+    protected:
+      void update_ssbo_intensity_and_determine_intensity_min_max_impl(GLuint z, GLuint t) final;
+    public:
+      /// @}
 
-  /// @{ -------------------------------------------------- OPERATOR =
-  self_type& operator=(const self_type& other) = delete;
-
-  auto operator=(self_type && other)
-
-  -> self_type&;
-  /// @}
-
-  //====================================================================================================
-  //===== FUNCTIONS
-  //====================================================================================================
-  /// @{ -------------------------------------------------- CLEAR
-  void clear_image()
-
-                        final;
-  /// @}
-
-  /// @{ -------------------------------------------------- UPDATE SSBO INTENSITY
-  protected:
-  void update_ssbo_intensity_and_determine_intensity_min_max_impl(GLuint z, GLuint t)
-
-                        final;
-
-  public:
-  /// @}
-
-  /// @{ -------------------------------------------------- CURRENT INTENSITY
-  protected:
-  auto rgb_at_xyzt_current() const -> rgb_type
-
-                        final;
-
-  public:
-  /// @}
-}; // class RGBDICOMSliceView
+      /// @{ -------------------------------------------------- CURRENT INTENSITY
+    protected:
+      auto rgb_at_xyzt_current() const -> rgb_type final;
+    public:
+      /// @}
+  }; // class RGBDICOMSliceView
 
 } // namespace bk
 

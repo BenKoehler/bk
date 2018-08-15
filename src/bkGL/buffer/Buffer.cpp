@@ -80,7 +80,7 @@ namespace bk
         _pdata(std::make_unique<Impl>())
   { /* do nothing */ }
 
-  Buffer::Buffer(self_type&&) = default;
+  Buffer::Buffer(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -129,7 +129,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto Buffer::operator=(self_type&&) -> self_type& = default;
+  auto Buffer::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET VBO/IBO/UBO/SSBO

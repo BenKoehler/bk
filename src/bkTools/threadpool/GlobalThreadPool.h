@@ -53,7 +53,7 @@ namespace bk
       ~GlobalThreadPool() = delete;
 
       self_type& operator=(const self_type&) = delete;
-      self_type& operator=(self_type&&) = delete;
+      self_type& operator=(self_type&&) noexcept = delete;
   }; // class GlobalThreadPool
 
 } // namespace bk

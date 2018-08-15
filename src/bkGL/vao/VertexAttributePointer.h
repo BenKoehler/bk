@@ -56,7 +56,7 @@ namespace bk
       VertexAttributePointer();
       VertexAttributePointer(GLuint id, GLenum value_type, bool normalized, std::string name);
       VertexAttributePointer(const self_type& other);
-      VertexAttributePointer(self_type&&);
+      VertexAttributePointer(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -95,7 +95,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&&) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET VALUE TYPE

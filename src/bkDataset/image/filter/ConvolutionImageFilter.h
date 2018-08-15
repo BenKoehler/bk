@@ -63,7 +63,7 @@ namespace bk
       { /* do nothing */ }
 
       constexpr ConvolutionImageFilter(const self_type&) = default;
-      constexpr ConvolutionImageFilter(self_type&&) = default;
+      constexpr ConvolutionImageFilter(self_type&&) noexcept = default;
 
       constexpr ConvolutionImageFilter(unsigned int numIterations, bool kernelIsIsotropicAndSeparable = false)
           : _num_iterations(numIterations),
@@ -93,7 +93,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] constexpr auto operator=(const self_type& other) -> self_type& = default;
-      [[maybe_unused]] constexpr auto operator=(self_type&& other) -> self_type& = default;
+      [[maybe_unused]] constexpr auto operator=(self_type&& other) noexcept -> self_type& = default;
       /// @}
 
       /// @{ -------------------------------------------------- SET NUM ITERATIONS

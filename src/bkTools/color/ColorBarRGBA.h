@@ -53,7 +53,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       ColorBarRGBA();
       ColorBarRGBA(const self_type&);
-      ColorBarRGBA(self_type&&);
+      ColorBarRGBA(self_type&&) noexcept;
 
       template<typename... Colors_>
       ColorBarRGBA(Colors_&& ... colors)
@@ -70,7 +70,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type&) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&&) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
   }; // class ColorBarRGBA
 } // namespace bk

@@ -80,7 +80,7 @@ namespace bk
       _pdata->ibo.set_usage_STATIC_DRAW();
   }
 
-  WindowingTransferFunctionView::WindowingTransferFunctionView(self_type&&) = default;
+  WindowingTransferFunctionView::WindowingTransferFunctionView(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -104,7 +104,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto WindowingTransferFunctionView::operator=(self_type&& other) -> self_type& = default;
+  auto WindowingTransferFunctionView::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET TRANSFER FUNCTION

@@ -35,7 +35,7 @@ namespace bk
   { /* do nothing */ }
 
   MedianImageFilter::MedianImageFilter(const self_type& other) = default;
-  MedianImageFilter::MedianImageFilter(self_type&& other) = default;
+  MedianImageFilter::MedianImageFilter(self_type&& other) noexcept = default;
 
   MedianImageFilter::MedianImageFilter(unsigned int nDims, unsigned int size)
       : _kernel_size(nDims, size)
@@ -59,7 +59,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto MedianImageFilter::operator=(const self_type& other) -> self_type& = default;
-  auto MedianImageFilter::operator=(self_type&& other) -> self_type& = default;
+  auto MedianImageFilter::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET KERNEL SIZE

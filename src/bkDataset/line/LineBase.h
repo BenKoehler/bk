@@ -50,7 +50,7 @@ namespace bk::details
       /// @{ -------------------------------------------------- CTOR
       LineBase() = default;
       LineBase(const self_type&) = default;
-      LineBase(self_type&&) = default;
+      LineBase(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -62,7 +62,7 @@ namespace bk::details
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       auto operator=(const self_type& other) -> self_type& = default;
-      auto operator=(self_type&& other) -> self_type& = default;
+      auto operator=(self_type&& other) noexcept -> self_type& = default;
       /// @}
 
       //====================================================================================================

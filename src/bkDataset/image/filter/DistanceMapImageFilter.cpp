@@ -36,7 +36,7 @@ namespace bk
   { /* do nothing */ }
 
   DistanceMapImageFilter::DistanceMapImageFilter(const self_type&) = default;
-  DistanceMapImageFilter::DistanceMapImageFilter(self_type&&) = default;
+  DistanceMapImageFilter::DistanceMapImageFilter(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -59,7 +59,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   [[maybe_unused]] auto DistanceMapImageFilter::operator=(const self_type& other) -> self_type& = default;
-  [[maybe_unused]] auto DistanceMapImageFilter::operator=(self_type&& other) -> self_type& = default;
+  [[maybe_unused]] auto DistanceMapImageFilter::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET VALUE

@@ -59,7 +59,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       MorphologicalErosionImageFilter();
       MorphologicalErosionImageFilter(const self_type& other);
-      MorphologicalErosionImageFilter(self_type&& other);
+      MorphologicalErosionImageFilter(self_type&& other) noexcept;
       MorphologicalErosionImageFilter(unsigned int nDims, unsigned int size);
       /// @}
 
@@ -79,7 +79,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET KERNEL SIZE

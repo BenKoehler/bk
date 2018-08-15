@@ -76,7 +76,7 @@ namespace bk
         _pdata(new Impl(*other._pdata.get()))
   { /* do nothing */ }
 
-  DicomDirImporter_CMR::DicomDirImporter_CMR(self_type&&) = default;
+  DicomDirImporter_CMR::DicomDirImporter_CMR(self_type&&) noexcept = default;
 
   DicomDirImporter_CMR::DicomDirImporter_CMR(const std::string& dir)
       : base_type(dir),
@@ -322,7 +322,7 @@ namespace bk
       return *this;
   }
 
-  auto DicomDirImporter_CMR::operator=(self_type&&) -> self_type& = default;
+  auto DicomDirImporter_CMR::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
 

@@ -70,7 +70,7 @@ namespace bk
       { std::fill(_size.begin(), _size.end(), 0); }
 
       GridSize(const self_type&) = default;
-      GridSize(self_type&&) = default;
+      GridSize(self_type&&) noexcept = default;
 
       template<typename... TIds, std::enable_if_t<std::conjunction_v<std::is_integral<TIds>...>>* = nullptr>
       GridSize(TIds... sizes_per_dimension)
@@ -120,7 +120,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- SET SIZE

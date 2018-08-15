@@ -89,7 +89,7 @@ namespace bk::details
         _pdata(new Impl(w, h))
   { set_default_config_gray_tex(); }
 
-  AbstractTexture::AbstractTexture(self_type&&) = default;
+  AbstractTexture::AbstractTexture(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -145,7 +145,7 @@ namespace bk::details
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto AbstractTexture::operator=(self_type&& other) -> self_type& = default;
+  auto AbstractTexture::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET TARGET

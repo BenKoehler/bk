@@ -65,7 +65,7 @@ namespace bk::details
       BK_UBO_SPECIALIZATION_REGISTER(scale_attrib_to_colorbar, GL_INT)
   }
 
-  UBOLine::UBOLine(self_type&&) = default;
+  UBOLine::UBOLine(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -76,7 +76,7 @@ namespace bk::details
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto UBOLine::operator=(self_type&&) -> self_type& = default;
+  auto UBOLine::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

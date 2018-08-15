@@ -64,9 +64,7 @@ namespace bk
           : _samples(other._samples.begin(), other._samples.end())
       { /*do nothing*/ }
 
-      SampleVectorTimeDependent(self_type&& other)
-          : _samples(std::move(other._samples))
-      { /*do nothing*/ }
+      SampleVectorTimeDependent(self_type&&) noexcept = default;
 
       ~SampleVectorTimeDependent() = default;
 
@@ -98,7 +96,7 @@ namespace bk
           return *this;
       }
 
-      self_type& operator=(self_type&& other)
+      self_type& operator=(self_type&& other) noexcept
       {
           _samples = std::move(other._samples);
           return *this;

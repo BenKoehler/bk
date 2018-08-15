@@ -60,7 +60,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       DicomDirImporter_CMR();
       DicomDirImporter_CMR(const self_type& other);
-      DicomDirImporter_CMR(self_type&&);
+      DicomDirImporter_CMR(self_type&&) noexcept;
       DicomDirImporter_CMR(const std::string& dir);
       /// @}
 
@@ -150,7 +150,7 @@ namespace bk
 
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&&) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
       //====================================================================================================

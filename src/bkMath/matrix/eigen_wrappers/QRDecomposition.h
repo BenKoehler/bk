@@ -70,7 +70,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       QRDecomposition() = delete;
       QRDecomposition(const self_type&) = default;
-      QRDecomposition(self_type&&) = default;
+      QRDecomposition(self_type&&) noexcept = default;
 
       QRDecomposition(const matrix_type& A)
           : _qr(A.num_rows(), A.num_cols())
@@ -135,7 +135,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
 
       //====================================================================================================

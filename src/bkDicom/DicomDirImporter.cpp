@@ -87,7 +87,7 @@ namespace bk
       : _pdata(new Impl(*other._pdata.get()))
   { /* do nothing */ }
 
-  DicomDirImporter::DicomDirImporter(self_type&&) = default;
+  DicomDirImporter::DicomDirImporter(self_type&&) noexcept = default;
 
   DicomDirImporter::DicomDirImporter(const std::string& dir)
       : _pdata(std::make_unique<Impl>())
@@ -266,7 +266,7 @@ namespace bk
       return *this;
   }
 
-  auto DicomDirImporter::operator=(self_type&&) -> self_type& = default;
+  auto DicomDirImporter::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

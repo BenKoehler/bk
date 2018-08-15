@@ -62,7 +62,7 @@ namespace bk::details
       explicit AbstractTexture(GLuint w, GLuint h, bk::qt_gl_functions* gl);
       #endif
       AbstractTexture(const self_type&) = delete;
-      AbstractTexture(self_type&&);
+      AbstractTexture(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -107,7 +107,7 @@ namespace bk::details
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type& = delete;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET TARGET

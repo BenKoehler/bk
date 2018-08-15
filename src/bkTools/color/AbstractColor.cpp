@@ -40,7 +40,7 @@ namespace bk::details
 
   AbstractColor::AbstractColor(const self_type&) = default;
 
-  AbstractColor::AbstractColor(self_type&&) = default;
+  AbstractColor::AbstractColor(self_type&&) noexcept = default;
 
   AbstractColor::AbstractColor(value_type r, value_type g, value_type b, value_type a)
       : _values{r,g,b,a}
@@ -112,7 +112,7 @@ namespace bk::details
       return *this;
   }
 
-  auto AbstractColor::operator=(self_type&& other) -> self_type& = default;
+  auto AbstractColor::operator=(self_type&& other) noexcept -> self_type& = default;
 
   auto AbstractColor::operator=(std::initializer_list<double> values) -> self_type&
   {

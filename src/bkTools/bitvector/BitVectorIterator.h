@@ -66,7 +66,7 @@ namespace bk
         /// @{ -------------------------------------------------- CONSTRUCTORS
         BitVectorIterator() = delete;
         BitVectorIterator(const self_type&) = default;
-        BitVectorIterator(self_type&&) = default;
+        BitVectorIterator(self_type&&) noexcept = default;
 
         BitVectorIterator(bitvector_type& bv, size_type i)
             : _bv(bv),
@@ -91,7 +91,7 @@ namespace bk
             return *this;
         }
 
-        [[maybe_unused]] self_type& operator=(self_type&& other)
+        [[maybe_unused]] self_type& operator=(self_type&& other) noexcept
         {
             _i = std::move(other._i);
             return *this;

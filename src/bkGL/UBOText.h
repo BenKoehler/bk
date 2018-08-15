@@ -53,7 +53,7 @@ namespace bk::details
       UBOText(qt_gl_functions* gl);
       #endif
       UBOText(const self_type&) = delete;
-      UBOText(self_type&&);
+      UBOText(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -65,7 +65,7 @@ namespace bk::details
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type&) -> self_type& = delete;
-      [[maybe_unused]] auto operator=(self_type&&) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
     private:

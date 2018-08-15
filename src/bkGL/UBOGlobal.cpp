@@ -58,7 +58,7 @@ namespace bk::details
       BK_UBO_SPECIALIZATION_REGISTER(animation_max_time, GL_FLOAT)
   }
 
-  UBOGlobal::UBOGlobal(self_type&&) = default;
+  UBOGlobal::UBOGlobal(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -69,7 +69,7 @@ namespace bk::details
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto UBOGlobal::operator=(self_type&&) -> self_type& = default;
+  auto UBOGlobal::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

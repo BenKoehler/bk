@@ -70,7 +70,7 @@ namespace bk::gc_details
       /// @{ -------------------------------------------------- CTOR
       GraphCutBase_Run() = delete;
       GraphCutBase_Run(const self_type&) = default;
-      GraphCutBase_Run(self_type&&) = default;
+      GraphCutBase_Run(self_type&&) noexcept = default;
 
       GraphCutBase_Run(int current_timestamp)
           : _current_timestamp(current_timestamp)
@@ -315,7 +315,7 @@ namespace bk::gc_details
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- SET PARENT

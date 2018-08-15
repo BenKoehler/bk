@@ -69,7 +69,7 @@ namespace bk
       GrayImageLiveThresholdSliceView(bk::qt_gl_functions* gl);
       #endif
       GrayImageLiveThresholdSliceView(const self_type& other) = delete;
-      GrayImageLiveThresholdSliceView(self_type&& other);
+      GrayImageLiveThresholdSliceView(self_type&& other) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DESTRUCTOR
@@ -99,7 +99,7 @@ namespace bk
 
       /// @{ -------------------------------------------------- OPERATOR =
       self_type& operator=(const self_type& other) = delete;
-      auto operator=(self_type&& other) -> self_type&;
+      auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       //====================================================================================================

@@ -35,7 +35,7 @@ namespace bk
   { /* do nothing */ }
 
   MorphologicalDilationImageFilter::MorphologicalDilationImageFilter(const self_type& other) = default;
-  MorphologicalDilationImageFilter::MorphologicalDilationImageFilter(self_type&& other) = default;
+  MorphologicalDilationImageFilter::MorphologicalDilationImageFilter(self_type&& other) noexcept = default;
 
   MorphologicalDilationImageFilter::MorphologicalDilationImageFilter(unsigned int nDims, unsigned int size)
       : _kernel_size(nDims, size)
@@ -59,7 +59,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto MorphologicalDilationImageFilter::operator=(const self_type& other) -> self_type& = default;
-  auto MorphologicalDilationImageFilter::operator=(self_type&& other) -> self_type& = default;
+  auto MorphologicalDilationImageFilter::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET KERNEL SIZE

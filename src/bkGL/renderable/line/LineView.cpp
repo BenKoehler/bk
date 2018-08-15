@@ -187,7 +187,7 @@ namespace bk
       _pdata->colorbarview.set_value_precision(1);
   }
 
-  LineView::LineView(self_type&&) = default;
+  LineView::LineView(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -267,7 +267,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto LineView::operator=(self_type&&) -> self_type& = default;
+  auto LineView::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET LINE WIDTH

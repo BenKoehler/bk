@@ -57,7 +57,7 @@ namespace bk
       explicit Texture3D(GLuint w, GLuint h, GLuint d, qt_gl_functions* gl);
       #endif
       Texture3D(const self_type& other) = delete;
-      Texture3D(self_type&&);
+      Texture3D(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -76,7 +76,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type& = delete;
-      [[maybe_unused]] auto operator=(self_type&&) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET DEPTH

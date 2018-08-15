@@ -72,7 +72,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       constexpr Matrix() = default;
       constexpr Matrix(const self_type&) = default;
-      constexpr Matrix(self_type&&) = default;
+      constexpr Matrix(self_type&&) noexcept = default;
 
       template<typename... Args>
       constexpr Matrix(Args&& ... args)
@@ -139,7 +139,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] constexpr self_type& operator=(const self_type&) = default;
-      constexpr self_type& operator=(self_type&&) = default;
+      constexpr self_type& operator=(self_type&&) noexcept = default;
 
       template<typename T_>
       [[maybe_unused]] constexpr self_type& operator=(T_&& rhs)

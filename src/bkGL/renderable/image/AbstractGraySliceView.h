@@ -81,7 +81,7 @@ namespace bk
         AbstractGraySliceView(bk::qt_gl_functions* gl);
         #endif
         AbstractGraySliceView(const self_type& other) = delete;
-        AbstractGraySliceView(self_type&& other);
+        AbstractGraySliceView(self_type&& other) noexcept;
         /// @}
 
         /// @{ -------------------------------------------------- DESTRUCTOR
@@ -117,7 +117,7 @@ namespace bk
         //====================================================================================================
         /// @{ -------------------------------------------------- OPERATOR =
         self_type& operator=(const self_type&) = delete;
-        auto operator=(self_type&&) -> self_type&;
+        auto operator=(self_type&&) noexcept -> self_type&;
         /// @}
 
         //====================================================================================================

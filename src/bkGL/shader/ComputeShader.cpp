@@ -53,7 +53,7 @@ namespace bk
 
   #endif
 
-  ComputeShader::ComputeShader(self_type&&) = default;
+  ComputeShader::ComputeShader(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -126,7 +126,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  [[maybe_unused]] auto ComputeShader::operator=(self_type&&) -> self_type& = default;
+  [[maybe_unused]] auto ComputeShader::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- HELPERS: COMPILE SHADER (FROM SOURCE)

@@ -39,7 +39,7 @@ namespace bk
   #endif
   { set_default_config_vertex_buffer_object(); }
 
-  VBO::VBO(self_type&&) = default;
+  VBO::VBO(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -50,7 +50,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto VBO::operator=(self_type&&) -> self_type& = default;
+  auto VBO::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 } // namespace bk
 

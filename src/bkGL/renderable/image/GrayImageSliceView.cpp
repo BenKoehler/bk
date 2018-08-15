@@ -41,7 +41,7 @@ namespace bk
   {
   }
 
-  GrayImageSliceView::GrayImageSliceView(self_type&&) = default;
+  GrayImageSliceView::GrayImageSliceView(self_type&&) noexcept = default;
 
   GrayImageSliceView::~GrayImageSliceView()
   { /* do nothing */ }
@@ -58,7 +58,7 @@ namespace bk
   //====================================================================================================
   //===== SETTER
   //====================================================================================================
-  auto GrayImageSliceView::operator=(self_type&&) -> self_type& = default;
+  auto GrayImageSliceView::operator=(self_type&&) noexcept -> self_type& = default;
 
   //====================================================================================================
   //===== FUNCTIONS

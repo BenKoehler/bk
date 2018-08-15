@@ -66,7 +66,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       ScalarLineFilter();
       ScalarLineFilter(const self_type&);
-      ScalarLineFilter(self_type&&);
+      ScalarLineFilter(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -113,7 +113,7 @@ namespace bk
 
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type&) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&&) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
       //====================================================================================================

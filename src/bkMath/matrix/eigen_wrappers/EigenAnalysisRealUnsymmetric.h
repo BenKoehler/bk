@@ -74,7 +74,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       EigenAnalysisRealUnsymmetric() = delete;
       EigenAnalysisRealUnsymmetric(const self_type&) = default;
-      EigenAnalysisRealUnsymmetric(self_type&&) = default;
+      EigenAnalysisRealUnsymmetric(self_type&&) noexcept = default;
 
       EigenAnalysisRealUnsymmetric(const matrix_type& A, bool computeEigenvectors = true)
           : _solver(A.num_rows()),
@@ -172,7 +172,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
   }; // class EigenAnalysisRealUnsymmetric
 } //namespace bk

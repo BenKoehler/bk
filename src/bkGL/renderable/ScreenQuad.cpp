@@ -68,7 +68,7 @@ namespace bk
       _pdata->vao.add_default_attribute_texture_coordinates_2xfloat();
   }
 
-  ScreenQuad::ScreenQuad(self_type&&) = default;
+  ScreenQuad::ScreenQuad(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -95,7 +95,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto ScreenQuad::operator=(self_type&&) -> self_type& = default;
+  auto ScreenQuad::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

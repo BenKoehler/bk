@@ -56,7 +56,7 @@ namespace bk::gc_details
       /// @{ -------------------------------------------------- CTOR
       constexpr GraphCutBase_MemberAccess() = default;
       constexpr GraphCutBase_MemberAccess(const self_type&) = default;
-      constexpr GraphCutBase_MemberAccess(self_type&&) = default;
+      constexpr GraphCutBase_MemberAccess(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -141,7 +141,7 @@ namespace bk::gc_details
     public:
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] constexpr self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] constexpr self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] constexpr self_type& operator=(self_type&&) noexcept = default;
       /// @}
   }; // class GraphCutBase_MemberAccess
 } // namespace bk

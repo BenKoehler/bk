@@ -35,7 +35,7 @@ namespace bk
   { /* do nothing */ }
 
   UnsharpMaskingImageFilter::UnsharpMaskingImageFilter(const self_type& other) = default;
-  UnsharpMaskingImageFilter::UnsharpMaskingImageFilter(self_type&& other) = default;
+  UnsharpMaskingImageFilter::UnsharpMaskingImageFilter(self_type&& other) noexcept = default;
 
   UnsharpMaskingImageFilter::UnsharpMaskingImageFilter(unsigned int numIterations, unsigned int nDims, unsigned int size)
       : _num_iterations(numIterations),
@@ -65,7 +65,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto UnsharpMaskingImageFilter::operator=(const self_type& other) -> self_type& = default;
-  auto UnsharpMaskingImageFilter::operator=(self_type&& other) -> self_type& = default;
+  auto UnsharpMaskingImageFilter::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET NUM ITERATIONS

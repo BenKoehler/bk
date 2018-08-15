@@ -56,7 +56,7 @@ namespace bk::details
       BK_UBO_SPECIALIZATION_REGISTER(max_attribute_value, GL_FLOAT)
   }
 
-  UBOPhong::UBOPhong(self_type&&) = default;
+  UBOPhong::UBOPhong(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -67,7 +67,7 @@ namespace bk::details
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto UBOPhong::operator=(self_type&&) -> self_type& = default;
+  auto UBOPhong::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

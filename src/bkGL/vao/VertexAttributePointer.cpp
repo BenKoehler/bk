@@ -71,7 +71,7 @@ namespace bk
       : _pdata(new Impl(*other._pdata.get()))
   { /* do nothing */ }
 
-  VertexAttributePointer::VertexAttributePointer(self_type&&) = default;
+  VertexAttributePointer::VertexAttributePointer(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -122,7 +122,7 @@ namespace bk
       return *this;
   }
 
-  auto VertexAttributePointer::operator=(self_type&&) -> self_type& = default;
+  auto VertexAttributePointer::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET VALUE TYPE

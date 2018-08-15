@@ -48,7 +48,7 @@ namespace bk::details
       BK_UBO_SPECIALIZATION_REGISTER(color_b, GL_FLOAT)
   }
 
-  UBOSelectionSphere::UBOSelectionSphere(self_type&&) = default;
+  UBOSelectionSphere::UBOSelectionSphere(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -59,7 +59,7 @@ namespace bk::details
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto UBOSelectionSphere::operator=(self_type&&) -> self_type& = default;
+  auto UBOSelectionSphere::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

@@ -75,7 +75,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       Interactor();
       Interactor(const self_type&) = delete;
-      Interactor(self_type&&);
+      Interactor(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -136,7 +136,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type&) -> self_type& = delete;
-      [[maybe_unused]] auto operator=(self_type&&) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET WINDOW SIZE

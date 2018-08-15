@@ -53,7 +53,7 @@ namespace bk::details
       UBODVR(qt_gl_functions* gl);
       #endif
       UBODVR(const self_type&) = delete;
-      UBODVR(self_type&&);
+      UBODVR(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -65,7 +65,7 @@ namespace bk::details
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type&) -> self_type& = delete;
-      [[maybe_unused]] auto operator=(self_type&&) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
     private:

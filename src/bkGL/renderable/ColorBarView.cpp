@@ -124,7 +124,7 @@ namespace bk
       set_num_ticks(_pdata->num_ticks); // create textviews for ticks
   }
 
-  ColorBarView::ColorBarView(self_type&&) = default;
+  ColorBarView::ColorBarView(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -204,7 +204,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto ColorBarView::operator=(self_type&& other) -> self_type& = default;
+  auto ColorBarView::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET POSITION

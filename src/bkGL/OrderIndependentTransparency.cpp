@@ -105,7 +105,7 @@ namespace bk
   #endif
   { /* do nothing */ }
 
-  OrderIndependentTransparency::OrderIndependentTransparency(self_type&&) = default;
+  OrderIndependentTransparency::OrderIndependentTransparency(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -218,7 +218,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto OrderIndependentTransparency::operator=(self_type&&) -> self_type& = default;
+  auto OrderIndependentTransparency::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET ENABLED

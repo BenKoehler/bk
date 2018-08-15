@@ -78,7 +78,7 @@ namespace bk::details
         AbstractRGBSliceView(bk::qt_gl_functions* gl);
         #endif
         AbstractRGBSliceView(const self_type& other) = delete;
-        AbstractRGBSliceView(self_type&& other);
+        AbstractRGBSliceView(self_type&& other) noexcept;
         /// @}
 
         /// @{ -------------------------------------------------- DESTRUCTOR
@@ -111,7 +111,7 @@ namespace bk::details
         //====================================================================================================
         /// @{ -------------------------------------------------- OPERATOR =
         self_type& operator=(const self_type& other) = delete;
-        auto operator=(self_type&& other) -> self_type&;
+        auto operator=(self_type&& other) noexcept -> self_type&;
         /// @}
 
         //====================================================================================================

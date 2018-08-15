@@ -59,7 +59,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       constexpr random() = default;
       constexpr random(const self_type&) = default;
-      constexpr random(self_type&&) = default;
+      constexpr random(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -71,7 +71,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] constexpr auto operator=(const self_type&) -> self_type& = default;
-      [[maybe_unused]] constexpr auto operator=(self_type&&) -> self_type& = default;
+      [[maybe_unused]] constexpr auto operator=(self_type&&) noexcept -> self_type& = default;
       /// @}
 
       //====================================================================================================

@@ -39,7 +39,7 @@ namespace bk
   #endif
   { set_default_config_index_buffer_object(); }
 
-  IBO::IBO(self_type&&) = default;
+  IBO::IBO(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -50,7 +50,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto IBO::operator=(self_type&&) -> self_type& = default;
+  auto IBO::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 } // namespace bk
 

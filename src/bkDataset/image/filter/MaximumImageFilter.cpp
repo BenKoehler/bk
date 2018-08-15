@@ -35,7 +35,7 @@ namespace bk
   { /* do nothing */ }
 
   MaximumImageFilter::MaximumImageFilter(const self_type& other) = default;
-  MaximumImageFilter::MaximumImageFilter(self_type&& other) = default;
+  MaximumImageFilter::MaximumImageFilter(self_type&& other) noexcept = default;
 
   MaximumImageFilter::MaximumImageFilter(unsigned int nDims, unsigned int size)
       : _kernel_size(nDims, size)
@@ -59,7 +59,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto MaximumImageFilter::operator=(const self_type& other) -> self_type& = default;
-  auto MaximumImageFilter::operator=(self_type&& other) -> self_type& = default;
+  auto MaximumImageFilter::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET KERNEL SIZE

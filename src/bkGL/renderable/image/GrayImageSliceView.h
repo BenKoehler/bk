@@ -75,7 +75,7 @@ namespace bk
       GrayImageSliceView(bk::qt_gl_functions* gl);
       #endif
       GrayImageSliceView(const self_type&) = delete;
-      GrayImageSliceView(self_type&&);
+      GrayImageSliceView(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DESTRUCTOR
@@ -103,7 +103,7 @@ namespace bk
 
       /// @{ -------------------------------------------------- OPERATOR =
       self_type& operator=(const self_type&) = delete;
-      self_type& operator=(self_type&&);
+      self_type& operator=(self_type&&) noexcept;
       /// @}
 
       //====================================================================================================

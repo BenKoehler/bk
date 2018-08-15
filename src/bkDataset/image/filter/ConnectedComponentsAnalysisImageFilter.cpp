@@ -32,7 +32,7 @@ namespace bk
   /// @{ -------------------------------------------------- CTOR
   ConnectedComponentAnalysisImageFilter::ConnectedComponentAnalysisImageFilter() = default;
   ConnectedComponentAnalysisImageFilter::ConnectedComponentAnalysisImageFilter(const self_type&) = default;
-  ConnectedComponentAnalysisImageFilter::ConnectedComponentAnalysisImageFilter(self_type&&) = default;
+  ConnectedComponentAnalysisImageFilter::ConnectedComponentAnalysisImageFilter(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -67,6 +67,6 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto ConnectedComponentAnalysisImageFilter::operator=(const self_type&) -> self_type& = default;
-  auto ConnectedComponentAnalysisImageFilter::operator=(self_type&&) -> self_type& = default;
+  auto ConnectedComponentAnalysisImageFilter::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 } // namespace bk

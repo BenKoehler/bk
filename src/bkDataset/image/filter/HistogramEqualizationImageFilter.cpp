@@ -35,7 +35,7 @@ namespace bk
   { /* do nothing */ }
 
   HistogramEqualizationImageFilter::HistogramEqualizationImageFilter(const self_type&) = default;
-  HistogramEqualizationImageFilter::HistogramEqualizationImageFilter(self_type&&) = default;
+  HistogramEqualizationImageFilter::HistogramEqualizationImageFilter(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -55,7 +55,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   [[maybe_unused]] auto HistogramEqualizationImageFilter::operator=(const self_type& other) -> self_type& = default;
-  [[maybe_unused]] auto HistogramEqualizationImageFilter::operator=(self_type&& other) -> self_type& = default;
+  [[maybe_unused]] auto HistogramEqualizationImageFilter::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET NUM BUCKETS

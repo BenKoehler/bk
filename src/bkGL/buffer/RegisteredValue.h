@@ -59,7 +59,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       RegisteredValue();
       RegisteredValue(const self_type&);
-      RegisteredValue(self_type&&);
+      RegisteredValue(self_type&&) noexcept;
       RegisteredValue(std::string_view name, GLenum type, unsigned int offset_in_bytes);
       /// @}
 
@@ -95,7 +95,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type&) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&&) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET NAME

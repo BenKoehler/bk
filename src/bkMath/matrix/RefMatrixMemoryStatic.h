@@ -68,7 +68,7 @@ namespace bk::details
       /// @{ -------------------------------------------------- CTOR
       constexpr RefMatrixMemoryStatic() = delete;
       constexpr RefMatrixMemoryStatic(const self_type&) = default;
-      constexpr RefMatrixMemoryStatic(self_type&&) = default;
+      constexpr RefMatrixMemoryStatic(self_type&&) noexcept = default;
 
       constexpr RefMatrixMemoryStatic(matrix_type& m)
           : _m(m)
@@ -183,7 +183,7 @@ namespace bk::details
     protected:
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] constexpr self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] constexpr self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] constexpr self_type& operator=(self_type&&) noexcept = default;
       /// @}
     public:
   }; // class RefMatrixMemoryStatic

@@ -172,7 +172,7 @@ namespace bk
           return *this;
       }
 
-      [[maybe_unused]] self_type& operator=(self_type&& other)
+      [[maybe_unused]] self_type& operator=(self_type&& other) noexcept
       {
           _points = std::move(other._points);
           _kdtree = std::move(other._kdtree);

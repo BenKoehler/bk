@@ -243,7 +243,7 @@ namespace bk
       connect_signals_renderable(_pdata->background);
   }
 
-  Renderer::Renderer(self_type&&) = default;
+  Renderer::Renderer(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -423,7 +423,7 @@ namespace bk
   { _pdata->fbo_default_id = id; }
 
   /// @{ -------------------------------------------------- OPERATOR =
-  auto Renderer::operator=(self_type&&) -> self_type& = default;
+  auto Renderer::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

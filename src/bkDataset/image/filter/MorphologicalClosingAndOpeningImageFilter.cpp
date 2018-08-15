@@ -35,7 +35,7 @@ namespace bk
   { /* do nothing */ }
 
   MorphologicalClosingAndOpeningImageFilter::MorphologicalClosingAndOpeningImageFilter(const self_type& other) = default;
-  MorphologicalClosingAndOpeningImageFilter::MorphologicalClosingAndOpeningImageFilter(self_type&& other) = default;
+  MorphologicalClosingAndOpeningImageFilter::MorphologicalClosingAndOpeningImageFilter(self_type&& other) noexcept = default;
 
   MorphologicalClosingAndOpeningImageFilter::MorphologicalClosingAndOpeningImageFilter(unsigned int nDims, unsigned int size)
       : _kernel_size(nDims, size)
@@ -59,7 +59,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto MorphologicalClosingAndOpeningImageFilter::operator=(const self_type& other) -> self_type& = default;
-  auto MorphologicalClosingAndOpeningImageFilter::operator=(self_type&& other) -> self_type& = default;
+  auto MorphologicalClosingAndOpeningImageFilter::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET KERNEL SIZE

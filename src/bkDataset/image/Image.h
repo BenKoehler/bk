@@ -99,7 +99,7 @@ namespace bk
       /// @{ -------------------------------------------------- CONSTRUCTORS
       Image() = default;
       Image(const self_type&) = default;
-      Image(self_type&&) = default;
+      Image(self_type&&) noexcept = default;
 
       template<typename TValue_, int TDims_, typename TTransformation_>
       Image(const Image<TValue_, TDims_, TTransformation_>& other)
@@ -549,7 +549,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
 
       template<typename TValue_, int TDims_, typename TTransformation_>
       [[maybe_unused]] self_type& operator=(const Image<TValue_, TDims_, TTransformation_>& other)

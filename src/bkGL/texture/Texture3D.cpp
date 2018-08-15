@@ -51,7 +51,7 @@ namespace bk
 
   #endif
 
-  Texture3D::Texture3D(self_type&&) = default;
+  Texture3D::Texture3D(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -70,7 +70,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto Texture3D::operator=(self_type&&) -> self_type& = default;
+  auto Texture3D::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET DEPTH

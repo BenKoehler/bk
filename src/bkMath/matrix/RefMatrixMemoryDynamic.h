@@ -62,7 +62,7 @@ namespace bk::details
       /// @{ -------------------------------------------------- CTOR
       RefMatrixMemoryDynamic() = delete;
       RefMatrixMemoryDynamic(const self_type&) = default;
-      RefMatrixMemoryDynamic(self_type&&) = default;
+      RefMatrixMemoryDynamic(self_type&&) noexcept = default;
 
       RefMatrixMemoryDynamic(matrix_type& m)
           : _m(m),
@@ -216,7 +216,7 @@ namespace bk::details
     protected:
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
     public:
   }; // class RefMatrixMemoryDynamic

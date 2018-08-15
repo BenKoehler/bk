@@ -54,7 +54,7 @@ namespace bk::details
     protected:
       constexpr TransformationBase() = default;
       constexpr TransformationBase(const self_type&) = default;
-      constexpr TransformationBase(self_type&&) = default;
+      constexpr TransformationBase(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -79,7 +79,7 @@ namespace bk::details
       /// @{ -------------------------------------------------- OPERATOR =
     protected:
       constexpr self_type& operator=(const self_type&) = default;
-      constexpr self_type& operator=(self_type&&) = default;
+      constexpr self_type& operator=(self_type&&) noexcept = default;
     public:
       /// @}
 

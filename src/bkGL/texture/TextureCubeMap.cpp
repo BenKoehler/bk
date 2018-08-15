@@ -65,7 +65,7 @@ namespace bk
         _pdata(std::make_unique<Impl>())
   { /* do nothing */ }
 
-  TextureCubeMap::TextureCubeMap(self_type&&) = default;
+  TextureCubeMap::TextureCubeMap(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -84,7 +84,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto TextureCubeMap::operator=(self_type&& other) -> self_type& = default;
+  auto TextureCubeMap::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET TEXTURE UNIT

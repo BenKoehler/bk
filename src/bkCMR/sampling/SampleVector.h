@@ -62,9 +62,7 @@ namespace bk
           : _samples(other._samples.begin(), other._samples.end())
       { /*do nothing*/ }
 
-      SampleVector(self_type&& other)
-          : _samples(std::move(other._samples))
-      { /*do nothing*/ }
+      SampleVector(self_type&&) noexcept = default;
 
       ~SampleVector() = default;
 
@@ -108,11 +106,7 @@ namespace bk
           return *this;
       }
 
-      self_type& operator=(self_type&& other)
-      {
-          _samples = std::move(other._samples);
-          return *this;
-      }
+      self_type& operator=(self_type&&) noexcept = default;
 
       void push_back(const T_& s)
       {

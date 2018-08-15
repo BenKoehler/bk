@@ -57,7 +57,7 @@ namespace bk::details
     {
     }
 
-    AbstractGraySliceView::AbstractGraySliceView(self_type&&) = default;
+    AbstractGraySliceView::AbstractGraySliceView(self_type&&) noexcept = default;
 
     AbstractGraySliceView::~AbstractGraySliceView()
     { _pdata->s_intensitycurrent_changed.disconnect_all(); }
@@ -83,7 +83,7 @@ namespace bk::details
     //====================================================================================================
     //===== SETTER
     //====================================================================================================
-    auto AbstractGraySliceView::operator=(self_type&&) -> self_type& = default;
+    auto AbstractGraySliceView::operator=(self_type&&) noexcept -> self_type& = default;
 
     //====================================================================================================
     //===== FUNCTIONS

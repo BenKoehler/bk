@@ -166,7 +166,7 @@ namespace bk::details
       constexpr self_type& operator=(const self_type&)
       { return *this; }
 
-      constexpr self_type& operator=(self_type&&)
+      constexpr self_type& operator=(self_type&&) noexcept
       { return *this; }
       /// @}
 

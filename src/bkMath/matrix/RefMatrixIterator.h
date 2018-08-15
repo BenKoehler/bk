@@ -65,7 +65,7 @@ namespace bk
       /// @{ -------------------------------------------------- CONSTRUCTORS
       constexpr RefMatrixIterator() = delete;
       constexpr RefMatrixIterator(const self_type&) = default;
-      constexpr RefMatrixIterator(self_type&&) = default;
+      constexpr RefMatrixIterator(self_type&&) noexcept = default;
 
       constexpr RefMatrixIterator(ref_matrix_type& m, size_type i)
           : _m(m),
@@ -185,7 +185,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] constexpr self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] constexpr self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] constexpr self_type& operator=(self_type&&) noexcept = default;
       /// @}
   }; // class RefMatrixIterator
 

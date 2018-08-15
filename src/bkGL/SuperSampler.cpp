@@ -99,7 +99,7 @@ namespace bk
   #endif
   { /* do nothing */ }
 
-  SuperSampler::SuperSampler(self_type&&) = default;
+  SuperSampler::SuperSampler(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -168,7 +168,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto SuperSampler::operator=(self_type&&) -> self_type& = default;
+  auto SuperSampler::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET FACTOR

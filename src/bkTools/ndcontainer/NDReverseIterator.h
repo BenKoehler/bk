@@ -77,7 +77,7 @@ namespace bk
       { /* do nothing */ }
 
       NDReverseIterator(const self_type&) = default;
-      NDReverseIterator(self_type&&) = default;
+      NDReverseIterator(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -219,7 +219,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
   }; // class NDReverseIterator
 

@@ -59,7 +59,7 @@ namespace bk
       { /* do nothing */ }
 
       constexpr Quaternion(const self_type&) = default;
-      constexpr Quaternion(self_type&&) = default;
+      constexpr Quaternion(self_type&&) noexcept = default;
 
       constexpr Quaternion(double w, double x, double y, double z)
           : _wxyz{{w, x, y, z}}
@@ -126,7 +126,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] constexpr auto operator=(const self_type&) -> self_type& = default;
-      [[maybe_unused]] constexpr auto operator=(self_type&&) -> self_type& = default;
+      [[maybe_unused]] constexpr auto operator=(self_type&&) noexcept -> self_type& = default;
       /// @}
 
       /// @{ -------------------------------------------------- SET

@@ -267,7 +267,7 @@ namespace bk::details
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] constexpr self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] constexpr self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] constexpr self_type& operator=(self_type&&) noexcept = default;
 
       template<typename T>
       [[maybe_unused]] constexpr self_type& operator=(T&& rhs)

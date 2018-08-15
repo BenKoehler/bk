@@ -91,7 +91,7 @@ namespace bk
       : _pdata(std::make_unique<Impl>())
   { /* do nothing */ }
 
-  Animator::Animator(self_type&&) = default;
+  Animator::Animator(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -173,7 +173,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto Animator::operator=(self_type&&) -> self_type& = default;
+  auto Animator::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET ENABLED

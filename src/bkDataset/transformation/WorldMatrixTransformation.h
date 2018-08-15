@@ -76,7 +76,7 @@ namespace bk
       { /* do nothing */ }
 
       WorldMatrixTransformation(const self_type&) = default;
-      WorldMatrixTransformation(self_type&&) = default;
+      WorldMatrixTransformation(self_type&&) noexcept = default;
 
       template<typename TMat>
       WorldMatrixTransformation(const TMat& w)
@@ -129,7 +129,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- SET WORLD MATRIX

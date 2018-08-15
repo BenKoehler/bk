@@ -40,7 +40,7 @@ namespace bk
   { /* do nothing */ }
 
   DicomTransformation::DicomTransformation(const self_type&) = default;
-  DicomTransformation::DicomTransformation(self_type&&) = default;
+  DicomTransformation::DicomTransformation(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -136,7 +136,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto DicomTransformation::operator=(const self_type&) -> self_type& = default;
-  auto DicomTransformation::operator=(self_type&&) -> self_type& = default;
+  auto DicomTransformation::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET DICOM IMAGE TYPE

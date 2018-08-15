@@ -65,7 +65,7 @@ namespace bk
   {
   }
 
-  GrayDICOMSliceView::GrayDICOMSliceView(self_type&&) = default;
+  GrayDICOMSliceView::GrayDICOMSliceView(self_type&&) noexcept = default;
 
   GrayDICOMSliceView::~GrayDICOMSliceView()
   { /* do nothing */ }
@@ -103,7 +103,7 @@ namespace bk
       return _pdata->image.num_values() > 1;
   }
 
-  auto GrayDICOMSliceView::operator=(self_type&&) -> self_type& = default;
+  auto GrayDICOMSliceView::operator=(self_type&&) noexcept -> self_type& = default;
 
   //====================================================================================================
   //===== FUNCTIONS

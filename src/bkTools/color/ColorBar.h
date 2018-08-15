@@ -53,7 +53,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       ColorBar() = default;
       ColorBar(const self_type&) = default;
-      ColorBar(self_type&&) = default;
+      ColorBar(self_type&&) noexcept = default;
 
       template<typename... Colors_>
       ColorBar(Colors_&& ... colors)
@@ -248,7 +248,7 @@ namespace bk
 
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type& = default;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type& = default;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type& = default;
       /// @}
   }; // class ColorBar<ColorType>
 } // namespace bk

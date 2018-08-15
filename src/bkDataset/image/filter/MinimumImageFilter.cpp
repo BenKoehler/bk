@@ -35,7 +35,7 @@ namespace bk
   { /* do nothing */ }
 
   MinimumImageFilter::MinimumImageFilter(const self_type& other) = default;
-  MinimumImageFilter::MinimumImageFilter(self_type&& other) = default;
+  MinimumImageFilter::MinimumImageFilter(self_type&& other) noexcept = default;
 
   MinimumImageFilter::MinimumImageFilter(unsigned int nDims, unsigned int size)
       : _kernel_size(nDims, size)
@@ -59,7 +59,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto MinimumImageFilter::operator=(const self_type& other) -> self_type& = default;
-  auto MinimumImageFilter::operator=(self_type&& other) -> self_type& = default;
+  auto MinimumImageFilter::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET KERNEL SIZE

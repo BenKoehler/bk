@@ -56,7 +56,7 @@ namespace bk
       { /* do nothing */ }
 
       constexpr KDPointInfo(const self_type&) = default;
-      constexpr KDPointInfo(self_type&&) = default;
+      constexpr KDPointInfo(self_type&&) noexcept = default;
 
       constexpr KDPointInfo(const point_type& point, unsigned int pointId, double dst)
           : point(point),
@@ -74,7 +74,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
   };
 } // namespace bk

@@ -69,7 +69,7 @@ namespace bk
   {
   }
 
-  RGBDICOMSliceView::RGBDICOMSliceView(self_type&&) = default;
+  RGBDICOMSliceView::RGBDICOMSliceView(self_type&&) noexcept = default;
 
   RGBDICOMSliceView::~RGBDICOMSliceView()
   { /* do nothing */ }
@@ -110,7 +110,7 @@ namespace bk
       return _pdata->image.num_values() > 1;
   }
 
-  auto RGBDICOMSliceView::operator=(self_type&& other) -> self_type& = default;
+  auto RGBDICOMSliceView::operator=(self_type&& other) noexcept -> self_type& = default;
 
   //====================================================================================================
   //===== FUNCTIONS

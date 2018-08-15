@@ -64,7 +64,7 @@ namespace bk
       : _pdata(std::make_unique<Impl>(*other._pdata.get()))
   { /* do nothing */ }
 
-  RegisteredValue::RegisteredValue(self_type&&) = default;
+  RegisteredValue::RegisteredValue(self_type&&) noexcept = default;
 
   RegisteredValue::RegisteredValue(std::string_view name, GLenum type, unsigned int offset_in_bytes)
       : _pdata(std::make_unique<Impl>(name, type, offset_in_bytes))
@@ -114,7 +114,7 @@ namespace bk
       return *this;
   }
 
-  auto RegisteredValue::operator=(self_type&&) -> self_type& = default;
+  auto RegisteredValue::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET NAME

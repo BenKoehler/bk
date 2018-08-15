@@ -74,7 +74,7 @@ namespace bk::details
       { /* do nothing */ }
 
       MatrixMemoryDynamic(const self_type&) = default;
-      MatrixMemoryDynamic(self_type&&) = default;
+      MatrixMemoryDynamic(self_type&&) noexcept = default;
 
       template<typename TMatrix, std::enable_if_t<bk::is_matrix_v<TMatrix>>* = nullptr>
       MatrixMemoryDynamic(const TMatrix& other)
@@ -189,7 +189,7 @@ namespace bk::details
     protected:
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
 
     public:

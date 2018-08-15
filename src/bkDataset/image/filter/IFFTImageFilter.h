@@ -63,7 +63,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       IFFTImageFilter();
       IFFTImageFilter(const self_type&);
-      IFFTImageFilter(self_type&&);
+      IFFTImageFilter(self_type&&) noexcept;
       IFFTImageFilter(const FFTImageFilter& filter_fft);
       /// @}
 
@@ -81,7 +81,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET PADDING SIZE

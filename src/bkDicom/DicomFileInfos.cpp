@@ -50,7 +50,7 @@ namespace bk
   { /* do nothing */ }
 
   DicomFileInfos::DicomFileInfos(const self_type&) = default;
-  DicomFileInfos::DicomFileInfos(self_type&&) = default;
+  DicomFileInfos::DicomFileInfos(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -62,7 +62,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto DicomFileInfos::operator=(const self_type&) -> self_type& = default;
-  auto DicomFileInfos::operator=(self_type&&) -> self_type& = default;
+  auto DicomFileInfos::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

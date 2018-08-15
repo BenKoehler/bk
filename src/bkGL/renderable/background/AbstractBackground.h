@@ -68,7 +68,7 @@ namespace bk::details
       AbstractBackground(bk::qt_gl_functions* gl);
       #endif
       AbstractBackground(const self_type& other) = delete;
-      AbstractBackground(self_type&& other);
+      AbstractBackground(self_type&& other) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -104,7 +104,7 @@ namespace bk::details
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type&) -> self_type& = delete;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       //====================================================================================================

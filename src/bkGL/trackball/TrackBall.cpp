@@ -85,7 +85,7 @@ namespace bk
       : _pdata(new Impl(*other._pdata.get()))
   { /* do nothing */ }
 
-  TrackBall::TrackBall(self_type&&) = default;
+  TrackBall::TrackBall(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR

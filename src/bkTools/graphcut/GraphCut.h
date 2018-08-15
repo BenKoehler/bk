@@ -85,7 +85,7 @@ namespace bk
       { /* do nothing */ }
 
       constexpr GraphCut(const self_type&) = default;
-      constexpr GraphCut(self_type&&) = default;
+      constexpr GraphCut(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -125,7 +125,7 @@ namespace bk
     public:
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = delete;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
 
       //====================================================================================================

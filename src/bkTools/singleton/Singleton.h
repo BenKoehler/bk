@@ -61,7 +61,7 @@ namespace bk
       /// @{ -------------------------------------------------- OPERATOR =
     private:
       self_type& operator=(const self_type&) = delete;
-      self_type& operator=(self_type&&) = delete;
+      self_type& operator=(self_type&&) noexcept = delete;
       /// @}
 
 

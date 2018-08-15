@@ -87,7 +87,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       constexpr RefMatrix() = delete;
       constexpr RefMatrix(const self_type&) = default;
-      constexpr RefMatrix(self_type&&) = default;
+      constexpr RefMatrix(self_type&&) noexcept = default;
 
       constexpr RefMatrix(TMatrix& m)
           : base_memory_type(m)

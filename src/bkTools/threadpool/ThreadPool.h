@@ -95,7 +95,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = delete;
-      [[maybe_unused]] self_type& operator=(self_type&&) = delete;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = delete;
       /// @}
 
       //====================================================================================================

@@ -59,7 +59,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       SmoothPointValuesFilter();
       SmoothPointValuesFilter(const self_type& other);
-      SmoothPointValuesFilter(self_type&& other);
+      SmoothPointValuesFilter(self_type&& other) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -86,7 +86,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET NUM ITERATIONS

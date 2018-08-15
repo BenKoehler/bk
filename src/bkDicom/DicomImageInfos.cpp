@@ -76,7 +76,7 @@ namespace bk
   { /* do nothing */ }
 
   DicomImageInfos::DicomImageInfos(const self_type&) = default;
-  DicomImageInfos::DicomImageInfos(self_type&&) = default;
+  DicomImageInfos::DicomImageInfos(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -88,7 +88,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto DicomImageInfos::operator=(const self_type&) -> self_type& = default;
-  auto DicomImageInfos::operator=(self_type&&) -> self_type& = default;
+  auto DicomImageInfos::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

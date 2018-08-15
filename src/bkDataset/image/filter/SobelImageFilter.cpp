@@ -35,7 +35,7 @@ namespace bk
   { /* do nothing */ }
 
   SobelImageFilter::SobelImageFilter(const self_type& other) = default;
-  SobelImageFilter::SobelImageFilter(self_type&& other) = default;
+  SobelImageFilter::SobelImageFilter(self_type&& other) noexcept = default;
 
   SobelImageFilter::SobelImageFilter(unsigned int nDims, unsigned int size, unsigned int targetDimId)
       : _kernel_size(nDims, size),
@@ -65,7 +65,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto SobelImageFilter::operator=(const self_type& other) -> self_type& = default;
-  auto SobelImageFilter::operator=(self_type&& other) -> self_type& = default;
+  auto SobelImageFilter::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET KERNEL SIZE

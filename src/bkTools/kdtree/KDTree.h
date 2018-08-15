@@ -74,7 +74,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       KDTree() = default;
       KDTree(const self_type&) = delete;
-      KDTree(self_type&&) = default;
+      KDTree(self_type&&) noexcept = default;
       /// @}
 
       //====================================================================================================
@@ -90,7 +90,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = delete;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
 
       //====================================================================================================

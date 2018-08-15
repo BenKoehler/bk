@@ -54,7 +54,7 @@ namespace bk::details
       UBOGlobal(qt_gl_functions* gl);
       #endif
       UBOGlobal(const self_type&) = delete;
-      UBOGlobal(self_type&&);
+      UBOGlobal(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -66,7 +66,7 @@ namespace bk::details
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type&) -> self_type& = delete;
-      [[maybe_unused]] auto operator=(self_type&&) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
     private:

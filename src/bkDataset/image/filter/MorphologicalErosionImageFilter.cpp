@@ -35,7 +35,7 @@ namespace bk
   { /* do nothing */ }
 
   MorphologicalErosionImageFilter::MorphologicalErosionImageFilter(const self_type& other) = default;
-  MorphologicalErosionImageFilter::MorphologicalErosionImageFilter(self_type&& other) = default;
+  MorphologicalErosionImageFilter::MorphologicalErosionImageFilter(self_type&& other) noexcept = default;
 
   MorphologicalErosionImageFilter::MorphologicalErosionImageFilter(unsigned int nDims, unsigned int size)
       : _kernel_size(nDims, size)
@@ -59,7 +59,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto MorphologicalErosionImageFilter::operator=(const self_type& other) -> self_type& = default;
-  auto MorphologicalErosionImageFilter::operator=(self_type&& other) -> self_type& = default;
+  auto MorphologicalErosionImageFilter::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET KERNEL SIZE

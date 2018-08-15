@@ -51,7 +51,7 @@ namespace bk::details
       BK_UBO_SPECIALIZATION_REGISTER(pos_is_absolute, GL_INT)
   }
 
-  UBOText::UBOText(self_type&&) = default;
+  UBOText::UBOText(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -62,7 +62,7 @@ namespace bk::details
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto UBOText::operator=(self_type&&) -> self_type& = default;
+  auto UBOText::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

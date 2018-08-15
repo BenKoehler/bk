@@ -130,7 +130,7 @@ namespace bk
       _pdata->colorbarview.set_value_precision(1);
   }
 
-  TriangularMesh3DView::TriangularMesh3DView(self_type&&) = default;
+  TriangularMesh3DView::TriangularMesh3DView(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -444,7 +444,7 @@ namespace bk
   /// @}
 
   /// @{ -------------------------------------------------- OPERATOR =
-  auto TriangularMesh3DView::operator=(self_type&& other) -> self_type& = default;
+  auto TriangularMesh3DView::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

@@ -61,7 +61,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       TrackBall();
       TrackBall(const self_type& other);
-      TrackBall(self_type&&);
+      TrackBall(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR

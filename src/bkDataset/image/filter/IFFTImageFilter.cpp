@@ -33,7 +33,7 @@ namespace bk
   /// @{ -------------------------------------------------- CTOR
   IFFTImageFilter::IFFTImageFilter() = default;
   IFFTImageFilter::IFFTImageFilter(const self_type&) = default;
-  IFFTImageFilter::IFFTImageFilter(self_type&&) = default;
+  IFFTImageFilter::IFFTImageFilter(self_type&&) noexcept = default;
 
   IFFTImageFilter::IFFTImageFilter(const FFTImageFilter& filter_fft)
   {
@@ -51,7 +51,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto IFFTImageFilter::operator=(const self_type& other) -> self_type& = default;
-  auto IFFTImageFilter::operator=(self_type&& other) -> self_type& = default;
+  auto IFFTImageFilter::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   void IFFTImageFilter::set_padding_size(const FFTImageFilter& filter_fft)

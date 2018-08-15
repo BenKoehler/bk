@@ -64,7 +64,7 @@ namespace bk
       WindowingTransferFunctionView(WindowingTransferFunction* tf, bk::qt_gl_functions* gl);
       #endif
       WindowingTransferFunctionView(const self_type& other) = delete;
-      WindowingTransferFunctionView(self_type&& other);
+      WindowingTransferFunctionView(self_type&& other) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -87,7 +87,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type& = delete;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET TRANSFER FUNCTION

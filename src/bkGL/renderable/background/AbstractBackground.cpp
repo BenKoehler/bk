@@ -77,7 +77,7 @@ namespace bk::details
       _pdata->vao.add_default_attribute_colorRGBA_4xfloat();
   }
 
-  AbstractBackground::AbstractBackground(self_type&&) = default;
+  AbstractBackground::AbstractBackground(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -120,7 +120,7 @@ namespace bk::details
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto AbstractBackground::operator=(self_type&&) -> self_type& = default;
+  auto AbstractBackground::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

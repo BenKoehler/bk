@@ -59,7 +59,7 @@ namespace bk
       TextureCubeMap(bk::qt_gl_functions* gl);
       #endif
       TextureCubeMap(const self_type& other) = delete;
-      TextureCubeMap(self_type&& other);
+      TextureCubeMap(self_type&& other) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -83,7 +83,7 @@ namespace bk
 
       /// @{ -------------------------------------------------- OPERATOR =
       self_type& operator=(const self_type& other) = delete;
-      auto operator=(self_type&& other) -> self_type&;
+      auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       //====================================================================================================

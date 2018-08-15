@@ -141,7 +141,7 @@ namespace bk::details
       _pdata->ssbo_intensity.set_usage_DYNAMIC_DRAW();
   }
 
-  AbstractSliceView::AbstractSliceView(self_type&&) = default;
+  AbstractSliceView::AbstractSliceView(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -275,7 +275,7 @@ namespace bk::details
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto AbstractSliceView::operator=(self_type&& other) -> self_type& = default;
+  auto AbstractSliceView::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET SCREEN SIZE

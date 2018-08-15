@@ -56,7 +56,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       DistanceMapImageFilter();
       DistanceMapImageFilter(const self_type&);
-      DistanceMapImageFilter(self_type&&);
+      DistanceMapImageFilter(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -76,7 +76,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type&) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&&) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET VALUE

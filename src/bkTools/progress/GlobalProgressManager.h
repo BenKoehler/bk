@@ -46,7 +46,7 @@ namespace bk
       ~GlobalProgressManager() = delete;
 
       self_type& operator=(const self_type&) = delete;
-      self_type& operator=(self_type&&) = delete;
+      self_type& operator=(self_type&&) noexcept = delete;
   }; // class GlobalProgressManager
 
 } // namespace bk

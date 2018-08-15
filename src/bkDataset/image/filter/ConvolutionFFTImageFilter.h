@@ -66,7 +66,7 @@ namespace bk
       { /* do nothing */ }
 
       constexpr ConvolutionFFTImageFilter(const self_type&) = default;
-      constexpr ConvolutionFFTImageFilter(self_type&&) = default;
+      constexpr ConvolutionFFTImageFilter(self_type&&) noexcept = default;
 
       constexpr ConvolutionFFTImageFilter(unsigned int numIterations)
           : _num_iterations(numIterations)
@@ -90,7 +90,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] constexpr auto operator=(const self_type& other) -> self_type& = default;
-      [[maybe_unused]] constexpr auto operator=(self_type&& other) -> self_type& = default;
+      [[maybe_unused]] constexpr auto operator=(self_type&& other) noexcept -> self_type& = default;
       /// @}
 
       /// @{ -------------------------------------------------- SET NUM ITERATIONS

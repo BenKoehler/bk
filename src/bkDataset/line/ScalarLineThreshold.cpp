@@ -41,7 +41,7 @@ namespace bk
   { /* do nothing */ }
 
   ScalarLineThreshold::ScalarLineThreshold(const self_type&) = default;
-  ScalarLineThreshold::ScalarLineThreshold(self_type&&) = default;
+  ScalarLineThreshold::ScalarLineThreshold(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -173,7 +173,7 @@ namespace bk
 
   /// @{ -------------------------------------------------- OPERATOR =
   auto ScalarLineThreshold::operator=(const self_type&) -> self_type& = default;
-  auto ScalarLineThreshold::operator=(self_type&&) -> self_type& = default;
+  auto ScalarLineThreshold::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

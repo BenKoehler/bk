@@ -58,7 +58,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       FFTImageFilter();
       FFTImageFilter(const self_type&);
-      FFTImageFilter(self_type&&);
+      FFTImageFilter(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -90,7 +90,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET NORMALIZATION

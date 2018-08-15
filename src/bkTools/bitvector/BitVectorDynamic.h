@@ -75,7 +75,7 @@ namespace bk::details
       /// @{ -------------------------------------------------- CONSTRUCTORS
       BitVectorDynamic() = default;
       BitVectorDynamic(const self_type&) = default;
-      BitVectorDynamic(self_type&&) = default;
+      BitVectorDynamic(self_type&&) noexcept = default;
       BitVectorDynamic(unsigned int size);
 
       template<typename... Bits_>
@@ -118,7 +118,7 @@ namespace bk::details
 
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
 
       //====================================================================================================

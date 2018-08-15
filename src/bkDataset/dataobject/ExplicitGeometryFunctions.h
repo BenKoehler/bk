@@ -53,7 +53,7 @@ namespace bk::details
       /// @{ -------------------------------------------------- CONSTRUCTORS
       constexpr GeometryFunctions() = default;
       constexpr GeometryFunctions(const self_type&) = default;
-      constexpr GeometryFunctions(self_type&&) = default;
+      constexpr GeometryFunctions(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DESTRUCTOR
@@ -155,7 +155,7 @@ namespace bk::details
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       constexpr self_type& operator=(const self_type&) = default;
-      constexpr self_type& operator=(self_type&&) = default;
+      constexpr self_type& operator=(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- ADD POINT ATTRIBUTE VECTOR

@@ -75,7 +75,7 @@ namespace bk
       RGBImageSliceView(bk::qt_gl_functions* gl);
       #endif
       RGBImageSliceView(const self_type& other) = delete;
-      RGBImageSliceView(self_type&& other);
+      RGBImageSliceView(self_type&& other) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DESTRUCTOR
@@ -103,7 +103,7 @@ namespace bk
 
       /// @{ -------------------------------------------------- OPERATOR =
       self_type& operator=(const self_type& other) = delete;
-      auto operator=(self_type&& other) -> self_type&;
+      auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       //====================================================================================================

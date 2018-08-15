@@ -53,7 +53,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       constexpr NoTransformation() = default;
       constexpr NoTransformation(const self_type&) = default;
-      constexpr NoTransformation(self_type&&) = default;
+      constexpr NoTransformation(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -65,7 +65,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       constexpr self_type& operator=(const self_type&) = default;
-      constexpr self_type& operator=(self_type&&) = default;
+      constexpr self_type& operator=(self_type&&) noexcept = default;
       /// @}
 
       //====================================================================================================

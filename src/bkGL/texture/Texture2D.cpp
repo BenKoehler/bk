@@ -46,7 +46,7 @@ namespace bk
 
   #endif
 
-  Texture2D::Texture2D(self_type&&) = default;
+  Texture2D::Texture2D(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -57,7 +57,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  [[maybe_unused]] auto Texture2D::operator=(self_type&&) -> self_type& = default;
+  [[maybe_unused]] auto Texture2D::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET SIZE

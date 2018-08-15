@@ -82,7 +82,7 @@ namespace bk
       : _pdata(new Impl(*other._pdata.get()))
   { /* do nothing */ }
 
-  WindowingTransferFunction::WindowingTransferFunction(self_type&&) = default;
+  WindowingTransferFunction::WindowingTransferFunction(self_type&&) noexcept = default;
 
   WindowingTransferFunction::WindowingTransferFunction(double intensity_min, double intensity_max, double center, double width)
       : _pdata(new Impl(intensity_min, intensity_max, center, width))
@@ -199,7 +199,7 @@ namespace bk
       return *this;
   }
 
-  auto WindowingTransferFunction::operator=(self_type&& other) -> self_type& = default;
+  auto WindowingTransferFunction::operator=(self_type&& other) noexcept -> self_type& = default;
 
   //====================================================================================================
   //===== FUNCTIONS

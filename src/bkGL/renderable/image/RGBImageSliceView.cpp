@@ -44,7 +44,7 @@ namespace bk
   {
   }
 
-  RGBImageSliceView::RGBImageSliceView(self_type&&) = default;
+  RGBImageSliceView::RGBImageSliceView(self_type&&) noexcept = default;
 
   RGBImageSliceView::~RGBImageSliceView()
   { /* do nothing */ }
@@ -61,7 +61,7 @@ namespace bk
   //====================================================================================================
   //===== SETTER
   //====================================================================================================
-  auto RGBImageSliceView::operator=(self_type&& other) -> self_type& = default;
+  auto RGBImageSliceView::operator=(self_type&& other) noexcept -> self_type& = default;
 
   //====================================================================================================
   //===== FUNCTIONS

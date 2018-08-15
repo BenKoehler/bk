@@ -62,7 +62,7 @@ namespace bk
       /// @{ -------------------------------------------------- CONSTRUCTORS
       AttributeMap() = default;
       AttributeMap(const self_type& other) = default;
-      AttributeMap(self_type&& other) = default;
+      AttributeMap(self_type&& other) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DESTRUCTOR
@@ -185,7 +185,7 @@ namespace bk
 
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type& other) = default;
-      [[maybe_unused]] self_type& operator=(self_type&& other) = default;
+      [[maybe_unused]] self_type& operator=(self_type&& other) noexcept = default;
       /// @}
   }; // class AttributeMap
 } // namespace bk

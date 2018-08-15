@@ -81,7 +81,7 @@ namespace bk
       { /* do nothing */ }
 
       constexpr ScaleTransformation(const self_type&) = default;
-      constexpr ScaleTransformation(self_type&&) = default;
+      constexpr ScaleTransformation(self_type&&) noexcept = default;
 
       template<typename... TScales>
       constexpr ScaleTransformation(TScales... scales)
@@ -124,7 +124,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] constexpr self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] constexpr self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] constexpr self_type& operator=(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- SET SCALE

@@ -64,7 +64,7 @@ namespace bk::details
       UBOSpecialization(qt_gl_functions* gl, std::string_view bufferName, unsigned int bufferBaseId);
       #endif
       UBOSpecialization(const self_type&) = delete;
-      UBOSpecialization(self_type&&);
+      UBOSpecialization(self_type&&) noexcept;
 
       /// @}
 
@@ -88,7 +88,7 @@ namespace bk::details
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type&) -> self_type& = delete;
-      [[maybe_unused]] auto operator=(self_type&&) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET BUFFER NAME

@@ -32,7 +32,7 @@ namespace bk
   /// @{ -------------------------------------------------- CTOR
   ColorRGBA::ColorRGBA() = default;
   ColorRGBA::ColorRGBA(const self_type&) = default;
-  ColorRGBA::ColorRGBA(self_type&&) = default;
+  ColorRGBA::ColorRGBA(self_type&&) noexcept = default;
 
   ColorRGBA::ColorRGBA(value_type r, value_type g, value_type b, value_type a)
       : base_type(r, g, b, a)
@@ -108,7 +108,7 @@ namespace bk
 
   /// @{ -------------------------------------------------- OPERATOR =
   auto ColorRGBA::operator=(const self_type& other) -> self_type& = default;
-  auto ColorRGBA::operator=(self_type&& other) -> self_type& = default;
+  auto ColorRGBA::operator=(self_type&& other) noexcept -> self_type& = default;
 
   auto ColorRGBA::operator=(std::initializer_list<double> values) -> self_type&
   {

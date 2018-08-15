@@ -52,7 +52,7 @@ namespace bk::details
       BK_UBO_SPECIALIZATION_REGISTER(threshold, GL_FLOAT)
   }
 
-  UBOSliceView::UBOSliceView(self_type&&) = default;
+  UBOSliceView::UBOSliceView(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -63,7 +63,7 @@ namespace bk::details
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto UBOSliceView::operator=(self_type&&) -> self_type& = default;
+  auto UBOSliceView::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

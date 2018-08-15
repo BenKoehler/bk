@@ -37,7 +37,7 @@ namespace bk
   { /* do nothing */ }
 
   SmoothPointValuesFilter::SmoothPointValuesFilter(const self_type& other) = default;
-  SmoothPointValuesFilter::SmoothPointValuesFilter(self_type&& other) = default;
+  SmoothPointValuesFilter::SmoothPointValuesFilter(self_type&& other) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -67,7 +67,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto SmoothPointValuesFilter::operator=(const self_type& other) -> self_type& = default;
-  auto SmoothPointValuesFilter::operator=(self_type&& other) -> self_type& = default;
+  auto SmoothPointValuesFilter::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET NUM ITERATIONS

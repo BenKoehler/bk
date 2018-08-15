@@ -69,7 +69,7 @@ namespace bk::details
       AbstractRenderable(bk::qt_gl_functions* gl);
       #endif
       AbstractRenderable(const self_type& other) = delete;
-      AbstractRenderable(self_type&& other);
+      AbstractRenderable(self_type&& other) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -102,7 +102,7 @@ namespace bk::details
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type& = delete;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET SETTINGS

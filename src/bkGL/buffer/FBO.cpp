@@ -57,7 +57,7 @@ namespace bk
         _pdata(std::make_unique<Impl>())
   { /* do nothing */ }
 
-  FBO::FBO(self_type&&) = default;
+  FBO::FBO(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -133,7 +133,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto FBO::operator=(self_type&& other) -> self_type& = default;
+  auto FBO::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET/ADD TEXTURE

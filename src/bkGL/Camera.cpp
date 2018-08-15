@@ -91,7 +91,7 @@ namespace bk
       calc_projection_matrix();
   }
 
-  Camera::Camera(self_type&&) = default;
+  Camera::Camera(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -206,7 +206,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto Camera::operator=(self_type&&) -> self_type& = default;
+  auto Camera::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET PROJECTION MATRIX MODE

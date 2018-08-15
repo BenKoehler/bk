@@ -64,7 +64,7 @@ namespace bk
       explicit Shader(bk::qt_gl_functions* gl);
       #endif
       Shader(const self_type& other) = delete;
-      Shader(self_type&&);
+      Shader(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -94,7 +94,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type& = delete;
-      [[maybe_unused]] auto operator=(self_type&&) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
     private:

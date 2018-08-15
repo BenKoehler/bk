@@ -97,7 +97,7 @@ namespace bk::gc_details
       { _size.fill(0); }
 
       GraphCutBase(const self_type&) = default;
-      GraphCutBase(self_type&&) = default;
+      GraphCutBase(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -185,7 +185,7 @@ namespace bk::gc_details
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- SET PARENT

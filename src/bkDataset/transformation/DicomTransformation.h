@@ -68,7 +68,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       DicomTransformation();
       DicomTransformation(const self_type&);
-      DicomTransformation(self_type&&);
+      DicomTransformation(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -120,7 +120,7 @@ namespace bk
       /// @{ -------------------------------------------------- OPERATOR =
     protected:
       [[maybe_unused]] auto operator=(const self_type&) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&&) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
     public:
       /// @}
 

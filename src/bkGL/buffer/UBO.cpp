@@ -64,7 +64,7 @@ namespace bk
         _pdata(std::make_unique<Impl>())
   { set_default_config_uniform_buffer_object(); }
 
-  UBO::UBO(self_type&&) = default;
+  UBO::UBO(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -128,7 +128,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto UBO::operator=(self_type&& other) -> self_type&
+  auto UBO::operator=(self_type&& other) noexcept -> self_type&
   {
       _pdata.reset(nullptr);
       _pdata = std::make_unique<Impl>(*other._pdata);

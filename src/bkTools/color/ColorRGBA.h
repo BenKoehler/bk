@@ -53,7 +53,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       ColorRGBA();
       ColorRGBA(const self_type&);
-      ColorRGBA(self_type&&);
+      ColorRGBA(self_type&&) noexcept;
       ColorRGBA(value_type r, value_type g, value_type b, value_type a = 1);
       /// @}
 
@@ -88,7 +88,7 @@ namespace bk
 
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       [[maybe_unused]] auto operator=(std::initializer_list<double> values) -> self_type&;
       /// @}
 

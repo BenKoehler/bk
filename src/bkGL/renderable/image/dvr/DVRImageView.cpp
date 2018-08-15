@@ -125,7 +125,7 @@ namespace bk
       _pdata->vao_cuboid.add_default_attribute_colorRGB_3xfloat();
   }
 
-  DVRImageView::DVRImageView(self_type&&) = default;
+  DVRImageView::DVRImageView(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -219,7 +219,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto DVRImageView::operator=(self_type&& other) -> self_type& = default;
+  auto DVRImageView::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET NUM RAY SAMPLES

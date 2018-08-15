@@ -35,7 +35,7 @@ namespace bk
   { /* do nothing */ }
 
   LaplaceImageFilter::LaplaceImageFilter(const self_type& other) = default;
-  LaplaceImageFilter::LaplaceImageFilter(self_type&& other) = default;
+  LaplaceImageFilter::LaplaceImageFilter(self_type&& other) noexcept = default;
 
   LaplaceImageFilter::LaplaceImageFilter(unsigned int nDims, unsigned int size)
       : _kernel_size(nDims, size)
@@ -59,7 +59,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto LaplaceImageFilter::operator=(const self_type& other) -> self_type& = default;
-  auto LaplaceImageFilter::operator=(self_type&& other) -> self_type& = default;
+  auto LaplaceImageFilter::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET KERNEL SIZE

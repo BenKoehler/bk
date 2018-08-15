@@ -38,7 +38,7 @@ namespace bk::details
   #endif
   { /* do nothing */ }
 
-  AbstractObject::AbstractObject(self_type&&) = default;
+  AbstractObject::AbstractObject(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -49,7 +49,7 @@ namespace bk::details
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto AbstractObject::operator=(self_type&& other) -> self_type& = default;
+  auto AbstractObject::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 } // namespace bk::details
 

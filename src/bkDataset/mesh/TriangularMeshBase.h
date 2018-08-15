@@ -57,7 +57,7 @@ namespace bk::details
       /// @{ -------------------------------------------------- CTOR
       TriangularMeshBase() = default;
       TriangularMeshBase(const self_type&) = default;
-      TriangularMeshBase(self_type&&) = default;
+      TriangularMeshBase(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -69,7 +69,7 @@ namespace bk::details
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type&) -> self_type& = default;
-      [[maybe_unused]] auto operator=(self_type&&) -> self_type& = default;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type& = default;
       /// @}
 
       //====================================================================================================

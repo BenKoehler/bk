@@ -65,7 +65,7 @@ namespace bk::details
       /// @{ -------------------------------------------------- CTOR
       CellBase() = default;
       CellBase(const self_type&) = default;
-      CellBase(self_type&&) = default;
+      CellBase(self_type&&) noexcept = default;
 
       template<typename... TIds>
       CellBase(TIds ... ids)
@@ -140,7 +140,7 @@ namespace bk::details
     protected:
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
     public:
 

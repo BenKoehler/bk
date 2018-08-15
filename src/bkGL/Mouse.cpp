@@ -63,7 +63,7 @@ namespace bk
       : _pdata(new Impl(*other._pdata.get()))
   { /* do nothing */ }
 
-  Mouse::Mouse(self_type&&) = default;
+  Mouse::Mouse(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -138,7 +138,7 @@ namespace bk
       return *this;
   }
 
-  auto Mouse::operator=(self_type&&) -> self_type& = default;
+  auto Mouse::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET POSITION

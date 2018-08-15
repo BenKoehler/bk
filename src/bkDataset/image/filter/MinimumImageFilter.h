@@ -57,7 +57,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       MinimumImageFilter();
       MinimumImageFilter(const self_type& other);
-      MinimumImageFilter(self_type&& other);
+      MinimumImageFilter(self_type&& other) noexcept;
       MinimumImageFilter(unsigned int nDims, unsigned int size);
       /// @}
 
@@ -77,7 +77,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET KERNEL SIZE

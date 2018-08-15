@@ -35,7 +35,7 @@ namespace bk
   { /* do nothing */ }
 
   BinomialSmoothingImageFilter::BinomialSmoothingImageFilter(const self_type& other) = default;
-  BinomialSmoothingImageFilter::BinomialSmoothingImageFilter(self_type&& other) = default;
+  BinomialSmoothingImageFilter::BinomialSmoothingImageFilter(self_type&& other) noexcept = default;
 
   BinomialSmoothingImageFilter::BinomialSmoothingImageFilter(unsigned int numIterations, unsigned int nDims, unsigned int size)
       : _num_iterations(numIterations),
@@ -65,7 +65,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto BinomialSmoothingImageFilter::operator=(const self_type& other) -> self_type& = default;
-  auto BinomialSmoothingImageFilter::operator=(self_type&& other) -> self_type& = default;
+  auto BinomialSmoothingImageFilter::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET NUM ITERATIONS

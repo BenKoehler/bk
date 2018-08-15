@@ -50,7 +50,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       ConnectedComponentAnalysisKeepLargestRegionImageFilter();
       ConnectedComponentAnalysisKeepLargestRegionImageFilter(const self_type&);
-      ConnectedComponentAnalysisKeepLargestRegionImageFilter(self_type&&);
+      ConnectedComponentAnalysisKeepLargestRegionImageFilter(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -62,7 +62,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type&) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&&) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
       //====================================================================================================

@@ -60,7 +60,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       IntervalThresholdImageFilter();
       IntervalThresholdImageFilter(const self_type&);
-      IntervalThresholdImageFilter(self_type&&);
+      IntervalThresholdImageFilter(self_type&&) noexcept;
       IntervalThresholdImageFilter(double threshold_lower, double threshold_upper, ThresholdMode mode, double outside_interval = 0, double inside_interval = 1);
       /// @}
 
@@ -93,7 +93,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type&) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&&) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET THRESHOLD

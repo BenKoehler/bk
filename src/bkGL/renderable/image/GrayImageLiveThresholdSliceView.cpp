@@ -75,7 +75,7 @@ namespace bk
   #endif
   { /* do nothing */ }
 
-  GrayImageLiveThresholdSliceView::GrayImageLiveThresholdSliceView(self_type&&) = default;
+  GrayImageLiveThresholdSliceView::GrayImageLiveThresholdSliceView(self_type&&) noexcept = default;
 
   GrayImageLiveThresholdSliceView::~GrayImageLiveThresholdSliceView()
   { /* do nothing */ };
@@ -105,7 +105,7 @@ namespace bk
   void GrayImageLiveThresholdSliceView::set_slice_impl(unsigned int /*z*/)
   { _pdata->slice_changed = true; }
 
-  auto GrayImageLiveThresholdSliceView::operator=(self_type&& other) -> self_type& = default;
+  auto GrayImageLiveThresholdSliceView::operator=(self_type&& other) noexcept -> self_type& = default;
 
   //====================================================================================================
   //===== FUNCTIONS

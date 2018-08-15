@@ -56,7 +56,7 @@ namespace bk::details
       BK_UBO_SPECIALIZATION_REGISTER(image_scale_z, GL_FLOAT)
   }
 
-  UBODVR::UBODVR(self_type&&) = default;
+  UBODVR::UBODVR(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -67,7 +67,7 @@ namespace bk::details
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto UBODVR::operator=(self_type&&) -> self_type& = default;
+  auto UBODVR::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

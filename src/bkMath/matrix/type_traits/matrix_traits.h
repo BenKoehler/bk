@@ -248,7 +248,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       constexpr self_type& operator=(const self_type&) = delete;
-      constexpr self_type& operator=(self_type&&) = delete;
+      constexpr self_type& operator=(self_type&&) noexcept = delete;
       /// @}
 
       //====================================================================================================
@@ -364,7 +364,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       constexpr self_type& operator=(const self_type& other) = delete;
-      constexpr self_type& operator=(self_type&& other) = delete;
+      constexpr self_type& operator=(self_type&& other) noexcept = delete;
       /// @}
 
       //====================================================================================================
@@ -501,7 +501,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       constexpr self_type& operator=(const self_type& other) = delete;
-      constexpr self_type& operator=(self_type&& other) = delete;
+      constexpr self_type& operator=(self_type&& other) noexcept = delete;
       /// @}
 
       //====================================================================================================

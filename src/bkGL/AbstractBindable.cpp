@@ -45,7 +45,7 @@ namespace bk::details
         _id(0)
   { /* do nothing */ }
 
-  AbstractBindable::AbstractBindable(self_type&& other)
+  AbstractBindable::AbstractBindable(self_type&& other) noexcept
       : base_type(std::move(other)),
         _is_bound(other._is_bound),
         _id(other._id)
@@ -81,7 +81,7 @@ namespace bk::details
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto AbstractBindable::operator=(self_type&& other) -> self_type&
+  auto AbstractBindable::operator=(self_type&& other) noexcept -> self_type&
   {
       _id = other._id;
       _is_bound = other._is_bound;

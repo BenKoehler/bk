@@ -92,7 +92,7 @@ namespace bk
       : _pdata(std::make_unique<Impl>())
   { /* do nothing */ }
 
-  Interactor::Interactor(self_type&&) = default;
+  Interactor::Interactor(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -183,7 +183,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  [[maybe_unused]] auto Interactor::operator=(self_type&&) -> self_type& = default;
+  [[maybe_unused]] auto Interactor::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET WINDOW SIZE

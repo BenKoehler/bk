@@ -34,12 +34,12 @@ class MyClass
   public:
     MyClass() = default;
     MyClass(const self_type&) = default;
-    MyClass(self_type&&) = default;
+    MyClass(self_type&&) noexcept = default;
 
     ~MyClass() = default;
 
     self_type& operator=(const self_type&) = default;
-    self_type& operator=(self_type&&) = default;
+    self_type& operator=(self_type&&) noexcept = default;
 
     void foo()
     {
@@ -59,7 +59,7 @@ class GlobalMyClass : public bk::Singleton<MyClass>
     ~GlobalMyClass() = delete;
 
     self_type& operator=(const self_type&) = delete;
-    self_type& operator=(self_type&&) = delete;
+    self_type& operator=(self_type&&) noexcept = delete;
 };
 
 // convenience macro to access the object instance

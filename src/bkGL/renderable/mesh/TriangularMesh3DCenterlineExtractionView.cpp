@@ -118,7 +118,7 @@ namespace bk
       _pdata->meshView.forward_signals(this);
   }
 
-  TriangularMesh3DCenterlineExtractionView::TriangularMesh3DCenterlineExtractionView(self_type&&) = default;
+  TriangularMesh3DCenterlineExtractionView::TriangularMesh3DCenterlineExtractionView(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -275,7 +275,7 @@ namespace bk
   /// @}
 
   /// @{ -------------------------------------------------- OPERATOR =
-  auto TriangularMesh3DCenterlineExtractionView::operator=(self_type&& other) -> self_type& = default;
+  auto TriangularMesh3DCenterlineExtractionView::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

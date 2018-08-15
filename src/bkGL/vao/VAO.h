@@ -66,7 +66,7 @@ namespace bk
       explicit VAO(qt_gl_functions* gl);
       #endif
       VAO(const self_type& other) = delete;
-      VAO(self_type&& other);
+      VAO(self_type&& other) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -93,7 +93,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type& = delete;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- ADD ATTRIBUTES

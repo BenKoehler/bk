@@ -59,7 +59,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       TransformableGeometry() = default;
       TransformableGeometry(const self_type& other) = default;
-      TransformableGeometry(self_type&& other) = default;
+      TransformableGeometry(self_type&& other) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -88,7 +88,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type& = default;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type& = default;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type& = default;
       /// @}
   }; // class TransformableGeometry
 } // namespace bk

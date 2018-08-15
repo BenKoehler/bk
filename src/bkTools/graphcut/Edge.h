@@ -60,7 +60,7 @@ namespace bk::gc_details
       /// @{ -------------------------------------------------- CONSTRUCTORS
       constexpr Edge() = default;
       constexpr Edge(const self_type&) = default;
-      constexpr Edge(self_type&&) = default;
+      constexpr Edge(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DESTRUCTOR
@@ -72,7 +72,7 @@ namespace bk::gc_details
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       constexpr self_type& operator=(const self_type&) = default;
-      constexpr self_type& operator=(self_type&&) = default;
+      constexpr self_type& operator=(self_type&&) noexcept = default;
       /// @}
   }; // class Edge
 } // namespace bk::gc_details

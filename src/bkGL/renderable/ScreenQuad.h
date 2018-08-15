@@ -64,7 +64,7 @@ namespace bk
       ScreenQuad(qt_gl_functions* gl);
       #endif
       ScreenQuad(const self_type&) = delete;
-      ScreenQuad(self_type&&);
+      ScreenQuad(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -88,7 +88,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type&) -> self_type& = delete;
-      [[maybe_unused]] auto operator=(self_type&&) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
       //====================================================================================================

@@ -80,7 +80,7 @@ namespace bk
   #endif
   { _pdata->ssbo.set_usage_STATIC_DRAW(); }
 
-  GrayImagePlusSegmentationSliceView::GrayImagePlusSegmentationSliceView(self_type&&) = default;
+  GrayImagePlusSegmentationSliceView::GrayImagePlusSegmentationSliceView(self_type&&) noexcept = default;
 
   GrayImagePlusSegmentationSliceView::~GrayImagePlusSegmentationSliceView()
   { /* do nothing */ };
@@ -100,7 +100,7 @@ namespace bk
       update_ssbo();
   }
 
-  auto GrayImagePlusSegmentationSliceView::operator=(self_type&& other) -> self_type& = default;
+  auto GrayImagePlusSegmentationSliceView::operator=(self_type&& other) noexcept -> self_type& = default;
 
   //====================================================================================================
   //===== FUNCTIONS

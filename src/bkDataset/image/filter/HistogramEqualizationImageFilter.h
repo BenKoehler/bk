@@ -54,7 +54,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       HistogramEqualizationImageFilter();
       HistogramEqualizationImageFilter(const self_type& other);
-      HistogramEqualizationImageFilter(self_type&& other);
+      HistogramEqualizationImageFilter(self_type&& other) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -73,7 +73,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET NUM BUCKETS

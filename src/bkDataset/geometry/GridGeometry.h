@@ -68,7 +68,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       GridGeometry() = default;
       GridGeometry(const self_type&) = default;
-      GridGeometry(self_type&&) = default;
+      GridGeometry(self_type&&) noexcept = default;
 
       template<typename... TIds, std::enable_if_t<std::conjunction_v<std::is_integral<TIds>...>>* = nullptr>
       GridGeometry(TIds... sizes_per_dimension)
@@ -126,7 +126,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
 
       //====================================================================================================

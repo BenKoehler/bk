@@ -57,7 +57,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       MorphologicalClosingImageFilter();
       MorphologicalClosingImageFilter(const self_type& other);
-      MorphologicalClosingImageFilter(self_type&& other);
+      MorphologicalClosingImageFilter(self_type&& other) noexcept;
       MorphologicalClosingImageFilter(unsigned int nDims, unsigned int size);
       /// @}
 
@@ -77,7 +77,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET KERNEL SIZE

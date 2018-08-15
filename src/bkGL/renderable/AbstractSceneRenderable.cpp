@@ -67,7 +67,7 @@ namespace bk::details
         _pdata(std::make_unique<Impl>())
   { /* do nothing */ }
 
-  AbstractSceneRenderable::AbstractSceneRenderable(self_type&&) = default;
+  AbstractSceneRenderable::AbstractSceneRenderable(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -86,7 +86,7 @@ namespace bk::details
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto AbstractSceneRenderable::operator=(self_type&& other) -> self_type& = default;
+  auto AbstractSceneRenderable::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

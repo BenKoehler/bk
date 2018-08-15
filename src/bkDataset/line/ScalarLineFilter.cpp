@@ -38,7 +38,7 @@ namespace bk
   { /* do nothing */ }
 
   ScalarLineFilter::ScalarLineFilter(const self_type&) = default;
-  ScalarLineFilter::ScalarLineFilter(self_type&&) = default;
+  ScalarLineFilter::ScalarLineFilter(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -137,7 +137,7 @@ namespace bk
 
   /// @{ -------------------------------------------------- OPERATOR =
   auto ScalarLineFilter::operator=(const self_type&) -> self_type& = default;
-  auto ScalarLineFilter::operator=(self_type&&) -> self_type& = default;
+  auto ScalarLineFilter::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

@@ -146,7 +146,7 @@ namespace bk::details
           return *this;
       }
 
-      [[maybe_unused]] constexpr self_type& operator=(self_type&& other)
+      [[maybe_unused]] constexpr self_type& operator=(self_type&& other) noexcept
       {
           for (unsigned int i = 0; i < Size(); ++i)
           { _data[i] = std::move(other._data[i]); }

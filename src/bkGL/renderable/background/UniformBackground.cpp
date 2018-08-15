@@ -64,7 +64,7 @@ namespace bk
         _pdata(std::make_unique<Impl>())
   { /* do nothing */ }
 
-  UniformBackground::UniformBackground(self_type&&) = default;
+  UniformBackground::UniformBackground(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -83,7 +83,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto UniformBackground::operator=(self_type&&) -> self_type& = default;
+  auto UniformBackground::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET COLOR

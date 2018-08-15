@@ -56,7 +56,7 @@ namespace bk
       : _pdata(std::make_unique<Impl>())
   { /* do nothing */ }
 
-  ProgressManager::ProgressManager(self_type&&) = default;
+  ProgressManager::ProgressManager(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -121,7 +121,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto ProgressManager::operator=(self_type&&) -> self_type& = default;
+  auto ProgressManager::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- ADD TASK

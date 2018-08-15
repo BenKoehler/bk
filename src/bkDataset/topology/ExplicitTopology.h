@@ -73,7 +73,7 @@ namespace bk
       { /* do nothing */ }
 
       ExplicitTopology(const self_type&) = default;
-      ExplicitTopology(self_type&&) = default;
+      ExplicitTopology(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -183,7 +183,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- SET NUM CELLS

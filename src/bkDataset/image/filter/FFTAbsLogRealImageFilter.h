@@ -48,7 +48,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       FFTAbsLogRealImageFilter() = default;
       FFTAbsLogRealImageFilter(const self_type&) = default;
-      FFTAbsLogRealImageFilter(self_type&&) = default;
+      FFTAbsLogRealImageFilter(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -60,7 +60,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type& = default;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type& = default;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type& = default;
       /// @}
 
       //====================================================================================================

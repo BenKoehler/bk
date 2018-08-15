@@ -57,7 +57,7 @@ namespace bk
       DVRImage3DView(bk::qt_gl_functions* gl);
       #endif
       DVRImage3DView(const self_type& other) = delete;
-      DVRImage3DView(self_type&& other);
+      DVRImage3DView(self_type&& other) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -78,7 +78,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type& = delete;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       //====================================================================================================

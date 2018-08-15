@@ -67,7 +67,7 @@ namespace bk
         _pdata(std::make_unique<Impl>())
   { /* do nothing */ }
 
-  GradientBackground::GradientBackground(self_type&&) = default;
+  GradientBackground::GradientBackground(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -89,7 +89,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto GradientBackground::operator=(self_type&& other) -> self_type& = default;
+  auto GradientBackground::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET COLOR

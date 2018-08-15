@@ -40,7 +40,7 @@ namespace bk
   #endif
   { set_default_config_shader_storage_buffer_object(); }
 
-  SSBO::SSBO(self_type&&) = default;
+  SSBO::SSBO(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -51,7 +51,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  [[maybe_unused]] auto SSBO::operator=(self_type&&) -> self_type& = default;
+  [[maybe_unused]] auto SSBO::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 } // namespace bk
 

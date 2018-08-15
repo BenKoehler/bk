@@ -54,7 +54,7 @@ namespace bk::details
       /// @{ -------------------------------------------------- CTOR
       constexpr SquareMatrix3Functions() = default;
       constexpr SquareMatrix3Functions(const self_type&) = default;
-      constexpr SquareMatrix3Functions(self_type&&) = default;
+      constexpr SquareMatrix3Functions(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -81,7 +81,7 @@ namespace bk::details
     protected:
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] constexpr self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] constexpr self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] constexpr self_type& operator=(self_type&&) noexcept = default;
       /// @}
     public:
 

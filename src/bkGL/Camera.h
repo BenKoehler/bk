@@ -60,7 +60,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       Camera();
       Camera(const self_type&) = delete;
-      Camera(self_type&&);
+      Camera(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -136,7 +136,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[nodiscard]] auto operator=(const self_type&) -> self_type& = delete;
-      [[nodiscard]] auto operator=(self_type&&) -> self_type&;
+      [[nodiscard]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET PROJECTION MATRIX MODE

@@ -30,7 +30,7 @@ namespace bk
   /// @{ -------------------------------------------------- CTOR
   ColorBarRGBA::ColorBarRGBA() = default;
   ColorBarRGBA::ColorBarRGBA(const self_type&) = default;
-  ColorBarRGBA::ColorBarRGBA(self_type&&) = default;
+  ColorBarRGBA::ColorBarRGBA(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -40,7 +40,7 @@ namespace bk
   //====================================================================================================  SETTER
   /// @{ -------------------------------------------------- OPERATOR =
   auto ColorBarRGBA::operator=(const self_type&) -> self_type& = default;
-  auto ColorBarRGBA::operator=(self_type&&) -> self_type& = default;
+  auto ColorBarRGBA::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 } // namespace bk
 

@@ -61,7 +61,7 @@ namespace bk::details
   #endif
   { /* do nothing */ }
 
-  UBOSpecialization::UBOSpecialization(self_type&&) = default;
+  UBOSpecialization::UBOSpecialization(self_type&&) noexcept = default;
 
   #ifndef BK_LIB_QT_AVAILABLE
   UBOSpecialization::UBOSpecialization(std::string_view bufferName, unsigned int bufferBaseId)
@@ -95,7 +95,7 @@ namespace bk::details
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto UBOSpecialization::operator=(self_type&&) -> self_type& = default;
+  auto UBOSpecialization::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET BUFFER NAME

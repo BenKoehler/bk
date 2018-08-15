@@ -76,7 +76,7 @@ namespace bk
       : _pdata(std::make_unique<Impl>())
   { /* do nothing */ }
 
-  Progress::Progress(self_type&&) = default;
+  Progress::Progress(self_type&&) noexcept = default;
 
   Progress::Progress(double max, std::string_view description)
       : _pdata(new Impl(max, description))
@@ -131,7 +131,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto Progress::operator=(self_type&&) -> self_type& = default;
+  auto Progress::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET MAX

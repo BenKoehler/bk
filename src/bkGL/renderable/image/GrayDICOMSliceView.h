@@ -85,7 +85,7 @@ namespace bk
       GrayDICOMSliceView(bk::qt_gl_functions* gl);
       #endif
       GrayDICOMSliceView(const self_type&) = delete;
-      GrayDICOMSliceView(self_type&&);
+      GrayDICOMSliceView(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DESTRUCTOR
@@ -120,7 +120,7 @@ namespace bk
 
       /// @{ -------------------------------------------------- OPERATOR =
       self_type& operator=(const self_type&) = delete;
-      auto operator=(self_type&&) -> self_type&;
+      auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
       //====================================================================================================

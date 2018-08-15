@@ -42,7 +42,7 @@ namespace bk
   { /* do nothing */ }
 
   WindowGeometry::WindowGeometry(const self_type&) = default;
-  WindowGeometry::WindowGeometry(self_type&&) = default;
+  WindowGeometry::WindowGeometry(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -67,7 +67,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto WindowGeometry::operator=(const self_type&) -> self_type& = default;
-  auto WindowGeometry::operator=(self_type&&) -> self_type& = default;
+  auto WindowGeometry::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET WIDTH

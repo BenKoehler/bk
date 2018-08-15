@@ -78,7 +78,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       SVDecomposition() = delete;
       SVDecomposition(const self_type&) = default;
-      SVDecomposition(self_type&&) = default;
+      SVDecomposition(self_type&&) noexcept = default;
 
       SVDecomposition(const matrix_type& A, bool computeU = false, bool computeV = false)
           : _svd(A.num_rows(), A.num_cols()),
@@ -228,7 +228,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
 
       //====================================================================================================

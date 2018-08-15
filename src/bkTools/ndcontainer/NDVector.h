@@ -80,7 +80,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       NDVector() = default;
       NDVector(const self_type&) = default;
-      NDVector(self_type&&) = default;
+      NDVector(self_type&&) noexcept = default;
 
       template<typename... TSizes, std::enable_if_t<std::conjunction_v<std::is_integral<TSizes>...>>* = nullptr>
       NDVector(TSizes... sizes)
@@ -404,7 +404,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&) = default;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- HELPER: VALID SIZES ASSERTION

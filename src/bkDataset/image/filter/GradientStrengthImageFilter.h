@@ -45,7 +45,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       constexpr GradientStrengthImageFilter() = default;
       constexpr GradientStrengthImageFilter(const self_type&) = default;
-      constexpr GradientStrengthImageFilter(self_type&&) = default;
+      constexpr GradientStrengthImageFilter(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -57,7 +57,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] constexpr auto operator=(const self_type& other) -> self_type& = default;
-      [[maybe_unused]] constexpr auto operator=(self_type&& other) -> self_type& = default;
+      [[maybe_unused]] constexpr auto operator=(self_type&& other) noexcept -> self_type& = default;
       /// @}
 
       //====================================================================================================

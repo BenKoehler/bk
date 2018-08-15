@@ -57,7 +57,7 @@ namespace bk::details
       /// @{ -------------------------------------------------- CTOR
       AbstractColor();
       AbstractColor(const self_type&);
-      AbstractColor(self_type&&);
+      AbstractColor(self_type&&) noexcept;
       AbstractColor(value_type r, value_type g, value_type b, value_type a = 1);
       /// @}
 
@@ -98,7 +98,7 @@ namespace bk::details
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR=
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       [[maybe_unused]] auto operator=(std::initializer_list<value_type> values) -> self_type&;
       /// @}
 

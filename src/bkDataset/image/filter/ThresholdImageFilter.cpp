@@ -35,7 +35,7 @@ namespace bk
   { /* do nothing */ }
 
   ThresholdImageFilter::ThresholdImageFilter(const self_type&) = default;
-  ThresholdImageFilter::ThresholdImageFilter(self_type&&) = default;
+  ThresholdImageFilter::ThresholdImageFilter(self_type&&) noexcept = default;
 
   ThresholdImageFilter::ThresholdImageFilter(double threshold, ThresholdMode mode, double below_threshold, double above_threshold)
       : _mode(mode),
@@ -81,7 +81,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto ThresholdImageFilter::operator=(const self_type&) -> self_type& = default;
-  auto ThresholdImageFilter::operator=(self_type&&) -> self_type& = default;
+  auto ThresholdImageFilter::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET THRESHOLD

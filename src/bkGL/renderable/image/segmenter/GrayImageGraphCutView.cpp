@@ -112,7 +112,7 @@ namespace bk
                                            });
   }
 
-  GrayImageGraphCutView::GrayImageGraphCutView(self_type&&) = default;
+  GrayImageGraphCutView::GrayImageGraphCutView(self_type&&) noexcept = default;
 
   GrayImageGraphCutView::~GrayImageGraphCutView()
   {};
@@ -184,7 +184,7 @@ namespace bk
       //}
   }
 
-  auto GrayImageGraphCutView::operator=(self_type&& other) -> self_type& = default;
+  auto GrayImageGraphCutView::operator=(self_type&& other) noexcept -> self_type& = default;
 
   void GrayImageGraphCutView::set_inside_outside_from_graph_cut()
   {

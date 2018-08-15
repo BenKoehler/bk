@@ -57,7 +57,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       SobelImageFilter();
       SobelImageFilter(const self_type& other);
-      SobelImageFilter(self_type&& other);
+      SobelImageFilter(self_type&& other) noexcept;
       SobelImageFilter(unsigned int nDims, unsigned int size, unsigned int targetDimId);
       /// @}
 
@@ -81,7 +81,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET KERNEL SIZE

@@ -73,7 +73,7 @@ namespace bk
   #endif
   { /* do nothing */ }
 
-  DVRImage4DView::DVRImage4DView(self_type&&) = default;
+  DVRImage4DView::DVRImage4DView(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -95,7 +95,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto DVRImage4DView::operator=(self_type&&) -> self_type& = default;
+  auto DVRImage4DView::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================

@@ -37,7 +37,7 @@ namespace bk
   { /* do nothing */ }
 
   FFTImageFilter::FFTImageFilter(const self_type&) = default;
-  FFTImageFilter::FFTImageFilter(self_type&&) = default;
+  FFTImageFilter::FFTImageFilter(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -65,7 +65,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto FFTImageFilter::operator=(const self_type& other) -> self_type& = default;
-  auto FFTImageFilter::operator=(self_type&& other) -> self_type& = default;
+  auto FFTImageFilter::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET NORMALIZATION

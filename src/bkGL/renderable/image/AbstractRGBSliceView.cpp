@@ -54,7 +54,7 @@ namespace bk::details
     {
     }
 
-    AbstractRGBSliceView::AbstractRGBSliceView(self_type&&) = default;
+    AbstractRGBSliceView::AbstractRGBSliceView(self_type&&) noexcept = default;
 
     AbstractRGBSliceView::~AbstractRGBSliceView()
     { _pdata->s_rgbcurrent_changed.disconnect_all(); }
@@ -80,7 +80,7 @@ namespace bk::details
     //====================================================================================================
     //===== SETTER
     //====================================================================================================
-    auto AbstractRGBSliceView::operator=(self_type&& other) -> self_type& = default;
+    auto AbstractRGBSliceView::operator=(self_type&& other) noexcept -> self_type& = default;
 
     //====================================================================================================
     //===== FUNCTIONS

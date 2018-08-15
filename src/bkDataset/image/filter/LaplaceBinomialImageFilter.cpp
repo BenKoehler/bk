@@ -35,7 +35,7 @@ namespace bk
   { /* do nothing */ }
 
   LaplaceBinomialImageFilter::LaplaceBinomialImageFilter(const self_type& other) = default;
-  LaplaceBinomialImageFilter::LaplaceBinomialImageFilter(self_type&& other) = default;
+  LaplaceBinomialImageFilter::LaplaceBinomialImageFilter(self_type&& other) noexcept = default;
 
   LaplaceBinomialImageFilter::LaplaceBinomialImageFilter(unsigned int nDims, unsigned int size)
       : _kernel_size(nDims, size)
@@ -59,7 +59,7 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
   auto LaplaceBinomialImageFilter::operator=(const self_type& other) -> self_type& = default;
-  auto LaplaceBinomialImageFilter::operator=(self_type&& other) -> self_type& = default;
+  auto LaplaceBinomialImageFilter::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET KERNEL SIZE

@@ -59,7 +59,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       BinomialSmoothingImageFilter();
       BinomialSmoothingImageFilter(const self_type& other);
-      BinomialSmoothingImageFilter(self_type&& other);
+      BinomialSmoothingImageFilter(self_type&& other) noexcept;
       BinomialSmoothingImageFilter(unsigned int numIterations, unsigned int nDims, unsigned int size);
       /// @}
 
@@ -83,7 +83,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SET NUM ITERATIONS

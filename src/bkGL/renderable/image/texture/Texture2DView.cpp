@@ -74,7 +74,7 @@ namespace bk
       _pdata->ubo.register_value("tex_unit", _pdata->tex_unit);
   }
 
-  Texture2DView::Texture2DView(self_type&&) = default;
+  Texture2DView::Texture2DView(self_type&&) noexcept = default;
 
   Texture2DView::~Texture2DView()
   {}
@@ -109,7 +109,7 @@ namespace bk
       }
   }
 
-  auto Texture2DView::operator=(self_type&& other) -> self_type& = default;
+  auto Texture2DView::operator=(self_type&& other) noexcept -> self_type& = default;
 
   //====================================================================================================
   //===== FUNCTIONS

@@ -64,7 +64,7 @@ namespace bk
     public:
       WindowingTransferFunction();
       WindowingTransferFunction(const self_type& other);
-      WindowingTransferFunction(self_type&& other);
+      WindowingTransferFunction(self_type&& other) noexcept;
       WindowingTransferFunction(double intensity_min, double intensity_max, double center, double width);
       ~WindowingTransferFunction();
 
@@ -130,7 +130,7 @@ namespace bk
 
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] auto operator=(const self_type& other) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       //====================================================================================================

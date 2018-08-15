@@ -78,7 +78,7 @@ namespace bk
       GrayImageGraphCutView(bk::qt_gl_functions* gl);
       #endif
       GrayImageGraphCutView(const self_type& other) = delete;
-      GrayImageGraphCutView(self_type&& other);
+      GrayImageGraphCutView(self_type&& other) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DESTRUCTOR
@@ -139,7 +139,7 @@ namespace bk
 
       /// @{ -------------------------------------------------- OPERATOR =
       self_type& operator=(const self_type& other) = delete;
-      auto operator=(self_type&& other) -> self_type&;
+      auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       void set_inside_outside_from_graph_cut();

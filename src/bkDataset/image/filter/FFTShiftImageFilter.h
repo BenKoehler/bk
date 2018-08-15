@@ -49,7 +49,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       constexpr FFTShiftImageFilter() = default;
       constexpr FFTShiftImageFilter(const self_type&) = default;
-      constexpr FFTShiftImageFilter(self_type&&) = default;
+      constexpr FFTShiftImageFilter(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -61,7 +61,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] constexpr auto operator=(const self_type& other) -> self_type& = default;
-      [[maybe_unused]] constexpr auto operator=(self_type&& other) -> self_type& = default;
+      [[maybe_unused]] constexpr auto operator=(self_type&& other) noexcept -> self_type& = default;
       /// @}
 
       //====================================================================================================

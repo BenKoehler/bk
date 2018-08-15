@@ -150,7 +150,7 @@ namespace bk
       _pdata->vao_background.add_default_attribute_position_2xfloat();
   }
 
-  TextView::TextView(self_type&&) = default;
+  TextView::TextView(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -291,7 +291,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto TextView::operator=(self_type&&) -> self_type& = default;
+  auto TextView::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- SET TEXT

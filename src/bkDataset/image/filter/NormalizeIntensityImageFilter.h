@@ -45,7 +45,7 @@ namespace bk
       /// @{ -------------------------------------------------- CTOR
       constexpr NormalizeIntensityImageFilter() = default;
       constexpr NormalizeIntensityImageFilter(const self_type&) = default;
-      constexpr NormalizeIntensityImageFilter(self_type&&) = default;
+      constexpr NormalizeIntensityImageFilter(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -57,7 +57,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] constexpr auto operator=(const self_type& other) -> self_type& = default;
-      [[maybe_unused]] constexpr auto operator=(self_type&& other) -> self_type& = default;
+      [[maybe_unused]] constexpr auto operator=(self_type&& other) noexcept -> self_type& = default;
       /// @}
 
       //====================================================================================================

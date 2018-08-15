@@ -71,7 +71,7 @@ namespace bk
       { /* do nothing */ }
 
       KDTreeNode(const self_type&) = delete;
-      KDTreeNode(self_type&&) = default;
+      KDTreeNode(self_type&&) noexcept = default;
       /// @}
 
       //====================================================================================================
@@ -129,7 +129,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type&)  = delete;
-      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- SET SPLIT VALUE

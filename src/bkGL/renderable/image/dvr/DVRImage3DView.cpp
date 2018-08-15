@@ -65,7 +65,7 @@ namespace bk
   #endif
   { /* do nothing */ }
 
-  DVRImage3DView::DVRImage3DView(self_type&&) = default;
+  DVRImage3DView::DVRImage3DView(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
@@ -84,7 +84,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto DVRImage3DView::operator=(self_type&& other) -> self_type& = default;
+  auto DVRImage3DView::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================
