@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
+#include <bkGL/renderable/AbstractRenderable.h>
+
 #include <atomic>
 #include <iostream>
 
-#include "../../../include/bkTools/Signal"
-
-#include "../../../include/bkGL/renderable/AbstractRenderable.h"
+#include <bk/Signal>
 
 namespace bk::details
 {

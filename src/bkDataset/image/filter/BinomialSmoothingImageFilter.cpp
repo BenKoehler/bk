@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../../include/bkDataset/image/filter/BinomialSmoothingImageFilter.h"
+#include <bkDataset/image/filter/BinomialSmoothingImageFilter.h>
 
 namespace bk
 {

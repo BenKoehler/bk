@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+#include <bkDicom/DicomDirImporter.h>
+
 #include <algorithm>
 #include <cassert>
 #include <cinttypes>
@@ -41,21 +43,20 @@
 #include <gdcmMediaStorage.h>
 #include <gdcmStringFilter.h>
 
-#include "../../include/bkTools/BitVector"
-#include "../../include/bkDataset/Image"
-#include "../../include/bkTools/StringUtils"
-#include "../../include/bkMath/functions/list_grid_id_conversion.h"
+#include <bk/BitVector>
+#include <bk/Image>
+#include <bk/StringUtils>
+#include <bkMath/functions/list_grid_id_conversion.h>
 
 #ifdef BK_EMIT_PROGRESS
 
-    #include "../../include/bkTools/Localization"
-    #include "../../include/bkTools/Progress"
+    #include <bk/Localization>
+    #include <bk/Progress>
 
 #endif
 
-#include "../../include/bkDicom/DicomDirImporter.h"
-#include "../../include/bkDicom/DicomFileInfos.h"
-#include "../../include/bkDicom/DicomImageInfos.h"
+#include <bkDicom/DicomFileInfos.h>
+#include <bkDicom/DicomImageInfos.h>
 
 namespace bk
 {

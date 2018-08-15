@@ -22,14 +22,14 @@
  * SOFTWARE.
  */
 
+#include <bkGL/shader/ComputeShader.h>
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
-#include "../../../include/bkTools/StringUtils"
-#include "../../../include/bkTools/io/read_text_file.h"
-
-#include "../../../include/bkGL/shader/ComputeShader.h"
+#include <bk/StringUtils>
+#include <bkTools/io/read_text_file.h>
 
 namespace bk
 {

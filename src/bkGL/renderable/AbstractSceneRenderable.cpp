@@ -22,11 +22,11 @@
  * SOFTWARE.
  */
 
+#include <bkGL/renderable/AbstractSceneRenderable.h>
+
 #include <iostream>
 
-#include "../../../include/bkTools/Signal"
-
-#include "../../../include/bkGL/renderable/AbstractSceneRenderable.h"
+#include <bk/Signal>
 
 namespace bk::details
 {

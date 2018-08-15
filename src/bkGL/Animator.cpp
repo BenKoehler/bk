@@ -22,15 +22,15 @@
  * SOFTWARE.
  */
 
+#include <bkGL/Animator.h>
+
 #include <algorithm>
 #include <cassert>
 
-#include "../../include/bkTools/Clock"
-#include "../../include/bkTools/Signal"
-
-#include "../include/bkGL/Animator.h"
-#include "../include/bkGL/renderable/AbstractRenderable.h"
-#include "../include/bkGL/renderable/AbstractSceneRenderable.h"
+#include <bkGL/renderable/AbstractRenderable.h>
+#include <bkGL/renderable/AbstractSceneRenderable.h>
+#include <bk/Clock>
+#include <bk/Signal>
 
 namespace bk
 {

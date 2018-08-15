@@ -1,14 +1,38 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018 Benjamin Köhler
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 #ifdef BK_LIB_GDCM_AVAILABLE
+
+    #include <bkGL/renderable/image/RGBDICOMFlowImageSliceView.h>
 
     #include <algorithm>
     #include <cmath>
 
-#include <bkGL/renderable/image/RGBDICOMFlowImageSliceView.h>
-
-#include <bkDicom/Dicom>
-    #include <bkDataset/Image>
-    #include <bkMath/Matrix>
-  #include "bkGL/buffer/SSBO.h"
+    #include <bk/Dicom>
+    #include <bk/Image>
+    #include <bk/Matrix>
+    #include <bkGL/buffer/SSBO.h>
 
 namespace bk
 {
@@ -19,23 +43,23 @@ namespace bk
   {
       image_type image;
       DicomDirImporter* dcm_importer;
-      unsigned int dcm_image_r_id;
-      unsigned int dcm_image_g_id;
-      unsigned int dcm_image_b_id;
-      bool flip_image_r;
-      bool flip_image_g;
-      bool flip_image_b;
-      bool abs_image_r;
-      bool abs_image_g;
-      bool abs_image_b;
-      bool col_image_r;
-      bool col_image_g;
-      bool col_image_b;
-      GLfloat lipv_r;
-      GLfloat lipv_g;
-      GLfloat lipv_b;
-      Vec4<GLuint> size;
-      
+      unsigned int  dcm_image_r_id;
+      unsigned int  dcm_image_g_id;
+      unsigned int  dcm_image_b_id;
+      bool          flip_image_r;
+      bool          flip_image_g;
+      bool          flip_image_b;
+      bool          abs_image_r;
+      bool          abs_image_g;
+      bool          abs_image_b;
+      bool          col_image_r;
+      bool          col_image_g;
+      bool          col_image_b;
+      GLfloat       lipv_r;
+      GLfloat       lipv_g;
+      GLfloat       lipv_b;
+      Vec4 <GLuint> size;
+
       Impl()
           : dcm_importer(nullptr),
             dcm_image_r_id(0),
@@ -62,12 +86,13 @@ namespace bk
   //====================================================================================================
   #ifndef BK_LIB_QT_AVAILABLE
 
-  RGBDICOMFlowImageSliceView::RGBDICOMFlowImageSliceView() : base_type(),
+  RGBDICOMFlowImageSliceView::RGBDICOMFlowImageSliceView()
+      : base_type(),
   #else
 
-  RGBDICOMFlowImageSliceView::RGBDICOMFlowImageSliceView(bk::qt_gl_functions* gl) : base_type(gl),
+      RGBDICOMFlowImageSliceView::RGBDICOMFlowImageSliceView(bk::qt_gl_functions* gl) : base_type(gl),
   #endif
-                                                                                          _pdata(std::make_unique<Impl>())
+        _pdata(std::make_unique<Impl>())
   {
   }
 
@@ -138,7 +163,7 @@ namespace bk
       _pdata->col_image_g = col_image_g;
       _pdata->col_image_b = col_image_b;
   }
-  
+
   auto RGBDICOMFlowImageSliceView::operator=(self_type&& other) -> self_type& = default;
 
   //====================================================================================================
@@ -148,14 +173,14 @@ namespace bk
   {
       _pdata->image.set_size(0, 0);
       _pdata->image.geometry().transformation().set_scale(1, 1);
-      _xmax() = 0;
-      _ymax() = 0;
-      _zmax() = 0;
-      _tmax() = 0;
-      _xcurrent() = 0;
-      _ycurrent() = 0;
-      _zcurrent() = 0;
-      _tcurrent() = 0;
+      _xmax()         = 0;
+      _ymax()         = 0;
+      _zmax()         = 0;
+      _tmax()         = 0;
+      _xcurrent()     = 0;
+      _ycurrent()     = 0;
+      _zcurrent()     = 0;
+      _tcurrent()     = 0;
       _intensitymax() = -std::numeric_limits<GLfloat>::max();
       _intensitymin() = std::numeric_limits<GLfloat>::max();
       rgb_current().set_constant(0);
@@ -174,9 +199,9 @@ namespace bk
           const auto img_b = _pdata->dcm_importer->read_image_block(_pdata->dcm_image_b_id, 0, _pdata->size[0] - 1, 0, _pdata->size[1] - 1, z, z, t, t);
           _intensitymax() = -std::numeric_limits<GLfloat>::max();
           _intensitymin() = std::numeric_limits<GLfloat>::max();
-          GLuint cnt = 0;
+          GLuint   cnt = 0;
           //for (GLuint y = 0; y < static_cast<GLuint>(_size[1]); ++y)
-          for (int y = static_cast<int>(_pdata->size[1] - 1); y >= 0; --y) // y is inverted, because GL coord system starts top left and image coord system starts bottom left
+          for (int y   = static_cast<int>(_pdata->size[1] - 1); y >= 0; --y) // y is inverted, because GL coord system starts top left and image coord system starts bottom left
           {
               for (GLuint x = 0; x < static_cast<GLuint>(_pdata->size[0]); ++x)
               {

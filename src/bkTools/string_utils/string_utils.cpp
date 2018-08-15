@@ -25,7 +25,7 @@
  * For more information, please refer to <http://unlicense.org>
  */
 
-#include "../../../include/bkTools/string_utils/string_utils.h"
+#include <bkTools/string_utils/string_utils.h>
 
 #include <cinttypes>
 #include <fstream>

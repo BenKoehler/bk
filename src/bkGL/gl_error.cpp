@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-#include <iostream>
+#include <bkGL/gl_error.h>
 
-#include "../include/bkGL/gl_error.h"
+#include <iostream>
 
 namespace bk
 {

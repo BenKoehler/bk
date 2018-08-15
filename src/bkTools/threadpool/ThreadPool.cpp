@@ -29,7 +29,7 @@
  * distribution.
  */
 
-#include "../../../include/bkTools/threadpool/ThreadPool.h"
+#include <bkTools/threadpool/ThreadPool.h>
 
 #include <algorithm>
 

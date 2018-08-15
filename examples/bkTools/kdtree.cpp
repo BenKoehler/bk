@@ -27,7 +27,7 @@
 #include <iostream>
 #include <random>
 
-#include <bkTools/KDTree>
+#include <bk/KDTree>
 
 /*
  * custom point class

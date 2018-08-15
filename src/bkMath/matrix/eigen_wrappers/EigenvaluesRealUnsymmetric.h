@@ -1,0 +1,81 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018 Benjamin Köhler
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+#pragma once
+
+#ifndef BK_EIGENWRAPPERS_EIGENVALUESREALUNSYMMETRIC_H
+#define BK_EIGENWRAPPERS_EIGENVALUESREALUNSYMMETRIC_H
+
+#include <bkMath/matrix/eigen_wrappers/EigenAnalysisRealUnsymmetric.h>
+
+namespace bk
+{
+  template<typename TMatrix> class EigenvaluesRealUnsymmetric : public EigenAnalysisRealUnsymmetric<TMatrix>
+  {
+      //====================================================================================================
+      //===== DEFINITIONS
+      //====================================================================================================
+      using self_type = EigenvaluesRealUnsymmetric<TMatrix>;
+      using base_type = EigenAnalysisRealUnsymmetric<TMatrix>;
+    public:
+      using matrix_type = typename base_type::matrix_type;
+      using eigenvalues_vector_type = typename base_type::eigenvalues_vector_type;
+      using eigen_matrix_type = typename base_type::eigen_matrix_type;
+      using eigen_solver_type = typename base_type::eigen_solver_type;
+
+      //====================================================================================================
+      //===== CONSTRUCTORS & DESTRUCTOR
+      //====================================================================================================
+      /// @{ -------------------------------------------------- CTOR
+      EigenvaluesRealUnsymmetric() = delete;
+      EigenvaluesRealUnsymmetric(const self_type&) = default;
+      EigenvaluesRealUnsymmetric(self_type&&) = default;
+
+      EigenvaluesRealUnsymmetric(const matrix_type& A)
+          : base_type(A, false)
+      { /* do nothing */ }
+      /// @}
+
+      /// @{ -------------------------------------------------- DTOR
+      ~EigenvaluesRealUnsymmetric() = default;
+      /// @}
+
+      //====================================================================================================
+      //===== GETTER
+      //====================================================================================================
+    private:
+      using base_type::eigenvectors; // hide eigenvector function
+    public:
+
+      //====================================================================================================
+      //===== SETTER
+      //====================================================================================================
+      /// @{ -------------------------------------------------- OPERATOR =
+      [[maybe_unused]] self_type& operator=(const self_type&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) = default;
+      /// @}
+  }; // class EigenvaluesRealUnsymmetric
+} //namespace bk
+
+#endif //BK_EIGENWRAPPERS_EIGENVALUESREALUNSYMMETRIC_H

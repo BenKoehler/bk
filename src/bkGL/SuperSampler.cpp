@@ -22,21 +22,21 @@
  * SOFTWARE.
  */
 
+#include <bkGL/SuperSampler.h>
+
 #include <algorithm>
 #include <utility>
 
-#include "../../include/bkTools/Signal"
-
-#include "../include/bkGL/SuperSampler.h"
-#include "../include/bkGL/UBOGlobal.h"
-#include "../include/bkGL/WindowGeometry.h"
-#include "../include/bkGL/buffer/FBO.h"
-#include "../include/bkGL/renderable/AbstractRenderable.h"
-#include "../include/bkGL/renderable/AbstractSceneRenderable.h"
-#include "../include/bkGL/renderable/ScreenQuad.h"
-#include "../include/bkGL/shader/Shader.h"
-#include "../include/bkGL/shader/ShaderLibrary.h"
-#include "../include/bkGL/texture/Texture2D.h"
+#include <bk/Signal>
+#include <bkGL/UBOGlobal.h>
+#include <bkGL/WindowGeometry.h>
+#include <bkGL/buffer/FBO.h>
+#include <bkGL/renderable/AbstractRenderable.h>
+#include <bkGL/renderable/AbstractSceneRenderable.h>
+#include <bkGL/renderable/ScreenQuad.h>
+#include <bkGL/shader/Shader.h>
+#include <bkGL/shader/ShaderLibrary.h>
+#include <bkGL/texture/Texture2D.h>
 
 namespace bk
 {

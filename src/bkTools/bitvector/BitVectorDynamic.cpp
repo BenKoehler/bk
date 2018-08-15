@@ -26,7 +26,7 @@
 #include <cassert>
 #include <utility>
 
-#include "../../../include/bkTools/bitvector/BitVectorDynamic.h"
+#include <bkTools/bitvector/BitVectorDynamic.h>
 
 namespace bk::details
 {

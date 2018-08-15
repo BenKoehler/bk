@@ -22,9 +22,10 @@
  * SOFTWARE.
  */
 
-#include "../../../include/bkGL/renderable/ScreenQuad.h"
-#include "../../../include/bkGL/buffer/VBO.h"
-#include "../../../include/bkGL/vao/VAO.h"
+#include <bkGL/renderable/ScreenQuad.h>
+
+#include <bkGL/buffer/VBO.h>
+#include <bkGL/vao/VAO.h>
 
 namespace bk
 {

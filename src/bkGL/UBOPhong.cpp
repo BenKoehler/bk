@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../include/bkGL/UBOPhong.h"
+#include <bkGL/UBOPhong.h>
 
 namespace bk::details
 {

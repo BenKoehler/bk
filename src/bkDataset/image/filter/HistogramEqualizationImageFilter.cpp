@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../../include/bkDataset/image/filter/HistogramEqualizationImageFilter.h"
+#include <bkDataset/image/filter/HistogramEqualizationImageFilter.h>
 
 namespace bk
 {

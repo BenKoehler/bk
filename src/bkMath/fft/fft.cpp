@@ -39,12 +39,11 @@
  * SOFTWARE.
  */
 
+#include <bkMath/fft/fft.h>
 
 #include <array>
 #include <cmath>
 #include <utility>
-
-#include "../../../include/bkMath/fft/fft.h"
 
 namespace bk
 {

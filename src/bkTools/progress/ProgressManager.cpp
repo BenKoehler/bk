@@ -22,15 +22,15 @@
  * SOFTWARE.
  */
 
+#include <bkTools/progress/ProgressManager.h>
+
 #include <algorithm>
 #include <map>
 #include <mutex>
 #include <vector>
 
-#include <bkTools/Signal>
-
-#include "../../../include/bkTools/progress/ProgressManager.h"
-#include "../../../include/bkTools/progress/Progress.h"
+#include <bkTools/progress/Progress.h>
+#include <bk/Signal>
 
 namespace bk
 {

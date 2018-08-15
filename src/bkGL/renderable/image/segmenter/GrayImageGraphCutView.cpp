@@ -1,11 +1,35 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018 Benjamin Köhler
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 #include <bkGL/renderable/image/segmenter/GrayImageGraphCutView.h>
 
 #include <algorithm>
 #include <cmath>
 
-#include <bkDataset/Image>
-#include <bkTools/Signal>
-#include <bkTools/ThreadPool>
+#include <bk/Image>
+#include <bk/Signal>
+#include <bk/ThreadPool>
 #include <bkMath/functions/list_grid_id_conversion.h>
 
 #include <bkGL/buffer/SSBO.h>
@@ -38,7 +62,7 @@ namespace bk
       segmentation_type seg;
       segmentation_type in;
       segmentation_type out;
-      Signal<> s_gc_finished;
+      bk::Signal<> s_gc_finished;
 
           #ifndef BK_LIB_QT_AVAILABLE
 
@@ -111,7 +135,7 @@ namespace bk
   auto GrayImageGraphCutView::segmentation() const -> const segmentation_type&
   { return _pdata->seg; }
 
-  Signal<>& GrayImageGraphCutView::signal_graph_cut_finished()
+  bk::Signal<>& GrayImageGraphCutView::signal_graph_cut_finished()
   { return _pdata->s_gc_finished; }
 
   //====================================================================================================

@@ -22,20 +22,21 @@
  * SOFTWARE.
  */
 
+#include <bkGL/OrderIndependentTransparency.h>
+
 #include <algorithm>
 #include <cstdint>
 #include <sstream>
 
-#include "../../include/bkTools/Signal"
-#include "../../include/bkTools/StringUtils"
+#include <bk/Signal>
+#include <bk/StringUtils>
 
-#include "../include/bkGL/OrderIndependentTransparency.h"
-#include "../include/bkGL/buffer/SSBO.h"
-#include "../include/bkGL/renderable/AbstractRenderable.h"
-#include "../include/bkGL/renderable/AbstractSceneRenderable.h"
-#include "../include/bkGL/renderable/ScreenQuad.h"
-#include "../include/bkGL/shader/Shader.h"
-#include "../include/bkGL/shader/ShaderLibrary.h"
+#include <bkGL/buffer/SSBO.h>
+#include <bkGL/renderable/AbstractRenderable.h>
+#include <bkGL/renderable/AbstractSceneRenderable.h>
+#include <bkGL/renderable/ScreenQuad.h>
+#include <bkGL/shader/Shader.h>
+#include <bkGL/shader/ShaderLibrary.h>
 
 namespace bk
 {

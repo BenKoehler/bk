@@ -22,13 +22,14 @@
  * SOFTWARE.
  */
 
+#include <bkGL/buffer/FBO.h>
+
 #include <cassert>
 #include <iostream>
 #include <map>
 #include <vector>
 
-#include "../../../include/bkGL/buffer/FBO.h"
-#include "../../../include/bkGL//texture/Texture2D.h"
+#include <bkGL/texture/Texture2D.h>
 
 namespace bk
 {

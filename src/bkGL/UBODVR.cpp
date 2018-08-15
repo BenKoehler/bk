@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../include/bkGL/UBODVR.h"
+#include <bkGL/UBODVR.h>
 
 namespace bk::details
 {

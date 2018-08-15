@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+#include <bkGL/renderable/image/AbstractSliceView.h>
+
 #include <algorithm>
 #include <cmath>
 #include <fstream>
@@ -31,17 +33,16 @@
 #include <vector>
 
 #include <bkTools/color/WindowingTransferFunction.h>
-#include <bkMath/Matrix>
-#include <bkTools/Signal>
+#include <bk/Matrix>
+#include <bk/Signal>
 
 #ifdef BK_EMIT_PROGRESS
 
-    #include <bkTools/Progress>
-    #include <bkTools/Localization>
+    #include <bk/Progress>
+    #include <bk/Localization>
 
 #endif
 
-#include <bkGL/renderable/image/AbstractSliceView.h>
 #include <bkGL/buffer/VBO.h>
 #include <bkGL/buffer/IBO.h>
 #include <bkGL/UBOSliceView.h>

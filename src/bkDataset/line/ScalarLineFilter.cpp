@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
+#include <bkDataset/line/ScalarLineFilter.h>
+
 #include <algorithm>
 #include <string_view>
-
-#include "../../../include/bkDataset/line/ScalarLineFilter.h"
 
 namespace bk
 {

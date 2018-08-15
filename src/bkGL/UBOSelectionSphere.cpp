@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../include/bkGL/UBOSelectionSphere.h"
+#include <bkGL/UBOSelectionSphere.h>
 
 namespace bk::details
 {

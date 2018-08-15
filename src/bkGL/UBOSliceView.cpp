@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../include/bkGL/UBOSliceView.h"
+#include <bkGL/UBOSliceView.h>
 
 namespace bk::details
 {

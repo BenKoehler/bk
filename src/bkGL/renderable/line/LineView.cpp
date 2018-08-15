@@ -22,29 +22,29 @@
  * SOFTWARE.
  */
 
+#include <bkGL/renderable/line/LineView.h>
+
 #include <algorithm>
 #include <cassert>
 #include <random>
 #include <vector>
 
-#include "../../../../include/bkTools/color/ColorRGBA.h"
-#include "../../../../include/bkTools/color/ColorBarRGBA.h"
-#include "../../../../include/bkMath/functions/equals_approx.h"
-
-#include "../../../../include/bkGL/renderable/line/LineView.h"
-#include "../../../../include/bkGL/buffer/FBO.h"
-#include "../../../../include/bkGL/buffer/IBO.h"
-#include "../../../../include/bkGL/buffer/SSBO.h"
-#include "../../../../include/bkGL/buffer/VBO.h"
-#include "../../../../include/bkGL/buffer/UBO.h"
-#include "../../../../include/bkGL/renderable/ScreenQuad.h"
-#include "../../../../include/bkGL/renderable/ColorBarView.h"
-#include "../../../../include/bkGL/renderable/EColorScaleType.h"
-#include "../../../../include/bkGL/shader/Shader.h"
-#include "../../../../include/bkGL/shader/ShaderLibrary.h"
-#include "../../../../include/bkGL/texture/Texture2D.h"
-#include "../../../../include/bkGL/vao/VAO.h"
-#include "../../../../include/bkGL/UBOLine.h"
+#include <bkGL/buffer/FBO.h>
+#include <bkGL/buffer/IBO.h>
+#include <bkGL/buffer/SSBO.h>
+#include <bkGL/buffer/VBO.h>
+#include <bkGL/buffer/UBO.h>
+#include <bkGL/renderable/ScreenQuad.h>
+#include <bkGL/renderable/ColorBarView.h>
+#include <bkGL/renderable/EColorScaleType.h>
+#include <bkGL/shader/Shader.h>
+#include <bkGL/shader/ShaderLibrary.h>
+#include <bkGL/texture/Texture2D.h>
+#include <bkGL/vao/VAO.h>
+#include <bkGL/UBOLine.h>
+#include <bkMath/functions/equals_approx.h>
+#include <bkTools/color/ColorRGBA.h>
+#include <bkTools/color/ColorBarRGBA.h>
 
 namespace bk
 {

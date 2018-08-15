@@ -25,16 +25,17 @@
 #include <algorithm>
 #include <sstream>
 
-#include "../../../include/bkTools/Color"
-#include "../../../include/bkMath/Matrix"
-#include "../../../include/bkTools/Signal"
+#include <bkGL/renderable/ColorBarView.h>
 
-#include "../../../include/bkGL/renderable/ColorBarView.h"
-#include "../../../include/bkGL/renderable/text/TextView.h"
-#include "../../../include/bkGL/buffer/VBO.h"
-#include "../../../include/bkGL/shader/Shader.h"
-#include "../../../include/bkGL/shader/ShaderLibrary.h"
-#include "../../../include/bkGL/vao/VAO.h"
+#include <bk/Color>
+#include <bk/Matrix>
+#include <bk/Signal>
+
+#include <bkGL/renderable/text/TextView.h>
+#include <bkGL/buffer/VBO.h>
+#include <bkGL/shader/Shader.h>
+#include <bkGL/shader/ShaderLibrary.h>
+#include <bkGL/vao/VAO.h>
 
 namespace bk
 {

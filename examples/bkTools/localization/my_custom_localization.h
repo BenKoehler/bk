@@ -29,7 +29,7 @@
 
 #include <memory>
 
-#include <bkTools/Localization>
+#include <bk/Localization>
 
 enum Text_ : unsigned int
 {

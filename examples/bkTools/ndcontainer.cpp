@@ -24,7 +24,7 @@
 
 #include <iostream>
 
-#include <bkTools/NDContainer>
+#include <bk/NDContainer>
 
 void ndarray_example()
 {

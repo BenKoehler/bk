@@ -33,7 +33,7 @@
 
 #include <png.h>
 
-#include <bkTools/GraphCut>
+#include <bk/GraphCut>
 
 struct MyGrayImage2D
 {

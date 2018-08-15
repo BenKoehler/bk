@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
+#include <bkGL/buffer/UBO.h>
+
 #include <algorithm>
 #include <unordered_map>
 
-#include "../../../include/bkTools/StringUtils"
-
-#include "../../../include/bkGL/buffer/RegisteredValue.h"
-#include "../../../include/bkGL/buffer/UBO.h"
+#include <bkGL/buffer/RegisteredValue.h>
+#include <bk/StringUtils>
 
 namespace bk
 {
@@ -37,7 +37,7 @@ namespace bk
   //====================================================================================================
   struct UBO::Impl
   {
-      std::unordered_map<std::string/*name*/, RegisteredValue, string_utils::hash_obj> registered_values;
+      std::unordered_map<std::string/*name*/, RegisteredValue, bk::string_utils::hash_obj> registered_values;
 
       Impl()
       { /* do nothing */ }

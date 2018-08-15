@@ -25,7 +25,7 @@
 #include <functional> // std::placeholders
 #include <iostream>
 
-#include <bkTools/Signal>
+#include <bk/Signal>
 
 struct MyClass
 {

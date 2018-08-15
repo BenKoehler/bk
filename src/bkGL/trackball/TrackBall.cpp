@@ -22,12 +22,13 @@
  * SOFTWARE.
  */
 
+#include <bkGL/trackball/TrackBall.h>
+
 #include <algorithm>
 #include <cmath>
 
-#include "../../../include/bkGL/trackball/TrackBall.h"
-#include "../../../include/bkGL/Mouse.h"
-#include "../../../include/bkGL/WindowGeometry.h"
+#include <bkGL/Mouse.h>
+#include <bkGL/WindowGeometry.h>
 
 namespace bk
 {

@@ -22,20 +22,21 @@
  * SOFTWARE.
  */
 
+#include <bkGL/renderable/text/TextView.h>
+
 #include <algorithm>
 #include <iostream>
 #include <map>
 #include <utility>
 
-#include "../../../../include/bkMath/Matrix"
-#include "../../../../include/bkTools/color/ColorRGBA.h"
+#include <bk/Matrix>
+#include <bkTools/color/ColorRGBA.h>
 
-#include "../../../../include/bkGL/renderable/text/TextView.h"
-#include "../../../../include/bkGL/buffer/VBO.h"
-#include "../../../../include/bkGL/vao/VAO.h"
-#include "../../../../include/bkGL/shader/Shader.h"
-#include "../../../../include/bkGL/shader/ShaderLibrary.h"
-#include "../../../../include/bkGL/UBOText.h"
+#include <bkGL/buffer/VBO.h>
+#include <bkGL/vao/VAO.h>
+#include <bkGL/shader/Shader.h>
+#include <bkGL/shader/ShaderLibrary.h>
+#include <bkGL/UBOText.h>
 
 namespace bk
 {

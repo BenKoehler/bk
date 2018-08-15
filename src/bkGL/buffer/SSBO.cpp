@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../include/bkGL/buffer/SSBO.h"
+#include <bkGL/buffer/SSBO.h>
 
 namespace bk
 {

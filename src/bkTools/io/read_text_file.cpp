@@ -25,9 +25,10 @@
  * For more information, please refer to <http://unlicense.org>
  */
 
-#include <sstream>
+#include <bkTools/io/read_text_file.h>
 
-#include "../../../include/bkTools/io/read_text_file.h"
+#include <fstream>
+#include <sstream>
 
 namespace bk
 {

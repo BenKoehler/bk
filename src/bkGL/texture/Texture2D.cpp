@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../include/bkGL/texture/Texture2D.h"
+#include <bkGL/texture/Texture2D.h>
 
 namespace bk
 {

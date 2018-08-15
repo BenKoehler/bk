@@ -28,17 +28,17 @@
 //#include <cstdint>
 //
 //#include <bkCMR/rotation_angle_2d.h>
-//#include <bkTools/BitVector>
-//#include <bkTools/Clock>
-//#include <bkDataset/Line>
-//#include <bkDataset/Image>
-//#include <bkDataset/Mesh>
-//#include <bkTools/ThreadPool>
+//#include <bk/BitVector>
+//#include <bk/Clock>
+//#include <bk/Line>
+//#include <bk/Image>
+//#include <bk/Mesh>
+//#include <bk/ThreadPool>
 //
 //#ifdef BK_EMIT_PROGRESS
 //
-//    #include <bkTools/Localization>
-//    #include <bkTools/Progress>
+//    #include <bk/Localization>
+//    #include <bk/Progress>
 //
 //#endif
 //

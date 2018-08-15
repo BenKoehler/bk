@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../include/bkGL/UBOGlobal.h"
+#include <bkGL/UBOGlobal.h>
 
 namespace bk::details
 {

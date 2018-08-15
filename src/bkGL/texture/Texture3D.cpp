@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-#include <algorithm>
+#include <bkGL/texture/Texture3D.h>
 
-#include "../../../include/bkGL/texture/Texture3D.h"
+#include <algorithm>
 
 namespace bk
 {

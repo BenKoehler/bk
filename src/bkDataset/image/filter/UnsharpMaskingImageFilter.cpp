@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../../include/bkDataset/image/filter/UnsharpMaskingImageFilter.h"
+#include <bkDataset/image/filter/UnsharpMaskingImageFilter.h>
 
 namespace bk
 {

@@ -22,16 +22,16 @@
  * SOFTWARE.
  */
 
-#include <iostream>
+#include <bkGL/renderable/background/AbstractBackground.h>
 
+#include <iostream>
 #include <sstream>
 #include <string>
 
-#include "../../../../include/bkGL/renderable/background/AbstractBackground.h"
-#include "../../../../include/bkGL/buffer/VBO.h"
-#include "../../../../include/bkGL/shader/Shader.h"
-#include "../../../../include/bkGL/shader/ShaderLibrary.h"
-#include "../../../../include/bkGL/vao/VAO.h"
+#include <bkGL/buffer/VBO.h>
+#include <bkGL/shader/Shader.h>
+#include <bkGL/shader/ShaderLibrary.h>
+#include <bkGL/vao/VAO.h>
 
 namespace bk::details
 {

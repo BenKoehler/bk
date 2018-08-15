@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
+#include <bkGL/trackball/Quaternion.h>
+
 #include <cassert>
 #include <cmath>
-
-#include "../../../include/bkGL/trackball/Quaternion.h"
 
 namespace bk
 {

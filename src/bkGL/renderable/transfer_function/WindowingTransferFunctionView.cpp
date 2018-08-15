@@ -22,14 +22,14 @@
  * SOFTWARE.
  */
 
-#include "../../../../include/bkTools/color/WindowingTransferFunction.h"
+#include <bkGL/renderable/transfer_function/WindowingTransferFunctionView.h>
 
-#include "../../../../include/bkGL/renderable/transfer_function/WindowingTransferFunctionView.h"
-#include "../../../../include/bkGL/buffer/VBO.h"
-#include "../../../../include/bkGL/buffer/IBO.h"
-#include "../../../../include/bkGL/shader/Shader.h"
-#include "../../../../include/bkGL/shader/ShaderLibrary.h"
-#include "../../../../include/bkGL/vao/VAO.h"
+#include <bkGL/buffer/VBO.h>
+#include <bkGL/buffer/IBO.h>
+#include <bkGL/shader/Shader.h>
+#include <bkGL/shader/ShaderLibrary.h>
+#include <bkGL/vao/VAO.h>
+#include <bkTools/color/WindowingTransferFunction.h>
 
 namespace bk
 {

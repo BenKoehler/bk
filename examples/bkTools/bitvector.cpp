@@ -24,7 +24,7 @@
 
 #include <iostream>
 
-#include <bkTools/BitVector>
+#include <bk/BitVector>
 
 int main(int, char**)
 {

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../../include/bkDataset/dataobject/filter/SmoothPointValuesFilter.h"
+#include <bkDataset/dataobject/filter/SmoothPointValuesFilter.h>
 
 namespace bk
 {

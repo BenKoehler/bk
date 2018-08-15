@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-#include <algorithm>
+#include <bkDataset/line/ScalarLineThreshold.h>
 
-#include "../../../include/bkDataset/line/ScalarLineThreshold.h"
+#include <algorithm>
 
 namespace bk
 {

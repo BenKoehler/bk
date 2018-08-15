@@ -112,8 +112,10 @@ include(MakeExamples.cmake)
 # add library bkAlgorithm
 # ----------
 _bk_make_lib_header(algorithm Algorithm)
-_bk_install_lib_header(algorithm Algorithm)
+
 target_link_libraries(bkAlgorithm INTERFACE bk::bkMath)
+
+_bk_install_lib_header(Algorithm)
 
 if (BUILD_EXAMPLES)
     set(BK_CURRENT_LIBRARY bkAlgorithm)
@@ -151,6 +153,7 @@ set(SOURCE_FILES
 
 add_library(bkCMR ${SOURCE_FILES})
 _bk_make_lib(cmr CMR)
+
 target_link_libraries(bkCMR PUBLIC Threads::Threads)
 target_link_libraries(bkCMR PUBLIC bk::bkAlgorithm)
 target_link_libraries(bkCMR PUBLIC bk::bkDataset)
@@ -159,6 +162,7 @@ target_link_libraries(bkCMR PUBLIC bk::bkTools)
 target_link_libraries(bkCMR PUBLIC bk::bkMath)
 target_link_libraries(bkCMR PUBLIC bk::bkTypeTraits)
 target_link_libraries(bkCMR PUBLIC bk::bkGL)
+
 _bk_install_lib(cmr CMR CMR)
 
 # ------------------------------------------------------------------------------------------------------------------------------------
@@ -200,8 +204,6 @@ if (PNG_FOUND)
     target_compile_definitions(bkDataset PUBLIC BK_LIB_PNG_AVAILABLE)
 endif ()
 
-_bk_install_lib(dataset Dataset DATASET)
-
 target_link_libraries(bkDataset PUBLIC bk::bkAlgorithm)
 target_link_libraries(bkDataset PUBLIC bk::bkTools)
 target_link_libraries(bkDataset PUBLIC bk::bkMath)
@@ -212,6 +214,8 @@ endif ()
 if (OpenMP_CXX_FOUND)
     target_link_libraries(bkDataset PRIVATE OpenMP::OpenMP_CXX)
 endif ()
+
+_bk_install_lib(dataset Dataset DATASET)
 
 # ------------------------------------------------------------------------------------------------------------------------------------
 # add library bkDicom
@@ -225,10 +229,12 @@ if (GDCM_FOUND)
 
     add_library(bkDicom ${SOURCE_FILES})
     _bk_make_lib(dicom Dicom)
+
     target_link_libraries(bkDicom bk::bkMath)
     target_link_libraries(bkDicom bk::bkDataset)
     target_link_libraries(bkDicom bk::bkTools)
     target_link_libraries(bkDicom GDCM::GDCM)
+
     _bk_install_lib(dicom Dicom DICOM)
 endif()
 
@@ -342,8 +348,6 @@ else()
     target_compile_definitions(bkGL PUBLIC BK_GL_FONT_PATH="C:/Windows/Fonts/arial.ttf")
 endif()
 
-_bk_install_lib(gl GL GL)
-
 target_link_libraries(bkGL PUBLIC bk::bkAlgorithm)
 target_link_libraries(bkGL PUBLIC bk::bkDataset)
 target_link_libraries(bkGL PUBLIC bk::bkTools)
@@ -372,6 +376,8 @@ endif()
 target_link_libraries(bkGL PUBLIC Freetype::Freetype)
 target_link_libraries(bkGL PUBLIC stdc++fs)
 
+_bk_install_lib(gl GL GL)
+
 # ------------------------------------------------------------------------------------------------------------------------------------
 # add library bkMath
 # ----------
@@ -381,10 +387,12 @@ set(SOURCE_FILES
 
 add_library(bkMath ${SOURCE_FILES})
 _bk_make_lib(math Math ${SOURCE_FILES})
+
 target_link_libraries(bkMath PUBLIC bk::bkTools)
 if (OpenMP_CXX_FOUND)
     target_link_libraries(bkMath PUBLIC OpenMP::OpenMP_CXX)
 endif ()
+
 _bk_install_lib(math Math MATH)
 
 if (BUILD_EXAMPLES)
@@ -424,7 +432,9 @@ set(SOURCE_FILES
 
 add_library(bkTools ${SOURCE_FILES})
 _bk_make_lib(tools Tools)
-target_link_libraries(bkTools Threads::Threads)
+
+target_link_libraries(bkTools PUBLIC Threads::Threads)
+
 _bk_install_lib(tools Tools TOOLS)
 
 # add localization crawler tool
@@ -499,7 +509,7 @@ endif ()
 # add library bkTypeTraits
 # ----------
 _bk_make_lib_header(type_traits TypeTraits)
-_bk_install_lib_header(type_traits TypeTraits)
+_bk_install_lib_header(TypeTraits)
 
 # ------------------------------------------------------------------------------------------------------------------------------------
 # add library bk
@@ -522,6 +532,10 @@ target_link_libraries(bk PUBLIC bk::bkGL)
 target_link_libraries(bk PUBLIC bk::bkMath)
 target_link_libraries(bk PUBLIC bk::bkTools)
 target_link_libraries(bk PUBLIC bk::bkTypeTraits)
+
+install(DIRECTORY
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/bk
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 install(TARGETS bk
         EXPORT bkTargets

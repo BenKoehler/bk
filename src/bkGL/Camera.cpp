@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
+#include <bkGL/Camera.h>
+
 #include <cmath>
 
-#include "../../include/bkTools/Signal"
-#include "../../include/bkMath/functions/radians_degree_conversion.h"
-#include "../../include/bkMath/constants/pi.h"
-
-#include "../include/bkGL/Camera.h"
+#include <bk/Signal>
+#include <bkMath/functions/radians_degree_conversion.h>
+#include <bkMath/constants/pi.h>
 
 namespace bk
 {

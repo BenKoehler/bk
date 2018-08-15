@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../include/bkGL/buffer/UBOSpecialization.h"
+#include <bkGL/buffer/UBOSpecialization.h>
 
 namespace bk::details
 {

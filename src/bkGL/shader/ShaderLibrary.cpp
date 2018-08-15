@@ -22,21 +22,22 @@
  * SOFTWARE.
  */
 
+#include <bkGL/shader/ShaderLibrary.h>
+
 #include <sstream>
 #include <vector>
 
-#include "../../../include/bkGL/shader/ShaderLibrary.h"
-#include "../../../include/bkGL/buffer/RegisteredValue.h"
-#include "../../../include/bkGL/buffer/UBO.h"
-#include "../../../include/bkGL/buffer/UBOSpecialization.h"
-#include "../../../include/bkGL/OrderIndependentTransparency.h"
-#include "../../../include/bkGL/UBODVR.h"
-#include "../../../include/bkGL/UBOGlobal.h"
-#include "../../../include/bkGL/UBOLine.h"
-#include "../../../include/bkGL/UBOPhong.h"
-#include "../../../include/bkGL/UBOSelectionSphere.h"
-#include "../../../include/bkGL/UBOSliceView.h"
-#include "../../../include/bkGL/UBOText.h"
+#include <bkGL/buffer/RegisteredValue.h>
+#include <bkGL/buffer/UBO.h>
+#include <bkGL/buffer/UBOSpecialization.h>
+#include <bkGL/OrderIndependentTransparency.h>
+#include <bkGL/UBODVR.h>
+#include <bkGL/UBOGlobal.h>
+#include <bkGL/UBOLine.h>
+#include <bkGL/UBOPhong.h>
+#include <bkGL/UBOSelectionSphere.h>
+#include <bkGL/UBOSliceView.h>
+#include <bkGL/UBOText.h>
 
 namespace bk::details
 {

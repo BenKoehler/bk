@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../../include/bkDataset/image/filter/LaplaceImageFilter.h"
+#include <bkDataset/image/filter/LaplaceImageFilter.h>
 
 namespace bk
 {

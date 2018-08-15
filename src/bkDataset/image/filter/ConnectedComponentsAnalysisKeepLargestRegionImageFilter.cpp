@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../../include/bkDataset/image/filter/ConnectedComponentsAnalysisKeepLargestRegionImageFilter.h"
+#include <bkDataset/image/filter/ConnectedComponentsAnalysisKeepLargestRegionImageFilter.h>
 
 namespace bk
 {

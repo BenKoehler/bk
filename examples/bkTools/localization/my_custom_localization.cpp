@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include <bkTools/Localization>
+#include <bk/Localization>
 
 #include "my_custom_localization.h"
 

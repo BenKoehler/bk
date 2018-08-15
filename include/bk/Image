@@ -1,0 +1,58 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018 Benjamin Köhler
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+#include "bkDataset/image/Image.h"
+
+#include "bkDataset/image/filter/ConvolutionFFTImageFilter.h"
+#include "bkDataset/image/filter/AverageSmoothingImageFilter.h"
+#include "bkDataset/image/filter/BinomialSmoothingImageFilter.h"
+#include "bkDataset/image/filter/ConnectedComponentsAnalysisImageFilter.h"
+#include "bkDataset/image/filter/ConnectedComponentsAnalysisKeepLargestRegionImageFilter.h"
+#include "bkDataset/image/filter/DistanceMapImageFilter.h"
+#include "bkDataset/image/filter/FFTAbsLogRealImageFilter.h"
+#include "bkDataset/image/filter/FFTImageFilter.h"
+#include "bkDataset/image/filter/FFTShiftImageFilter.h"
+#include "bkDataset/image/filter/GradientImageFilter.h"
+#include "bkDataset/image/filter/GradientStrengthImageFilter.h"
+#include "bkDataset/image/filter/HistogramEqualizationImageFilter.h"
+#include "bkDataset/image/filter/IFFTImageFilter.h"
+#include "bkDataset/image/filter/IFFTShiftImageFilter.h"
+#include "bkDataset/image/filter/IntervalThresholdImageFilter.h"
+#include "bkDataset/image/filter/InvertIntensityImageFilter.h"
+#include "bkDataset/image/filter/LaplaceBinomialImageFilter.h"
+#include "bkDataset/image/filter/LaplaceImageFilter.h"
+#include "bkDataset/image/filter/MaximumImageFilter.h"
+#include "bkDataset/image/filter/MedianImageFilter.h"
+#include "bkDataset/image/filter/MinimumImageFilter.h"
+#include "bkDataset/image/filter/MorphologicalOperationImageFilter.h"
+#include "bkDataset/image/filter/MorphologicalDilationImageFilter.h"
+#include "bkDataset/image/filter/MorphologicalErosionImageFilter.h"
+#include "bkDataset/image/filter/MorphologicalClosingImageFilter.h"
+#include "bkDataset/image/filter/MorphologicalOpeningImageFilter.h"
+#include "bkDataset/image/filter/MorphologicalClosingAndOpeningImageFilter.h"
+#include "bkDataset/image/filter/MorphologicalOpeningAndClosingImageFilter.h"
+#include "bkDataset/image/filter/NormalizeIntensityImageFilter.h"
+#include "bkDataset/image/filter/SobelImageFilter.h"
+#include "bkDataset/image/filter/ThresholdImageFilter.h"
+#include "bkDataset/image/filter/UnsharpMaskingImageFilter.h"

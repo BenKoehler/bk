@@ -28,14 +28,14 @@
 #include <utility>
 
 #ifdef BK_EMIT_PROGRESS
-    #include "../../include/bkTools/Localization"
-    #include "../../include/bkTools/Progress"
+    #include <bk/Localization>
+    #include <bk/Progress>
 #endif
 
-#include "../../include/bkTools/ThreadPool"
-#include "../../include/bkDicom/DicomDirImporter_CMR.h"
-#include "../../include/bkDicom/DicomImageInfos.h"
-#include "../../include/bkDicom/EFlowImageOrdering.h"
+#include <bkDicom/DicomDirImporter_CMR.h>
+#include <bkDicom/DicomImageInfos.h>
+#include <bkDicom/EFlowImageOrdering.h>
+#include <bk/ThreadPool>
 
 namespace bk
 {

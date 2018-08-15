@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../include/bkGL/AbstractObject.h"
+#include <bkGL/AbstractObject.h>
 
 namespace bk::details
 {

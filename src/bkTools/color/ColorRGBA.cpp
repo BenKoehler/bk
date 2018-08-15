@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../include/bkTools/color/ColorRGBA.h"
+#include <bkTools/color/ColorRGBA.h>
 
 namespace bk
 {

@@ -27,8 +27,8 @@
 #include <iostream>
 #include <string_view>
 
-#include <bkTools/Signal>
-#include <bkTools/Localization>
+#include <bk/Signal>
+#include <bk/Localization>
 
 #include "my_custom_localization.h"
 

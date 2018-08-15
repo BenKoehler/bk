@@ -25,7 +25,7 @@
  * For more information, please refer to <http://unlicense.org>
  */
 
-#include "../../../include/bkTools/clock/Clock.h"
+#include <bkTools/clock/Clock.h>
 
 namespace bk
 {

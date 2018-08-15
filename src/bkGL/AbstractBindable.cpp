@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../include/bkGL/AbstractBindable.h"
+#include <bkGL/AbstractBindable.h>
 
 #include <utility>
 

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../../include/bkDataset/image/filter/AverageSmoothingImageFilter.h"
+#include <bkDataset/image/filter/AverageSmoothingImageFilter.h>
 
 namespace bk
 {

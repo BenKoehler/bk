@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../../include/bkDataset/image/filter/ThresholdImageFilter.h"
+#include <bkDataset/image/filter/ThresholdImageFilter.h>
 
 namespace bk
 {

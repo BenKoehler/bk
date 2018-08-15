@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../../include/bkDataset/image/filter/MorphologicalClosingImageFilter.h"
+#include <bkDataset/image/filter/MorphologicalClosingImageFilter.h>
 
 namespace bk
 {

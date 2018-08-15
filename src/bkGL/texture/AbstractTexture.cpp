@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
+#include <bkGL/texture/AbstractTexture.h>
+
 #include <algorithm>
 #include <cassert>
-
-#include "../../../include/bkGL/texture/AbstractTexture.h"
 
 namespace bk::details
 {

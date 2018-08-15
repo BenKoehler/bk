@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../include/bkDataset/transformation/DicomTransformation.h"
+#include <bkDataset/transformation/DicomTransformation.h>
 
 namespace bk
 {

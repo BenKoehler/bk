@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../include/bkGL/UBOText.h"
+#include <bkGL/UBOText.h>
 
 namespace bk::details
 {

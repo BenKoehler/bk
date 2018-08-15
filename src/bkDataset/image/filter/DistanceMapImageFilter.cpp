@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../../include/bkDataset/image/filter/DistanceMapImageFilter.h"
+#include <bkDataset/image/filter/DistanceMapImageFilter.h>
 
 namespace bk
 {

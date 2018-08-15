@@ -22,13 +22,14 @@
  * SOFTWARE.
  */
 
+#include <bkTools/color/WindowingTransferFunction.h>
+
 #include <algorithm>
 #include <cassert>
 #include <limits>
 
-#include "../../../include/bkTools/color/WindowingTransferFunction.h"
-#include "../../../include/bkTools/color/ColorRGBA.h"
-#include "../../../include/bkTools/color/ColorBarRGBA.h"
+#include <bkTools/color/ColorRGBA.h>
+#include <bkTools/color/ColorBarRGBA.h>
 
 namespace bk
 {

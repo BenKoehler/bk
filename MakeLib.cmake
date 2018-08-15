@@ -24,11 +24,11 @@ function(_bk_make_lib name Name)
     target_include_directories(bk${Name}
             PUBLIC
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/bk${Name}>
-            $<INSTALL_INTERFACE:include>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
             PRIVATE
-            ${CMAKE_CURRENT_SOURCE_DIR})
+            ${CMAKE_CURRENT_SOURCE_DIR}
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+            )
 endfunction()
 
 function(_bk_make_lib_header name Name)
@@ -39,10 +39,10 @@ function(_bk_make_lib_header name Name)
 
     target_compile_definitions(bk${Name} INTERFACE LIBRARY_HEADER_ONLY)
 
-    target_include_directories(bk${Name} INTERFACE
+    target_include_directories(bk${Name}
+            INTERFACE
             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/bk${Name}>
-            $<INSTALL_INTERFACE:include>)
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 endfunction()
 
 function(_bk_install_lib name Name NAME)
@@ -56,9 +56,9 @@ function(_bk_install_lib name Name NAME)
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-    install(DIRECTORY
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/bk${Name}
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/bk${Name}
+                DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+                FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
 
     install(FILES
             ${CMAKE_CURRENT_SOURCE_DIR}/doc/bk${Name}/LICENSE
@@ -93,16 +93,16 @@ function(_bk_install_lib name Name NAME)
             NAMESPACE bk::)
 endfunction()
 
-function(_bk_install_lib_header name Name)
+function(_bk_install_lib_header Name)
     install(TARGETS bk${Name}
             EXPORT bk${Name}Targets
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-    install(DIRECTORY
-            ${CMAKE_CURRENT_SOURCE_DIR}/include/bk${Name}
-            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/bk${Name}
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+            FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
 
     install(FILES
             ${CMAKE_CURRENT_SOURCE_DIR}/doc/bk${Name}/LICENSE

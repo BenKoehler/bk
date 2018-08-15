@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
- #include <iterator>
+#include <bkGL/buffer/Buffer.h>
 
-#include "../../../include/bkGL/buffer/Buffer.h"
+#include <iterator>
 
 namespace bk
 {

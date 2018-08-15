@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../include/bkGL/buffer/IBO.h"
+#include <bkGL/buffer/IBO.h>
 
 namespace bk
 {

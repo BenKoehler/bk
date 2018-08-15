@@ -22,52 +22,53 @@
  * SOFTWARE.
  */
 
+#include <bkGL/Renderer.h>
+
 #include <algorithm>
 #include <filesystem>
 #include <future>
 #include <memory>
 #include <vector>
 
-#include "../../include/bkAlgorithm/Algorithm"
-#include "../../include/bkTools/Clock"
-#include "../../include/bkTools/Signal"
-#include "../../include/bkTools/ThreadPool"
-#include "../../include/bkMath/functions/equals_approx.h"
-#include "../../include/bkMath/functions/num_digits.h"
+#include <bk/Algorithm>
+#include <bk/Clock>
+#include <bk/Signal>
+#include <bk/ThreadPool>
+#include <bkMath/functions/equals_approx.h>
+#include <bkMath/functions/num_digits.h>
 
 #ifdef BK_LIB_PNG_AVAILABLE
 
-    #include "../../include/bkDataset/Image"
-    #include "../../include/bkTools/StringUtils"
+    #include <bk/Image>
+    #include <bk/StringUtils>
 
 #endif
 
 #ifdef BK_EMIT_PROGRESS
 
-    #include "../../include/bkTools/Progress"
-    #include "../../include/bkTools/Localization"
+    #include <bk/Progress>
+    #include <bk/Localization>
 
 #endif
 
-#include "../include/bkGL/Animator.h"
-#include "../include/bkGL/Interactor.h"
-#include "../include/bkGL/OrderIndependentTransparency.h"
-#include "../include/bkGL/Renderer.h"
-#include "../include/bkGL/SuperSampler.h"
-#include "../include/bkGL/UBOGlobal.h"
-#include "../include/bkGL/gl_definitions.h"
-#include "../include/bkGL/gl_error.h"
-#include "../include/bkGL/renderable/AbstractSceneRenderable.h"
-#include "../include/bkGL/renderable/ScreenQuad.h"
-#include "../include/bkGL/renderable/background/GradientBackground.h"
-#include "../include/bkGL/Camera.h"
-#include "../include/bkGL/Mouse.h"
-#include "../include/bkGL/WindowGeometry.h"
-#include "../include/bkGL/buffer/FBO.h"
-#include "../include/bkGL/buffer/SSBO.h"
-#include "../include/bkGL/shader/Shader.h"
-#include "../include/bkGL/texture/Texture2D.h"
-#include "../include/bkGL/trackball/TrackBall.h"
+#include <bkGL/Animator.h>
+#include <bkGL/Interactor.h>
+#include <bkGL/OrderIndependentTransparency.h>
+#include <bkGL/SuperSampler.h>
+#include <bkGL/UBOGlobal.h>
+#include <bkGL/gl_definitions.h>
+#include <bkGL/gl_error.h>
+#include <bkGL/renderable/AbstractSceneRenderable.h>
+#include <bkGL/renderable/ScreenQuad.h>
+#include <bkGL/renderable/background/GradientBackground.h>
+#include <bkGL/Camera.h>
+#include <bkGL/Mouse.h>
+#include <bkGL/WindowGeometry.h>
+#include <bkGL/buffer/FBO.h>
+#include <bkGL/buffer/SSBO.h>
+#include <bkGL/shader/Shader.h>
+#include <bkGL/texture/Texture2D.h>
+#include <bkGL/trackball/TrackBall.h>
 
 namespace bk
 {

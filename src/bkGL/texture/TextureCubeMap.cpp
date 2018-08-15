@@ -22,13 +22,13 @@
  * SOFTWARE.
  */
 
+#include <bkGL/texture/TextureCubeMap.h>
+
 #include <climits>
 
-#include "../../../include/bkMath/Matrix"
-#include "../../../include/bkDataset/Image"
-
-#include "../../../include/bkGL/texture/TextureCubeMap.h"
-#include "../../../include/bkGL/texture/Texture2D.h"
+#include <bk/Image>
+#include <bkGL/texture/Texture2D.h>
+#include <bk/Matrix>
 
 namespace bk
 {

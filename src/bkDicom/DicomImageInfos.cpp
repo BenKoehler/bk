@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
+#include <bkDicom/DicomImageInfos.h>
+
 #include <cinttypes>
 #include <fstream>
 
-#include "../../include/bkTools/StringUtils"
-
-#include "bkDicom/DicomImageInfos.h"
+#include <bk/StringUtils>
 
 namespace bk
 {

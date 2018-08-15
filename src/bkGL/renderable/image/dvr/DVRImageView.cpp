@@ -22,23 +22,23 @@
  * SOFTWARE.
  */
 
+#include <bkGL/renderable/image/dvr/DVRImageView.h>
+
 #include <algorithm>
 #include <vector>
 
-#include "../../../../../include/bkTools/color/WindowingTransferFunction.h"
-#include "../../../../../include/bkGL/shader/ShaderLibrary.h"
-
-#include "../../../../../include/bkGL/renderable/image/dvr/DVRImageView.h"
-#include "../../../../../include/bkGL/renderable/transfer_function/WindowingTransferFunctionView.h"
-#include "../../../../../include/bkGL/renderable/ScreenQuad.h"
-#include "../../../../../include/bkGL/buffer/IBO.h"
-#include "../../../../../include/bkGL/buffer/VBO.h"
-#include "../../../../../include/bkGL/buffer/FBO.h"
-#include "../../../../../include/bkGL/vao/VAO.h"
-#include "../../../../../include/bkGL/shader/Shader.h"
-#include "../../../../../include/bkGL/texture/Texture3D.h"
-#include "../../../../../include/bkGL/texture/Texture2D.h"
-#include "../../../../../include/bkGL/UBODVR.h"
+#include <bkGL/UBODVR.h>
+#include <bkGL/buffer/IBO.h>
+#include <bkGL/buffer/VBO.h>
+#include <bkGL/buffer/FBO.h>
+#include <bkGL/renderable/transfer_function/WindowingTransferFunctionView.h>
+#include <bkGL/renderable/ScreenQuad.h>
+#include <bkGL/shader/Shader.h>
+#include <bkGL/shader/ShaderLibrary.h>
+#include <bkGL/texture/Texture3D.h>
+#include <bkGL/texture/Texture2D.h>
+#include <bkGL/vao/VAO.h>
+#include <bkTools/color/WindowingTransferFunction.h>
 
 namespace bk
 {

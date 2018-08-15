@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../include/bkGL/buffer/VBO.h"
+#include <bkGL/buffer/VBO.h>
 
 namespace bk
 {

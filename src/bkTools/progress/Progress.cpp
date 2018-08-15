@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
+#include <bkTools/progress/Progress.h>
+
 #include <algorithm>
 #include <atomic>
 
-#include <bkTools/Signal>
-
-#include "../../../include/bkTools/progress/Progress.h"
+#include <bk/Signal>
 
 namespace bk
 {

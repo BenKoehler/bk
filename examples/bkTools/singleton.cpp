@@ -24,7 +24,7 @@
 
 #include <iostream>
 
-#include <bkTools/Singleton>
+#include <bk/Singleton>
 
 // class with whatever functionality
 class MyClass

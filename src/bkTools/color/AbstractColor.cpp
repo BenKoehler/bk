@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../include/bkTools/color/AbstractColor.h"
+#include <bkTools/color/AbstractColor.h>
 
 #include <algorithm>
 #include <cassert>

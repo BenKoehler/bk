@@ -24,7 +24,7 @@
 
 #include <iostream>
 
-#include <bkTools/Clock>
+#include <bk/Clock>
 
 int main(int, char**)
 {

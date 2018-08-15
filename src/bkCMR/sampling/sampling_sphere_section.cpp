@@ -22,11 +22,12 @@
  * SOFTWARE.
  */
 
+#include <bkCMR/sampling/sampling_sphere_section.h>
+
 #include <array>
 #include <cmath>
 
-#include <bkCMR/sampling/sampling_sphere_section.h>
-#include <bkTools/Random>
+#include <bk/Random>
 
 namespace bk
 {

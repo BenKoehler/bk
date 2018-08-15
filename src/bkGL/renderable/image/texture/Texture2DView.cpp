@@ -1,9 +1,33 @@
-#include "../../../../../include/bkGL/renderable/image/texture/Texture2DView.h"
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018 Benjamin Köhler
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-#include "../../../../../include/bkGL/renderable/ScreenQuad.h"
-#include "../../../../../include/bkGL/buffer/UBO.h"
-#include "../../../../../include/bkGL/shader/Shader.h"
-#include "../../../../../include/bkGL/shader/ShaderLibrary.h"
+#include <bkGL/renderable/image/texture/Texture2DView.h>
+
+#include <bkGL/renderable/ScreenQuad.h>
+#include <bkGL/buffer/UBO.h>
+#include <bkGL/shader/Shader.h>
+#include <bkGL/shader/ShaderLibrary.h>
 
 namespace bk
 {

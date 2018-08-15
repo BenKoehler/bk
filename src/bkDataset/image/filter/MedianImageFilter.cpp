@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../../include/bkDataset/image/filter/MedianImageFilter.h"
+#include <bkDataset/image/filter/MedianImageFilter.h>
 
 namespace bk
 {

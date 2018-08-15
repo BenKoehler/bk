@@ -1,0 +1,40 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018 Benjamin Köhler
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+#include "bkMath/constants/euler.h"
+#include "bkMath/constants/pi.h"
+
+#include "bkMath/functions/bernoulli_number.h"
+#include "bkMath/functions/binomial_coefficient.h"
+#include "bkMath/functions/double_factorial.h"
+#include "bkMath/functions/equals_approx.h"
+#include "bkMath/functions/factorial.h"
+#include "bkMath/functions/fract.h"
+#include "bkMath/functions/inv_factorial.h"
+#include "bkMath/functions/list_grid_id_conversion.h"
+#include "bkMath/functions/nthroot.h"
+#include "bkMath/functions/num_digits.h"
+#include "bkMath/functions/radians_degree_conversion.h"
+#include "bkMath/functions/shift_to_interval.h"
+#include "bkMath/functions/sqr.h"

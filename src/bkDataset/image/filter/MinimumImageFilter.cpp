@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../../include/bkDataset/image/filter/MinimumImageFilter.h"
+#include <bkDataset/image/filter/MinimumImageFilter.h>
 
 namespace bk
 {

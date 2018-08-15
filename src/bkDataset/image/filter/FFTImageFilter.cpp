@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../../include/bkDataset/image/filter/FFTImageFilter.h"
+#include <bkDataset/image/filter/FFTImageFilter.h>
 
 namespace bk
 {

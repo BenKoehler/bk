@@ -25,8 +25,8 @@
 #include <algorithm>
 #include <string>
 
-#include "../../../include/bkGL/vao/VertexAttributePointer.h"
-#include "../../../include/bkGL/gl_type_traits.h"
+#include <bkGL/vao/VertexAttributePointer.h>
+#include <bkGL/gl_type_traits.h>
 
 namespace bk
 {

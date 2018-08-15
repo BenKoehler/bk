@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
+#include <bkGL/Mouse.h>
+
 #include <array>
 #include <unordered_set>
-
-#include "../include/bkGL/Mouse.h"
 
 namespace bk
 {

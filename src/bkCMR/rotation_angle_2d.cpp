@@ -22,9 +22,10 @@
  * SOFTWARE.
  */
 
+#include <bkCMR/rotation_angle_2d.h>
+
 #include <cmath>
 
-#include <bkCMR/rotation_angle_2d.h>
 #include <bkMath/constants/pi.h>
 #include <bkMath/functions/radians_degree_conversion.h>
 

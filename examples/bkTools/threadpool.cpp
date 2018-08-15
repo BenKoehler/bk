@@ -24,7 +24,7 @@
 
 #include <iostream>
 
-#include <bkTools/ThreadPool>
+#include <bk/ThreadPool>
 
 int main(int, char**)
 {

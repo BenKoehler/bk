@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../../include/bkDataset/image/filter/SobelImageFilter.h"
+#include <bkDataset/image/filter/SobelImageFilter.h>
 
 namespace bk
 {

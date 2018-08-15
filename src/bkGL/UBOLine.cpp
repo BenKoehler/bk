@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../include/bkGL/UBOLine.h"
+#include <bkGL/UBOLine.h>
 
 namespace bk::details
 {

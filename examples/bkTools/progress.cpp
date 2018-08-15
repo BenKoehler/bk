@@ -24,7 +24,7 @@
 
 #include <iostream>
 
-#include <bkTools/Progress>
+#include <bk/Progress>
 
 void on_task_finished(unsigned int taskId)
 {

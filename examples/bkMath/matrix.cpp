@@ -24,7 +24,7 @@
 
 #include <iostream>
 
-#include <bkMath/Matrix>
+#include <bk/Matrix>
 
 void example_basic_usage()
 {

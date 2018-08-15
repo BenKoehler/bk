@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../../include/bkDataset/image/filter/MorphologicalErosionImageFilter.h"
+#include <bkDataset/image/filter/MorphologicalErosionImageFilter.h>
 
 namespace bk
 {

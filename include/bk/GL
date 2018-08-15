@@ -1,0 +1,82 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018 Benjamin Köhler
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+// buffer
+#include "bkGL/buffer/Buffer.h"
+#include "bkGL/buffer/FBO.h"
+#include "bkGL/buffer/IBO.h"
+#include "bkGL/buffer/SSBO.h"
+#include "bkGL/buffer/VBO.h"
+#include "bkGL/buffer/UBO.h"
+#include "bkGL/UBODVR.h"
+#include "bkGL/UBOGlobal.h"
+#include "bkGL/UBOLine.h"
+#include "bkGL/UBOPhong.h"
+#include "bkGL/UBOSelectionSphere.h"
+#include "bkGL/UBOSliceView.h"
+#include "bkGL/UBOText.h"
+
+// renderable
+#include "bkGL/renderable/background/GradientBackground.h"
+#include "bkGL/renderable/background/UniformBackground.h"
+#include "bkGL/renderable/image/dvr/DVRImage3DView.h"
+#include "bkGL/renderable/image/dvr/DVRImage4DView.h"
+#include "bkGL/renderable/line/LineView.h"
+#include "bkGL/renderable/mesh/TriangularMesh3DView.h"
+#include "bkGL/renderable/mesh/TriangularMesh3DCenterlineExtractionView.h"
+#include "bkGL/renderable/text/TextView.h"
+#include "bkGL/renderable/ColorBarView.h"
+#include "bkGL/renderable/ScreenQuad.h"
+
+// shader
+#include "bkGL/shader/ComputeShader.h"
+#include "bkGL/shader/Shader.h"
+#include "bkGL/shader/ShaderLibrary.h"
+
+// texture
+#include "bkGL/texture/Texture2D.h"
+#include "bkGL/texture/Texture3D.h"
+#include "bkGL/texture/TextureCubeMap.h"
+
+// trackball
+#include "bkGL/trackball/TrackBall.h"
+
+// VAO
+#include "bkGL/vao/VAO.h"
+#include "bkGL/vao/VertexAttributePointer.h"
+
+// misc
+#include "bkGL/AbstractBindable.h"
+#include "bkGL/AbstractObject.h"
+#include "bkGL/Animator.h"
+#include "bkGL/Camera.h"
+#include "bkGL/EMouseButton.h"
+#include "bkGL/gl_definitions.h"
+#include "bkGL/gl_error.h"
+#include "bkGL/Interactor.h"
+#include "bkGL/Mouse.h"
+#include "bkGL/OrderIndependentTransparency.h"
+#include "bkGL/Renderer.h"
+#include "bkGL/SuperSampler.h"
+#include "bkGL/WindowGeometry.h"

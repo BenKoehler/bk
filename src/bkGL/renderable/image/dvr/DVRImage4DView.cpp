@@ -22,11 +22,12 @@
  * SOFTWARE.
  */
 
-#include "../../../../../include/bkGL/renderable/image/dvr/DVRImage4DView.h"
-#include "../../../../../include/bkGL/shader/Shader.h"
-#include "../../../../../include/bkGL/shader/ShaderLibrary.h"
-#include "../../../../../include/bkGL/texture/Texture3D.h"
-#include "../../../../../include/bkGL/UBODVR.h"
+#include <bkGL/renderable/image/dvr/DVRImage4DView.h>
+
+#include <bkGL/shader/Shader.h>
+#include <bkGL/shader/ShaderLibrary.h>
+#include <bkGL/texture/Texture3D.h>
+#include <bkGL/UBODVR.h>
 
 namespace bk
 {

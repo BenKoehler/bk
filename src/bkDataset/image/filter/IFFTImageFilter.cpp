@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
-#include "../../../../include/bkDataset/image/filter/IFFTImageFilter.h"
-#include "../../../../include/bkDataset/image/filter/FFTImageFilter.h"
+#include <bkDataset/image/filter/IFFTImageFilter.h>
+#include <bkDataset/image/filter/FFTImageFilter.h>
 
 namespace bk
 {

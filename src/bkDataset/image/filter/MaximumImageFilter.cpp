@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../../include/bkDataset/image/filter/MaximumImageFilter.h"
+#include <bkDataset/image/filter/MaximumImageFilter.h>
 
 namespace bk
 {

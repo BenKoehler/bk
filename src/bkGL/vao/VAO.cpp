@@ -22,14 +22,15 @@
  * SOFTWARE.
  */
 
+#include <bkGL/vao/VAO.h>
+
 #include <sstream>
 #include <vector>
 
-#include "../../../include/bkGL/vao/VAO.h"
-#include "../../../include/bkGL/vao/VertexAttributePointer.h"
-#include "../../../include/bkGL/buffer/VBO.h"
-#include "../../../include/bkGL/buffer/IBO.h"
-#include "../../../include/bkGL/gl_type_traits.h"
+#include <bkGL/vao/VertexAttributePointer.h>
+#include <bkGL/buffer/VBO.h>
+#include <bkGL/buffer/IBO.h>
+#include <bkGL/gl_type_traits.h>
 
 namespace bk
 {

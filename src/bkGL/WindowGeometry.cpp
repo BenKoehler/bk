@@ -24,7 +24,7 @@
 
 #include <algorithm>
 
-#include "../include/bkGL/WindowGeometry.h"
+#include <bkGL/WindowGeometry.h>
 
 namespace bk
 {

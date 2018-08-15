@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "../../../../include/bkDataset/image/filter/ConnectedComponentsAnalysisImageFilter.h"
+#include <bkDataset/image/filter/ConnectedComponentsAnalysisImageFilter.h>
 
 namespace bk
 {
