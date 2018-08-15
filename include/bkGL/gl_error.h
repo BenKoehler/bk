@@ -30,13 +30,13 @@
 #include <string>
 
 #include "gl_definitions.h"
-#include "lib/export.h"
+#include "lib/bkGL_export.h"
 
 namespace bk
 {
-  void BK_GL_EXPORT gl_print_error(const std::string& msg = "");
-  [[nodiscard]] bool BK_GL_EXPORT gl_has_error();
-  void BK_GL_EXPORT gl_clear_error();
+  void BKGL_EXPORT gl_print_error(const std::string& msg = "");
+  [[nodiscard]] bool BKGL_EXPORT gl_has_error();
+  void BKGL_EXPORT gl_clear_error();
 
   #ifdef BK_DEBUG_GL
   void /*APIENTRY*/ openglCallbackFunction(GLenum source, GLenum type, GLuint /*id*/, GLenum severity, GLsizei /*length*/, const GLchar* message, const void* /*userParam*/);

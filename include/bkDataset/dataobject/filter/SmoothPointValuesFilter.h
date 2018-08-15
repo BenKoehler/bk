@@ -30,15 +30,15 @@
 #include <vector>
 
 #ifdef BK_EMIT_PROGRESS
-    #include "../../../bkTools/Progress"
+    #include <bkTools/Progress>
+    #include <bkTools/Localization>
 #endif
 
-#include <bkTools/Localization>
-#include "bkDataset/lib/export.h"
+#include "../../lib/bkDataset_export.h"
 
 namespace bk
 {
-  class BK_DATASET_EXPORT SmoothPointValuesFilter
+  class BKDATASET_EXPORT SmoothPointValuesFilter
   {
       //====================================================================================================
       //===== DEFINITIONS

@@ -22,6 +22,6 @@
  * SOFTWARE.
  */
 
-#ifndef BK_DICOM_EXPORT
-#define BK_DICOM_EXPORT
+#ifndef BKCMR_EXPORT
+#define BKCMR_EXPORT
 #endif

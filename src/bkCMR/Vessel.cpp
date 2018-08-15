@@ -30,7 +30,6 @@
 //#include <bkCMR/rotation_angle_2d.h>
 //#include <bkTools/BitVector>
 //#include <bkTools/Clock>
-//#include <bkTools/Localization>
 //#include <bkDataset/Line>
 //#include <bkDataset/Image>
 //#include <bkDataset/Mesh>
@@ -38,6 +37,7 @@
 //
 //#ifdef BK_EMIT_PROGRESS
 //
+//    #include <bkTools/Localization>
 //    #include <bkTools/Progress>
 //
 //#endif

@@ -32,15 +32,15 @@
 LocalizationEnglish::LocalizationEnglish()
     : LocalizationManager()
 {
-    set(Text_language, "English");
-    set(Text_button_ok, "Ok");
-    set(Text_button_cancel, "Cancel");
-    set(Text_calculation_time, "@0 finished in @1 seconds");
-    set(Text_calculation_name_pathlines, "Pathline calculation");
+    set_tag(Text_language, "English");
+    set_tag(Text_button_ok, "Ok");
+    set_tag(Text_button_cancel, "Cancel");
+    set_tag(Text_calculation_time, "@0 finished in @1 seconds");
+    set_tag(Text_calculation_name_pathlines, "Pathline calculation");
 
-    set("Calculate pathlines");
-    set("Calculating @0 pathlines");
-    set("repeat me @0 times @1 @1 @1 (was @0x repeated)");
+    set_text("Calculate pathlines");
+    set_text("Calculating @0 pathlines");
+    set_text("repeat me @0 times @1 @1 @1 (was @0x repeated)");
 }
 
 LocalizationEnglish::LocalizationEnglish(const LocalizationEnglish&) = default;
@@ -56,17 +56,17 @@ void set_localization_english()
 LocalizationGerman::LocalizationGerman()
     : LocalizationManager()
 {
-    set(Text_language, "Deutsch");
-    set(Text_button_ok, "Ok");
-    set(Text_button_cancel, "Abbrechen");
-    set(Text_calculation_time, "@0 abgeschlossen in @1 Sekunden");
-    //set(Text_calculation_time, "@1 s benoetigt fuer @0"); // switched argument order; works!
-    //set(Text_calculation_time, "@1 abgeschlossen in @2 Sekunden"); // error finding replacement tags
-    set(Text_calculation_name_pathlines, "Pfadlinien Berechnung");
+    set_tag(Text_language, "Deutsch");
+    set_tag(Text_button_ok, "Ok");
+    set_tag(Text_button_cancel, "Abbrechen");
+    set_tag(Text_calculation_time, "@0 abgeschlossen in @1 Sekunden");
+    //set_tag(Text_calculation_time, "@1 s benoetigt fuer @0"); // switched argument order; works!
+    //set_tag(Text_calculation_time, "@1 abgeschlossen in @2 Sekunden"); // error finding replacement tags
+    set_tag(Text_calculation_name_pathlines, "Pfadlinien Berechnung");
 
-    set("Calculate pathlines", "Berechne Pfadlinien");
-    set("Calculating @0 pathlines", "Berechne @0 Pfadlinien");
-    set("repeat me @0 times @1 @1 @1 (was @0x repeated)", "wiederhole mich @0 mal @1 @1 @1 (wurde @0x wiederholt)");
+    set_text("Calculate pathlines", "Berechne Pfadlinien");
+    set_text("Calculating @0 pathlines", "Berechne @0 Pfadlinien");
+    set_text("repeat me @0 times @1 @1 @1 (was @0x repeated)", "wiederhole mich @0 mal @1 @1 @1 (wurde @0x wiederholt)");
 }
 
 LocalizationGerman::LocalizationGerman(const LocalizationGerman&) = default;

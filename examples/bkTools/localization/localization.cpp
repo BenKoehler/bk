@@ -49,8 +49,8 @@ void myPrint(std::string_view s)
 //------------------------------------------------------------------------------------------------------
 void print_stuff_to_translate()
 {
-    std::cout << ___(Text_button_cancel) << std::endl;
-    std::cout << ___(Text_calculation_time, ___(Text_calculation_name_pathlines), 5) << std::endl;
+    std::cout << bk_lm.translate_tag(Text_button_cancel) << std::endl;
+    std::cout << bk_lm.translate_tag(Text_calculation_time, bk_lm.translate_tag(Text_calculation_name_pathlines), 5) << std::endl;
     logic_class_function();
     std::cout << ___("repeat me @0 times @1 @1 @1 (was @0x repeated)", 3, "bla") << std::endl;
 }

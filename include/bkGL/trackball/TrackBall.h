@@ -33,7 +33,7 @@
 
 #include "Quaternion.h"
 #include "../gl_definitions.h"
-#include "../lib/export.h"
+#include "../lib/bkGL_export.h"
 
 namespace bk
 {
@@ -42,7 +42,7 @@ namespace bk
   class WindowGeometry;
   // -------------------- forward declaration END
 
-  class BK_GL_EXPORT TrackBall
+  class BKGL_EXPORT TrackBall
   {
       //====================================================================================================
       //===== DEFINITIONS

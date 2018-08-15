@@ -28,11 +28,11 @@
 #define BKGL_WINDOWGEOMETRY_H
 
 #include "gl_definitions.h"
-#include "lib/export.h"
+#include "lib/bkGL_export.h"
 
 namespace bk
 {
-  class BK_GL_EXPORT WindowGeometry
+  class BKGL_EXPORT WindowGeometry
   {
       //====================================================================================================
       //===== DEFINITIONS

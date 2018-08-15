@@ -32,7 +32,7 @@
 #include "../bkMath/Matrix"
 
 #include "gl_definitions.h"
-#include "lib/export.h"
+#include "lib/bkGL_export.h"
 
 namespace bk
 {
@@ -40,7 +40,7 @@ namespace bk
   template<typename...> class Signal;
   // -------------------- forward declaration END
 
-  class BK_GL_EXPORT Camera
+  class BKGL_EXPORT Camera
   {
       //====================================================================================================
       //===== DEFINITIONS

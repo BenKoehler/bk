@@ -45,7 +45,7 @@
 #include <memory>
 
 #include "../AbstractRenderable.h"
-#include "../../lib/export.h"
+#include "../../lib/bkGL_export.h"
 
 namespace bk
 {
@@ -68,7 +68,7 @@ namespace bk
 
   namespace details
   {
-    class BK_GL_EXPORT AbstractSliceView : public details::AbstractRenderable
+    class BKGL_EXPORT AbstractSliceView : public details::AbstractRenderable
     {
         //====================================================================================================
         //===== DEFINITIONS

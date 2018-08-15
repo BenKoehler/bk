@@ -30,6 +30,8 @@
 #include <memory>
 
 #include <bkTools/Singleton>
+#include <bkTools/StringUtils>
+
 #include "LocalizationManager.h"
 
 #define bk_lm_unique_ptr bk::GlobalLocalizationManager::get_instance().localization_manager()
@@ -70,10 +72,14 @@ namespace bk
 
 
 #ifdef BK_LOCALIZATION
-    #define TRANSLATION_FUNCTION bk_lm.translate
+    #define TRANSLATION_FUNCTION bk_lm.translate_text
+    #define ___1(String) TRANSLATION_FUNCTION (bk::string_utils::hash(String))
 #else
 namespace bk::details
 {
+  constexpr const char* bk_print(const char* text)
+  { return text; }
+
   template<typename... Args>
   std::string bk_print(std::string_view text, Args&& ... args)
   {
@@ -85,9 +91,11 @@ namespace bk::details
 } // namespace bk::details
 
     #define TRANSLATION_FUNCTION bk::details::bk_print
+    #define ___1(String) TRANSLATION_FUNCTION (String)
 #endif
 
-#define ___1(String) TRANSLATION_FUNCTION (String)
+
+//#define ___1(String) TRANSLATION_FUNCTION (String)
 #define ___2(String, x0) TRANSLATION_FUNCTION (String, x0)
 #define ___3(String, x0, x1) TRANSLATION_FUNCTION (String, x0, x1)
 #define ___4(String, x0, x1, x2) TRANSLATION_FUNCTION (String, x0, x1, x2)

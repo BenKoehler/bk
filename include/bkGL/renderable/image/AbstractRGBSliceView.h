@@ -25,7 +25,7 @@
 
 namespace bk::details
 {
-    class BK_GL_EXPORT AbstractRGBSliceView : public details::AbstractSliceView
+    class BKGL_EXPORT AbstractRGBSliceView : public details::AbstractSliceView
     {
         //====================================================================================================
         //===== DEFINITIONS

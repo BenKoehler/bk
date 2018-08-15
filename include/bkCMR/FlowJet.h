@@ -31,7 +31,7 @@
 #include <utility>
 #include <vector>
 
-#include "lib/export.h"
+#include "bkCMR/lib/bkCMR_export.h"
 
 namespace bk
 {
@@ -41,7 +41,7 @@ namespace bk
     class FlowJetPoint;
     // -------------------- forward declaration END
 
-    class BK_DATASET_EXPORT FlowJet
+    class BKCMR_EXPORT FlowJet
     {
         //====================================================================================================
         // MEMBERS

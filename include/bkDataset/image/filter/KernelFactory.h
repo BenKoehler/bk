@@ -37,11 +37,11 @@
 #include "../../../bkMath/functions/list_grid_id_conversion.h"
 #include "../../../bkTools/NDContainer"
 
-#include "../../lib/export.h"
+#include "../../lib/bkDataset_export.h"
 
 namespace bk
 {
-  struct BK_DATASET_EXPORT KernelFactory
+  struct BKDATASET_EXPORT KernelFactory
   {
       //====================================================================================================
       //===== CONVOLUTION KERNELS

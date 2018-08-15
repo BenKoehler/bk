@@ -22,6 +22,6 @@
  * SOFTWARE.
  */
 
-#ifndef BK_GL_EXPORT
-#define BK_GL_EXPORT
+#ifndef BKDICOM_EXPORT
+#define BKDICOM_EXPORT
 #endif

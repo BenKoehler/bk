@@ -28,11 +28,11 @@
 #define BKGL_ABSTRACTOBJECT_H
 
 #include "gl_definitions.h"
-#include "lib/export.h"
+#include "lib/bkGL_export.h"
 
 namespace bk::details
 {
-  class BK_GL_EXPORT AbstractObject
+  class BKGL_EXPORT AbstractObject
   {
       //====================================================================================================
       //===== DEFINITIONS

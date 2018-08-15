@@ -57,7 +57,7 @@ namespace bk
   } // namespace details
   // ------ forward declaration -------
 
-  class BK_GL_EXPORT Renderer : public details::AbstractObject
+  class BKGL_EXPORT Renderer : public details::AbstractObject
   {
       //====================================================================================================
       //===== DEFINITIONS

@@ -32,7 +32,7 @@
 
 #include "AbstractObject.h"
 #include "gl_definitions.h"
-#include "lib/export.h"
+#include "lib/bkGL_export.h"
 
 namespace bk
 {
@@ -49,7 +49,7 @@ namespace bk
   } // namespace details
   // -------------------- forward declaration END
 
-  class BK_GL_EXPORT OrderIndependentTransparency : public details::AbstractObject
+  class BKGL_EXPORT OrderIndependentTransparency : public details::AbstractObject
   {
       //====================================================================================================
       //===== DEFINITIONS

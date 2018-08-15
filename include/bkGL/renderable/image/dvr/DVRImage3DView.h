@@ -28,11 +28,11 @@
 #define BKGL_DVRIMAGE3DVIEW_H
 
 #include "DVRImageView.h"
-#include "../../../lib/export.h"
+#include "../../../lib/bkGL_export.h"
 
 namespace bk
 {
-  class BK_GL_EXPORT DVRImage3DView : public DVRImageView
+  class BKGL_EXPORT DVRImage3DView : public DVRImageView
   {
       //====================================================================================================
       //===== DEFINITIONS

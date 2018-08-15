@@ -37,7 +37,7 @@ namespace bk
   class Texture2D;
   // -------------------- forward declaration END
 
-  class BK_GL_EXPORT FBO : public details::AbstractBindable
+  class BKGL_EXPORT FBO : public details::AbstractBindable
   {
       //====================================================================================================
       //===== DEFINITIONS

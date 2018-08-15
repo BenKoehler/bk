@@ -33,11 +33,11 @@
 
 #include "../../../bkMath/FFT"
 
-#include "../../lib/export.h"
+#include "../../lib/bkDataset_export.h"
 
 namespace bk
 {
-  class BK_DATASET_EXPORT FFTImageFilter
+  class BKDATASET_EXPORT FFTImageFilter
   {
       //====================================================================================================
       //===== DEFINITIONS

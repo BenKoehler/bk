@@ -34,11 +34,11 @@
 #include <type_traits>
 #include <vector>
 
-#include "../../lib/export.h"
+#include "../../lib/bkDataset_export.h"
 
 namespace bk
 {
-  class BK_DATASET_EXPORT MinimumImageFilter
+  class BKDATASET_EXPORT MinimumImageFilter
   {
       //====================================================================================================
       //===== DEFINITIONS

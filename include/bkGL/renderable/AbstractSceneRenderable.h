@@ -33,7 +33,7 @@
 
 namespace bk::details
 {
-  class BK_GL_EXPORT AbstractSceneRenderable : public AbstractRenderable
+  class BKGL_EXPORT AbstractSceneRenderable : public AbstractRenderable
   {
       //====================================================================================================
       //===== DEFINITIONS

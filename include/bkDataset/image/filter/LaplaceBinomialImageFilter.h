@@ -34,11 +34,11 @@
 
 #include "ConvolutionImageFilter.h"
 #include "KernelFactory.h"
-#include "../../lib/export.h"
+#include "../../lib/bkDataset_export.h"
 
 namespace bk
 {
-  class BK_DATASET_EXPORT LaplaceBinomialImageFilter
+  class BKDATASET_EXPORT LaplaceBinomialImageFilter
   {
       //====================================================================================================
       //===== DEFINITIONS

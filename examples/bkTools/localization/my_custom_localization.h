@@ -31,13 +31,13 @@
 
 #include <bkTools/Localization>
 
-enum Text_ : std::size_t
+enum Text_ : unsigned int
 {
-    Text_language                   = __LINE__, //!< no parameters
-    Text_button_ok                  = __LINE__, //!< no parameters
-    Text_button_cancel              = __LINE__, //!< no parameters
-    Text_calculation_time           = __LINE__, //!< @0: string "calculation name" ; @1: int N (seconds)
-    Text_calculation_name_pathlines = __LINE__, //!< @0: string "calculation name"
+    Text_language                   = 0, //!< no parameters
+    Text_button_ok                  = 1, //!< no parameters
+    Text_button_cancel              = 2, //!< no parameters
+    Text_calculation_time           = 3, //!< @0: string "calculation name" ; @1: int N (seconds)
+    Text_calculation_name_pathlines = 4, //!< @0: string "calculation name"
 };
 
 template<typename TLoc>

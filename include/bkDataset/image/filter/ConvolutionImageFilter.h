@@ -32,10 +32,10 @@
 #ifdef BK_EMIT_PROGRESS
 
     #include "../../../bkTools/Progress"
+    #include <bkTools/Localization>
 
 #endif
 
-#include <bkTools/Localization>
 #include "../../../bkMath/functions/list_grid_id_conversion.h"
 
 namespace bk

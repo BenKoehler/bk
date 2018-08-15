@@ -33,7 +33,7 @@
 
 namespace bk
 {
-  class BK_GL_EXPORT VertexAttributePointer
+  class BKGL_EXPORT VertexAttributePointer
   {
       //====================================================================================================
       //===== DEFINITIONS

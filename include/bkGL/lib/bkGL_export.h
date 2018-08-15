@@ -22,6 +22,6 @@
  * SOFTWARE.
  */
 
-#ifndef BK_DATASET_EXPORT
-#define BK_DATASET_EXPORT
+#ifndef BKGL_EXPORT
+#define BKGL_EXPORT
 #endif

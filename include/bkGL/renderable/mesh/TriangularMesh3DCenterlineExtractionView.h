@@ -9,7 +9,7 @@
 #include "../../../bkDataset/Mesh"
 
 #include "../AbstractSceneRenderable.h"
-#include "../../lib/export.h"
+#include "../../lib/bkGL_export.h"
 
 namespace bk
 {
@@ -17,7 +17,7 @@ namespace bk
   class ColorRGBA;
   // ------ forward declaration -------
 
-  class BK_GL_EXPORT TriangularMesh3DCenterlineExtractionView : public details::AbstractSceneRenderable
+  class BKGL_EXPORT TriangularMesh3DCenterlineExtractionView : public details::AbstractSceneRenderable
   {
       //====================================================================================================
       //===== DEFINITIONS

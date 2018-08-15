@@ -24,7 +24,7 @@
 
 namespace bk
 {
-  class BK_GL_EXPORT GrayImageSliceView : public details::AbstractGraySliceView
+  class BKGL_EXPORT GrayImageSliceView : public details::AbstractGraySliceView
   {
       //====================================================================================================
       //===== DEFINITIONS

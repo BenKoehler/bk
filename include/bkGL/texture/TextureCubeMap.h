@@ -33,7 +33,7 @@
 
 namespace bk
 {
-  class BK_GL_EXPORT TextureCubeMap : public details::AbstractBindable
+  class BKGL_EXPORT TextureCubeMap : public details::AbstractBindable
   {
       //====================================================================================================
       //===== DEFINITIONS

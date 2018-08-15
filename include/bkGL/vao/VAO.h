@@ -40,7 +40,7 @@ namespace bk
   class VertexAttributePointer;
   // ------ forward declaration -------
 
-  class BK_GL_EXPORT VAO : public details::AbstractBindable
+  class BKGL_EXPORT VAO : public details::AbstractBindable
   {
       //====================================================================================================
       //===== DEFINITIONS

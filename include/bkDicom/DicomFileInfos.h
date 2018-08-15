@@ -35,11 +35,11 @@
 
 #include "../bkMath/Matrix"
 
-#include "lib/export.h"
+#include "lib/bkDicom_export.h"
 
 namespace bk
 {
-  class BK_DICOM_EXPORT DicomFileInfos
+  class BKDICOM_EXPORT DicomFileInfos
   {
       //====================================================================================================
       //===== DEFINITIONS

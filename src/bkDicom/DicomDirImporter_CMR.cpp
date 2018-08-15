@@ -27,10 +27,12 @@
 #include <cstdint>
 #include <utility>
 
-#include "../../include/bkTools/Localization"
-#include "../../include/bkTools/Progress"
-#include "../../include/bkTools/ThreadPool"
+#ifdef BK_EMIT_PROGRESS
+    #include "../../include/bkTools/Localization"
+    #include "../../include/bkTools/Progress"
+#endif
 
+#include "../../include/bkTools/ThreadPool"
 #include "../../include/bkDicom/DicomDirImporter_CMR.h"
 #include "../../include/bkDicom/DicomImageInfos.h"
 #include "../../include/bkDicom/EFlowImageOrdering.h"

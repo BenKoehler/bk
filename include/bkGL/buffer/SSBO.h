@@ -31,7 +31,7 @@
 
 namespace bk
 {
-  class BK_GL_EXPORT SSBO : protected Buffer
+  class BKGL_EXPORT SSBO : protected Buffer
   {
       //====================================================================================================
       //===== DEFINITIONS

@@ -32,20 +32,19 @@
 #ifdef BK_EMIT_PROGRESS
 
     #include "../../../bkTools/Progress"
+    #include <bkTools/Localization>
 
 #endif
-
-#include <bkTools/Localization>
 
 #include "FFTImageFilter.h"
 #include "IFFTImageFilter.h"
 #include "FFTShiftImageFilter.h"
 
-#include "../../lib/export.h"
+#include "../../lib/bkDataset_export.h"
 
 namespace bk
 {
-  class BK_DATASET_EXPORT ConvolutionFFTImageFilter
+  class BKDATASET_EXPORT ConvolutionFFTImageFilter
   {
       //====================================================================================================
       //===== DEFINITIONS

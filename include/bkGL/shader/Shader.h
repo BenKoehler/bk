@@ -33,11 +33,11 @@
 
 #include "EShaderType.h"
 #include "../AbstractBindable.h"
-#include "../lib/export.h"
+#include "../lib/bkGL_export.h"
 
 namespace bk
 {
-  class BK_GL_EXPORT Shader : public details::AbstractBindable
+  class BKGL_EXPORT Shader : public details::AbstractBindable
   {
       //====================================================================================================
       //===== DEFINITIONS

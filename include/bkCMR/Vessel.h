@@ -61,7 +61,7 @@
 //    //class TriangularMesh3D;
 //    // -------------------- forward declaration END
 //
-//    class BK_DATASET_EXPORT Vessel
+//    class BKCMR_EXPORT Vessel
 //    {
 //        //====================================================================================================
 //        //===== DEFINITIONS

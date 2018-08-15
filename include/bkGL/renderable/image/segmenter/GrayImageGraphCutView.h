@@ -17,7 +17,7 @@ namespace bk
   template<typename...> class Signal;
   // ------ forward declaration -------
 
-  class BK_GL_EXPORT GrayImageGraphCutView : public GrayImageSliceView
+  class BKGL_EXPORT GrayImageGraphCutView : public GrayImageSliceView
   {
       //====================================================================================================
       //===== DEFINITIONS

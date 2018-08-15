@@ -38,24 +38,25 @@ namespace bk
   //====================================================================================================
   //===== GETTER
   //====================================================================================================
-  std::string LocalizationManager::get(std::size_t key) const
+  std::string LocalizationManager::get_tag(unsigned int id) const
+  { return id < _tags.size() ? _tags[id] : "UNKNOWN-TAG"; }
+
+  std::string LocalizationManager::get_text(unsigned long long hash) const
   {
-      const auto it = entries_tag.find(key);
-
-      if (it == entries_tag.end())
-      { std::cerr << "tag " << key << " was not found in the database!" << std::endl; }
-
-      return it != entries_tag.end() ? it->second : "UNKNOWN-TAG";
+      const auto it = _text.find(hash);
+      return it != _text.end() ? it->second : "UNKNOWN-HASH";
   }
 
-  std::string LocalizationManager::get(std::string_view referenceTextInEnglish) const
+  std::string LocalizationManager::get_text(std::string_view referenceText) const
   {
-      const auto it = entries_text.find(std::string(referenceTextInEnglish));
+      const unsigned long long hash = bk::string_utils::hash(referenceText);
 
-      if (it == entries_text.end())
-      { std::cerr << "text \"" << referenceTextInEnglish << "\" was not found in the database!" << std::endl; }
+      const auto it = _text.find(hash);
 
-      return it != entries_text.end() ? it->second : referenceTextInEnglish.data();
+      if (_text.find(hash) == _text.end())
+      { std::cerr << "text \"" << referenceText << "\" was not found in the database!" << std::endl; }
+
+      return it != _text.end() ? it->second : "UNKNOWN-HASH";
   }
 
   bool LocalizationManager::is_tag_at_position(std::string_view text, unsigned int pos)
@@ -85,14 +86,22 @@ namespace bk
   //====================================================================================================
   LocalizationManager& LocalizationManager::operator=(const LocalizationManager&) = default;
 
-  void LocalizationManager::set(std::size_t key, std::string_view textInLanguage)
-  { entries_tag.try_emplace(key, textInLanguage); }
+  void LocalizationManager::set_tag(unsigned int id, std::string_view textInLanguage)
+  {
+      if (id >= _tags.size())
+      { _tags.resize(id + 1); }
 
-  void LocalizationManager::set(std::string_view key, std::string_view textInLanguage)
-  { entries_text.try_emplace(std::string(key.data()), std::string(textInLanguage)); }
+      _tags[id] = textInLanguage;
+  }
 
-  void LocalizationManager::set(std::string_view key_equals_textInLanguage)
-  { set(key_equals_textInLanguage, key_equals_textInLanguage); }
+  void LocalizationManager::set_text(unsigned long long hash, std::string_view textInLanguage)
+  {      _text.try_emplace(hash, std::string(textInLanguage));  }
+
+  void LocalizationManager::set_text(std::string_view key, std::string_view textInLanguage)
+  { set_text(bk::string_utils::hash(key.data()), textInLanguage); }
+
+  void LocalizationManager::set_text(std::string_view key_equals_textInLanguage)
+  { set_text(key_equals_textInLanguage, key_equals_textInLanguage); }
 
   //====================================================================================================
   //===== FUNCTIONS

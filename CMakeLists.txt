@@ -381,7 +381,10 @@ set(SOURCE_FILES
 
 add_library(bkMath ${SOURCE_FILES})
 _bk_make_lib(math Math ${SOURCE_FILES})
-target_link_libraries(bkMath bk::bkTools)
+target_link_libraries(bkMath PUBLIC bk::bkTools)
+if (OpenMP_CXX_FOUND)
+    target_link_libraries(bkMath PUBLIC OpenMP::OpenMP_CXX)
+endif ()
 _bk_install_lib(math Math MATH)
 
 if (BUILD_EXAMPLES)

@@ -37,11 +37,11 @@
 #include "MorphologicalOperationImageFilter.h"
 #include "DistanceMapImageFilter.h"
 
-#include "../../lib/export.h"
+#include "../../lib/bkDataset_export.h"
 
 namespace bk
 {
-  class BK_DATASET_EXPORT MorphologicalDilationImageFilter
+  class BKDATASET_EXPORT MorphologicalDilationImageFilter
   {
       //====================================================================================================
       //===== DEFINITIONS

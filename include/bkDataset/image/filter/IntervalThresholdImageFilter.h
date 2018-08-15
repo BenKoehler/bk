@@ -33,11 +33,11 @@
 #include "../../../bkAlgorithm/threshold.h"
 
 #include "ThresholdMode.h"
-#include "../../lib/export.h"
+#include "../../lib/bkDataset_export.h"
 
 namespace bk
 {
-  class BK_DATASET_EXPORT IntervalThresholdImageFilter
+  class BKDATASET_EXPORT IntervalThresholdImageFilter
   {
       //====================================================================================================
       //===== DEFINITIONS

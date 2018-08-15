@@ -32,17 +32,17 @@
 #ifdef BK_EMIT_PROGRESS
 
     #include "../../../bkTools/Progress"
+    #include <bkTools/Localization>
 
 #endif
 
-#include <bkTools/Localization>
 #include "../../../bkMath/matrix/MatrixFactory.h"
 #include "../../../bkMath/functions/list_grid_id_conversion.h"
-#include "../../lib/export.h"
+#include "../../lib/bkDataset_export.h"
 
 namespace bk
 {
-  class BK_DATASET_EXPORT MorphologicalOperationImageFilter
+  class BKDATASET_EXPORT MorphologicalOperationImageFilter
   {
       //====================================================================================================
       //===== FUNCTIONS

@@ -35,16 +35,41 @@
 #include <utility>
 #include <vector>
 
+#include <bkTools/StringUtils>
+
+#include "../lib/bkTools_export.h"
+
 namespace bk
 {
-  class LocalizationManager
+  namespace details
   {
+    struct disable_hash
+    {
+        [[nodiscard]] constexpr unsigned long long operator()(unsigned long long x) const
+        {
+            return x;
+        }
+    }; // struct disable_hash
+  } // namespace details
+
+  class BKTOOLS_EXPORT LocalizationManager
+  {
+      //====================================================================================================
+      //===== DEINITIONS
+      //====================================================================================================
+      using hash_map_type = std::unordered_map<unsigned long long, std::string, details::disable_hash>;
+      using vector_type = std::vector<std::string>;
+
       //====================================================================================================
       //===== MEMBERS
       //====================================================================================================
     protected:
-      std::unordered_map<std::string, std::string> entries_text;
-      std::map<std::size_t, std::string>           entries_tag;
+      //std::unordered_map<std::string, std::string> entries_text;
+      //std::map<std::string, std::string> entries_text;
+      //std::map<std::size_t, std::string>           entries_tag;
+
+      hash_map_type _text;
+      vector_type   _tags;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR
@@ -58,8 +83,9 @@ namespace bk
       //====================================================================================================
       //===== GETTER
       //====================================================================================================
-      std::string get(std::size_t key) const;
-      std::string get(std::string_view referenceTextInEnglish) const;
+      std::string get_tag(unsigned int id) const;
+      std::string get_text(unsigned long long hash) const;
+      std::string get_text(std::string_view referenceText) const;
 
       //! check if there is any tag with an arbitrary (first version) or specific number (second version) at this position
       [[nodiscard]] static bool is_tag_at_position(std::string_view text, unsigned int pos);
@@ -71,9 +97,10 @@ namespace bk
       [[maybe_unused]] LocalizationManager& operator=(const LocalizationManager&);
       [[maybe_unused]] LocalizationManager& operator=(LocalizationManager&&) noexcept = default;
 
-      void set(std::size_t, std::string_view textInLanguage);
-      void set(std::string_view key, std::string_view textInLanguage);
-      void set(std::string_view key_equals_textInLanguage);
+      void set_tag(unsigned int id, std::string_view textInLanguage);
+      void set_text(unsigned long long hash, std::string_view textInLanguage);
+      void set_text(std::string_view key, std::string_view textInLanguage);
+      void set_text(std::string_view key_equals_textInLanguage);
 
       //====================================================================================================
       //===== FUNCTIONS
@@ -92,9 +119,14 @@ namespace bk
       [[nodiscard]] static std::string replace_parameters(std::string_view text, T&& arg0, Args&& ... args);
 
       template<typename... Args>
-      [[nodiscard]] std::string translate(std::size_t key, Args&& ... args) const;
+      [[nodiscard]] std::string translate_tag(unsigned int id, Args&& ... args) const;
+      template<unsigned long long key, typename... Args>
+      [[nodiscard]] std::string translate_text(Args&& ... args) const;
       template<typename... Args>
-      [[nodiscard]] std::string translate(std::string_view key, Args&& ... args) const;
+      [[nodiscard]] std::string translate_text(unsigned long long key, Args&& ... args) const;
+      template<typename... Args>
+      [[nodiscard]] std::string translate_text(std::string_view text, Args&& ... args) const;
+
   };
 } // namespace bk
 

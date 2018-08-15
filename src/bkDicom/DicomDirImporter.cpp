@@ -42,13 +42,13 @@
 #include <gdcmStringFilter.h>
 
 #include "../../include/bkTools/BitVector"
-#include "../../include/bkTools/Localization"
 #include "../../include/bkDataset/Image"
 #include "../../include/bkTools/StringUtils"
 #include "../../include/bkMath/functions/list_grid_id_conversion.h"
 
 #ifdef BK_EMIT_PROGRESS
 
+    #include "../../include/bkTools/Localization"
     #include "../../include/bkTools/Progress"
 
 #endif

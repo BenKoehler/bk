@@ -36,7 +36,7 @@
 #include "../../../bkMath/Matrix"
 
 #include "../AbstractSceneRenderable.h"
-#include "../../lib/export.h"
+#include "../../lib/bkGL_export.h"
 
 namespace bk
 {
@@ -48,7 +48,7 @@ namespace bk
   class ColorBarView;
   // -------------------- forward declaration END
 
-  class BK_GL_EXPORT LineView : public details::AbstractSceneRenderable
+  class BKGL_EXPORT LineView : public details::AbstractSceneRenderable
   {
       //====================================================================================================
       //===== DEFINITIONS

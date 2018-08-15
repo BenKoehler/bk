@@ -31,7 +31,7 @@
 
 namespace bk::details
 {
-    class BK_GL_EXPORT AbstractBindable : public AbstractObject
+    class BKGL_EXPORT AbstractBindable : public AbstractObject
     {
         //====================================================================================================
         //===== DEFINITIONS

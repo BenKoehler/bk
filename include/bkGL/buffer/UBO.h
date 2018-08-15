@@ -37,7 +37,7 @@ namespace bk
   class RegisteredValue;
   // -------------------- forward declaration END
 
-  class BK_GL_EXPORT UBO : protected Buffer
+  class BKGL_EXPORT UBO : protected Buffer
   {
       //====================================================================================================
       //===== DEFINITIONS

@@ -34,11 +34,11 @@
 #include "../../../bkTypeTraits/has_index_operator.h"
 #include "../../../bkMath/functions/list_grid_id_conversion.h"
 
-#include "../../lib/export.h"
+#include "../../lib/bkDataset_export.h"
 
 namespace bk
 {
-  class BK_DATASET_EXPORT NearestNeighborImageInterpolation
+  class BKDATASET_EXPORT NearestNeighborImageInterpolation
   {
     public:
       template<typename TImage, typename TIndexAccessible>

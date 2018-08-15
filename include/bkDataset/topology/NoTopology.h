@@ -30,11 +30,11 @@
 #include <array>
 
 #include "Cell.h"
-#include "../lib/export.h"
+#include "../lib/bkDataset_export.h"
 
 namespace bk
 {
-  class BK_DATASET_EXPORT NoTopology
+  class BKDATASET_EXPORT NoTopology
   {
       //====================================================================================================
       //===== DEFINITIONS

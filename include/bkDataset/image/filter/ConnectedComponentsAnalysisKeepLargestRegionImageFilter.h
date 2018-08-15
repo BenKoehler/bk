@@ -32,11 +32,11 @@
 #include <vector>
 
 #include "ConnectedComponentsAnalysisImageFilter.h"
-#include "../../lib/export.h"
+#include "../../lib/bkDataset_export.h"
 
 namespace bk
 {
-  class BK_DATASET_EXPORT ConnectedComponentAnalysisKeepLargestRegionImageFilter
+  class BKDATASET_EXPORT ConnectedComponentAnalysisKeepLargestRegionImageFilter
   {
       //====================================================================================================
       //===== DEFINITIONS

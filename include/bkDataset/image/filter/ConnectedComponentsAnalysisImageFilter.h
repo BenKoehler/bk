@@ -33,11 +33,11 @@
 
 #include "../../../bkMath/functions/list_grid_id_conversion.h"
 
-#include "../../lib/export.h"
+#include "../../lib/bkDataset_export.h"
 
 namespace bk
 {
-  class BK_DATASET_EXPORT ConnectedComponentAnalysisImageFilter
+  class BKDATASET_EXPORT ConnectedComponentAnalysisImageFilter
   {
       //====================================================================================================
       //===== DEFINITIONS

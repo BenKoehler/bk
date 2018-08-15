@@ -42,7 +42,7 @@
 #include "../bkDataset/Image"
 #include "../bkMath/Matrix"
 
-#include "lib/export.h"
+#include "lib/bkDicom_export.h"
 
 namespace bk
 {
@@ -50,7 +50,7 @@ namespace bk
   class DicomImageInfos;
   // -------------------- forward declaration END
 
-  class BK_DICOM_EXPORT DicomDirImporter
+  class BKDICOM_EXPORT DicomDirImporter
   {
       //====================================================================================================
       //===== DEFINITIONS

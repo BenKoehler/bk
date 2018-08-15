@@ -42,7 +42,7 @@ namespace bk
 
 namespace bk::details
 {
-  class BK_GL_EXPORT AbstractBackground : public AbstractRenderable
+  class BKGL_EXPORT AbstractBackground : public AbstractRenderable
   {
       //====================================================================================================
       //===== DEFINITIONS

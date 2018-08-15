@@ -57,11 +57,6 @@ namespace bk
               if (i < text.size())
               { ss << text.substr(i, text.size() - i); }
 
-              //if constexpr (sizeof...(Args) != 0)
-              //{ return _replace_parameters_impl(ss.str(), ++cnt, std::forward<Args>(args)...); }
-              //else
-              //{ return ss.str(); }
-
               return _replace_parameters_impl(ss.str(), cnt, std::forward<T>(arg0), std::forward<Args>(args)...);
           }
       }
@@ -71,9 +66,6 @@ namespace bk
       { return _replace_parameters_impl(text, ++cnt, std::forward<Args>(args)...); }
       else
       { return text.data(); }
-
-      //std::cerr << "error finding all replacement tags in \"" << text << "\"" << " - wrong tag indices?" << std::endl;
-      //return text.data();
   }
 
   template<typename T, typename... Args>
@@ -94,12 +86,20 @@ namespace bk
   }
 
   template<typename... Args>
-  std::string LocalizationManager::translate(std::size_t key, Args&& ... args) const
-  { return _translate_impl(get(key), std::forward<Args>(args)...); }
+  std::string LocalizationManager::translate_tag(unsigned int id, Args&& ... args) const
+  { return _translate_impl(get_tag(id), std::forward<Args>(args)...); }
+
+  template<unsigned long long key, typename... Args>
+  std::string LocalizationManager::translate_text(Args&& ... args) const
+  { return _translate_impl(get_text(key), std::forward<Args>(args)...); }
 
   template<typename... Args>
-  std::string LocalizationManager::translate(std::string_view key, Args&& ... args) const
-  { return _translate_impl(get(key), std::forward<Args>(args)...); }
+  std::string LocalizationManager::translate_text(unsigned long long key, Args&& ... args) const
+  { return _translate_impl(get_text(key), std::forward<Args>(args)...); }
+
+  template<typename... Args>
+  std::string LocalizationManager::translate_text(std::string_view text, Args&& ... args) const
+  { return translate_text(bk::string_utils::hash(text), std::forward<Args>(args)...); }
 } // namespace bk
 
 #endif //BKTOOLS_LOCALIZATIONMANAGER_HPP

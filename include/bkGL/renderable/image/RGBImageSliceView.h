@@ -22,7 +22,7 @@
 
 namespace bk
 {
-  class BK_GL_EXPORT RGBImageSliceView : public details::AbstractRGBSliceView
+  class BKGL_EXPORT RGBImageSliceView : public details::AbstractRGBSliceView
   {
       //====================================================================================================
       //===== DEFINITIONS

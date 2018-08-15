@@ -33,11 +33,11 @@
 #include <vector>
 
 #include "BinomialSmoothingImageFilter.h"
-#include "../../lib/export.h"
+#include "../../lib/bkDataset_export.h"
 
 namespace bk
 {
-  class BK_DATASET_EXPORT UnsharpMaskingImageFilter
+  class BKDATASET_EXPORT UnsharpMaskingImageFilter
   {
       //====================================================================================================
       //===== DEFINITIONS

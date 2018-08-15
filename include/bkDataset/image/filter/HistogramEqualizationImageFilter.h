@@ -31,11 +31,11 @@
 
 #include "../../../bkAlgorithm/histogram_equalization.h"
 
-#include "../../lib/export.h"
+#include "../../lib/bkDataset_export.h"
 
 namespace bk
 {
-  class BK_DATASET_EXPORT HistogramEqualizationImageFilter
+  class BKDATASET_EXPORT HistogramEqualizationImageFilter
   {
       //====================================================================================================
       //===== DEFINITIONS

@@ -35,7 +35,7 @@
 #include <utility>
 
 #include "../AbstractBindable.h"
-#include "../lib/export.h"
+#include "../lib/bkGL_export.h"
 
 namespace bk
 {
@@ -43,7 +43,7 @@ namespace bk
   class RegisteredValue;
   // -------------------- forward declaration END
 
-  class BK_GL_EXPORT Buffer : public details::AbstractBindable
+  class BKGL_EXPORT Buffer : public details::AbstractBindable
   {
       //====================================================================================================
       //===== DEFINITIONS

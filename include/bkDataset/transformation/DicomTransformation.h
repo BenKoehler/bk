@@ -36,12 +36,12 @@
 #include "../../bkMath/Matrix"
 #include "../../bkTypeTraits/has_index_operator.h"
 
-#include "../lib/export.h"
+#include "../lib/bkDataset_export.h"
 #include "EDicomImageType.h"
 
 namespace bk
 {
-  class BK_DATASET_EXPORT DicomTransformation
+  class BKDATASET_EXPORT DicomTransformation
   {
       //====================================================================================================
       //===== DEFINITIONS

@@ -30,26 +30,26 @@
 #include <sstream>
 #include <vector>
 
-#include "../../../include/bkTools/color/WindowingTransferFunction.h"
-#include "../../../include/bkMath/Matrix"
-#include "../../../include/bkTools/Signal"
-#include "../../../include/bkTools/Localization"
+#include <bkTools/color/WindowingTransferFunction.h>
+#include <bkMath/Matrix>
+#include <bkTools/Signal>
 
 #ifdef BK_EMIT_PROGRESS
 
-    #include "../../../include/bkTools/Progress"
+    #include <bkTools/Progress>
+    #include <bkTools/Localization>
 
 #endif
 
-#include "../../../include/bkGL/renderable/image/AbstractSliceView.h"
-#include "../../../include/bkGL/buffer/VBO.h"
-#include "../../../include/bkGL/buffer/IBO.h"
-#include "../../../include/bkGL/UBOSliceView.h"
-#include "../../../include/bkGL/buffer/SSBO.h"
-#include "../../../include/bkGL/vao/VAO.h"
-#include "../../../include/bkGL/shader/Shader.h"
-#include "../../../include/bkGL/WindowGeometry.h"
-#include "../../../include/bkGL/renderable/transfer_function/WindowingTransferFunctionView.h"
+#include <bkGL/renderable/image/AbstractSliceView.h>
+#include <bkGL/buffer/VBO.h>
+#include <bkGL/buffer/IBO.h>
+#include <bkGL/UBOSliceView.h>
+#include <bkGL/buffer/SSBO.h>
+#include <bkGL/vao/VAO.h>
+#include <bkGL/shader/Shader.h>
+#include <bkGL/WindowGeometry.h>
+#include <bkGL/renderable/transfer_function/WindowingTransferFunctionView.h>
 
 namespace bk::details
 {

@@ -30,7 +30,7 @@
 #include <memory>
 
 #include "../AbstractRenderable.h"
-#include "../../lib/export.h"
+#include "../../lib/bkGL_export.h"
 
 namespace bk
 {
@@ -38,7 +38,7 @@ namespace bk
   class WindowingTransferFunction;
   // ------ forward declaration -------
 
-  class BK_GL_EXPORT WindowingTransferFunctionView : public details::AbstractRenderable
+  class BKGL_EXPORT WindowingTransferFunctionView : public details::AbstractRenderable
   {
       //====================================================================================================
       //===== DEFINITIONS

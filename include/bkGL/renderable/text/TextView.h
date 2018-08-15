@@ -48,7 +48,7 @@ namespace bk
   //====================================================================================================
   namespace details
   {
-    struct FreeTypeCharacter
+    struct BKGL_EXPORT FreeTypeCharacter
     {
         Texture2D tex;
         GLint size_x;
@@ -71,7 +71,7 @@ namespace bk
     };
   } // namespace details
 
-  class TextView : public details::AbstractRenderable
+  class BKGL_EXPORT TextView : public details::AbstractRenderable
   {
       //====================================================================================================
       //===== DEFINITIONS

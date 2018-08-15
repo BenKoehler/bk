@@ -29,7 +29,7 @@ namespace bk
   class DicomDirImporter;
   // ------ forward declaration -------
 
-  class BK_GL_EXPORT RGBDICOMFlowImageSliceView : public details::AbstractRGBSliceView
+  class BKGL_EXPORT RGBDICOMFlowImageSliceView : public details::AbstractRGBSliceView
   {
       //====================================================================================================
       //===== DEFINITIONS

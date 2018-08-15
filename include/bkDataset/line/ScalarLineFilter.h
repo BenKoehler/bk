@@ -32,11 +32,11 @@
 
 #include "ScalarLineThreshold.h"
 #include "Line.h"
-#include "../lib/export.h"
+#include "../lib/bkDataset_export.h"
 
 namespace bk
 {
-  class BK_DATASET_EXPORT ScalarLineFilter
+  class BKDATASET_EXPORT ScalarLineFilter
   {
       //====================================================================================================
       //===== ENUMS

@@ -31,11 +31,11 @@
 #include <string>
 
 #include "Line.h"
-#include "../lib/export.h"
+#include "../lib/bkDataset_export.h"
 
 namespace bk
 {
-  class BK_DATASET_EXPORT ScalarLineThreshold
+  class BKDATASET_EXPORT ScalarLineThreshold
   {
       //====================================================================================================
       //===== DEFINITIONS

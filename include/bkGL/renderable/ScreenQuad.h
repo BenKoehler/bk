@@ -38,7 +38,7 @@ namespace bk
   class VAO;
   // -------------------- forward declaration END
 
-  class BK_GL_EXPORT ScreenQuad : public details::AbstractRenderable
+  class BKGL_EXPORT ScreenQuad : public details::AbstractRenderable
   {
       //====================================================================================================
       //===== DEFINITIONS

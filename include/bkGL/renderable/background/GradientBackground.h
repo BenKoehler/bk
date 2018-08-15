@@ -13,7 +13,7 @@ namespace bk
   class ColorRGBA;
   // -------------------- forward declaration END
 
-  class BK_GL_EXPORT GradientBackground : public details::AbstractBackground
+  class BKGL_EXPORT GradientBackground : public details::AbstractBackground
   {
       //====================================================================================================
       //===== DEFINITIONS

@@ -35,7 +35,7 @@
 #include "../../../bkMath/FFT"
 #include "../../../bkMath/functions/list_grid_id_conversion.h"
 
-#include "../../lib/export.h"
+#include "../../lib/bkDataset_export.h"
 
 namespace bk
 {
@@ -43,7 +43,7 @@ namespace bk
   class FFTImageFilter;
   // -------------------- forward declaration END
 
-  class BK_DATASET_EXPORT IFFTImageFilter
+  class BKDATASET_EXPORT IFFTImageFilter
   {
       //====================================================================================================
       //===== DEFINITIONS

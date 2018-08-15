@@ -12,7 +12,7 @@
 
 namespace bk
 {
-  class BK_GL_EXPORT GrayImagePlusSegmentationSliceView : public GrayImageSliceView
+  class BKGL_EXPORT GrayImagePlusSegmentationSliceView : public GrayImageSliceView
   {
       //====================================================================================================
       //===== DEFINITIONS

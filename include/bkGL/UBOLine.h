@@ -30,11 +30,11 @@
 #include <string>
 
 #include "buffer/UBOSpecialization.h"
-#include "lib/export.h"
+#include "lib/bkGL_export.h"
 
 namespace bk::details
 {
-  class BK_GL_EXPORT UBOLine : public UBOSpecialization
+  class BKGL_EXPORT UBOLine : public UBOSpecialization
   {
       //====================================================================================================
       //===== DEFINITIONS

@@ -34,7 +34,7 @@
 #include <vector>
 
 #include "AbstractRenderable.h"
-#include "../lib/export.h"
+#include "../lib/bkGL_export.h"
 
 namespace bk
 {
@@ -46,7 +46,7 @@ namespace bk
   template<typename...> class Signal;
   // -------------------- forward declaration END
 
-  class BK_GL_EXPORT ColorBarView : public details::AbstractRenderable
+  class BKGL_EXPORT ColorBarView : public details::AbstractRenderable
   {
       //====================================================================================================
       //===== DEFINITIONS

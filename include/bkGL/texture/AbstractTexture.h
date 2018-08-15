@@ -33,7 +33,7 @@
 
 namespace bk::details
 {
-  class BK_GL_EXPORT AbstractTexture : public AbstractBindable
+  class BKGL_EXPORT AbstractTexture : public AbstractBindable
   {
       //====================================================================================================
       //===== DEFINITIONS

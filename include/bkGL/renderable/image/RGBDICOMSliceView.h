@@ -31,7 +31,7 @@ namespace bk
   class DicomDirImporter;
   // ------ forward declaration -------
 
-  class BK_GL_EXPORT RGBDICOMSliceView : public details::AbstractRGBSliceView
+  class BKGL_EXPORT RGBDICOMSliceView : public details::AbstractRGBSliceView
   {
       //====================================================================================================
       //===== DEFINITIONS

@@ -31,7 +31,7 @@
 
 namespace bk
 {
-  class BK_GL_EXPORT Texture2D : public details::AbstractTexture
+  class BKGL_EXPORT Texture2D : public details::AbstractTexture
   {
       //====================================================================================================
       //===== DEFINITIONS

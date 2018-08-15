@@ -33,11 +33,11 @@
 #include "../../bkMath/Matrix"
 #include "../../bkMath/constants/pi.h"
 
-#include "../lib/export.h"
+#include "../lib/bkGL_export.h"
 
 namespace bk
 {
-  class BK_GL_EXPORT Quaternion
+  class BKGL_EXPORT Quaternion
   {
       //====================================================================================================
       //===== DEFINITIONS

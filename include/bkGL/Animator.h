@@ -30,7 +30,7 @@
 #include <memory>
 
 #include "gl_definitions.h"
-#include "lib/export.h"
+#include "lib/bkGL_export.h"
 
 namespace bk
 {
@@ -45,7 +45,7 @@ namespace bk
   } // namespace details
   // -------------------- forward declaration END
 
-  class BK_GL_EXPORT Animator
+  class BKGL_EXPORT Animator
   {
       //====================================================================================================
       //===== DEFINITIONS

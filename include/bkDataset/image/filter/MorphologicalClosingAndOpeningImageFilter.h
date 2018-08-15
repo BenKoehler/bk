@@ -34,11 +34,11 @@
 
 #include "MorphologicalDilationImageFilter.h"
 #include "MorphologicalErosionImageFilter.h"
-#include "../../lib/export.h"
+#include "../../lib/bkDataset_export.h"
 
 namespace bk
 {
-  class BK_DATASET_EXPORT MorphologicalClosingAndOpeningImageFilter
+  class BKDATASET_EXPORT MorphologicalClosingAndOpeningImageFilter
   {
       //====================================================================================================
       //===== DEFINITIONS

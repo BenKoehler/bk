@@ -55,7 +55,7 @@ namespace bk
 
   namespace details
   {
-    class BK_GL_EXPORT AbstractGraySliceView : public AbstractSliceView
+    class BKGL_EXPORT AbstractGraySliceView : public AbstractSliceView
     {
         //====================================================================================================
         //===== DEFINITIONS

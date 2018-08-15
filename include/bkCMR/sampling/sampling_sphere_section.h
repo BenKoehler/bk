@@ -32,19 +32,19 @@
 
 #include <bkMath/Matrix>
 
-#include "../lib/export.h"
+#include "bkCMR/lib/bkCMR_export.h"
 
 namespace bk
 {
-  [[nodiscard]] double BK_DATASET_EXPORT distance_on_sphere(double theta0, double phi0, double theta1, double phi1, double radius = 1);
-  void BK_DATASET_EXPORT poisson_sphere(std::vector<double>& sampleTheta_out, std::vector<double>& samplePhi_out, double thetaMin_deg = 0, double thetaMax_deg = 60, double phiMin_deg = 0, double phiMax_deg = 360, double minDistOnSphere = 0.1, unsigned int maxTriesPerSample = 1000);
-  void BK_DATASET_EXPORT poisson_sphere(std::vector<double>& sampleX_out, std::vector<double>& sampleY_out, std::vector<double>& sampleZ_out, double thetaMin_deg = 0, double thetaMax_deg = 60, double phiMin_deg = 0, double phiMax_deg = 360, double minDistOnSphere = 0.1, unsigned int maxTriesPerSample = 1000);
-  void BK_DATASET_EXPORT poisson_sphere(std::vector<bk::Vec3d>& samples_out, double thetaMin_deg = 0, double thetaMax_deg = 60, double phiMin_deg = 0, double phiMax_deg = 360, double minDistOnSphere = 0.1, unsigned int maxTriesPerSample = 1000);
-  void BK_DATASET_EXPORT uniform_sphere(std::vector<double>& sampleTheta_out, std::vector<double>& samplePhi_out, unsigned int numSamples = 250, double thetaMin_deg = 0, double thetaMax_deg = 60, double phiMin_deg = 0, double phiMax_deg = 360);
-  void BK_DATASET_EXPORT uniform_sphere(std::vector<double>& sampleX_out, std::vector<double>& sampleY_out, std::vector<double>& sampleZ_out, unsigned int numSamples = 250, double thetaMin_deg = 0, double thetaMax_deg = 60, double phiMin_deg = 0, double phiMax_deg = 360);
-  void BK_DATASET_EXPORT random_sphere(std::vector<double>& sampleTheta_out, std::vector<double>& samplePhi_out, unsigned int numSamples = 250, double thetaMin_deg = 0, double thetaMax_deg = 60, double phiMin_deg = 0, double phiMax_deg = 360);
-  void BK_DATASET_EXPORT random_sphere(std::vector<double>& sampleX_out, std::vector<double>& sampleY_out, std::vector<double>& sampleZ_out, unsigned int numSamples = 250, double thetaMin_deg = 0, double thetaMax_deg = 60, double phiMin_deg = 0, double phiMax_deg = 360);
-  void BK_DATASET_EXPORT random_sphere(std::vector<bk::Vec3d>& samples_out, unsigned int numSamples = 250, double thetaMin_deg = 0, double thetaMax_deg = 60, double phiMin_deg = 0, double phiMax_deg = 360);
+  [[nodiscard]] double BKCMR_EXPORT distance_on_sphere(double theta0, double phi0, double theta1, double phi1, double radius = 1);
+  void BKCMR_EXPORT poisson_sphere(std::vector<double>& sampleTheta_out, std::vector<double>& samplePhi_out, double thetaMin_deg = 0, double thetaMax_deg = 60, double phiMin_deg = 0, double phiMax_deg = 360, double minDistOnSphere = 0.1, unsigned int maxTriesPerSample = 1000);
+  void BKCMR_EXPORT poisson_sphere(std::vector<double>& sampleX_out, std::vector<double>& sampleY_out, std::vector<double>& sampleZ_out, double thetaMin_deg = 0, double thetaMax_deg = 60, double phiMin_deg = 0, double phiMax_deg = 360, double minDistOnSphere = 0.1, unsigned int maxTriesPerSample = 1000);
+  void BKCMR_EXPORT poisson_sphere(std::vector<bk::Vec3d>& samples_out, double thetaMin_deg = 0, double thetaMax_deg = 60, double phiMin_deg = 0, double phiMax_deg = 360, double minDistOnSphere = 0.1, unsigned int maxTriesPerSample = 1000);
+  void BKCMR_EXPORT uniform_sphere(std::vector<double>& sampleTheta_out, std::vector<double>& samplePhi_out, unsigned int numSamples = 250, double thetaMin_deg = 0, double thetaMax_deg = 60, double phiMin_deg = 0, double phiMax_deg = 360);
+  void BKCMR_EXPORT uniform_sphere(std::vector<double>& sampleX_out, std::vector<double>& sampleY_out, std::vector<double>& sampleZ_out, unsigned int numSamples = 250, double thetaMin_deg = 0, double thetaMax_deg = 60, double phiMin_deg = 0, double phiMax_deg = 360);
+  void BKCMR_EXPORT random_sphere(std::vector<double>& sampleTheta_out, std::vector<double>& samplePhi_out, unsigned int numSamples = 250, double thetaMin_deg = 0, double thetaMax_deg = 60, double phiMin_deg = 0, double phiMax_deg = 360);
+  void BKCMR_EXPORT random_sphere(std::vector<double>& sampleX_out, std::vector<double>& sampleY_out, std::vector<double>& sampleZ_out, unsigned int numSamples = 250, double thetaMin_deg = 0, double thetaMax_deg = 60, double phiMin_deg = 0, double phiMax_deg = 360);
+  void BKCMR_EXPORT random_sphere(std::vector<bk::Vec3d>& samples_out, unsigned int numSamples = 250, double thetaMin_deg = 0, double thetaMax_deg = 60, double phiMin_deg = 0, double phiMax_deg = 360);
 } // namespace bk
 
 #endif //BKCMR_SAMPLING_SPHERE_SECTION_H

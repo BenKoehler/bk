@@ -30,7 +30,6 @@
 
 #include "../../include/bkAlgorithm/Algorithm"
 #include "../../include/bkTools/Clock"
-#include "../../include/bkTools/Localization"
 #include "../../include/bkTools/Signal"
 #include "../../include/bkTools/ThreadPool"
 #include "../../include/bkMath/functions/equals_approx.h"
@@ -46,6 +45,7 @@
 #ifdef BK_EMIT_PROGRESS
 
     #include "../../include/bkTools/Progress"
+    #include "../../include/bkTools/Localization"
 
 #endif
 
