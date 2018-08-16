@@ -94,8 +94,8 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR=
       //! assignment creates new Signal
-      [[maybe_unused]] auto operator=(const self_type&) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
+      [[maybe_unused]] auto operator=(const self_type&) -> self_type& = default;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type& = default;
       /// @}
 
       //====================================================================================================
