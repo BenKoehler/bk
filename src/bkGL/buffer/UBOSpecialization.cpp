@@ -70,7 +70,7 @@ namespace bk::details
   UBOSpecialization::UBOSpecialization(bk::qt_gl_functions* gl, std::string_view bufferName, unsigned int bufferBaseId)
       : base_type(gl),
   #endif
-        _pdata(std::make_unique<Impl>(bufferName, bufferBaseId))
+        _pdata(bufferName, bufferBaseId)
   { /* do nothing */ }
   /// @}
 
@@ -104,7 +104,7 @@ namespace bk::details
   /// @}
 
   /// @{ -------------------------------------------------- SET BUFFER BASE
-  void UBOSpecialization::set_buffer_base(unsigned int bufferBaseId) const
+  void UBOSpecialization::set_buffer_base(unsigned int bufferBaseId)
   { _pdata->bufferBaseId = bufferBaseId; }
   /// @}
 

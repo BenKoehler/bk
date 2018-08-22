@@ -27,10 +27,10 @@
 #ifndef BKGL_UBOSPECIALIZATION_H
 #define BKGL_UBOSPECIALIZATION_H
 
-#include <memory>
 #include <string>
 #include <string_view>
 
+#include <bk/CopyablePIMPL>
 #include <bkGL/buffer/UBO.h>
 #include <bkGL/gl_definitions.h>
 
@@ -49,7 +49,7 @@ namespace bk::details
       //===== MEMBERS
       //====================================================================================================
       class Impl;
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR
@@ -96,7 +96,7 @@ namespace bk::details
       /// @}
 
       /// @{ -------------------------------------------------- SET BUFFER BASE
-      void set_buffer_base(unsigned int bufferBaseId) const;
+      void set_buffer_base(unsigned int bufferBaseId);
       /// @}
 
       //====================================================================================================

@@ -27,8 +27,7 @@
 #ifndef BKGL_FRAMEBUFFER_H
 #define BKGL_FRAMEBUFFER_H
 
-#include <memory>
-
+#include <bk/CopyablePIMPL>
 #include <bkGL/AbstractBindable.h>
 
 namespace bk
@@ -51,7 +50,7 @@ namespace bk
     protected:
       class Impl;
 
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

@@ -28,8 +28,8 @@
 #define BK_GRAYIMAGELIVETHRESHOLDSLICEVIEW_H
 
 #include <cstdint>
-#include <memory>
 
+#include <bk/CopyablePIMPL>
 #include <bk/Image>
 
 #include <bkGL/renderable/image/GrayImageSliceView.h>
@@ -55,7 +55,7 @@ namespace bk
     private:
       class Impl;
 
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

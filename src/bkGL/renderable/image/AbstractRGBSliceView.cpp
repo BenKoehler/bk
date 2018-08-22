@@ -45,14 +45,12 @@ namespace bk::details
     #ifndef BK_LIB_QT_AVAILABLE
 
     AbstractRGBSliceView::AbstractRGBSliceView()
-        : base_type(),
+        : base_type()
     #else
 
-    AbstractRGBSliceView::AbstractRGBSliceView(bk::qt_gl_functions* gl) : base_type(gl),
+    AbstractRGBSliceView::AbstractRGBSliceView(bk::qt_gl_functions* gl) : base_type(gl)
     #endif
-          _pdata(std::make_unique<Impl>())
-    {
-    }
+    { /* do nothing */ }
 
     AbstractRGBSliceView::AbstractRGBSliceView(self_type&&) noexcept = default;
 

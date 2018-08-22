@@ -27,9 +27,9 @@
 #ifndef BKGL_VAO_H
 #define BKGL_VAO_H
 
-#include <memory>
 #include <string>
 
+#include <bk/CopyablePIMPL>
 #include <bkGL/AbstractBindable.h>
 
 namespace bk
@@ -53,7 +53,7 @@ namespace bk
       //====================================================================================================
     private:
       class Impl;
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

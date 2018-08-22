@@ -28,13 +28,12 @@
 #define BK_LINE4DVIEW_H
 
 #include <iterator>
-#include <memory>
 #include <string_view>
 #include <vector>
 
+#include <bk/CopyablePIMPL>
 #include <bk/Line>
 #include <bk/Matrix>
-
 #include <bkGL/renderable/AbstractSceneRenderable.h>
 #include <bkGL/lib/bkGL_export.h>
 
@@ -62,7 +61,7 @@ namespace bk
     protected:
       class Impl;
 
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

@@ -27,8 +27,7 @@
 #ifndef BKGL_UBO_H
 #define BKGL_UBO_H
 
-#include <memory>
-
+#include <bk/CopyablePIMPL>
 #include <bkGL/buffer/Buffer.h>
 #include <bkGL/shader/glsl_helpers.h>
 #include <bkGL/gl_type_traits.h>
@@ -52,7 +51,7 @@ namespace bk
       //====================================================================================================
       class Impl;
 
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

@@ -27,10 +27,8 @@
 #ifndef BKGL_CAMERA_H
 #define BKGL_CAMERA_H
 
-#include <memory>
-
+#include <bk/CopyablePIMPL>
 #include <bk/Matrix>
-
 #include <bkGL/gl_definitions.h>
 #include <bkGL/lib/bkGL_export.h>
 
@@ -51,7 +49,7 @@ namespace bk
       //===== MEMBERS
       //====================================================================================================
       class Impl;
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

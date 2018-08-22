@@ -92,13 +92,12 @@ namespace bk
   #ifndef BK_LIB_QT_AVAILABLE
 
   GrayImageGraphCutView::GrayImageGraphCutView()
-      : base_type(),
-        _pdata(std::make_unique<Impl>())
+      : base_type()
   #else
 
   GrayImageGraphCutView::GrayImageGraphCutView(bk::qt_gl_functions* gl)
       : base_type(gl),
-        _pdata(std::make_unique<Impl>(gl))
+        _pdata(gl)
   #endif
   {
       _pdata->ssbo_gc.set_usage_DYNAMIC_DRAW();
@@ -114,8 +113,7 @@ namespace bk
 
   GrayImageGraphCutView::GrayImageGraphCutView(self_type&&) noexcept = default;
 
-  GrayImageGraphCutView::~GrayImageGraphCutView()
-  {};
+  GrayImageGraphCutView::~GrayImageGraphCutView() = default;
 
   //====================================================================================================
   //===== GETTER

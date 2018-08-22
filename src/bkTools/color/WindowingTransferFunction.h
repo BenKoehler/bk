@@ -27,9 +27,9 @@
 #ifndef BKTOOLS_WINDOWINGTRANSFERFUNCTION_H
 #define BKTOOLS_WINDOWINGTRANSFERFUNCTION_H
 
-#include <memory>
 #include <type_traits>
 
+#include <bk/CopyablePIMPL>
 #include <bkTools/color/ITransferFunction.h>
 #include <bkTools/lib/bkTools_export.h>
 
@@ -56,7 +56,7 @@ namespace bk
       //====================================================================================================
     private:
       class Impl;
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

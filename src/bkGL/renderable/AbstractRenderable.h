@@ -27,8 +27,7 @@
 #ifndef BKGL_ABSTRACTRENDERABLE_H
 #define BKGL_ABSTRACTRENDERABLE_H
 
-#include <memory>
-
+#include <bk/CopyablePIMPL>
 #include <bkGL/AbstractObject.h>
 #include <bkGL/EMouseButton.h>
 
@@ -55,7 +54,7 @@ namespace bk::details
     private:
       class Impl;
 
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

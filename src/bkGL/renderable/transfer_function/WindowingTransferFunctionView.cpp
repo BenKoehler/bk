@@ -67,12 +67,12 @@ namespace bk
 
   WindowingTransferFunctionView::WindowingTransferFunctionView(WindowingTransferFunction* tf)
       : base_type(),
-        _pdata(new Impl(tf))
+        _pdata(tf)
   #else
 
   WindowingTransferFunctionView::WindowingTransferFunctionView(WindowingTransferFunction* tf, bk::qt_gl_functions* gl)
       : base_type(gl),
-        _pdata(new Impl(tf, gl))
+        _pdata(tf, gl)
   #endif
   {
       _pdata->vao.add_default_attribute_position_2xfloat();

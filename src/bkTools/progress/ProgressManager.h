@@ -27,9 +27,9 @@
 #ifndef BKTOOLS_PROGRESSMANAGER_H
 #define BKTOOLS_PROGRESSMANAGER_H
 
-#include <memory>
 #include <string>
 
+#include <bk/CopyablePIMPL>
 #include <bkTools/lib/bkTools_export.h>
 
 namespace bk
@@ -50,7 +50,7 @@ namespace bk
       //===== MEMBERS
       //====================================================================================================
       class Impl;
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

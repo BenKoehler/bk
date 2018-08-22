@@ -40,9 +40,9 @@
 #ifndef BK_ABSTRACTRGBSLICEVIEW_H
 #define BK_ABSTRACTRGBSLICEVIEW_H
 
-#include <memory>
 #include <string>
 
+#include <bk/CopyablePIMPL>
 #include <bk/Matrix>
 
 #include <bkGL/renderable/image/AbstractSliceView.h>
@@ -64,7 +64,7 @@ namespace bk::details
         //====================================================================================================
       protected:
         class Impl;
-        std::unique_ptr<Impl> _pdata;
+        bk::cpimpl<Impl> _pdata;
 
         //====================================================================================================
         //===== CONSTRUCTORS & DESTRUCTOR

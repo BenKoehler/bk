@@ -55,14 +55,8 @@ namespace bk
   //===== CONSTRUCTORS & DESTRUCTOR
   //====================================================================================================
   /// @{ -------------------------------------------------- CTOR
-  Mouse::Mouse()
-      : _pdata(std::make_unique<Impl>())
-  { /* do nothing */ }
-
-  Mouse::Mouse(const self_type& other)
-      : _pdata(new Impl(*other._pdata.get()))
-  { /* do nothing */ }
-
+  Mouse::Mouse() = default;
+  Mouse::Mouse(const self_type&) = default;
   Mouse::Mouse(self_type&&) noexcept = default;
   /// @}
 
@@ -127,17 +121,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto Mouse::operator=(const self_type& other) -> self_type&
-  {
-      _pdata->pos[0] = other._pdata->pos[0];
-      _pdata->pos[1] = other._pdata->pos[1];
-      _pdata->last_pos[0] = other._pdata->last_pos[0];
-      _pdata->last_pos[1] = other._pdata->last_pos[1];
-      _pdata->pressed_buttons = other._pdata->pressed_buttons;
-
-      return *this;
-  }
-
+  auto Mouse::operator=(const self_type& other) -> self_type& = default;
   auto Mouse::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 

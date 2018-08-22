@@ -27,10 +27,10 @@
 #ifndef BKCMR_FLOWJET_H
 #define BKCMR_FLOWJET_H
 
-#include <memory>
 #include <utility>
 #include <vector>
 
+#include <bk/CopyablePIMPL>
 #include <bkCMR/lib/bkCMR_export.h>
 
 namespace bk
@@ -47,7 +47,7 @@ namespace bk
         // MEMBERS
       private:
         class Impl;
-        std::unique_ptr<Impl> _pdata;
+        bk::cpimpl<Impl> _pdata;
 
         //====================================================================================================
         //===== CONSTRUCTORS & DESTRUCTOR

@@ -27,8 +27,7 @@
 #ifndef BKGL_INTERACTOR_H
 #define BKGL_INTERACTOR_H
 
-#include <memory>
-
+#include <bk/CopyablePIMPL>
 #include <bk/Matrix>
 #include <bkGL/gl_definitions.h>
 #include <bkGL/EMouseButton.h>
@@ -66,7 +65,7 @@ namespace bk
     private:
       class Impl;
 
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

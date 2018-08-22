@@ -29,7 +29,6 @@
 
 #include <cmath>
 #include <fstream>
-#include <memory>
 #include <string>
 #include <string_view>
 #include <tuple>
@@ -38,6 +37,7 @@
 
 #include <gdcmDirectory.h>
 
+#include <bk/CopyablePIMPL>
 #include <bk/Image>
 #include <bkDicom/lib/bkDicom_export.h>
 #include <bk/Matrix>
@@ -61,8 +61,7 @@ namespace bk
       //====================================================================================================
     protected:
       class Impl;
-
-      std::unique_ptr <Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

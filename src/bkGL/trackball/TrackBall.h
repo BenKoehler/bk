@@ -27,8 +27,7 @@
 #ifndef BKGL_TRACKBALL_H
 #define BKGL_TRACKBALL_H
 
-#include <memory>
-
+#include <bk/CopyablePIMPL>
 #include <bkGL/trackball/Quaternion.h>
 #include <bkGL/gl_definitions.h>
 #include <bkGL/lib/bkGL_export.h>
@@ -52,7 +51,7 @@ namespace bk
       //===== MEMBERS
       //====================================================================================================
       class Impl;
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

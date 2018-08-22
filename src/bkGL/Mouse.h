@@ -27,8 +27,7 @@
 #ifndef BKGL_MOUSE_H
 #define BKGL_MOUSE_H
 
-#include <memory>
-
+#include <bk/CopyablePIMPL>
 #include <bkGL/gl_definitions.h>
 #include <bkGL/lib/bkGL_export.h>
 #include <bkGL/EMouseButton.h>
@@ -46,7 +45,7 @@ namespace bk
       //===== MEMBERS
       //====================================================================================================
       class Impl;
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

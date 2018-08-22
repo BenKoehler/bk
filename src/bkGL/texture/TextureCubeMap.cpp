@@ -57,12 +57,11 @@ namespace bk
   #ifndef BK_LIB_QT_AVAILABLE
 
   TextureCubeMap::TextureCubeMap()
-      : base_type(),
+      : base_type()
   #else
   TextureCubeMap::TextureCubeMap(bk::qt_gl_functions* gl)
-      : base_type(gl),
+      : base_type(gl)
   #endif
-        _pdata(std::make_unique<Impl>())
   { /* do nothing */ }
 
   TextureCubeMap::TextureCubeMap(self_type&&) noexcept = default;

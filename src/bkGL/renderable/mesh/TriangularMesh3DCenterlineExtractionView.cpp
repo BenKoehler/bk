@@ -102,13 +102,12 @@ namespace bk
   #ifndef BK_LIB_QT_AVAILABLE
 
   TriangularMesh3DCenterlineExtractionView::TriangularMesh3DCenterlineExtractionView()
-      : base_type(),
-        _pdata(std::make_unique<Impl>())
+      : base_type()
   #else
 
   TriangularMesh3DCenterlineExtractionView::TriangularMesh3DCenterlineExtractionView(bk::qt_gl_functions* gl)
       : base_type(gl),
-        _pdata(std::make_unique<Impl>(gl))
+        _pdata(gl)
   #endif
   {
       _pdata->vbo_selection_sphere.set_usage_STATIC_DRAW();
@@ -155,7 +154,7 @@ namespace bk
   /// @}
 
   /// @{ -------------------------------------------------- INDEX AT SCREEN POS
-  int TriangularMesh3DCenterlineExtractionView::index_at_screen_pos(GLint x, GLint y) const
+  int TriangularMesh3DCenterlineExtractionView::index_at_screen_pos(GLint x, GLint y)
   {
       _pdata->fbo_picking.bind();
 

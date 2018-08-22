@@ -27,8 +27,7 @@
 #ifndef BKGL_VERTEXATTRIBUTEPOINTER_H
 #define BKGL_VERTEXATTRIBUTEPOINTER_H
 
-#include <memory>
-
+#include <bk/CopyablePIMPL>
 #include <bkGL/gl_definitions.h>
 
 namespace bk
@@ -46,7 +45,7 @@ namespace bk
     private:
       class Impl;
 
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

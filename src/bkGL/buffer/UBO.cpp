@@ -56,12 +56,11 @@ namespace bk
   #ifndef BK_LIB_QT_AVAILABLE
 
   UBO::UBO()
-      : base_type(),
+      : base_type()
   #else
   UBO::UBO(bk::qt_gl_functions* gl)
-      : base_type(gl),
+      : base_type(gl)
   #endif
-        _pdata(std::make_unique<Impl>())
   { set_default_config_uniform_buffer_object(); }
 
   UBO::UBO(self_type&&) noexcept = default;
@@ -128,12 +127,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto UBO::operator=(self_type&& other) noexcept -> self_type&
-  {
-      _pdata.reset(nullptr);
-      _pdata = std::make_unique<Impl>(*other._pdata);
-      return *this;
-  }
+  auto UBO::operator=(self_type&& other) noexcept -> self_type& = default;
   /// @}
 
   /// @{ -------------------------------------------------- REGISTER VALUE

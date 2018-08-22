@@ -71,13 +71,12 @@ namespace bk
   #ifndef BK_LIB_QT_AVAILABLE
 
   Buffer::Buffer()
-      : base_type(),
+      : base_type()
   #else
 
   Buffer::Buffer(bk::qt_gl_functions* gl)
-      : base_type(gl),
+      : base_type(gl)
   #endif
-        _pdata(std::make_unique<Impl>())
   { /* do nothing */ }
 
   Buffer::Buffer(self_type&&) noexcept = default;

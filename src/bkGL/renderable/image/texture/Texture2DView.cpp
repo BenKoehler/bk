@@ -61,13 +61,12 @@ namespace bk
   #ifndef BK_LIB_QT_AVAILABLE
 
   Texture2DView::Texture2DView()
-      : base_type(),
-        _pdata(std::make_unique<Impl>())
+      : base_type()
   #else
 
   Texture2DView::Texture2DView(bk::qt_gl_functions* gl)
       : base_type(gl),
-        _pdata(std::make_unique<Impl>(gl))
+        _pdata(gl)
   #endif
   {
       _pdata->ubo.set_usage_STATIC_DRAW();
@@ -76,8 +75,7 @@ namespace bk
 
   Texture2DView::Texture2DView(self_type&&) noexcept = default;
 
-  Texture2DView::~Texture2DView()
-  {}
+  Texture2DView::~Texture2DView() = default;
 
   //====================================================================================================
   //===== GETTER

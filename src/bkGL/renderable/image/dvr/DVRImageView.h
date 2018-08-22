@@ -27,8 +27,7 @@
 #ifndef BKGL_DVRIMAGEVIEW_H
 #define BKGL_DVRIMAGEVIEW_H
 
-#include <memory>
-
+#include <bk/CopyablePIMPL>
 #include <bk/Matrix>
 #include <bk/Image>
 
@@ -67,7 +66,7 @@ namespace bk
       //====================================================================================================
     private:
       class Impl;
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

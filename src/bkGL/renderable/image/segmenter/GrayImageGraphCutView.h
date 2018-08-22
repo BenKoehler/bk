@@ -28,8 +28,8 @@
 #define BK_GRAYIMAGEGRAPHCUTVIEW_H
 
 #include <cstdint>
-#include <memory>
 
+#include <bk/CopyablePIMPL>
 #include <bkGL/renderable/image/GrayImageSliceView.h> // cannot derive from DICOMSliceView, since the full image is needed at once for the graph cut
 #include <bk/Image>
 #include <bk/GraphCut>
@@ -64,7 +64,7 @@ namespace bk
       //====================================================================================================
     private:
       class Impl;
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

@@ -28,12 +28,12 @@
 #define BKGL_BUFFER_H
 
 #include <cstdint>
-#include <memory>
 #include <string>
 #include <string_view>
 #include <type_traits>
 #include <utility>
 
+#include <bk/CopyablePIMPL>
 #include <bkGL/AbstractBindable.h>
 #include <bkGL/lib/bkGL_export.h>
 
@@ -57,7 +57,7 @@ namespace bk
     protected:
       class Impl;
 
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

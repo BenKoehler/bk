@@ -78,14 +78,12 @@ namespace bk
       : WindowingTransferFunction(0, 1, 0.5, 0.4)
   { /* do nothing */ }
 
-  WindowingTransferFunction::WindowingTransferFunction(const self_type& other)
-      : _pdata(new Impl(*other._pdata.get()))
-  { /* do nothing */ }
+  WindowingTransferFunction::WindowingTransferFunction(const self_type&) = default;
 
   WindowingTransferFunction::WindowingTransferFunction(self_type&&) noexcept = default;
 
   WindowingTransferFunction::WindowingTransferFunction(double intensity_min, double intensity_max, double center, double width)
-      : _pdata(new Impl(intensity_min, intensity_max, center, width))
+      : _pdata(intensity_min, intensity_max, center, width)
   {
       _set_color_boundaries();
       _set_inner_colors();
@@ -193,11 +191,7 @@ namespace bk
       _set_inner_colors();
   }
 
-  auto WindowingTransferFunction::operator=(const self_type& other) -> self_type&
-  {
-      _pdata.reset(new Impl(*other._pdata.get()));
-      return *this;
-  }
+  auto WindowingTransferFunction::operator=(const self_type& other) -> self_type& = default;
 
   auto WindowingTransferFunction::operator=(self_type&& other) noexcept -> self_type& = default;
 

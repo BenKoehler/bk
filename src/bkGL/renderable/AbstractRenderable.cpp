@@ -87,13 +87,12 @@ namespace bk::details
   #ifndef BK_LIB_QT_AVAILABLE
 
   AbstractRenderable::AbstractRenderable()
-      : base_type(),
+      : base_type()
   #else
 
   AbstractRenderable::AbstractRenderable(bk::qt_gl_functions* gl)
-      : base_type(gl),
+      : base_type(gl)
   #endif
-        _pdata(std::make_unique<Impl>())
   { /* do nothing */ }
 
   AbstractRenderable::AbstractRenderable(self_type&&) noexcept = default;

@@ -38,7 +38,7 @@ namespace bk
   {
       RegularImage<double, 4> img;
       Texture3D image_tex[2];
-      bool time_changed;
+      mutable bool time_changed;
       GLuint oldt0;
       GLuint oldt1;
 
@@ -63,13 +63,12 @@ namespace bk
   #ifndef BK_LIB_QT_AVAILABLE
 
   DVRImage4DView::DVRImage4DView()
-      : base_type(),
-        _pdata(std::make_unique<Impl>())
+      : base_type()
   #else
 
   DVRImage4DView::DVRImage4DView(bk::qt_gl_functions* gl)
       : base_type(gl),
-        _pdata(std::make_unique<Impl>(gl))
+        _pdata(gl)
   #endif
   { /* do nothing */ }
 

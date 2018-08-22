@@ -28,10 +28,9 @@
 #define BKDICOM_DICOMDIRIMPORTER_CMR_H
 
 #include <map>
-#include <memory>
 
 #include <bk/Image>
-
+#include <bk/CopyablePIMPL>
 #include <bkDicom/DicomDirImporter.h>
 #include <bkDicom/EDicomImageClass.h>
 #include <bkDicom/lib/bkDicom_export.h>
@@ -50,8 +49,7 @@ namespace bk
       //===== MEMBERS
       //====================================================================================================
       class Impl;
-
-      std::unique_ptr <Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR
@@ -59,7 +57,7 @@ namespace bk
     public:
       /// @{ -------------------------------------------------- CTOR
       DicomDirImporter_CMR();
-      DicomDirImporter_CMR(const self_type& other);
+      DicomDirImporter_CMR(const self_type&);
       DicomDirImporter_CMR(self_type&&) noexcept;
       DicomDirImporter_CMR(const std::string& dir);
       /// @}

@@ -44,23 +44,14 @@ namespace bk
     //====================================================================================================
     //===== CONSTRUCTORS & DESTRUCTOR
     //====================================================================================================
-    FlowJet::FlowJet()
-        : _pdata(std::make_unique<Impl>())
-    { /* do nothing */ }
-
-    FlowJet::FlowJet(const FlowJet& other)
-        : _pdata(std::make_unique<Impl>(*other._pdata))
-    { /* do nothing */ }
-
+    FlowJet::FlowJet() = default;
+    FlowJet::FlowJet(const FlowJet&) = default;
     FlowJet::FlowJet(FlowJet&&) noexcept = default;
-
     FlowJet::~FlowJet() = default;
 
     //====================================================================================================
     //===== GETTER
     //====================================================================================================
-
-
     bool FlowJet::_is_valid_posID(unsigned int posID) const
     { return posID < num_positions(); }
 
@@ -79,13 +70,7 @@ namespace bk
     //====================================================================================================
     //===== SETTER
     //====================================================================================================
-    FlowJet& FlowJet::operator=(const FlowJet& other)
-    {
-        _pdata.reset(nullptr);
-        _pdata = std::make_unique<Impl>(*other._pdata);
-        return *this;
-    }
-
+    FlowJet& FlowJet::operator=(const FlowJet&) = default;
     FlowJet& FlowJet::operator=(FlowJet&& other) noexcept = default;
 
     void FlowJet::resize(unsigned int N, unsigned int numTimes)

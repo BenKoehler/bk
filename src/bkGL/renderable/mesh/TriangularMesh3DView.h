@@ -27,14 +27,11 @@
 #ifndef BKGL_TRIANGULARMESH3DVIEW_H
 #define BKGL_TRIANGULARMESH3DVIEW_H
 
-#include <memory>
-
+#include <bk/CopyablePIMPL>
 #include <bk/Matrix>
 #include <bk/Mesh>
-
 #include <bkGL/renderable/AbstractSceneRenderable.h>
 #include <bkGL/lib/bkGL_export.h>
-
 
 namespace bk
 {
@@ -73,7 +70,7 @@ namespace bk
       //====================================================================================================
     protected:
       class Impl;
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

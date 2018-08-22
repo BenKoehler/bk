@@ -52,10 +52,7 @@ namespace bk
   //===== CONSTRUCTORS & DESTRUCTOR
   //====================================================================================================
   /// @{ -------------------------------------------------- CTOR
-  ProgressManager::ProgressManager()
-      : _pdata(std::make_unique<Impl>())
-  { /* do nothing */ }
-
+  ProgressManager::ProgressManager() = default;
   ProgressManager::ProgressManager(self_type&&) noexcept = default;
   /// @}
 

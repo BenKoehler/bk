@@ -34,6 +34,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+#include <bk/CopyablePIMPL>
 #include <bkGL/renderable/AbstractRenderable.h>
 #include <bkGL/texture/Texture2D.h>
 
@@ -95,7 +96,7 @@ namespace bk
       //====================================================================================================
       class Impl;
 
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

@@ -88,9 +88,7 @@ namespace bk
   //===== CONSTRUCTORS & DESTRUCTOR
   //====================================================================================================
   /// @{ -------------------------------------------------- CTOR
-  Interactor::Interactor()
-      : _pdata(std::make_unique<Impl>())
-  { /* do nothing */ }
+  Interactor::Interactor() = default;
 
   Interactor::Interactor(self_type&&) noexcept = default;
   /// @}

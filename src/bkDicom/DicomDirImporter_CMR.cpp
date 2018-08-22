@@ -66,21 +66,11 @@ namespace bk
   //===== CONSTRUCTORS & DESTRUCTOR
   //====================================================================================================
   /// @{ -------------------------------------------------- CTOR
-  DicomDirImporter_CMR::DicomDirImporter_CMR()
-      : base_type(),
-        _pdata(std::make_unique<Impl>())
-  { /* do nothing */ }
-
-  DicomDirImporter_CMR::DicomDirImporter_CMR(const self_type& other)
-      : base_type(other),
-        _pdata(new Impl(*other._pdata.get()))
-  { /* do nothing */ }
-
+  DicomDirImporter_CMR::DicomDirImporter_CMR() = default;
+  DicomDirImporter_CMR::DicomDirImporter_CMR(const self_type&) = default;
   DicomDirImporter_CMR::DicomDirImporter_CMR(self_type&&) noexcept = default;
-
   DicomDirImporter_CMR::DicomDirImporter_CMR(const std::string& dir)
-      : base_type(dir),
-        _pdata(std::make_unique<Impl>())
+      : base_type(dir)
   { /* do nothing */ }
   /// @}
 
@@ -316,15 +306,9 @@ namespace bk
   /// @}
 
   /// @{ -------------------------------------------------- OPERATOR =
-  auto DicomDirImporter_CMR::operator=(const self_type& other) -> self_type&
-  {
-      _pdata.reset(new Impl(*other._pdata.get()));
-      return *this;
-  }
-
+  auto DicomDirImporter_CMR::operator=(const self_type&) -> self_type& = default;
   auto DicomDirImporter_CMR::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
-
 
   //====================================================================================================
   //===== FUNCTIONS

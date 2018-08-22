@@ -126,13 +126,12 @@ namespace bk
   #ifndef BK_LIB_QT_AVAILABLE
 
   Renderer::Renderer()
-      : base_type(),
-        _pdata(std::make_unique<Impl>())
+      : base_type()
   #else
 
   Renderer::Renderer(bk::qt_gl_functions* gl)
       : base_type(gl),
-        _pdata(std::make_unique<Impl>(gl))
+        _pdata(gl)
   #endif
   {
       _pdata->renderables.reserve(10);
@@ -293,11 +292,11 @@ namespace bk
   /// @}
 
   /// @{ -------------------------------------------------- GET MATRICES
-  const bk::ColMat4<GLfloat>& Renderer::modelview_matrix() const
-  { return _pdata->modelview_matrix; }
+  //const bk::ColMat4<GLfloat>& Renderer::modelview_matrix() const
+  //{ return _pdata->modelview_matrix; }
 
-  const bk::ColMat4<GLfloat>& Renderer::projection_matrix() const
-  { return _pdata->camera.projection_matrix(); }
+  //const bk::ColMat4<GLfloat>& Renderer::projection_matrix() const
+  //{ return _pdata->camera.projection_matrix(); }
   /// @}
 
   /// @{ -------------------------------------------------- GET OIT

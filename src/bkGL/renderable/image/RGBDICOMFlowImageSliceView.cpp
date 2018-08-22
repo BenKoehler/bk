@@ -87,14 +87,12 @@ namespace bk
   #ifndef BK_LIB_QT_AVAILABLE
 
   RGBDICOMFlowImageSliceView::RGBDICOMFlowImageSliceView()
-      : base_type(),
+      : base_type()
   #else
 
-      RGBDICOMFlowImageSliceView::RGBDICOMFlowImageSliceView(bk::qt_gl_functions* gl) : base_type(gl),
+      RGBDICOMFlowImageSliceView::RGBDICOMFlowImageSliceView(bk::qt_gl_functions* gl) : base_type(gl)
   #endif
-        _pdata(std::make_unique<Impl>())
-  {
-  }
+  { /* do nothing */ }
 
   RGBDICOMFlowImageSliceView::RGBDICOMFlowImageSliceView(self_type&&) noexcept = default;
 

@@ -86,7 +86,7 @@ namespace bk::details
   AbstractTexture::AbstractTexture(GLuint w, GLuint h, bk::qt_gl_functions* gl)
         : base_type(gl),
   #endif
-        _pdata(new Impl(w, h))
+        _pdata(w, h)
   { set_default_config_gray_tex(); }
 
   AbstractTexture::AbstractTexture(self_type&&) noexcept = default;

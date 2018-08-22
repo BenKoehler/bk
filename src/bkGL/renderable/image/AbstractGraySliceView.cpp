@@ -48,14 +48,12 @@ namespace bk::details
     #ifndef BK_LIB_QT_AVAILABLE
 
     AbstractGraySliceView::AbstractGraySliceView()
-        : base_type(),
+        : base_type()
     #else
 
-    AbstractGraySliceView::AbstractGraySliceView(bk::qt_gl_functions* gl) : base_type(gl),
+    AbstractGraySliceView::AbstractGraySliceView(bk::qt_gl_functions* gl) : base_type(gl)
     #endif
-          _pdata(std::make_unique<Impl>())
-    {
-    }
+    { /* do nothing */ }
 
     AbstractGraySliceView::AbstractGraySliceView(self_type&&) noexcept = default;
 

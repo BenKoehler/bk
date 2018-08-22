@@ -27,12 +27,12 @@
 #ifndef BKGL_COLORBARVIEW_H
 #define BKGL_COLORBARVIEW_H
 
-#include <memory>
 #include <string>
 #include <string_view>
 #include <tuple>
 #include <vector>
 
+#include <bk/CopyablePIMPL>
 #include <bkGL/renderable/AbstractRenderable.h>
 #include <bkGL/lib/bkGL_export.h>
 
@@ -63,7 +63,7 @@ namespace bk
     private:
       class Impl;
 
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR 

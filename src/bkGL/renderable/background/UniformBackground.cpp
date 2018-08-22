@@ -55,13 +55,12 @@ namespace bk
   #ifndef BK_LIB_QT_AVAILABLE
 
   UniformBackground::UniformBackground()
-      : base_type(),
+      : base_type()
   #else
 
   UniformBackground::UniformBackground(bk::qt_gl_functions* gl)
-      : base_type(gl),
+      : base_type(gl)
   #endif
-        _pdata(std::make_unique<Impl>())
   { /* do nothing */ }
 
   UniformBackground::UniformBackground(self_type&&) noexcept = default;

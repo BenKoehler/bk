@@ -42,8 +42,7 @@
 #define BK_RGBDICOMFLOWIMAGESLICEVIEW_H
 #ifdef BK_LIB_GDCM_AVAILABLE
 
-    #include <memory>
-
+    #include <bk/CopyablePIMPL>
     #include <bk/Image>
     #include <bkGL/renderable/image/AbstractRGBSliceView.h>
 
@@ -70,7 +69,7 @@ namespace bk
     protected:
       class Impl;
 
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

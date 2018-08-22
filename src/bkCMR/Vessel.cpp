@@ -83,13 +83,9 @@ namespace bk
     //====================================================================================================
     //===== CONSTRUCTORS & DESTRUCTOR
     //====================================================================================================
-    Vessel::Vessel()
-        : _pdata(std::make_unique<Impl>())
-    { /* do nothing */ }
+    Vessel::Vessel() = default;
 
-    Vessel::Vessel(const Vessel& other)
-        : _pdata(std::make_unique<Impl>(*other._pdata.get()))
-    { /* do nothing */ }
+    Vessel::Vessel(const Vessel&) = default;
 
     Vessel::Vessel(Vessel&&) noexcept = default;
     Vessel::~Vessel() = default;
@@ -307,12 +303,7 @@ namespace bk
     //    _pdata->centerline_target_ids.clear();
     //}
 
-    Vessel& Vessel::operator=(const Vessel& other)
-    {
-        _pdata.reset(nullptr);
-        _pdata = std::make_unique<Impl>(*other._pdata.get());
-        return *this;
-    }
+    Vessel& Vessel::operator=(const Vessel&) = default;
 
     Vessel& Vessel::operator=(Vessel&&) noexcept = default;
 

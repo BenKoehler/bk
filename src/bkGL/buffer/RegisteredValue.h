@@ -27,10 +27,10 @@
 #ifndef BKGL_REGISTEREDVALUE_H
 #define BKGL_REGISTEREDVALUE_H
 
-#include <memory>
 #include <string>
 #include <string_view>
 
+#include <bk/CopyablePIMPL>
 #include <bkGL//gl_definitions.h>
 #include <bkGL//lib/bkGL_export.h>
 
@@ -50,7 +50,7 @@ namespace bk
     private:
       class Impl;
 
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

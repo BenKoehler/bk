@@ -64,12 +64,10 @@ namespace bk
   { /* do nothing */ }
 
   VertexAttributePointer::VertexAttributePointer(GLuint id, GLenum value_type, bool normalized, std::string name)
-      : _pdata(new Impl(id, value_type, normalized, name))
+      : _pdata(id, value_type, normalized, name)
   { /* do nothing */ }
 
-  VertexAttributePointer::VertexAttributePointer(const self_type& other)
-      : _pdata(new Impl(*other._pdata.get()))
-  { /* do nothing */ }
+  VertexAttributePointer::VertexAttributePointer(const self_type&) = default;
 
   VertexAttributePointer::VertexAttributePointer(self_type&&) noexcept = default;
   /// @}
@@ -115,13 +113,7 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto VertexAttributePointer::operator=(const self_type& other) -> self_type&
-  {
-      _pdata.reset(nullptr);
-      _pdata = std::make_unique<Impl>(*other._pdata.get());
-      return *this;
-  }
-
+  auto VertexAttributePointer::operator=(const self_type& other) -> self_type& = default;
   auto VertexAttributePointer::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 

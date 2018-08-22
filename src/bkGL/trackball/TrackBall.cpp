@@ -77,13 +77,9 @@ namespace bk
   //===== CONSTRUCTORS & DESTRUCTOR
   //====================================================================================================
   /// @{ -------------------------------------------------- CTOR
-  TrackBall::TrackBall()
-      : _pdata(std::make_unique<Impl>())
-  { /* do nothing */ }
+  TrackBall::TrackBall() = default;
 
-  TrackBall::TrackBall(const self_type& other)
-      : _pdata(new Impl(*other._pdata.get()))
-  { /* do nothing */ }
+  TrackBall::TrackBall(const self_type&) = default;
 
   TrackBall::TrackBall(self_type&&) noexcept = default;
   /// @}

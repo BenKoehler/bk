@@ -27,8 +27,7 @@
 #ifndef BKGL_WINDOWINGTRANSFERFUNCTIONVIEW_H
 #define BKGL_WINDOWINGTRANSFERFUNCTIONVIEW_H
 
-#include <memory>
-
+#include <bk/CopyablePIMPL>
 #include <bkGL/renderable/AbstractRenderable.h>
 #include <bkGL/lib/bkGL_export.h>
 
@@ -50,7 +49,7 @@ namespace bk
       //===== MEMBERS
       //====================================================================================================
       class Impl;
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

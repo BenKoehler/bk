@@ -28,10 +28,9 @@
 #define BK_GRAYIMAGEPLUSSEGMENTATIONSLICEVIEW_H
 
 #include <cstdint>
-#include <memory>
 
 #include <bk/Image>
-
+#include <bk/CopyablePIMPL>
 #include <bkGL/renderable/image/GrayImageSliceView.h>
 
 namespace bk
@@ -56,7 +55,7 @@ namespace bk
     private:
       class Impl;
 
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

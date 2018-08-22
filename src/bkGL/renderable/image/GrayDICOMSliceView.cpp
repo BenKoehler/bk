@@ -56,14 +56,12 @@ namespace bk
   #ifndef BK_LIB_QT_AVAILABLE
 
   GrayDICOMSliceView::GrayDICOMSliceView()
-      : base_type(),
+      : base_type()
   #else
 
-      GrayDICOMSliceView::GrayDICOMSliceView(bk::qt_gl_functions* gl) : base_type(gl),
+      GrayDICOMSliceView::GrayDICOMSliceView(bk::qt_gl_functions* gl) : base_type(gl)
   #endif
-        _pdata(std::make_unique<Impl>())
-  {
-  }
+  { /* do nothing */ }
 
   GrayDICOMSliceView::GrayDICOMSliceView(self_type&&) noexcept = default;
 

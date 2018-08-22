@@ -72,14 +72,10 @@ namespace bk
   //===== CONSTRUCTORS & DESTRUCTOR
   //====================================================================================================
   /// @{ -------------------------------------------------- CTOR
-  Progress::Progress()
-      : _pdata(std::make_unique<Impl>())
-  { /* do nothing */ }
-
+  Progress::Progress() = default;
   Progress::Progress(self_type&&) noexcept = default;
-
   Progress::Progress(double max, std::string_view description)
-      : _pdata(new Impl(max, description))
+      : _pdata(max, description)
   { /* do nothing */ }
   /// @}
 

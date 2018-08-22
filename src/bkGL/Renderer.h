@@ -27,8 +27,7 @@
 #ifndef BKGL_RENDERER_H
 #define BKGL_RENDERER_H
 
-#include <memory>
-
+#include <bk/CopyablePIMPL>
 #include <bk/Algorithm>
 #include <bk/Image>
 #include <bk/Matrix>
@@ -69,7 +68,7 @@ namespace bk
       //====================================================================================================
     protected:
       class Impl;
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR
@@ -113,8 +112,8 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- GET MATRICES
-      [[nodiscard]] const bk::ColMat4<GLfloat>& modelview_matrix() const;
-      [[nodiscard]] const bk::ColMat4<GLfloat>& projection_matrix() const;
+      //[[nodiscard]] const bk::ColMat4<GLfloat>& modelview_matrix() const;
+      //[[nodiscard]] const bk::ColMat4<GLfloat>& projection_matrix() const;
       /// @}
 
       /// @{ -------------------------------------------------- GET OIT

@@ -27,8 +27,7 @@
 #ifndef BKGL_ABSTRACTBACKGROUND_H
 #define BKGL_ABSTRACTBACKGROUND_H
 
-#include <memory>
-
+#include <bk/CopyablePIMPL>
 #include <bkGL/renderable/AbstractRenderable.h>
 
 // -------------------- forward declaration
@@ -55,7 +54,7 @@ namespace bk::details
       //====================================================================================================
     protected:
       class Impl;
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

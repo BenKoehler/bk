@@ -48,13 +48,12 @@ namespace bk
   #ifndef BK_LIB_QT_AVAILABLE
 
   FBO::FBO()
-      : base_type(),
+      : base_type()
   #else
 
   FBO::FBO(bk::qt_gl_functions* gl)
-      : base_type(gl),
+      : base_type(gl)
   #endif
-        _pdata(std::make_unique<Impl>())
   { /* do nothing */ }
 
   FBO::FBO(self_type&&) noexcept = default;

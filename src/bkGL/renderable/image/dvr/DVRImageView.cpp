@@ -110,13 +110,12 @@ namespace bk
   #ifndef BK_LIB_QT_AVAILABLE
 
   DVRImageView::DVRImageView()
-      : base_type(),
-        _pdata(std::make_unique<Impl>())
+      : base_type()
   #else
 
   DVRImageView::DVRImageView(bk::qt_gl_functions* gl)
       : base_type(gl),
-        _pdata(std::make_unique<Impl>(gl))
+        _pdata(gl)
   #endif
   {
       _pdata->vbo_cuboid.set_usage_STATIC_DRAW();

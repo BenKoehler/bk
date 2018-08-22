@@ -28,12 +28,12 @@
 #define BKCMR_VESSEL_H
 
 #include <fstream>
-#include <memory>
 #include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
 
+#include <bk/CopyablePIMPL>
 #include <bk/Matrix>
 #include <bk/KDTree>
 #include <bk/Image>
@@ -78,7 +78,7 @@ namespace bk
       private:
         class Impl;
 
-        std::unique_ptr<Impl> _pdata;
+        bk::cpimpl<Impl> _pdata;
 
         //====================================================================================================
         //===== CONSTRUCTORS & DESTRUCTOR

@@ -87,9 +87,7 @@ namespace bk
   //===== CONSTRUCTORS & DESTRUCTOR
   //====================================================================================================
   /// @{ -------------------------------------------------- CTOR
-  Animator::Animator()
-      : _pdata(std::make_unique<Impl>())
-  { /* do nothing */ }
+  Animator::Animator() = default;
 
   Animator::Animator(self_type&&) noexcept = default;
   /// @}

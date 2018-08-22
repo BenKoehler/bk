@@ -50,11 +50,11 @@ namespace bk
   #ifndef BK_LIB_QT_AVAILABLE
 
   VAO::VAO()
-      : base_type(),
+      : base_type()
   #else
-      VAO::VAO(bk::qt_gl_functions* gl) : base_type(gl),
+  VAO::VAO(bk::qt_gl_functions* gl)
+      : base_type(gl)
   #endif
-        _pdata(std::make_unique<Impl>())
   { /* do nothing */ }
 
   VAO::VAO(self_type&&) noexcept = default;

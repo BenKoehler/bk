@@ -27,6 +27,7 @@
 #ifndef BKGL_DVRIMAGE4DVIEW_H
 #define BKGL_DVRIMAGE4DVIEW_H
 
+#include <bk/CopyablePIMPL>
 #include <bk/Image>
 #include <bkGL/lib/bkGL_export.h>
 #include <bkGL/renderable/image/dvr/DVRImageView.h>
@@ -45,7 +46,7 @@ namespace bk
       //===== MEMBERS
       //====================================================================================================
       class Impl;
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

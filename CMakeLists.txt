@@ -33,12 +33,16 @@ find_package(Threads REQUIRED)
 find_package(PNG REQUIRED)
 if (NOT PNG_FOUND)
     message(WARNING "LIBPNG NOT FOUND!")
+else()
+    message(STATUS "DETECTED LIBPNG!")
 endif ()
 
 # OPENMP
 find_package(OpenMP REQUIRED)
 if (NOT OPENMP_FOUND)
     message(WARNING "OPENMP NOT FOUND!")
+else()
+    message(STATUS "DETECTED OPENMP!")
 endif ()
 
 # GDCM
@@ -46,6 +50,8 @@ find_package(GDCM QUIET)
 if (NOT GDCM_FOUND)
     message(WARNING "GDCM NOT FOUND!")
 else ()
+    message(STATUS "DETECTED GDCM!")
+
     if (NOT TARGET GDCM::GDCM)
         add_library(GDCM::GDCM INTERFACE IMPORTED)
 
@@ -75,31 +81,59 @@ if (NOT Eigen3_FOUND AND NOT TARGET Eigen3::Eigen AND ${ENABLE_SUPERBUILD})
     endif ()
 
     add_subdirectory(dep/Eigen3)
+else()
+    message(STATUS "DETECTED EIGEN3!")
 endif ()
 
 # OPENGL
 find_package(OpenGL REQUIRED)
+if (NOT OpenGL_FOUND)
+    message(WARNING "OpenGL NOT FOUND!")
+else()
+    message(STATUS "DETECTED OpenGL!")
+endif ()
 
 # GLEW
 find_package(GLEW QUIET)
 
-if (GLEW_FOUND AND NOT TARGET GLEW::GLEW)
-    add_library(GLEW::GLEW INTERFACE IMPORTED)
+if (GLEW_FOUND)
+    message(STATUS "DETECTED GLEW!")
 
-    set_target_properties(GLEW::GLEW PROPERTIES
-            INTERFACE_INCLUDE_DIRECTORIES "${GLEW_INCLUDE_DIRS}"
-            INTERFACE_LINK_DIRECTORIES "${GLEW_LIBRARY_DIRS}"
-            INTERFACE_LINK_LIBRARIES "GLEW")
-endif ()
+    if (NOT TARGET GLEW::GLEW)
+        message(STATUS "DETECTED GLEW!")
+
+        add_library(GLEW::GLEW INTERFACE IMPORTED)
+
+        set_target_properties(GLEW::GLEW PROPERTIES
+                INTERFACE_INCLUDE_DIRECTORIES "${GLEW_INCLUDE_DIRS}"
+                INTERFACE_LINK_DIRECTORIES "${GLEW_LIBRARY_DIRS}"
+                INTERFACE_LINK_LIBRARIES "GLEW")
+    endif ()
+else()
+    message(WARNING "GLEW NOT FOUND!")
+endif()
+
+
 
 # FREETYPE
 find_package(Freetype REQUIRED)
+if (NOT Freetype_FOUND)
+    message(WARNING "FREETYPE NOT FOUND!")
+else()
+    message(STATUS "DETECTED FREETYPE!")
+endif ()
 
 if (GL_USE_QT)
     find_package(Qt5Core REQUIRED)
     find_package(Qt5Widgets REQUIRED)
     find_package(Qt5Gui REQUIRED)
     find_package(Qt5OpenGL REQUIRED)
+
+    if (NOT Qt5Core_FOUND OR NOT Qt5Widgets_FOUND OR NOT Qt5Gui_FOUND OR NOT Qt5OpenGL_FOUND)
+        message(WARNING "QT5 NOT FOUND!")
+    else()
+        message(STATUS "DETECTED QT5!")
+    endif ()
 endif()
 
 # ------------------------------------------------------------------------------------------------------------------------------------
@@ -441,9 +475,18 @@ _bk_install_lib(tools Tools TOOLS)
 add_executable(localization_crawler ${CMAKE_CURRENT_SOURCE_DIR}/src/bkTools/localization/localization_crawler.cpp)
 target_link_libraries(localization_crawler PRIVATE bk::bkTools)
 target_link_libraries(localization_crawler PRIVATE stdc++fs)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/localization_crawler
-        PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
-        DESTINATION ${CMAKE_INSTALL_BINDIR}/bkTools)
+
+if(WIN32) # .exe for binaries
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/localization_crawler.exe
+            PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
+            DESTINATION ${CMAKE_INSTALL_BINDIR}/bkTools)
+else()
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/localization_crawler
+            PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
+            DESTINATION ${CMAKE_INSTALL_BINDIR}/bkTools)
+endif()
+
+
 
 if (BUILD_EXAMPLES)
     set(BK_CURRENT_LIBRARY bkTools)

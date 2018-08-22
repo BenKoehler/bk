@@ -59,12 +59,12 @@ namespace bk
   #ifndef BK_LIB_QT_AVAILABLE
 
   GradientBackground::GradientBackground()
-      : base_type(),
+      : base_type()
   #else
 
-      GradientBackground::GradientBackground(bk::qt_gl_functions* gl) : base_type(gl),
+  GradientBackground::GradientBackground(bk::qt_gl_functions* gl)
+      : base_type(gl)
   #endif
-        _pdata(std::make_unique<Impl>())
   { /* do nothing */ }
 
   GradientBackground::GradientBackground(self_type&&) noexcept = default;

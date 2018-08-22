@@ -27,8 +27,7 @@
 #ifndef BKGL_GRADIENTBACKGROUND_H
 #define BKGL_GRADIENTBACKGROUND_H
 
-#include <memory>
-
+#include <bk/CopyablePIMPL>
 #include <bkGL/renderable/background/AbstractBackground.h>
 
 namespace bk
@@ -52,7 +51,7 @@ namespace bk
       //====================================================================================================
     protected:
       class Impl;
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR

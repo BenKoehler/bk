@@ -27,11 +27,9 @@
 #ifndef BKGL_TRIANGULARMESH3DCENTERLINEEXTRACTIONVIEW_H
 #define BKGL_TRIANGULARMESH3DCENTERLINEEXTRACTIONVIEW_H
 
-#include <memory>
-
+#include <bk/CopyablePIMPL>
 #include <bk/Matrix>
 #include <bk/Mesh>
-
 #include <bkGL/renderable/AbstractSceneRenderable.h>
 #include <bkGL/lib/bkGL_export.h>
 
@@ -59,7 +57,7 @@ namespace bk
     protected:
       class Impl;
 
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR
@@ -102,7 +100,7 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- INDEX AT SCREEN POS
-      [[nodiscard]] int index_at_screen_pos(GLint x, GLint y) const;
+      [[nodiscard]] int index_at_screen_pos(GLint x, GLint y);
       /// @}
 
       /// @{ -------------------------------------------------- START/END POINTS

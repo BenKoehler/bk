@@ -27,6 +27,7 @@
 #ifndef BKGL_ABSTRACTSCENERENDERABLE_H
 #define BKGL_ABSTRACTSCENERENDERABLE_H
 
+#include <bk/CopyablePIMPL>
 #include <bk/Matrix>
 #include <bkGL/renderable/AbstractRenderable.h>
 
@@ -44,7 +45,7 @@ namespace bk::details
       //===== MEMBERS
       //====================================================================================================
       class Impl;
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR 

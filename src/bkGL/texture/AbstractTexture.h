@@ -27,8 +27,7 @@
 #ifndef BKGL_ABSTRACTTEXTURE_H
 #define BKGL_ABSTRACTTEXTURE_H
 
-#include <memory>
-
+#include <bk/CopyablePIMPL>
 #include <bkGL/AbstractBindable.h>
 
 namespace bk::details
@@ -47,7 +46,7 @@ namespace bk::details
     protected:
       class Impl;
 
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR
