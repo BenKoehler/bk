@@ -488,6 +488,10 @@ if (BUILD_EXAMPLES)
     add_executable(ndcontainer_example ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/ndcontainer.cpp)
     _bk_make_example(ndcontainer_example ${BK_CURRENT_LIBRARY})
 
+    # cpimpl
+    add_executable(cpimpl_example ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/cpimpl.cpp)
+    _bk_make_example(cpimpl_example ${BK_CURRENT_LIBRARY})
+
     # progress
     add_executable(progress_example ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/progress.cpp)
     _bk_make_example(progress_example ${BK_CURRENT_LIBRARY})
