@@ -179,6 +179,7 @@ endif()
 # add library bkCMR
 # ----------
 set(SOURCE_FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/Dataset.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/Vessel.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowJet.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/rotation_angle_2d.cpp
@@ -189,6 +190,7 @@ add_library(bkCMR ${SOURCE_FILES})
 _bk_make_lib(cmr CMR)
 
 target_link_libraries(bkCMR PUBLIC Threads::Threads)
+target_link_libraries(bkCMR PUBLIC stdc++fs)
 target_link_libraries(bkCMR PUBLIC bk::bkAlgorithm)
 target_link_libraries(bkCMR PUBLIC bk::bkDataset)
 target_link_libraries(bkCMR PUBLIC bk::bkDicom)
