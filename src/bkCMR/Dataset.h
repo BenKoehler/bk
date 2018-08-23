@@ -1,3 +1,27 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2018 Benjamin Köhler
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 #pragma once
 
 #ifndef BK_DATASET_H
@@ -11,17 +35,32 @@
 #include <bk/CopyablePIMPL>
 #include <bk/Image>
 #include <bk/Matrix>
+#include <bkCMR/lib/bkCMR_export.h>
 
 namespace bk
 {
   // -------------------- forward declaration
   class DicomDirImporter_CMR;
-  class Vessel;
-  // -------------------- forward declaration END
 
   inline namespace cmr
   {
-    class Dataset
+    // -------------------- forward declaration END
+    class FlowDirCorrection;
+    class FlowImage3DT;
+
+    class Vessel;
+
+    enum DatasetFilter_ : unsigned int
+    {
+        DatasetFilter_PhaseUnwrapping   = 1 << 0, //
+        DatasetFilter_VelocityOffset    = 1 << 1, //
+        DatasetFilter_FlowDirCorrection = 1 << 2, //
+        //
+        DatasetFilter_None              = 0, //
+        DatasetFilter_All               = DatasetFilter_PhaseUnwrapping | DatasetFilter_VelocityOffset | DatasetFilter_FlowDirCorrection, //
+    };
+
+    class BKCMR_EXPORT Dataset
     {
         //====================================================================================================
         //===== DEFINITIONS
@@ -35,6 +74,7 @@ namespace bk
         //====================================================================================================
       private:
         class Impl;
+
         bk::cpimpl<Impl> _pdata;
 
         //====================================================================================================
@@ -56,12 +96,15 @@ namespace bk
 
         [[nodiscard]] bool has_magnitude_images() const;
         [[nodiscard]] bool has_signal_intensity_image() const;
+      private:
+        [[nodiscard]] std::vector<unsigned int> ids_of_local_image_copies() const;
+
+      public:
         [[nodiscard]] bool has_local_image_copies() const;
-        [[nodiscard]] bool has_flow_dir_correction() const;
         [[nodiscard]] bool is_flow_image_3dt_loaded() const;
 
-        [[nodiscard]] bk::DicomImage<bk::Vec3d, 4>* flow_image_3dt();
-        [[nodiscard]] const bk::DicomImage<bk::Vec3d, 4>* flow_image_3dt() const;
+        [[nodiscard]] FlowImage3DT* flow_image_3dt();
+        [[nodiscard]] const FlowImage3DT* flow_image_3dt() const;
 
         [[nodiscard]] unsigned int num_vessels() const;
         [[nodiscard]] Vessel* vessel(unsigned int i);
@@ -80,6 +123,9 @@ namespace bk
         //double pathline_scalar_point_attribute_quantile(const std::string& attributeName, double p) const;
         //std::pair<double, double> pathline_scalar_point_attribute_interquartile_range(const std::string& attributeName) const;
 
+        [[nodiscard]] FlowDirCorrection& flow_image_3dt_dir_correction();
+        [[nodiscard]] const FlowDirCorrection& flow_image_3dt_dir_correction() const;
+
         //====================================================================================================
         //===== SETTER
         //====================================================================================================
@@ -88,8 +134,6 @@ namespace bk
 
         void set_project_path(std::string_view path);
 
-        void set_flow_image_3dt_dir_correction(int cx, int cy, int cz);
-
         [[maybe_unused]] Vessel* add_vessel(std::string_view name);
         [[maybe_unused]] Vessel* add_vessel(Vessel&& v);
         [[maybe_unused]] bool remove_vessel(Vessel* v);
@@ -97,10 +141,19 @@ namespace bk
         //====================================================================================================
         //===== IMAGES
         //====================================================================================================
-        void load_flow_image_3dt(bool unwrap_phases_if_available = true, bool correct_eddy_currents_if_available = true);
+      private:
+        [[nodiscard]] std::string filepath_flow_image(unsigned int v) const;
+        [[nodiscard]] std::string filepath_tmip_mag() const;
+        [[nodiscard]] std::string filepath_lpc() const;
+        [[nodiscard]] std::string filepath_ivsd() const;
+        [[nodiscard]] std::string filepath_tmip_signal() const;
+        [[nodiscard]] std::vector<std::string> filepaths_of_local_image_copies() const;
+      public:
 
-        [[nodiscard]] std::vector<std::unique_ptr<DicomImage<double>>> flow_images_2dt(bool unwrap_phases_if_available = true, bool correct_eddy_currents_if_available = true);
-        [[nodiscard]] std::unique_ptr<bk::DicomImage<double, 3>> flow_image_2dt(unsigned int dcm_id, bool unwrap_phases_if_available = true, bool correct_eddy_currents_if_available = true);
+        [[maybe_unused]] bool load_flow_image_3dt(DatasetFilter_ flags = DatasetFilter_All);
+
+        [[nodiscard]] std::vector<std::unique_ptr<DicomImage<double, -1>>> flow_images_2dt(DatasetFilter_ flags = DatasetFilter_All);
+        [[nodiscard]] std::unique_ptr<bk::DicomImage<double, 3>> flow_image_2dt(unsigned int dcm_id, DatasetFilter_ flags = DatasetFilter_All);
 
         [[nodiscard]] int anatomical_2dt_image_id_of_flow_image_2dt(unsigned int flowimg_dcm_id);
 
@@ -109,7 +162,7 @@ namespace bk
         [[nodiscard]] std::unique_ptr<bk::DicomImage<double, 3>> tmip_magnitude_3dt() const;
         [[nodiscard]] std::unique_ptr<bk::DicomImage<double, 3>> tmip_signal_intensity_3dt() const;
         [[nodiscard]] std::unique_ptr<bk::DicomImage<double, 4>> pressure_map() const;
-        [[nodiscard]] std::unique_ptr<bk::DicomImage<double, 3>> vessel_segmentation_in_flow_field_3dt_size(const Vessel_4DPCMRI* v) const;
+        [[nodiscard]] std::unique_ptr<bk::DicomImage<double, 3>> vessel_segmentation_in_flow_field_3dt_size(const Vessel* v) const;
 
         // todo: 2dt centerline cuts
 
@@ -127,7 +180,18 @@ namespace bk
         //===== FUNCTIONS
         //====================================================================================================
         void clear();
+        void delete_local_image_copies_if_incomplete() const;
+        void delete_local_image_copies() const;
 
+        //====================================================================================================
+        //===== I/O
+        //====================================================================================================
+      private:
+        [[nodiscard]] std::string filepath_flow_dir_correction() const;
+      public:
+
+        [[maybe_unused]] bool save_flow_dir_correction();
+        [[maybe_unused]] bool load_flow_dir_correction();
     }; // class Dataset
   } // inline namespace cmr
 } // namespace bk

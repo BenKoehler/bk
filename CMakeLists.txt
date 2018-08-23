@@ -181,7 +181,13 @@ endif()
 set(SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/Dataset.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/Vessel.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowDirCorrection.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowImage2DT.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowImage3DT.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowJet.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/AverageSmoothingImageFilter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/PhaseUnwrapping2DT.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/PhaseUnwrapping3DT.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/rotation_angle_2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/sampling/sampling_sphere_section.cpp
         )

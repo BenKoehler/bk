@@ -28,11 +28,12 @@
 #define BKCMR_ROTATION_DIRECTION_2D_H
 
 #include <bk/Matrix>
+#include <bkCMR/lib/bkCMR_export.h>
 
 namespace bk
 {
-  [[nodiscard]] double rotation_angle_deg_2d(const bk::Vec2d& p0, const bk::Vec2d& p1);
-  [[nodiscard]] double rotation_angle_deg_2d_of_3d_points_projected_onto_plane(const bk::Vec3d& p0, const bk::Vec3d& p1, const bk::Vec3d& planeCenter, const bk::Vec3d& planeDirX, const bk::Vec3d& planeDirY);
+  [[nodiscard]] BKCMR_EXPORT double rotation_angle_deg_2d(const bk::Vec2d& p0, const bk::Vec2d& p1);
+  [[nodiscard]] BKCMR_EXPORT double rotation_angle_deg_2d_of_3d_points_projected_onto_plane(const bk::Vec3d& p0, const bk::Vec3d& p1, const bk::Vec3d& planeCenter, const bk::Vec3d& planeDirX, const bk::Vec3d& planeDirY);
 } // namespace bk
 
 #endif //BKCMR_ROTATION_DIRECTION_2D_H

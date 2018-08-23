@@ -118,10 +118,8 @@ namespace bk
       //===== SETTER
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
-    protected:
-      [[maybe_unused]] auto operator=(const self_type&) -> self_type&;
+      [[maybe_unused]] auto operator=(const self_type& ) -> self_type&;
       [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
-    public:
       /// @}
 
       /// @{ -------------------------------------------------- SET DICOM IMAGE TYPE

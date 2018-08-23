@@ -1247,7 +1247,7 @@ namespace bk
                               { operator()(x, y)[k] = val[i]; }
                           }
 
-                          if (PNG_COLOR_TYPE_GRAY && N == 2 || N == 4) // image has alpha channel -> set opaque
+                          if (PNG_COLOR_TYPE_GRAY && (N == 2 || N == 4)) // image has alpha channel -> set opaque
                           { operator()(x, y)[N - 1] = 255; }
                       }
                       else
