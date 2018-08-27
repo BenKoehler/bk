@@ -30,6 +30,7 @@
 #include <memory>
 #include <string>
 
+#include <bk/CopyablePIMPL>
 #include <bkGL/AbstractObject.h>
 #include <bkGL/gl_definitions.h>
 #include <bkGL/lib/bkGL_export.h>
@@ -63,7 +64,7 @@ namespace bk
       //====================================================================================================
     private:
       class Impl;
-      std::unique_ptr <Impl> _pdata;
+      bk::cpimpl <Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR
