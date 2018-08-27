@@ -23,16 +23,27 @@
  */
 
 #include <algorithm>
+#include <cassert>
 #include <filesystem>
+#include <future>
 #include <utility>
 
 #include <bkCMR/Dataset.h>
 #include <bkCMR/FlowDirCorrection.h>
+#include <bkCMR/FlowImage2DT.h>
 #include <bkCMR/FlowImage3DT.h>
+#include <bkCMR/IVSDImageFilter.h>
+#include <bkCMR/MagTMIPImageFilter.h>
+#include <bkCMR/LPCImageFilter.h>
+#include <bkCMR/PhaseUnwrapping2DT.h>
+#include <bkCMR/PhaseUnwrapping3DT.h>
+#include <bkCMR/PressureMapImageFilter.h>
 #include <bkCMR/Vessel.h>
+#include <bkCMR/VesselSegmentationInFlowFieldSizeImageFilter.h>
 #include <bkDicom/DicomDirImporter_CMR.h>
 #include <bkDicom/DicomImageInfos.h>
 #include <bk/StringUtils>
+#include <bk/ThreadPool>
 
 #ifdef BK_EMIT_PROGRESS
 
@@ -50,21 +61,23 @@ namespace bk
     //====================================================================================================
     struct Dataset::Impl
     {
-        std::string          project_path; //!< path of current directory; ends with /
-        DicomDirImporter_CMR importer;
-        FlowImage3DT         flow_image_3dt;
-        FlowDirCorrection    flow_dir_correction;
-        std::vector<Vessel>  vessels;
+        std::string                                         project_path; //!< path of current directory; ends with /
+        DicomDirImporter_CMR                                importer;
+        FlowImage3DT                                        flow_image_3dt;
+        FlowDirCorrection                                   flow_dir_correction;
+        std::vector<Vessel>                                 vessels;
+        PhaseUnwrapping3DT                                  phase_unwrapping_3dt;
+        std::map<unsigned int/*imgId*/, PhaseUnwrapping2DT> phase_unwrapping_2dt;
 
-        // todo flow dir correction
-        // todo phase unwrapping
-        // todo eddy current correction
+        // todo velocity offset correction
     };
 
     //====================================================================================================
     //===== DEFINITIONS
     //====================================================================================================
     const std::string Dataset::dcmbytes = "dcmbytes";
+
+    const std::string Dataset::vessel_dir = "vessels/";
 
     //====================================================================================================
     //===== CONSTRUCTORS & DESTRUCTOR
@@ -295,7 +308,7 @@ namespace bk
     std::string Dataset::filepath_flow_image(unsigned int v) const
     { return _pdata->project_path + dcmbytes + string_utils::from_number(_pdata->importer.class_3dt_flow_images()[v]); }
 
-    std::string Dataset::filepath_tmip_mag() const
+    std::string Dataset::filepath_tmip_magnitude() const
     { return _pdata->project_path + "tmip_mag"; }
 
     std::string Dataset::filepath_lpc() const
@@ -319,6 +332,98 @@ namespace bk
         { paths.emplace_back(filepath_base + string_utils::from_number(imgId)); }
 
         return paths;
+    }
+
+    std::string Dataset::filepath_pressure_map_of_vessel(const Vessel& v) const
+    { return _pdata->project_path + vessel_dir + v.name() + "/" + v.name() + ".pm"; }
+
+    bool Dataset::has_local_image_copy(std::string_view filepath) const
+    { return std::filesystem::exists(filepath.data()); }
+
+    bool Dataset::has_local_image_copy_dcmbytes(unsigned int imgId) const
+    { return std::filesystem::exists(_pdata->project_path + dcmbytes + string_utils::from_number(imgId)); }
+
+    std::unique_ptr<DicomImage<double, 3>> Dataset::load_local_image_copy(std::string_view filepath) const
+    {
+        if (has_local_image_copy(filepath))
+        {
+            std::ifstream file(filepath.data(), std::ios_base::in | std::ios_base::binary);
+
+            if (file.good())
+            {
+                // size
+                std::uint16_t sz[3] = {0, 0, 0};
+                file.read(reinterpret_cast<char*>(sz), 3 * sizeof(std::uint16_t));
+
+                // world matrix
+                double w[16]        = {0};
+                file.read(reinterpret_cast<char*>(&w), 16 * sizeof(double));
+                Mat4d             W;
+                for (unsigned int i = 0; i < 16; ++i)
+                { W[i] = w[i]; }
+
+                #ifdef BK_EMIT_PROGRESS
+                Progress& prog = bk_progress.emplace_task((sz[0] * sz[1] * sz[2]) + (sz[0] * sz[1] * sz[2]) / 4, ___("loading local image"));
+                #endif
+
+                auto img = std::make_unique<DicomImage<double, 3>>();
+                img->set_size(sz[0], sz[1], sz[2]);
+                img->geometry().transformation().set_world_matrix(W);
+
+                #ifdef BK_EMIT_PROGRESS
+                prog.increment((sz[0] * sz[1] * sz[2]) / 4);
+                #endif
+
+                // values
+                std::vector<double> buf(img->num_values());
+                file.read(reinterpret_cast<char*>(buf.data()), img->num_values() * sizeof(double));
+
+                #pragma omp parallel for
+                for (int i = 0; i < static_cast<int>(img->num_values()); ++i)
+                { (*img)[i] = buf[i]; }
+
+                buf.clear();
+                buf.shrink_to_fit();
+
+                #ifdef BK_EMIT_PROGRESS
+                prog.increment(sz[0] * sz[1] * sz[2]);
+                #endif
+
+                file.close();
+
+                #ifdef BK_EMIT_PROGRESS
+                prog.set_finished();
+                #endif
+
+                return img;
+            }
+        }
+
+        std::cerr << "loading local image copy failed (" << filepath.data() << ")" << std::endl;
+
+        return nullptr;
+    }
+
+    std::unique_ptr<DicomImage<double, -1>> Dataset::load_local_image_copy_dcmbytes(unsigned int imgId) const
+    {
+        if (has_local_image_copy_dcmbytes(imgId))
+        {
+            const std::string dcmpath = _pdata->project_path + dcmbytes + string_utils::from_number(imgId);
+            std::ifstream     file(dcmpath, std::ios_base::binary | std::ios_base::in);
+
+            if (file.good())
+            {
+                const unsigned int filesize = std::filesystem::file_size(dcmpath);
+                std::vector<char>  imgBytes(filesize);
+                file.read(imgBytes.data(), filesize * sizeof(char));
+                file.close();
+
+                return _pdata->importer.read_image_from_bytes(imgId, imgBytes);
+            }
+        }
+
+        // no local image copy or file not good -> read from original data
+        return _pdata->importer.read_image(imgId);
     }
 
     bool Dataset::load_flow_image_3dt(DatasetFilter_ flags)
@@ -377,9 +482,7 @@ namespace bk
 
         const auto size = f[0]->geometry().size();
         _pdata->flow_image_3dt.set_size(size);
-
-        _pdata->flow_image_3dt.geometry().transformation().set_world_matrix(info[0].get().worldMatrix);
-        _pdata->flow_image_3dt.geometry().transformation().set_temporal_resolution(info[0].get().TemporalResolution);
+        _pdata->flow_image_3dt.geometry().transformation().set_world_matrix(info[0].get().worldMatrix, info[0].get().TemporalResolution);
 
         // derive flow vector ordering from world matrix
         unsigned int      order[3]  = {0, 1, 2};
@@ -435,14 +538,13 @@ namespace bk
         if (flags & DatasetFilter_PhaseUnwrapping)
         {
             load_phase_unwrapping_3dt();
-            unwrap_phases_3dt();
-            // todo
+            _pdata->phase_unwrapping_3dt.apply(_pdata->flow_image_3dt, _pdata->importer.venc_3dt_in_m_per_s());
         }
 
         if (flags & DatasetFilter_VelocityOffset)
         {
-            load_eddy_current_correction_3dt();
-            correct_eddy_currents_3dt();
+            //load_eddy_current_correction_3dt();
+            //correct_eddy_currents_3dt();
             // todo
         }
 
@@ -453,17 +555,245 @@ namespace bk
         return true;
     }
 
-    std::vector<std::unique_ptr<DicomImage<double, -1>>> Dataset::flow_images_2dt(DatasetFilter_ flags);
-    std::unique_ptr<bk::DicomImage<double, 3>> Dataset::flow_image_2dt(unsigned int dcm_id, DatasetFilter_ flags);
+    std::vector<std::unique_ptr<FlowImage2DT>> Dataset::flow_images_2dt(DatasetFilter_ flags)
+    {
+        const std::vector<unsigned int>            imgIds = _pdata->importer.class_2dt_flow_images();
+        std::vector<std::unique_ptr<FlowImage2DT>> images;
+        images.reserve(imgIds.size());
 
-    int Dataset::anatomical_2dt_image_id_of_flow_image_2dt(unsigned int flowimg_dcm_id);
+        for (unsigned int dcm_id: imgIds)
+        { images.emplace_back(flow_image_2dt(dcm_id, flags)); }
 
-    std::unique_ptr<bk::DicomImage<double, 3>> Dataset::lpc() const;
-    std::unique_ptr<bk::DicomImage<double, 3>> Dataset::ivsd() const;
-    std::unique_ptr<bk::DicomImage<double, 3>> Dataset::tmip_magnitude_3dt() const;
-    std::unique_ptr<bk::DicomImage<double, 3>> Dataset::tmip_signal_intensity_3dt() const;
-    std::unique_ptr<bk::DicomImage<double, 4>> Dataset::pressure_map() const;
-    std::unique_ptr<bk::DicomImage<double, 3>> Dataset::vessel_segmentation_in_flow_field_3dt_size(const Vessel* v) const;
+        return images;
+    }
+
+    std::unique_ptr<FlowImage2DT> Dataset::flow_image_2dt(unsigned int dcm_id, DatasetFilter_ flags)
+    {
+        std::unique_ptr<DicomImage<double, -1>> img = has_local_image_copy_dcmbytes(dcm_id) ? load_local_image_copy_dcmbytes(dcm_id) : _pdata->importer.read_image(dcm_id);
+
+        auto ff = std::make_unique<FlowImage2DT>();
+        ff->set_size(img->size());
+        ff->geometry().transformation().set_world_matrix(img->geometry().transformation().world_matrix_with_time());
+
+        #pragma omp parallel for
+        for (unsigned int i = 0; i < img->num_values(); ++i)
+        { (*ff)[i] = (*img)[i]; }
+
+        if (flags | DatasetFilter_PhaseUnwrapping)
+        {
+            PhaseUnwrapping2DT pu;
+            pu.apply(*ff, _pdata->importer.venc_2dt_in_m_per_s());
+        }
+
+        if (flags | DatasetFilter_VelocityOffset)
+        {
+            // todo
+        }
+
+        return ff;
+    }
+
+    int Dataset::anatomical_2dt_image_id_of_flow_image_2dt(unsigned int flowimg_dcm_id, bool* success)
+    {
+        // assumption:
+        // flow and anatomical image correspond if they have an identical world matrix
+
+        const DicomImageInfos& ffinfo = _pdata->importer.image_infos(flowimg_dcm_id);
+
+        for (auto aid : _pdata->importer.class_2dt_anatomical_images())
+        {
+            if (ffinfo.worldMatrix == _pdata->importer.image_infos(aid).worldMatrix)
+            {
+                if (success != nullptr)
+                { *success = true; }
+
+                return aid;
+            }
+        }
+
+        if (success != nullptr)
+        { *success = false; }
+
+        return -1;
+    }
+
+    std::unique_ptr<DicomImage<double, 3>> Dataset::lpc() const
+    {
+        if (has_local_image_copy(filepath_lpc()))
+        { return load_local_image_copy(filepath_lpc()); }
+
+        assert(is_flow_image_3dt_loaded() && "3dt flow image must be loaded prior to calling this function!");
+        return LPCImageFilter::apply(_pdata->flow_image_3dt);
+    }
+
+    std::unique_ptr<DicomImage<double, 3>> Dataset::ivsd() const
+    {
+        if (has_local_image_copy(filepath_ivsd()))
+        { return load_local_image_copy(filepath_ivsd()); }
+
+        assert(is_flow_image_3dt_loaded() && "3dt flow image must be loaded prior to calling this function!");
+        return IVSDImageFilter::apply(_pdata->flow_image_3dt);
+    }
+
+    std::unique_ptr<DicomImage<double, 3>> Dataset::tmip_magnitude_3dt() const
+    {
+        if (has_local_image_copy(filepath_tmip_magnitude()))
+        { return load_local_image_copy(filepath_tmip_magnitude()); }
+
+        const std::vector<unsigned int> magnitudeImageIds  = _pdata->importer.class_3dt_magnitude_images();
+        const unsigned int              numMagnitudeImages = magnitudeImageIds.size();
+
+        assert((numMagnitudeImages == 1 || numMagnitudeImages == 3) && "invalid number of magnitude images (should be 1 or 3)!");
+
+        #ifdef BK_EMIT_PROGRESS
+        bk::Progress& prog = bk_progress.emplace_task(numMagnitudeImages, ___("loading magnitude images"));
+        #endif
+
+        std::vector<std::unique_ptr<DicomImage<double, -1>>> m;
+
+        for (unsigned int id : magnitudeImageIds)
+        {
+            m.push_back(load_local_image_copy_dcmbytes(id));
+
+            #ifdef BK_EMIT_PROGRESS
+            prog.increment(1);
+            #endif
+        }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        if (numMagnitudeImages == 1)
+        { return MagTMIPImageFilter::apply(*m[0]); }
+        else //if (numMagnitudeImages == 3)
+        { return MagTMIPImageFilter::apply(*m[0], *m[1], *m[2]); }
+    }
+
+    std::unique_ptr<DicomImage<double, 3>> Dataset::tmip_signal_intensity_3dt() const
+    {
+        // todo
+        return nullptr;
+    }
+
+    std::unique_ptr<DicomImage<double, 4>> Dataset::pressure_map(PressureMapImageFilter pmf) const
+    {
+        #ifdef BK_EMIT_PROGRESS
+        bk::Progress& prog = bk_progress.emplace_task(_pdata->vessels.size(), ___("loading pressure map"));
+        #endif
+
+        std::vector<std::reference_wrapper<const Vessel>> vesselsToProcess;
+        std::vector<bool>                                 hasPressureMap(_pdata->vessels.size(), false);
+
+        for (unsigned int i = 0; i < num_vessels(); ++i)
+        {
+            hasPressureMap[i] = has_local_image_copy(filepath_pressure_map_of_vessel(_pdata->vessels[i]));
+
+            if (!hasPressureMap[i])
+            { vesselsToProcess.emplace_back(_pdata->vessels[i]); }
+        }
+
+        /*
+         * calculate pressure map for vessels that were not processed yet
+         */
+        std::unique_ptr<DicomImage<double, 4>> pm = nullptr;
+
+        if (!vesselsToProcess.empty())
+        {
+            pm = pmf.apply(_pdata->flow_image_3dt, vesselsToProcess);
+
+            #ifdef BK_EMIT_PROGRESS
+            prog.increment(vesselsToProcess.size());
+            #endif
+        }
+        else // if no new vessel had to be processed
+        {
+            pm->set_size(_pdata->flow_image_3dt.size());
+            pm->geometry().transformation().set_world_matrix(_pdata->flow_image_3dt.geometry().transformation().world_matrix_with_time());
+        }
+
+        /*
+         * copy existing pressure maps
+         */
+        for (unsigned int i = 0; i < num_vessels(); ++i)
+        {
+            if (hasPressureMap[i])
+            {
+                std::ifstream file(filepath_pressure_map_of_vessel(_pdata->vessels[i]), std::ios_base::in | std::ios_base::binary);
+
+                if (file.good())
+                {
+                    std::uint16_t       pos[3] = {0, 0, 0};
+                    std::vector<double> buf(_pdata->flow_image_3dt.size(3));
+
+                    while (!file.eof())
+                    {
+                        file.read(reinterpret_cast<char*>(pos), 3 * sizeof(std::uint16_t));
+                        file.read(reinterpret_cast<char*>(buf.data()), _pdata->flow_image_3dt.size(3) * sizeof(double));
+
+                        for (unsigned int t = 0; t < _pdata->flow_image_3dt.size(3); ++t)
+                        { (*pm)(pos[0], pos[1], pos[2], t) = buf[t]; }
+                    }
+
+                    file.close();
+                }
+
+                #ifdef BK_EMIT_PROGRESS
+                prog.increment(1);
+                #endif
+            }
+        }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        return pm;
+    }
+
+    std::unique_ptr<DicomImage<double, 4>> Dataset::pressure_map() const
+    { return pressure_map(PressureMapImageFilter()); }
+
+    std::unique_ptr<DicomImage<double, 3>> Dataset::vessel_segmentation_in_flow_field_3dt_size(const Vessel& v) const
+    {
+        assert(is_flow_image_3dt_loaded() && "3dt flow image must be loaded!");
+        return VesselSegmentationInFlowFieldSizeImageFilter::apply(_pdata->flow_image_3dt, v);
+    }
+
+    //====================================================================================================
+    //===== FILTERS
+    //====================================================================================================
+    bool Dataset::determine_phase_wraps_2dt()
+    {
+        const std::vector<unsigned int> imgIds = _pdata->importer.class_2dt_flow_images();
+
+        _pdata->phase_unwrapping_2dt.clear();
+
+        for (unsigned int id: imgIds)
+        {
+            std::unique_ptr<FlowImage2DT> ff = flow_image_2dt(id, DatasetFilter_None);
+
+            PhaseUnwrapping2DT pu;
+            pu.init(*ff, _pdata->importer.venc_2dt_in_m_per_s());
+
+            _pdata->phase_unwrapping_2dt.emplace(id, std::move(pu));
+        }
+
+        return true;
+    }
+
+    bool Dataset::determine_phase_wraps_3dt(bool reload_flow_image)
+    {
+        if (reload_flow_image)
+        { load_flow_image_3dt(DatasetFilter_FlowDirCorrection); }
+
+        if (!is_flow_image_3dt_loaded())
+        { return false; }
+
+        _pdata->phase_unwrapping_3dt.init(_pdata->flow_image_3dt, _pdata->importer.venc_3dt_in_m_per_s());
+
+        return true;
+    }
 
     //====================================================================================================
     //===== FUNCTIONS
@@ -471,18 +801,26 @@ namespace bk
     void Dataset::clear()
     {
         // todo
+
+        _pdata->project_path = "";
+        _pdata->importer.clear();
+        _pdata->flow_image_3dt.clear();
+        _pdata->flow_dir_correction;
+        _pdata->vessels.clear();
+        _pdata->phase_unwrapping_3dt.clear();
+        _pdata->phase_unwrapping_2dt.clear();
     }
 
     void Dataset::delete_local_image_copies_if_incomplete() const
     {
         if (!has_local_image_copies())
-        {delete_local_image_copies();}
+        { delete_local_image_copies(); }
     }
 
     void Dataset::delete_local_image_copies() const
     {
         std::vector<std::string> paths = filepaths_of_local_image_copies();
-        paths.emplace_back(filepath_tmip_mag());
+        paths.emplace_back(filepath_tmip_magnitude());
         paths.emplace_back(filepath_lpc());
         paths.emplace_back(filepath_ivsd());
         paths.emplace_back(filepath_tmip_signal());
@@ -511,11 +849,246 @@ namespace bk
     std::string Dataset::filepath_flow_dir_correction() const
     { return _pdata->project_path + "dir.fdc"; }
 
+    std::string Dataset::filepath_phase_unwrapping_2dt() const
+    { return _pdata->project_path + "phase_wraps_2dt.pu"; }
+
+    std::string Dataset::filepath_phase_unwrapping_3dt() const
+    { return _pdata->project_path + "phase_wraps_3dt.pu"; }
+
+    bool Dataset::save_local_dcmbyte_image_copies() const
+    {
+        const std::vector<unsigned int> ids       = ids_of_local_image_copies();
+        const std::vector<std::string>  filepaths = filepaths_of_local_image_copies();
+        std::vector<std::future<void>>  tasks;
+
+        if (ids.empty())
+        {return false;}
+
+        #ifdef BK_EMIT_PROGRESS
+        bk::Progress& prog = bk_progress.emplace_task(ids.size(), ___("saving local dicom image copies"));
+        #endif
+
+        for (unsigned int i = 0; i < ids.size(); ++i)
+        {
+            tasks.emplace_back(bk_threadpool.enqueue([&, i]()
+                                                     {
+                                                         std::vector<char> imgbytes = std::move(this->_pdata->importer.read_image_bytes(ids[i]));
+                                                         std::ofstream     file(filepaths[i], std::ios_base::out | std::ios_base::binary);
+
+                                                         if (file.good())
+                                                         {
+                                                             file.write(imgbytes.data(), imgbytes.size() * sizeof(char));
+                                                             file.close();
+                                                         }
+
+                                                         #ifdef BK_EMIT_PROGRESS
+                                                         prog.increment(1);
+                                                         #endif
+                                                     }));
+        }
+
+        for (std::future<void>& f: tasks)
+        { f.get(); }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        return true;
+    }
+
+    bool Dataset::save_local_image_copy(std::string_view filepath, const DicomImage<double, 3>& img) const
+    {
+        std::ofstream file(filepath.data(), std::ios_base::out | std::ios_base::binary);
+
+        if (!file.good())
+        { return false; }
+
+        #ifdef BK_EMIT_PROGRESS
+        bk::Progress& prog = bk_progress.emplace_task(100, ___("saving local image copy"));
+        #endif
+
+        std::uint16_t ui16temp = 0;
+        double        dtemp    = 0;
+
+        // size
+        const auto        size = img.geometry().size();
+        for (unsigned int i    = 0; i < 3; ++i)
+        {
+            ui16temp = size[i];
+            file.write(reinterpret_cast<char*>(&ui16temp), sizeof(std::uint16_t));
+        }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
+
+        // world matrix
+        const Mat5d& w = img.geometry().transformation().world_matrix_with_time();
+        for (unsigned int i = 0; i < w.num_elements(); ++i)
+        {
+            dtemp = w[i];
+            file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
+        }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
+
+        // values
+        for (unsigned int i = 0; i < img.num_values(); ++i)
+        {
+            dtemp = img[i];
+            file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
+        }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        file.close();
+
+        return true;
+    }
+
+    bool Dataset::save_pressure_map(PressureMapImageFilter pmf) const
+    {
+        bool                                         success = true;
+        const std::unique_ptr<DicomImage<double, 4>> pm      = pressure_map(pmf);
+
+        #ifdef BK_EMIT_PROGRESS
+        bk::Progress& prog = bk_progress.emplace_task(_pdata->vessels.size() * 5, ___("saving pressure map"));
+        #endif
+
+        for (const Vessel& v: _pdata->vessels)
+        {
+            std::ofstream file(filepath_pressure_map_of_vessel(v), std::ios_base::out | std::ios_base::binary);
+
+            if (!file.good())
+            {
+                success = false;
+                continue;
+            }
+
+            double                                       dtemp = 0;
+            const auto                                   size  = pm->size();
+            const std::unique_ptr<DicomImage<double, 3>> seg   = vessel_segmentation_in_flow_field_3dt_size(v);
+
+            #ifdef BK_EMIT_PROGRESS
+            prog.increment(1);
+            #endif
+
+            // values
+            //    - large parts of the image (everything outside segmentation) will be 0.
+            //    -> save only positions inside seg
+            for (std::uint16_t x = 0; x < static_cast<std::uint16_t>(size[0]); ++x)
+            {
+                for (std::uint16_t y = 0; y < static_cast<std::uint16_t>(size[1]); ++y)
+                {
+                    for (std::uint16_t z = 0; z < static_cast<std::uint16_t>(size[2]); ++z)
+                    {
+                        if ((*seg)(x, y, z) == 0)
+                        { continue; }
+
+                        file.write(reinterpret_cast<char*>(&x), sizeof(std::uint16_t));
+                        file.write(reinterpret_cast<char*>(&y), sizeof(std::uint16_t));
+                        file.write(reinterpret_cast<char*>(&z), sizeof(std::uint16_t));
+
+                        // save values of all temporal positions
+                        for (std::uint16_t t = 0; t < static_cast<std::uint16_t>(size[3]); ++t)
+                        {
+                            dtemp = (*pm)(x, y, z, t);
+                            file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
+                        } // for t
+                    } // for z
+                } // for y
+            } // for x
+
+            file.close();
+
+            #ifdef BK_EMIT_PROGRESS
+            prog.increment(4);
+            #endif
+        } // for v: vessels
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        return success;
+    }
+
+    bool Dataset::save_pressure_map() const
+    { return save_pressure_map(PressureMapImageFilter()); }
+
     bool Dataset::save_flow_dir_correction()
     { return _pdata->flow_dir_correction.save(filepath_flow_dir_correction()); }
 
     bool Dataset::load_flow_dir_correction()
     { return _pdata->flow_dir_correction.load(filepath_flow_dir_correction()); }
+
+    bool Dataset::save_phase_unwrapping_2dt()
+    {
+        std::ofstream file(filepath_phase_unwrapping_2dt(), std::ios_base::binary | std::ios_base::out);
+
+        if (!file.good())
+        { return false; }
+
+        bool success = true;
+
+        const std::uint8_t num_2dt_flow_images = static_cast<std::uint8_t>(_pdata->phase_unwrapping_2dt.size());
+        file.write(reinterpret_cast<const char*>(&num_2dt_flow_images), sizeof(std::uint8_t));
+
+        for (auto it = _pdata->phase_unwrapping_2dt.begin(); it != _pdata->phase_unwrapping_2dt.end(); ++it)
+        {
+            // dcm id
+            const std::uint8_t dcm_id = static_cast<std::uint8_t>(it->first);
+            file.write(reinterpret_cast<const char*>(&dcm_id), sizeof(std::uint8_t));
+
+            success &= it->second.save(file);
+        }
+
+        file.close();
+
+        return success;
+    }
+
+    bool Dataset::load_phase_unwrapping_2dt()
+    {
+        _pdata->phase_unwrapping_2dt.clear();
+
+        std::ifstream file(filepath_phase_unwrapping_2dt(), std::ios_base::binary | std::ios_base::in);
+
+        if (!file.good())
+        { return false; }
+
+        bool success = true;
+
+        std::uint8_t num_2dt_flow_images = 0;
+        file.read(reinterpret_cast<char*>(&num_2dt_flow_images), sizeof(std::uint8_t));
+
+        for (unsigned int i = 0; i < num_2dt_flow_images; ++i)
+        {
+            // dcm id
+            std::uint8_t dcm_id = 0;
+            file.read(reinterpret_cast<char*>(&dcm_id), sizeof(std::uint8_t));
+
+            PhaseUnwrapping2DT pu;
+            success &= pu.load(file);
+
+            _pdata->phase_unwrapping_2dt.emplace(dcm_id, std::move(pu));
+        }
+
+        file.close();
+
+        return success;
+    }
+
+    bool Dataset::save_phase_unwrapping_3dt()
+    { return _pdata->phase_unwrapping_3dt.save(filepath_phase_unwrapping_3dt()); }
+
+    bool Dataset::load_phase_unwrapping_3dt()
+    { return _pdata->phase_unwrapping_3dt.load(filepath_phase_unwrapping_3dt()); }
   } // inline namespace cmr
 } // namespace bk
 

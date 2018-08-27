@@ -446,6 +446,11 @@ namespace bk
 
         std::ofstream file(filepath.data(), std::ios_base::out | std::ios_base::binary);
 
+        return save(file);
+    }
+
+    bool PhaseUnwrapping2DT::save(std::ofstream& file) const
+    {
         if (!file.good())
         { return false; }
 
@@ -474,9 +479,13 @@ namespace bk
 
     bool PhaseUnwrapping2DT::load(std::string_view filepath)
     {
-        clear();
-
         std::ifstream file(filepath.data(), std::ios_base::in | std::ios_base::binary);
+        return load(file);
+    }
+
+    bool PhaseUnwrapping2DT::load(std::ifstream& file)
+    {
+        clear();
 
         if (!file.good())
         { return false; }

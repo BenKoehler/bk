@@ -23,10 +23,13 @@
  */
 
 #include <algorithm>
+#include <cassert>
+#include <cmath>
 
 #include <bkCMR/MagTMIPImageFilter.h>
 
 #include <bkMath/functions/list_grid_id_conversion.h>
+#include <bk/Matrix>
 
 #ifdef BK_EMIT_PROGRESS
 
@@ -34,8 +37,6 @@
     #include <bk/Progress>
 
 #endif
-
-#include <bkCMR/FlowImage3DT.h>
 
 namespace bk
 {
@@ -56,48 +57,121 @@ namespace bk
   //====================================================================================================
   //===== FUNCTIONS
   //====================================================================================================
-  std::unique_ptr<DicomImage<double, 3>> apply(const DicomImage<double, 4>& mag)
+  namespace
   {
-      #ifdef BK_EMIT_PROGRESS
-      bk::Progress& prog = bk_progress.emplace_task(mag.num_values() / mag.size(3), ___("calculating magnitude tmip"));
-      #endif
+    template<auto Dims>
+    static std::unique_ptr<DicomImage<double, 3>> _apply(const DicomImage<double, Dims>& mag)
+    {
+        static_assert(Dims == 4 || Dims == -1, "invalid number of dimensions");
 
-      auto res = std::make_unique<DicomImage<double, 3>>();
-      res->set_size(mag.size(0), mag.size(1), mag.size(2));
-      res->geometry().transformation().set_world_matrix(mag.geometry().transformation().world_matrix());
+        const auto& size = mag.size();
 
-      const unsigned int stride_t = bk::stride_of_dim(mag.size(), 3, 4);
+        #ifdef BK_EMIT_PROGRESS
+        bk::Progress& prog = bk_progress.emplace_task(mag.num_values() / size[3], ___("calculating magnitude tmip"));
+        #endif
 
-      #pragma omp parallel for
-      for (unsigned int x = 0; x < mag.size(0); ++x)
-      {
-          double maxval = 0;
+        auto res = std::make_unique<DicomImage<double, 3>>();
+        res->set_size(size[0], size[1], size[2]);
+        res->geometry().transformation().set_world_matrix(mag.geometry().transformation().world_matrix());
 
-          for (unsigned int y = 0; y < mag.size(1); ++y)
-          {
-              for (unsigned int z = 0; z < mag.size(2); ++z)
-              {
-                  unsigned int lid = bk::grid_to_list_id(mag.size(), x, y, z, 0);
+        const unsigned int stride_t = bk::stride_of_dim(size, 3, 4);
 
-                  maxval = 0;
+        #pragma omp parallel for
+        for (unsigned int x = 0; x < size[0]; ++x)
+        {
+            double maxval = 0;
 
-                  for (unsigned int t = 0; t < mag.size(3); ++t, lid += stride_t)
-                  { maxval = std::max(maxval, mag[lid]); }
+            for (unsigned int y = 0; y < size[1]; ++y)
+            {
+                for (unsigned int z = 0; z < size[2]; ++z)
+                {
+                    unsigned int lid = bk::grid_to_list_id(size, x, y, z, 0);
 
-                  (*res)(x, y, z) = maxval;
-              }
-          }
+                    maxval = 0;
 
-          #ifdef BK_EMIT_PROGRESS
-              #pragma omp critical(MagTMIPImageFilter_progress)
-          { prog.increment(mag.size(1) * mag.size(2)); }
-          #endif
-      }
+                    for (unsigned int t = 0; t < size[3]; ++t, lid += stride_t)
+                    { maxval = std::max(maxval, mag[lid]); }
 
-      #ifdef BK_EMIT_PROGRESS
-      prog.set_finished();
-      #endif
+                    (*res)(x, y, z) = maxval;
+                }
+            }
 
-      return res;
-  }
+            #ifdef BK_EMIT_PROGRESS
+                #pragma omp critical(MagTMIPImageFilter_progress)
+            { prog.increment(size[1] * size[2]); }
+            #endif
+        }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        return res;
+    }
+
+    template<auto Dims>
+    static std::unique_ptr<DicomImage<double, 3>> _apply(const DicomImage<double, Dims>& mag_x, const DicomImage<double, Dims>& mag_y, const DicomImage<double, Dims>& mag_z)
+    {
+        const auto& size = mag_x.size();
+
+        assert(size[0] == mag_y.size(0) && size[0] == mag_z.size(0) && "MagTMIPImageFilter::apply - magnitude image size x mismatch");
+        assert(size[1] == mag_y.size(1) && size[1] == mag_z.size(1) && "MagTMIPImageFilter::apply - magnitude image size y mismatch");
+        assert(size[2] == mag_y.size(2) && size[2] == mag_z.size(2) && "MagTMIPImageFilter::apply - magnitude image size z mismatch");
+        assert(size[3] == mag_y.size(3) && size[3] == mag_z.size(3) && "MagTMIPImageFilter::apply - magnitude image size t mismatch");
+
+        #ifdef BK_EMIT_PROGRESS
+        bk::Progress& prog = bk_progress.emplace_task(mag_x.num_values() / size[3], ___("calculating magnitude tmip"));
+        #endif
+
+        auto res = std::make_unique<DicomImage<double, 3>>();
+        res->set_size(size[0], size[1], size[2]);
+        res->geometry().transformation().set_world_matrix(mag_x.geometry().transformation().world_matrix());
+
+        const unsigned int stride_t = bk::stride_of_dim(size, 3, 4);
+
+        #pragma omp parallel for
+        for (unsigned int x = 0; x < size[0]; ++x)
+        {
+            double maxval = 0;
+
+            for (unsigned int y = 0; y < size[1]; ++y)
+            {
+                for (unsigned int z = 0; z < size[2]; ++z)
+                {
+                    unsigned int lid = bk::grid_to_list_id(size, x, y, z, 0);
+
+                    maxval = 0;
+
+                    for (unsigned int t = 0; t < size[3]; ++t, lid += stride_t)
+                    { maxval = std::max(maxval, Vec3d(mag_x[lid], mag_y[lid], mag_z[lid]).norm_squared()); }
+
+                    (*res)(x, y, z) = std::sqrt(maxval);
+                }
+            }
+
+            #ifdef BK_EMIT_PROGRESS
+                #pragma omp critical(MagTMIPImageFilter_progress)
+            { prog.increment(size[1] * size[2]); }
+            #endif
+        }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        return res;
+    }
+  } // anonymous namespace
+
+  std::unique_ptr<DicomImage<double, 3>> apply(const DicomImage<double, 4>& mag)
+  { return _apply(mag); }
+
+  std::unique_ptr<DicomImage<double, 3>> apply(const DicomImage<double, -1>& mag)
+  { return _apply(mag); }
+
+  std::unique_ptr<DicomImage<double, 3>> apply(const DicomImage<double, 4>& mag_x, const DicomImage<double, 4>& mag_y, const DicomImage<double, 4>& mag_z)
+  { return _apply(mag_x, mag_y, mag_z); }
+
+  std::unique_ptr<DicomImage<double, 3>> apply(const DicomImage<double, -1>& mag_x, const DicomImage<double, -1>& mag_y, const DicomImage<double, -1>& mag_z)
+  { return _apply(mag_x, mag_y, mag_z); }
 } // namespace bk

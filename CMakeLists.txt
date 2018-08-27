@@ -185,11 +185,15 @@ set(SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowImage2DT.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowImage3DT.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowJet.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/AverageSmoothingImageFilter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/IVSDImageFilter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/LPCImageFilter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/MagTMIPImageFilter.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/PhaseUnwrapping2DT.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/PhaseUnwrapping3DT.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/PressureMapImageFilter.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/rotation_angle_2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/sampling/sampling_sphere_section.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/VesselSegmentationInFlowFieldSizeImageFilter.cpp
         )
 
 add_library(bkCMR ${SOURCE_FILES})

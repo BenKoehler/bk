@@ -46,8 +46,9 @@ namespace bk
   {
     // -------------------- forward declaration END
     class FlowDirCorrection;
+    class FlowImage2DT;
     class FlowImage3DT;
-
+    class PressureMapImageFilter;
     class Vessel;
 
     enum DatasetFilter_ : unsigned int
@@ -66,6 +67,7 @@ namespace bk
         //===== DEFINITIONS
         //====================================================================================================
         static const std::string dcmbytes;
+        static const std::string vessel_dir;
 
       public:
 
@@ -143,38 +145,45 @@ namespace bk
         //====================================================================================================
       private:
         [[nodiscard]] std::string filepath_flow_image(unsigned int v) const;
-        [[nodiscard]] std::string filepath_tmip_mag() const;
+        [[nodiscard]] std::string filepath_tmip_magnitude() const;
         [[nodiscard]] std::string filepath_lpc() const;
         [[nodiscard]] std::string filepath_ivsd() const;
         [[nodiscard]] std::string filepath_tmip_signal() const;
         [[nodiscard]] std::vector<std::string> filepaths_of_local_image_copies() const;
+        [[nodiscard]] std::string filepath_pressure_map_of_vessel(const Vessel& v) const;
+
+        [[nodiscard]] bool has_local_image_copy(std::string_view filepath) const;
+        [[nodiscard]] bool has_local_image_copy_dcmbytes(unsigned int imgId) const;
+
+        [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> load_local_image_copy(std::string_view filepath) const;
+        [[nodiscard]] std::unique_ptr<DicomImage<double, -1>> load_local_image_copy_dcmbytes(unsigned int imgId) const;
       public:
 
         [[maybe_unused]] bool load_flow_image_3dt(DatasetFilter_ flags = DatasetFilter_All);
 
-        [[nodiscard]] std::vector<std::unique_ptr<DicomImage<double, -1>>> flow_images_2dt(DatasetFilter_ flags = DatasetFilter_All);
-        [[nodiscard]] std::unique_ptr<bk::DicomImage<double, 3>> flow_image_2dt(unsigned int dcm_id, DatasetFilter_ flags = DatasetFilter_All);
+        [[nodiscard]] std::vector<std::unique_ptr<FlowImage2DT>> flow_images_2dt(DatasetFilter_ flags = DatasetFilter_All);
+        [[nodiscard]] std::unique_ptr<FlowImage2DT> flow_image_2dt(unsigned int dcm_id, DatasetFilter_ flags = DatasetFilter_All);
 
-        [[nodiscard]] int anatomical_2dt_image_id_of_flow_image_2dt(unsigned int flowimg_dcm_id);
+        [[nodiscard]] int anatomical_2dt_image_id_of_flow_image_2dt(unsigned int flowimg_dcm_id, bool* success = nullptr);
 
-        [[nodiscard]] std::unique_ptr<bk::DicomImage<double, 3>> lpc() const;
-        [[nodiscard]] std::unique_ptr<bk::DicomImage<double, 3>> ivsd() const;
-        [[nodiscard]] std::unique_ptr<bk::DicomImage<double, 3>> tmip_magnitude_3dt() const;
-        [[nodiscard]] std::unique_ptr<bk::DicomImage<double, 3>> tmip_signal_intensity_3dt() const;
-        [[nodiscard]] std::unique_ptr<bk::DicomImage<double, 4>> pressure_map() const;
-        [[nodiscard]] std::unique_ptr<bk::DicomImage<double, 3>> vessel_segmentation_in_flow_field_3dt_size(const Vessel* v) const;
+        [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> lpc() const;
+        [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> ivsd() const;
+        [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> tmip_magnitude_3dt() const;
+        [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> tmip_signal_intensity_3dt() const;
+        [[nodiscard]] std::unique_ptr<DicomImage<double, 4>> pressure_map(PressureMapImageFilter pmf) const;
+        [[nodiscard]] std::unique_ptr<DicomImage<double, 4>> pressure_map() const;
+        [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> vessel_segmentation_in_flow_field_3dt_size(const Vessel& v) const;
 
         // todo: 2dt centerline cuts
 
         //====================================================================================================
         //===== FILTERS
         //====================================================================================================
-        //[[maybe_unused]] bool determine_phase_wraps_3dt();
+        [[maybe_unused]] bool determine_phase_wraps_2dt();
+        [[maybe_unused]] bool determine_phase_wraps_3dt(bool reload_flow_image = true);
 
-        // todo phase unwrapping 3dt
-        // todo phase unwrapping 2dt
-        // todo eddy current 3dt
-        // todo eddy current 2dt
+        // todo velocity offset correction 3dt
+        // todo velocity offset correction 2dt
 
         //====================================================================================================
         //===== FUNCTIONS
@@ -188,10 +197,24 @@ namespace bk
         //====================================================================================================
       private:
         [[nodiscard]] std::string filepath_flow_dir_correction() const;
+        [[nodiscard]] std::string filepath_phase_unwrapping_2dt() const;
+        [[nodiscard]] std::string filepath_phase_unwrapping_3dt() const;
       public:
+
+        [[maybe_unused]] bool save_local_dcmbyte_image_copies() const;
+
+        [[maybe_unused]] bool save_local_image_copy(std::string_view filepath, const DicomImage<double, 3>& img) const;
+        [[maybe_unused]] bool save_pressure_map(PressureMapImageFilter pmf) const;
+        [[maybe_unused]] bool save_pressure_map() const;
 
         [[maybe_unused]] bool save_flow_dir_correction();
         [[maybe_unused]] bool load_flow_dir_correction();
+
+        [[maybe_unused]] bool save_phase_unwrapping_2dt();
+        [[maybe_unused]] bool load_phase_unwrapping_2dt();
+
+        [[maybe_unused]] bool save_phase_unwrapping_3dt();
+        [[maybe_unused]] bool load_phase_unwrapping_3dt();
     }; // class Dataset
   } // inline namespace cmr
 } // namespace bk

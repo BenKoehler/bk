@@ -24,68 +24,50 @@
 
 #pragma once
 
-#ifndef BK_PHASEUNWRAPPING2DT_H
-#define BK_PHASEUNWRAPPING2DT_H
+#ifndef BK_LPCIMAGEFILTER_H
+#define BK_LPCIMAGEFILTER_H
 
-#include <fstream>
-#include <string_view>
+#include <memory>
 
-#include <bk/Clock>
-#include <bk/CopyablePIMPL>
+#include <bk/Image>
+#include <bkCMR/lib/bkCMR_export.h>
 
 namespace bk
 {
   inline namespace cmr
   {
     // -------------------- forward declaration
-    class FlowImage2DT;
+    class FlowImage3DT;
     // -------------------- forward declaration END
 
-    class PhaseUnwrapping2DT
+    class BKCMR_EXPORT LPCImageFilter
     {
         //====================================================================================================
-        //===== MEMBERS
+        //===== DEFINITIONS
         //====================================================================================================
-        class Impl;
-        bk::cpimpl<Impl> _pdata;
+        using self_type = LPCImageFilter;
 
         //====================================================================================================
         //===== CONSTRUCTORS & DESTRUCTOR
         //====================================================================================================
       public:
-        PhaseUnwrapping2DT();
-        PhaseUnwrapping2DT(const PhaseUnwrapping2DT&);
-        PhaseUnwrapping2DT(PhaseUnwrapping2DT&&) noexcept;
-        ~PhaseUnwrapping2DT();
-
-        //====================================================================================================
-        //===== GETTER
-        //====================================================================================================
-        [[nodiscard]] bool is_wrapped() const;
-        [[nodiscard]] unsigned int num_wrapped_voxels() const;
+        LPCImageFilter();
+        LPCImageFilter(const LPCImageFilter&);
+        LPCImageFilter(LPCImageFilter&&) noexcept;
+        ~LPCImageFilter();
 
         //====================================================================================================
         //===== SETTER
         //====================================================================================================
-        [[maybe_unused]] PhaseUnwrapping2DT& operator=(const PhaseUnwrapping2DT&);
-        [[maybe_unused]] PhaseUnwrapping2DT& operator=(PhaseUnwrapping2DT&&) noexcept;
+        [[maybe_unused]] LPCImageFilter& operator=(const LPCImageFilter&);
+        [[maybe_unused]] LPCImageFilter& operator=(LPCImageFilter&&) noexcept;
 
         //====================================================================================================
         //===== FUNCTIONS
         //====================================================================================================
-        void clear();
-
-        // the ff must not already be phase-unwrapped
-        [[maybe_unused]] Clock init(const FlowImage2DT& ff, double venc);
-
-        void apply(FlowImage2DT& ff, double venc) const;
-
-        [[maybe_unused]] bool save(std::string_view filepath) const;
-        [[maybe_unused]] bool save(std::ofstream& file) const;
-        [[maybe_unused]] bool load(std::string_view filepath);
-        [[maybe_unused]] bool load(std::ifstream& file);
-    }; // class PhaseUnwrapping2DT
+        [[nodiscard]] static std::unique_ptr<DicomImage<double, 3>> apply(const FlowImage3DT& ff);
+    }; // class LPCImageFilter
   } // inline namespace cmr
 } // namespace bk
 
-#endif //BK_PHASEUNWRAPPING2DT_H
+#endif //BK_LPCIMAGEFILTER_H

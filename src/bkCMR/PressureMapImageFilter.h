@@ -24,25 +24,35 @@
 
 #pragma once
 
-#ifndef BK_PHASEUNWRAPPING2DT_H
-#define BK_PHASEUNWRAPPING2DT_H
+#ifndef BK_PRESSUREMAPIMAGEFILTER_H
+#define BK_PRESSUREMAPIMAGEFILTER_H
 
-#include <fstream>
-#include <string_view>
+#include <memory>
+#include <utility>
+#include <vector>
 
-#include <bk/Clock>
 #include <bk/CopyablePIMPL>
+#include <bk/Image>
+#include <bkCMR/lib/bkCMR_export.h>
 
 namespace bk
 {
+  // -------------------- forward declaration
+  class Clock;
+
   inline namespace cmr
   {
-    // -------------------- forward declaration
-    class FlowImage2DT;
+    class FlowImage3DT;
+    class Vessel;
     // -------------------- forward declaration END
 
-    class PhaseUnwrapping2DT
+    class BKCMR_EXPORT PressureMapImageFilter
     {
+        //====================================================================================================
+        //===== DEFINITIONS
+        //====================================================================================================
+        using self_type = PressureMapImageFilter;
+
         //====================================================================================================
         //===== MEMBERS
         //====================================================================================================
@@ -53,39 +63,36 @@ namespace bk
         //===== CONSTRUCTORS & DESTRUCTOR
         //====================================================================================================
       public:
-        PhaseUnwrapping2DT();
-        PhaseUnwrapping2DT(const PhaseUnwrapping2DT&);
-        PhaseUnwrapping2DT(PhaseUnwrapping2DT&&) noexcept;
-        ~PhaseUnwrapping2DT();
+        PressureMapImageFilter();
+        PressureMapImageFilter(const PressureMapImageFilter&);
+        PressureMapImageFilter(PressureMapImageFilter&&) noexcept;
+        ~PressureMapImageFilter();
 
         //====================================================================================================
         //===== GETTER
         //====================================================================================================
-        [[nodiscard]] bool is_wrapped() const;
-        [[nodiscard]] unsigned int num_wrapped_voxels() const;
+        [[nodiscard]] double density() const;
+        [[nodiscard]] double viscosity() const;
+        [[nodiscard]] unsigned int max_iterations() const;
+        [[nodiscard]] bool convert_to_mmhg() const;
 
         //====================================================================================================
         //===== SETTER
         //====================================================================================================
-        [[maybe_unused]] PhaseUnwrapping2DT& operator=(const PhaseUnwrapping2DT&);
-        [[maybe_unused]] PhaseUnwrapping2DT& operator=(PhaseUnwrapping2DT&&) noexcept;
+        [[maybe_unused]] PressureMapImageFilter& operator=(const PressureMapImageFilter&);
+        [[maybe_unused]] PressureMapImageFilter& operator=(PressureMapImageFilter&&) noexcept;
+
+        void set_density(double dens);
+        void set_viscosity(double viscos);
+        void set_max_iterations(unsigned int maxIter);
+        void set_convert_to_mmhg(bool useMmhg);
 
         //====================================================================================================
         //===== FUNCTIONS
         //====================================================================================================
-        void clear();
-
-        // the ff must not already be phase-unwrapped
-        [[maybe_unused]] Clock init(const FlowImage2DT& ff, double venc);
-
-        void apply(FlowImage2DT& ff, double venc) const;
-
-        [[maybe_unused]] bool save(std::string_view filepath) const;
-        [[maybe_unused]] bool save(std::ofstream& file) const;
-        [[maybe_unused]] bool load(std::string_view filepath);
-        [[maybe_unused]] bool load(std::ifstream& file);
-    }; // class PhaseUnwrapping2DT
+        [[nodiscard]] std::unique_ptr<DicomImage<double, 4>> apply(const FlowImage3DT& ff, const std::vector<std::reference_wrapper<const Vessel>>& vessels);
+    }; // class PressureMapImageFilter
   } // inline namespace cmr
 } // namespace bk
 
-#endif //BK_PHASEUNWRAPPING2DT_H
+#endif //BK_PRESSUREMAPIMAGEFILTER_H

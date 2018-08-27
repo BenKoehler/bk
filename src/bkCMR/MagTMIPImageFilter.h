@@ -62,6 +62,9 @@ namespace bk
         //===== FUNCTIONS
         //====================================================================================================
         [[nodiscard]] static std::unique_ptr<DicomImage<double, 3>> apply(const DicomImage<double, 4>& mag);
+        [[nodiscard]] static std::unique_ptr<DicomImage<double, 3>> apply(const DicomImage<double, -1>& mag);
+        [[nodiscard]] static std::unique_ptr<DicomImage<double, 3>> apply(const DicomImage<double, 4>& mag_x, const DicomImage<double, 4>& mag_y, const DicomImage<double, 4>& mag_z);
+        [[nodiscard]] static std::unique_ptr<DicomImage<double, 3>> apply(const DicomImage<double, -1>& mag_x, const DicomImage<double, -1>& mag_y, const DicomImage<double, -1>& mag_z);
     }; // class MagTMIPImageFilter
   } // inline namespace cmr
 } // namespace bk
