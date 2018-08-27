@@ -65,10 +65,10 @@ namespace bk
   //====================================================================================================
   struct DicomDirImporter::Impl
   {
-      std::string dir;
-      std::string dataset_name;
-      std::vector<DicomFileInfos> files;
-      std::vector<DicomImageInfos> info;
+      std::string                                               dir;
+      std::string                                               dataset_name;
+      std::vector<DicomFileInfos>                               files;
+      std::vector<DicomImageInfos>                              info;
       std::vector<std::pair<Vec2ui, std::vector<unsigned int>>> images_2d; //!< pair = <grid size, list of image ids>
       std::vector<std::pair<Vec3ui, std::vector<unsigned int>>> images_2dt; //!< pair = <grid size, list of image ids>
       std::vector<std::pair<Vec3ui, std::vector<unsigned int>>> images_3d; //!< pair = <grid size, list of image ids>
@@ -192,11 +192,16 @@ namespace bk
   }
   /// @}
 
+  /// @{ -------------------------------------------------- GET SUCCESS
+  bool DicomDirImporter::is_import_successful() const
+  { return !_pdata->files.empty() && !_pdata->info.empty(); }
+  /// @}
+
   //====================================================================================================
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- SET DIRECTORY
-  void DicomDirImporter::set_directory(const std::string& dir)
+  void DicomDirImporter::set_directory(std::string_view dir)
   {
       /*
        * replace dicom directory
@@ -233,7 +238,7 @@ namespace bk
   /// @}
 
   /// @{ -------------------------------------------------- SET DATASET NAME
-  void DicomDirImporter::set_dataset_name(const std::string& name)
+  void DicomDirImporter::set_dataset_name(std::string_view name)
   {
       if (!name.empty())
       { _pdata->dataset_name = name; }
@@ -321,7 +326,7 @@ namespace bk
        * is there a DICOMDIR file?
        */
       unsigned int DICOMDIR_id = 0;
-      bool hasDICOMDIR = false;
+      bool         hasDICOMDIR = false;
 
       for (; DICOMDIR_id < dcmfilenames.size(); ++DICOMDIR_id)
       {
@@ -360,13 +365,13 @@ namespace bk
           sf.SetFile(dcm);
 
           DicomFileInfos info;
-          info.filename = dcmfilenames[i];
-          info.InstanceNumber = bk::string_utils::to_uint(sf.ToString(gdcm::Keywords::InstanceNumber::GetTag()));
-          info.StudyInstanceUID = bk::string_utils::trim(sf.ToString(gdcm::Keywords::StudyInstanceUID::GetTag()));
+          info.filename          = dcmfilenames[i];
+          info.InstanceNumber    = bk::string_utils::to_uint(sf.ToString(gdcm::Keywords::InstanceNumber::GetTag()));
+          info.StudyInstanceUID  = bk::string_utils::trim(sf.ToString(gdcm::Keywords::StudyInstanceUID::GetTag()));
           info.SeriesInstanceUID = bk::string_utils::trim(sf.ToString(gdcm::Keywords::SeriesInstanceUID::GetTag()));
-          info.SequenceName = bk::string_utils::trim(sf.ToString(gdcm::Keywords::SequenceName::GetTag()));
-          info.ProtocolName = bk::string_utils::trim(sf.ToString(gdcm::Keywords::ProtocolName::GetTag()));
-          info.SliceLocation = bk::string_utils::to_double(sf.ToString(gdcm::Keywords::SliceLocation::GetTag()));
+          info.SequenceName      = bk::string_utils::trim(sf.ToString(gdcm::Keywords::SequenceName::GetTag()));
+          info.ProtocolName      = bk::string_utils::trim(sf.ToString(gdcm::Keywords::ProtocolName::GetTag()));
+          info.SliceLocation     = bk::string_utils::to_double(sf.ToString(gdcm::Keywords::SliceLocation::GetTag()));
           // format : hhmmss.ssssss -> h: hour, m: minute, s: fraction second
           const std::string at = sf.ToString(gdcm::Keywords::AcquisitionTime::GetTag());
           info.AcquisitionTime = bk::string_utils::to_double(bk::string_utils::sub_string(at, 0, 2)) * 3'600'000 /*h -> ms*/;
@@ -376,8 +381,8 @@ namespace bk
           //info.AcquisitionTime = bk::string_utils::to_double(sf.ToString(gdcm::Keywords::AcquisitionTime::GetTag()));
 
           const gdcm::DataSet& ds = dcm.GetDataSet();
-          const std::string ipp = sf.ToString(ds.GetDataElement(gdcm::Keywords::ImagePositionPatient::GetTag()));
-          const auto vipp = bk::string_utils::contains(ipp, "\\") ? bk::string_utils::split(ipp, "\\") : bk::string_utils::split(ipp, "/");
+          const std::string ipp  = sf.ToString(ds.GetDataElement(gdcm::Keywords::ImagePositionPatient::GetTag()));
+          const auto        vipp = bk::string_utils::contains(ipp, "\\") ? bk::string_utils::split(ipp, "\\") : bk::string_utils::split(ipp, "/");
           if (vipp.size() == 3)
           {
               info.ImagePositionPatient[0] = bk::string_utils::to_double(vipp[0]);
@@ -385,9 +390,9 @@ namespace bk
               info.ImagePositionPatient[2] = bk::string_utils::to_double(vipp[2]);
           }
 
-          info.StudyDescription = bk::string_utils::trim(sf.ToString(gdcm::Keywords::StudyDescription::GetTag()));
+          info.StudyDescription  = bk::string_utils::trim(sf.ToString(gdcm::Keywords::StudyDescription::GetTag()));
           info.SeriesDescription = bk::string_utils::trim(sf.ToString(gdcm::Keywords::SeriesDescription::GetTag()));
-          info.ImageType = bk::string_utils::trim(sf.ToString(gdcm::Keywords::ImageType::GetTag()));
+          info.ImageType         = bk::string_utils::trim(sf.ToString(gdcm::Keywords::ImageType::GetTag()));
 
           _pdata->files.push_back(std::move(info));
 
@@ -434,50 +439,50 @@ namespace bk
       //------------------------------------------------------------------------------------------------------
       // sort each image by SliceLocation and AcquisitionTime
       //------------------------------------------------------------------------------------------------------
-      std::string tempSeriesInstanceUID;
-      std::string tempSequenceName;
-      std::string tempStudyInstanceUID;
-      std::string tempProtocolName;
-      std::string tempStudyDescription;
-      std::string tempSeriesDescription;
-      std::string tempImageType;
-      unsigned int i = 0;
+      std::string  tempSeriesInstanceUID;
+      std::string  tempSequenceName;
+      std::string  tempStudyInstanceUID;
+      std::string  tempProtocolName;
+      std::string  tempStudyDescription;
+      std::string  tempSeriesDescription;
+      std::string  tempImageType;
+      unsigned int i      = 0;
 
       for (auto it = _pdata->files.begin(); it != _pdata->files.end(); /*++it, ++i*/ /*increment happens within loop*/)
       {
           auto itend = it;
 
           tempSeriesInstanceUID = it->SeriesInstanceUID;
-          tempSequenceName = it->SequenceName;
-          tempStudyInstanceUID = it->StudyInstanceUID;
-          tempProtocolName = it->ProtocolName;
-          tempStudyDescription = it->StudyDescription;
+          tempSequenceName      = it->SequenceName;
+          tempStudyInstanceUID  = it->StudyInstanceUID;
+          tempProtocolName      = it->ProtocolName;
+          tempStudyDescription  = it->StudyDescription;
           tempSeriesDescription = it->SeriesDescription;
-          tempImageType = it->ImageType;
+          tempImageType         = it->ImageType;
 
           DicomImageInfos imgInfo;
-          imgInfo.id_file_start = i;
+          imgInfo.id_file_start     = i;
           imgInfo.SeriesInstanceUID = tempSeriesInstanceUID;
-          imgInfo.SequenceName = tempSequenceName;
-          imgInfo.StudyInstanceUID = tempStudyInstanceUID;
-          imgInfo.ProtocolName = tempProtocolName;
+          imgInfo.SequenceName      = tempSequenceName;
+          imgInfo.StudyInstanceUID  = tempStudyInstanceUID;
+          imgInfo.ProtocolName      = tempProtocolName;
 
           std::vector<double> slicePositions;
           std::vector<double> acquisitionTimes;
           slicePositions.reserve(500);
           acquisitionTimes.reserve(500);
 
-          bool hasSlices = false;
+          bool hasSlices            = false;
           bool hasTemporalPositions = false;
-          bool hasNumberOfFrames = false;
+          bool hasNumberOfFrames    = false;
 
           gdcm::Reader reader0;
           reader0.SetFileName(_pdata->files[imgInfo.id_file_start].filename.c_str());
 
           if (reader0.Read())
           {
-              const gdcm::File& file = reader0.GetFile();
-              const gdcm::DataSet& ds = file.GetDataSet();
+              const gdcm::File   & file = reader0.GetFile();
+              const gdcm::DataSet& ds   = file.GetDataSet();
               gdcm::StringFilter sf;
               sf.SetFile(file);
 
@@ -560,8 +565,8 @@ namespace bk
                       if (!hasTemporalPositions)
                       {
                           // format : hhmmss.ssssss -> h: hour, m: minute, s: fraction second
-                          const std::string at = sf.ToString(gdcm::Keywords::AcquisitionTime::GetTag());
-                          double acqt = bk::string_utils::to_double(bk::string_utils::sub_string(at, 0, 2)) * 3'600'000 /*h -> ms*/;
+                          const std::string at   = sf.ToString(gdcm::Keywords::AcquisitionTime::GetTag());
+                          double            acqt = bk::string_utils::to_double(bk::string_utils::sub_string(at, 0, 2)) * 3'600'000 /*h -> ms*/;
                           acqt += bk::string_utils::to_double(bk::string_utils::sub_string(at, 2, 2)) * 60'000 /*h -> ms*/;
                           acqt += bk::string_utils::to_double(bk::string_utils::sub_string(at, 4, 9)) * 1'000 /*s -> ms*/;
 
@@ -607,8 +612,8 @@ namespace bk
               }
           }
 
-          const unsigned int expected2 = imgInfo.Slices * imgInfo.TemporalPositions;
-          bool this_is_a_split_image = false;
+          const unsigned int expected2             = imgInfo.Slices * imgInfo.TemporalPositions;
+          bool               this_is_a_split_image = false;
 
           if (hasSlices && hasTemporalPositions && expectedNumFiles != expected2)
           {
@@ -637,7 +642,7 @@ namespace bk
                   imgInfoSplit.id_file_start += s * expected2;
                   imgInfoSplit.id_file_end = imgInfoSplit.id_file_start + expected2;
 
-                  auto tempit = it + s * expected2;
+                  auto tempit    = it + s * expected2;
                   auto tempitend = it + (s + 1) * expected2;
 
                   std::sort(tempit, tempitend, [](const DicomFileInfos& a, const DicomFileInfos& b)
@@ -696,8 +701,8 @@ namespace bk
 
       if (reader.Read())
       {
-          gdcm::File& file = reader.GetFile();
-          gdcm::DataSet& ds = file.GetDataSet();
+          gdcm::File               & file     = reader.GetFile();
+          gdcm::DataSet            & ds       = file.GetDataSet();
           gdcm::FileMetaInformation& metaInfo = file.GetHeader();
           gdcm::MediaStorage ms;
           ms.SetFromFile(file);
@@ -709,7 +714,7 @@ namespace bk
               // valid DICOMDIR file
 
               std::stringstream strm;
-              std::string strmStr;
+              std::string       strmStr;
               const std::string MediaStorageSOPClassUID_Value("1.2.840.10008.1.3.10");
 
               if (metaInfo.FindDataElement(gdcm::Keywords::MediaStorageSOPClassUID::GetTag()))
@@ -727,19 +732,19 @@ namespace bk
                       if (itr->GetTag() == gdcm::Keywords::DirectoryRecordSequence::GetTag())
                       {
                           const gdcm::DataElement& dataElt = (*itr);
-                          gdcm::SmartPointer<gdcm::SequenceOfItems> seqOfItems = dataElt.GetValueAsSQ();
-                          DicomImageInfos imgInfo;
-                          bool lastWasImage = false;
-                          unsigned int expectedNumFiles = 0;
-                          unsigned int fileCnt = 0;
-                          DicomFileInfos globalFileInfo;
-                          bool this_is_a_split_image = false;
-                          bool perform_image_splitting = false;
-                          bool first_after_splitting = false;
-                          unsigned int slicesBeforeSplitting = 0;
-                          unsigned int timesBeforeSplitting = 0;
-                          unsigned int numFramesBeforeSplitting = 0;
-                          unsigned int expectedNumFilesBeforeSplitting = 0;
+                          gdcm::SmartPointer<gdcm::SequenceOfItems> seqOfItems                      = dataElt.GetValueAsSQ();
+                          DicomImageInfos                           imgInfo;
+                          bool                                      lastWasImage                    = false;
+                          unsigned int                              expectedNumFiles                = 0;
+                          unsigned int                              fileCnt                         = 0;
+                          DicomFileInfos                            globalFileInfo;
+                          bool                                      this_is_a_split_image           = false;
+                          bool                                      perform_image_splitting         = false;
+                          bool                                      first_after_splitting           = false;
+                          unsigned int                              slicesBeforeSplitting           = 0;
+                          unsigned int                              timesBeforeSplitting            = 0;
+                          unsigned int                              numFramesBeforeSplitting        = 0;
+                          unsigned int                              expectedNumFilesBeforeSplitting = 0;
 
                           #ifdef BK_EMIT_PROGRESS
                           bk::Progress& prog = bk_progress.emplace_task(seqOfItems->GetNumberOfItems(), ___("scanning dicomdir"));
@@ -766,32 +771,32 @@ namespace bk
                                    */
                                   if (lastWasImage && itemUsed != 1 /*first item*/ && (!bk::string_utils::equals(DirectoryRecordType, "image", false) || perform_image_splitting))
                                   {
-                                      imgInfo.id_file_end = _pdata->files.size() - 1;
-                                      imgInfo.StudyInstanceUID = globalFileInfo.StudyInstanceUID;
+                                      imgInfo.id_file_end       = _pdata->files.size() - 1;
+                                      imgInfo.StudyInstanceUID  = globalFileInfo.StudyInstanceUID;
                                       imgInfo.SeriesInstanceUID = globalFileInfo.SeriesInstanceUID;
-                                      imgInfo.ProtocolName = globalFileInfo.ProtocolName;
+                                      imgInfo.ProtocolName      = globalFileInfo.ProtocolName;
 
                                       if (this_is_a_split_image)
                                       {
                                           //const std::string rnd = bk::string_utils::from_int(bk_rand.next_integral(0,10000000));
-                                          globalFileInfo.StudyInstanceUID = bk::string_utils::append(globalFileInfo.StudyInstanceUID, "_");
+                                          globalFileInfo.StudyInstanceUID  = bk::string_utils::append(globalFileInfo.StudyInstanceUID, "_");
                                           globalFileInfo.SeriesInstanceUID = bk::string_utils::append(globalFileInfo.SeriesInstanceUID, "_");
-                                          globalFileInfo.ProtocolName = bk::string_utils::append(globalFileInfo.ProtocolName, "_");
-                                          globalFileInfo.SequenceName = bk::string_utils::append(globalFileInfo.SequenceName, "_");
+                                          globalFileInfo.ProtocolName      = bk::string_utils::append(globalFileInfo.ProtocolName, "_");
+                                          globalFileInfo.SequenceName      = bk::string_utils::append(globalFileInfo.SequenceName, "_");
                                       }
 
                                       _pdata->info.emplace_back(DicomImageInfos(imgInfo));
 
                                       globalFileInfo.AcquisitionTime = 0;
-                                      globalFileInfo.filename = "";
-                                      globalFileInfo.SliceLocation = 0;
+                                      globalFileInfo.filename        = "";
+                                      globalFileInfo.SliceLocation   = 0;
 
                                       if (!this_is_a_split_image)
                                       {
-                                          globalFileInfo.ProtocolName = "";
-                                          globalFileInfo.SequenceName = "";
+                                          globalFileInfo.ProtocolName      = "";
+                                          globalFileInfo.SequenceName      = "";
                                           globalFileInfo.SeriesInstanceUID = "";
-                                          globalFileInfo.StudyInstanceUID = "";
+                                          globalFileInfo.StudyInstanceUID  = "";
                                       }
 
                                       fileCnt = 0;
@@ -799,20 +804,20 @@ namespace bk
                                       if (this_is_a_split_image)
                                       {
                                           perform_image_splitting = false;
-                                          first_after_splitting = true;
+                                          first_after_splitting   = true;
 
-                                          slicesBeforeSplitting = imgInfo.Slices;
-                                          timesBeforeSplitting = imgInfo.TemporalPositions;
-                                          numFramesBeforeSplitting = imgInfo.NumberOfFrames;
+                                          slicesBeforeSplitting           = imgInfo.Slices;
+                                          timesBeforeSplitting            = imgInfo.TemporalPositions;
+                                          numFramesBeforeSplitting        = imgInfo.NumberOfFrames;
                                           expectedNumFilesBeforeSplitting = expectedNumFiles;
                                       }
                                       else
                                       {
                                           expectedNumFiles = 0;
 
-                                          slicesBeforeSplitting = 0;
-                                          timesBeforeSplitting = 0;
-                                          numFramesBeforeSplitting = 0;
+                                          slicesBeforeSplitting           = 0;
+                                          timesBeforeSplitting            = 0;
+                                          numFramesBeforeSplitting        = 0;
                                           expectedNumFilesBeforeSplitting = 0;
                                       }
                                   }
@@ -829,9 +834,9 @@ namespace bk
                                           globalFileInfo.StudyInstanceUID = bk::string_utils::trim(strm.str());
                                       }
 
-                                      lastWasImage = false;
-                                      this_is_a_split_image = false;
-                                      first_after_splitting = false;
+                                      lastWasImage            = false;
+                                      this_is_a_split_image   = false;
+                                      first_after_splitting   = false;
                                       perform_image_splitting = false;
                                   }
                                   else if (bk::string_utils::equals(DirectoryRecordType, "series", false))
@@ -850,9 +855,9 @@ namespace bk
                                           globalFileInfo.ProtocolName = bk::string_utils::trim(strm.str());
                                       }
 
-                                      lastWasImage = false;
-                                      this_is_a_split_image = false;
-                                      first_after_splitting = false;
+                                      lastWasImage            = false;
+                                      this_is_a_split_image   = false;
+                                      first_after_splitting   = false;
                                       perform_image_splitting = false;
                                   }
                                       /*
@@ -861,10 +866,10 @@ namespace bk
                                   else if (bk::string_utils::equals(DirectoryRecordType, "image", false))
                                   {
                                       DicomFileInfos fileInfo;
-                                      fileInfo.StudyInstanceUID = globalFileInfo.StudyInstanceUID;
+                                      fileInfo.StudyInstanceUID  = globalFileInfo.StudyInstanceUID;
                                       fileInfo.SeriesInstanceUID = globalFileInfo.SeriesInstanceUID;
-                                      fileInfo.ProtocolName = globalFileInfo.ProtocolName;
-                                      fileInfo.SequenceName = globalFileInfo.SequenceName;
+                                      fileInfo.ProtocolName      = globalFileInfo.ProtocolName;
+                                      fileInfo.SequenceName      = globalFileInfo.SequenceName;
 
                                       if (item.FindDataElement(gdcm::Keywords::ReferencedFileID::GetTag()))
                                       {
@@ -882,8 +887,8 @@ namespace bk
                                       reader.SetFileName(fileInfo.filename.c_str());
                                       if (reader.Read())
                                       {
-                                          const gdcm::File& dcmfile = reader.GetFile();
-                                          const gdcm::DataSet& ds = dcmfile.GetDataSet();
+                                          const gdcm::File   & dcmfile = reader.GetFile();
+                                          const gdcm::DataSet& ds      = dcmfile.GetDataSet();
                                           gdcm::StringFilter sf;
                                           sf.SetFile(dcmfile);
 
@@ -894,9 +899,9 @@ namespace bk
 
                                               if (first_after_splitting)
                                               {
-                                                  imgInfo.Slices = slicesBeforeSplitting;
+                                                  imgInfo.Slices            = slicesBeforeSplitting;
                                                   imgInfo.TemporalPositions = timesBeforeSplitting;
-                                                  imgInfo.NumberOfFrames = numFramesBeforeSplitting;
+                                                  imgInfo.NumberOfFrames    = numFramesBeforeSplitting;
                                                   expectedNumFiles = expectedNumFilesBeforeSplitting;
                                               }
                                               else
@@ -1009,8 +1014,8 @@ namespace bk
                                                                       if (!hasTemporalPositions)
                                                                       {
                                                                           // format : hhmmss.ssssss -> h: hour, m: minute, s: fraction second
-                                                                          const std::string at = tempsf.ToString(gdcm::Keywords::AcquisitionTime::GetTag());
-                                                                          double acqt = bk::string_utils::to_double(bk::string_utils::sub_string(at, 0, 2)) * 3'600'000 /*h -> ms*/;
+                                                                          const std::string at   = tempsf.ToString(gdcm::Keywords::AcquisitionTime::GetTag());
+                                                                          double            acqt = bk::string_utils::to_double(bk::string_utils::sub_string(at, 0, 2)) * 3'600'000 /*h -> ms*/;
                                                                           acqt += bk::string_utils::to_double(bk::string_utils::sub_string(at, 2, 2)) * 60'000 /*h -> ms*/;
                                                                           acqt += bk::string_utils::to_double(bk::string_utils::sub_string(at, 4, 9)) * 1'000 /*s -> ms*/;
 
@@ -1047,12 +1052,12 @@ namespace bk
                                                           // --> there must be multiple images in this range
 
                                                           expectedNumFiles /*per image*/ = expected2;
-                                                          this_is_a_split_image = true;
+                                                          this_is_a_split_image          = true;
                                                       }
                                                   }
                                               }
 
-                                              fileCnt = 0;
+                                              fileCnt               = 0;
                                               first_after_splitting = false;
                                           } // if first image tag after study/series
 
@@ -1064,8 +1069,8 @@ namespace bk
                                           fileInfo.AcquisitionTime += bk::string_utils::to_double(bk::string_utils::sub_string(at, 2, 2)) * 60'000 /*h -> ms*/;
                                           fileInfo.AcquisitionTime += bk::string_utils::to_double(bk::string_utils::sub_string(at, 4, 9)) * 1'000 /*s -> ms*/;
 
-                                          const std::string ipp = sf.ToString(ds.GetDataElement(gdcm::Keywords::ImagePositionPatient::GetTag()));
-                                          const auto vipp = bk::string_utils::contains(ipp, "\\") ? bk::string_utils::split(ipp, "\\") : bk::string_utils::split(ipp, "/");
+                                          const std::string ipp  = sf.ToString(ds.GetDataElement(gdcm::Keywords::ImagePositionPatient::GetTag()));
+                                          const auto        vipp = bk::string_utils::contains(ipp, "\\") ? bk::string_utils::split(ipp, "\\") : bk::string_utils::split(ipp, "/");
                                           if (vipp.size() == 3)
                                           {
                                               fileInfo.ImagePositionPatient[0] = bk::string_utils::to_double(vipp[0]);
@@ -1082,7 +1087,7 @@ namespace bk
                                       { perform_image_splitting = true; }
 
                                       first_after_splitting = false;
-                                      lastWasImage = true;
+                                      lastWasImage          = true;
                                   } // if image tag
                               }
                               #ifdef BK_EMIT_PROGRESS
@@ -1136,74 +1141,74 @@ namespace bk
           imagePositionPatient.reserve(estimated_size);
 
           constexpr unsigned int nInfos = 29;
-          bool hasInfo[nInfos];
+          bool                   hasInfo[nInfos];
 
           for (unsigned int k = 0; k < nInfos; ++k)
           { hasInfo[k] = false; }
 
-          bool& hasDimensions = hasInfo[0];
-          bool& hasRows = hasInfo[1];
-          bool& hasColumns = hasInfo[2];
-          bool& hasSlices = hasInfo[3];
-          bool& hasTemporalPositions = hasInfo[4];
-          bool& hasNumberOfFrames = hasInfo[5];
-          bool& hasSpacing = hasInfo[6];
-          bool& hasSamplesPerPixel = hasInfo[7];
-          bool& hasBitsAllocated = hasInfo[8];
-          bool& hasBitsStored = hasInfo[9];
-          bool& hasHighBit = hasInfo[10];
+          bool& hasDimensions              = hasInfo[0];
+          bool& hasRows                    = hasInfo[1];
+          bool& hasColumns                 = hasInfo[2];
+          bool& hasSlices                  = hasInfo[3];
+          bool& hasTemporalPositions       = hasInfo[4];
+          bool& hasNumberOfFrames          = hasInfo[5];
+          bool& hasSpacing                 = hasInfo[6];
+          bool& hasSamplesPerPixel         = hasInfo[7];
+          bool& hasBitsAllocated           = hasInfo[8];
+          bool& hasBitsStored              = hasInfo[9];
+          bool& hasHighBit                 = hasInfo[10];
           //bool& hasImagePositionPatient = hasInfo[11];
           bool& hasImageOrientationPatient = hasInfo[12];
-          bool& hasPatientName = hasInfo[13];
-          bool& hasPatientID = hasInfo[14];
-          bool& hasPatientSex = hasInfo[15];
-          bool& hasPatientBirthDate = hasInfo[16];
-          bool& hasPatientAge = hasInfo[17];
-          bool& hasPatientWeight = hasInfo[18];
-          bool& hasPatientPosition = hasInfo[19];
-          bool& hasSequenceName = hasInfo[20];
-          bool& hasModality = hasInfo[21];
-          bool& hasStudyDescription = hasInfo[22];
-          bool& hasSeriesDescription = hasInfo[23];
-          bool& hasProtocolName = hasInfo[24];
-          bool& hasAcquisitionDate = hasInfo[25];
-          bool& hasInstitutionName = hasInfo[26];
-          bool& hasNominalInterval = hasInfo[27];
-          bool& hasHeartRate = hasInfo[28];
+          bool& hasPatientName             = hasInfo[13];
+          bool& hasPatientID               = hasInfo[14];
+          bool& hasPatientSex              = hasInfo[15];
+          bool& hasPatientBirthDate        = hasInfo[16];
+          bool& hasPatientAge              = hasInfo[17];
+          bool& hasPatientWeight           = hasInfo[18];
+          bool& hasPatientPosition         = hasInfo[19];
+          bool& hasSequenceName            = hasInfo[20];
+          bool& hasModality                = hasInfo[21];
+          bool& hasStudyDescription        = hasInfo[22];
+          bool& hasSeriesDescription       = hasInfo[23];
+          bool& hasProtocolName            = hasInfo[24];
+          bool& hasAcquisitionDate         = hasInfo[25];
+          bool& hasInstitutionName         = hasInfo[26];
+          bool& hasNominalInterval         = hasInfo[27];
+          bool& hasHeartRate               = hasInfo[28];
 
-          hasDimensions = imgInfo.nDimensions != 0;
-          hasRows = imgInfo.Rows != 0;
-          hasColumns = imgInfo.Columns != 0;
-          hasSlices = imgInfo.Slices != 0;
-          hasTemporalPositions = imgInfo.TemporalPositions != 0;
-          hasNumberOfFrames = imgInfo.NumberOfFrames != 0;
-          hasSpacing = imgInfo.RowSpacing != 0 && imgInfo.ColSpacing != 0 && imgInfo.SliceSpacing != 0;
-          hasSamplesPerPixel = imgInfo.SamplesPerPixel != 0;
-          hasBitsAllocated = imgInfo.BitsAllocated != 0;
-          hasBitsStored = imgInfo.BitsStored != 0;
-          hasHighBit = imgInfo.HighBit != -1;
+          hasDimensions              = imgInfo.nDimensions != 0;
+          hasRows                    = imgInfo.Rows != 0;
+          hasColumns                 = imgInfo.Columns != 0;
+          hasSlices                  = imgInfo.Slices != 0;
+          hasTemporalPositions       = imgInfo.TemporalPositions != 0;
+          hasNumberOfFrames          = imgInfo.NumberOfFrames != 0;
+          hasSpacing                 = imgInfo.RowSpacing != 0 && imgInfo.ColSpacing != 0 && imgInfo.SliceSpacing != 0;
+          hasSamplesPerPixel         = imgInfo.SamplesPerPixel != 0;
+          hasBitsAllocated           = imgInfo.BitsAllocated != 0;
+          hasBitsStored              = imgInfo.BitsStored != 0;
+          hasHighBit                 = imgInfo.HighBit != -1;
           //hasImagePositionPatient = imagePositionPatient.size() == 3;
           hasImageOrientationPatient = imgInfo.ImageOrientationPatientX.norm() != 0 && imgInfo.ImageOrientationPatientY.norm() != 0;
-          hasPatientName = !imgInfo.PatientName.empty();
-          hasPatientID = !imgInfo.PatientID.empty();
-          hasPatientSex = !imgInfo.PatientSex.empty();
-          hasPatientBirthDate = !imgInfo.PatientBirthDate.empty();
-          hasPatientAge = imgInfo.PatientAge != 0;
-          hasPatientWeight = imgInfo.PatientWeight != 0;
-          hasPatientPosition = !imgInfo.PatientPosition.empty();
-          hasSequenceName = (!imgInfo.SequenceName.empty() || !imgInfo.SequenceName_Private.empty());
-          hasModality = !imgInfo.Modality.empty();
-          hasStudyDescription = !imgInfo.StudyDescription.empty();
-          hasSeriesDescription = !imgInfo.SeriesDescription.empty();
-          hasProtocolName = !imgInfo.ProtocolName.empty();
-          hasAcquisitionDate = !imgInfo.AcquisitionDate.empty();
-          hasInstitutionName = !imgInfo.InstitutionName.empty();
-          hasNominalInterval = imgInfo.TemporalResolution != 0;
-          hasHeartRate = imgInfo.TemporalResolution != 0;
+          hasPatientName             = !imgInfo.PatientName.empty();
+          hasPatientID               = !imgInfo.PatientID.empty();
+          hasPatientSex              = !imgInfo.PatientSex.empty();
+          hasPatientBirthDate        = !imgInfo.PatientBirthDate.empty();
+          hasPatientAge              = imgInfo.PatientAge != 0;
+          hasPatientWeight           = imgInfo.PatientWeight != 0;
+          hasPatientPosition         = !imgInfo.PatientPosition.empty();
+          hasSequenceName            = (!imgInfo.SequenceName.empty() || !imgInfo.SequenceName_Private.empty());
+          hasModality                = !imgInfo.Modality.empty();
+          hasStudyDescription        = !imgInfo.StudyDescription.empty();
+          hasSeriesDescription       = !imgInfo.SeriesDescription.empty();
+          hasProtocolName            = !imgInfo.ProtocolName.empty();
+          hasAcquisitionDate         = !imgInfo.AcquisitionDate.empty();
+          hasInstitutionName         = !imgInfo.InstitutionName.empty();
+          hasNominalInterval         = imgInfo.TemporalResolution != 0;
+          hasHeartRate               = imgInfo.TemporalResolution != 0;
 
           for (int k = imgInfo.id_file_start; k < imgInfo.id_file_end; ++k)
           {
-              bool hasSliceLocation = _pdata->files[k].SliceLocation != 0;
+              bool hasSliceLocation   = _pdata->files[k].SliceLocation != 0;
               bool hasAcquisitionTime = _pdata->files[k].AcquisitionTime != 0;
 
               if (hasSliceLocation)
@@ -1220,9 +1225,9 @@ namespace bk
               if (!imgreader.Read())
               { continue; }
 
-              const gdcm::File& dcmfile = imgreader.GetFile();
-              const gdcm::DataSet& ds = dcmfile.GetDataSet();
-              const gdcm::Image& img = imgreader.GetImage();
+              const gdcm::File   & dcmfile = imgreader.GetFile();
+              const gdcm::DataSet& ds      = dcmfile.GetDataSet();
+              const gdcm::Image  & img     = imgreader.GetImage();
 
               gdcm::StringFilter sf;
               sf.SetFile(dcmfile);
@@ -1245,8 +1250,8 @@ namespace bk
               if (!hasAcquisitionTime && ds.FindDataElement(gdcm::Keywords::AcquisitionTime::GetTag()))
               {
                   // format : hhmmss.ssssss -> h: hour, m: minute, s: fraction second
-                  const std::string at = sf.ToString(gdcm::Keywords::AcquisitionTime::GetTag());
-                  double AcquisitionTime = bk::string_utils::to_double(bk::string_utils::sub_string(at, 0, 2)) * 3'600'000 /*h -> ms*/;
+                  const std::string at              = sf.ToString(gdcm::Keywords::AcquisitionTime::GetTag());
+                  double            AcquisitionTime = bk::string_utils::to_double(bk::string_utils::sub_string(at, 0, 2)) * 3'600'000 /*h -> ms*/;
                   AcquisitionTime += bk::string_utils::to_double(bk::string_utils::sub_string(at, 2, 2)) * 60'000 /*h -> ms*/;
                   AcquisitionTime += bk::string_utils::to_double(bk::string_utils::sub_string(at, 4, 9)) * 1'000 /*s -> ms*/;
 
@@ -1380,7 +1385,7 @@ namespace bk
 
               if (imgInfo.BitsStored == 0)
               {
-                  imgInfo.BitsStored = bk::string_utils::to_int(sf.ToString(ds.GetDataElement(gdcm::Keywords::BitsStored::GetTag())));
+                  imgInfo.BitsStored             = bk::string_utils::to_int(sf.ToString(ds.GetDataElement(gdcm::Keywords::BitsStored::GetTag())));
                   imgInfo.LargestImagePixelValue = std::pow(2, imgInfo.BitsStored);
                   hasBitsStored = imgInfo.BitsStored != 0;
               }
@@ -1394,8 +1399,8 @@ namespace bk
               // ImageOrientation ("specifies the direction cosines of the first row and the first column with respect to the patient. These Attributes shall be provide as a pair.")
               if (imgInfo.ImageOrientationPatientX.norm() == 0 && imgInfo.ImageOrientationPatientY.norm() == 0 && ds.FindDataElement(gdcm::Keywords::ImageOrientationPatient::GetTag()))
               {
-                  const std::string iop = sf.ToString(ds.GetDataElement(gdcm::Keywords::ImageOrientationPatient::GetTag()));
-                  const auto viop = bk::string_utils::contains(iop, "\\") ? bk::string_utils::split(iop, "\\") : bk::string_utils::split(iop, "/");
+                  const std::string iop  = sf.ToString(ds.GetDataElement(gdcm::Keywords::ImageOrientationPatient::GetTag()));
+                  const auto        viop = bk::string_utils::contains(iop, "\\") ? bk::string_utils::split(iop, "\\") : bk::string_utils::split(iop, "/");
 
                   if (viop.size() == 6)
                   {
@@ -1575,10 +1580,10 @@ namespace bk
           {
               // there are larger jumps at slice changes -> need to be filtered
 
-              double diffval = 0;
-              bool first = true;
-              double currentMean = 0;
-              unsigned int cnt = 0;
+              double       diffval     = 0;
+              bool         first       = true;
+              double       currentMean = 0;
+              unsigned int cnt         = 0;
 
               for (unsigned int i = 0; i < acquisitionTimes.size() - 1; ++i)
               {
@@ -1586,7 +1591,7 @@ namespace bk
 
                   if (first)
                   {
-                      first = false;
+                      first       = false;
                       diffval += current_diff;
                       currentMean = diffval;
                       ++cnt;
@@ -1690,8 +1695,8 @@ namespace bk
               // add half voxelscale to translation in order to center the data points
               constexpr const Vec4d v0(0, 0, 0, 1);
               constexpr const Vec4d v1(1, 1, 1, 1);
-              auto p0 = imgInfo.worldMatrix * v0;
-              auto p1 = imgInfo.worldMatrix * v1;
+              auto                  p0  = imgInfo.worldMatrix * v0;
+              auto                  p1  = imgInfo.worldMatrix * v1;
               p0[0] /= p0[3];
               p0[1] /= p0[3];
               p0[2] /= p0[3];
@@ -1714,7 +1719,7 @@ namespace bk
               }
 
               const Vec3d sliceDirection = imgInfo.worldMatrix.col(2).sub_vector<0, 2>().normalize();
-              const Vec3d startPoint = start_from_T1 ? T1 : TN;
+              const Vec3d startPoint     = start_from_T1 ? T1 : TN;
 
               for (int k = imgInfo.id_file_start; k < imgInfo.id_file_end; ++k)
               { _pdata->files[k].SliceLocation = std::abs(sliceDirection.dot(startPoint - _pdata->files[k].ImagePositionPatient)); }
@@ -1832,8 +1837,8 @@ namespace bk
       {
           const Vec4ui& last_size = image3d_t[i].second;
 
-          unsigned int duplicate_cnt = 0;
-          for (unsigned int k = i + 1; k < image3d_t.size() && last_size == image3d_t[k].second; ++k)
+          unsigned int      duplicate_cnt = 0;
+          for (unsigned int k             = i + 1; k < image3d_t.size() && last_size == image3d_t[k].second; ++k)
           { ++duplicate_cnt; }
 
           // create new group
@@ -2217,7 +2222,7 @@ namespace bk
       _setup_image(imgInfo, img, has_x, has_y, has_z, has_t);
 
       const int nPixelsPerSlice = imgInfo.Rows * imgInfo.Columns;
-      const int nBytesPerPixel = imgInfo.BitsAllocated / 8; // bit to byte
+      const int nBytesPerPixel  = imgInfo.BitsAllocated / 8; // bit to byte
 
       #ifdef BK_EMIT_PROGRESS
       prog.increment(1);
@@ -2233,9 +2238,9 @@ namespace bk
       #pragma omp parallel for
       for (int i = imgInfo.id_file_start; i < imgInfo.id_file_end; ++i)
       {
-          const unsigned int imgNum = static_cast<unsigned int>(i - imgInfo.id_file_start);
+          const unsigned int imgNum      = static_cast<unsigned int>(i - imgInfo.id_file_start);
           const unsigned int temporalPos = imgNum % imgInfo.TemporalPositions;
-          const unsigned int slicePos = imgNum / imgInfo.TemporalPositions;
+          const unsigned int slicePos    = imgNum / imgInfo.TemporalPositions;
           //BitVectorX bits;
           //bits.set_size(imgInfo.BitsAllocated);
 
@@ -2268,7 +2273,7 @@ namespace bk
 
               unsigned int rowid = 0;
               unsigned int colid = 0;
-              for (int k = 0; k < nPixelsPerSlice; ++k)
+              for (int     k     = 0; k < nPixelsPerSlice; ++k)
               {
                   if (rowid >= xfrom && rowid <= xto && colid >= yfrom && colid <= yto)
                   {
@@ -2322,7 +2327,7 @@ namespace bk
       #endif
 
       const int nPixelsPerSlice = imgInfo.Rows * imgInfo.Columns;
-      const int nBytesPerPixel = imgInfo.BitsAllocated / 8; // bit to byte
+      const int nBytesPerPixel  = imgInfo.BitsAllocated / 8; // bit to byte
 
       imgbytes.reserve(nBytesPerPixel * nPixelsPerSlice * std::max(1, imgInfo.Slices) * std::max(1, imgInfo.TemporalPositions));
 
@@ -2432,7 +2437,7 @@ namespace bk
       _setup_image(imgInfo, img, has_x, has_y, has_z, has_t);
 
       const int nPixelsPerSlice = imgInfo.Rows * imgInfo.Columns;
-      const int nBytesPerPixel = imgInfo.BitsAllocated / 8; // bit to byte
+      const int nBytesPerPixel  = imgInfo.BitsAllocated / 8; // bit to byte
 
       //if (imgbytes.size() < nBytesPerPixel * img->num_values())
       //{
@@ -2458,16 +2463,16 @@ namespace bk
       #pragma omp parallel for
       for (int i = imgInfo.id_file_start; i < imgInfo.id_file_end; ++i)
       {
-          const unsigned int imgNum = static_cast<unsigned int>(i - imgInfo.id_file_start);
+          const unsigned int imgNum      = static_cast<unsigned int>(i - imgInfo.id_file_start);
           const unsigned int temporalPos = imgNum % imgInfo.TemporalPositions;
-          const unsigned int slicePos = imgNum / imgInfo.TemporalPositions;
+          const unsigned int slicePos    = imgNum / imgInfo.TemporalPositions;
 
           if (slicePos >= zfrom && slicePos <= zto && temporalPos >= tfrom && temporalPos <= tto)
           {
-              const unsigned int off = nBytesPerPixel * nPixelsPerSlice * (temporalPos + slicePos * imgInfo.TemporalPositions);
-              unsigned int rowid = 0;
-              unsigned int colid = 0;
-              for (int k = 0; k < nPixelsPerSlice; ++k)
+              const unsigned int off   = nBytesPerPixel * nPixelsPerSlice * (temporalPos + slicePos * imgInfo.TemporalPositions);
+              unsigned int       rowid = 0;
+              unsigned int       colid = 0;
+              for (int           k     = 0; k < nPixelsPerSlice; ++k)
               {
                   if (rowid >= xfrom && rowid <= xto && colid >= yfrom && colid <= yto)
                   {
@@ -2657,7 +2662,7 @@ namespace bk
 
       if (file.good())
       {
-          _pdata->dir = bk::string_utils::read_string_from_binary_file(file);
+          _pdata->dir          = bk::string_utils::read_string_from_binary_file(file);
           _pdata->dataset_name = bk::string_utils::read_string_from_binary_file(file);
 
           // files

@@ -121,15 +121,19 @@ namespace bk
       [[nodiscard]] const Vec2ui& image_2d_group_grid_size(unsigned int id) const;
       /// @}
 
+      /// @{ -------------------------------------------------- GET SUCCESS
+      [[nodiscard]] bool is_import_successful() const;
+      /// @}
+
       //====================================================================================================
       //===== SETTER
       //====================================================================================================
       /// @{ -------------------------------------------------- SET DIRECTORY
-      void set_directory(const std::string& dir);
+      void set_directory(std::string_view dir);
       /// @}
 
       /// @{ -------------------------------------------------- SET DATASET NAME
-      void set_dataset_name(const std::string& name);
+      void set_dataset_name(std::string_view name);
       void set_dataset_name_from_patient_name();
       /// @}
 

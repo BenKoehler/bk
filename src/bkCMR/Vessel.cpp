@@ -227,6 +227,11 @@ namespace bk
         // todo 
     }
 
+    void Vessel::clear_centerline_ids()
+    {
+        // todo
+    }
+
     void Vessel::clear_measuring_planes()
     { 
         //_pdata->measuring_planes.clear();

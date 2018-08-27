@@ -163,15 +163,15 @@ namespace bk
     }
   } // anonymous namespace
 
-  std::unique_ptr<DicomImage<double, 3>> apply(const DicomImage<double, 4>& mag)
+  std::unique_ptr<DicomImage<double, 3>> MagTMIPImageFilter::apply(const DicomImage<double, 4>& mag)
   { return _apply(mag); }
 
-  std::unique_ptr<DicomImage<double, 3>> apply(const DicomImage<double, -1>& mag)
+  std::unique_ptr<DicomImage<double, 3>> MagTMIPImageFilter::apply(const DicomImage<double, -1>& mag)
   { return _apply(mag); }
 
-  std::unique_ptr<DicomImage<double, 3>> apply(const DicomImage<double, 4>& mag_x, const DicomImage<double, 4>& mag_y, const DicomImage<double, 4>& mag_z)
+  std::unique_ptr<DicomImage<double, 3>> MagTMIPImageFilter::apply(const DicomImage<double, 4>& mag_x, const DicomImage<double, 4>& mag_y, const DicomImage<double, 4>& mag_z)
   { return _apply(mag_x, mag_y, mag_z); }
 
-  std::unique_ptr<DicomImage<double, 3>> apply(const DicomImage<double, -1>& mag_x, const DicomImage<double, -1>& mag_y, const DicomImage<double, -1>& mag_z)
+  std::unique_ptr<DicomImage<double, 3>> MagTMIPImageFilter::apply(const DicomImage<double, -1>& mag_x, const DicomImage<double, -1>& mag_y, const DicomImage<double, -1>& mag_z)
   { return _apply(mag_x, mag_y, mag_z); }
 } // namespace bk

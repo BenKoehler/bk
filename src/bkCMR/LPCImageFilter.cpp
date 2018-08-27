@@ -58,7 +58,7 @@ namespace bk
   //====================================================================================================
   //===== FUNCTIONS
   //====================================================================================================
-  std::unique_ptr<DicomImage<double, 3>> apply(const FlowImage3DT& ff)
+  std::unique_ptr<DicomImage<double, 3>> LPCImageFilter::apply(const FlowImage3DT& ff)
   {
       const auto& size = ff.size();
 

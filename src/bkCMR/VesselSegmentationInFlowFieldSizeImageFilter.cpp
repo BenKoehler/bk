@@ -59,7 +59,7 @@ namespace bk
   //====================================================================================================
   //===== FUNCTIONS
   //====================================================================================================
-  std::unique_ptr<DicomImage<double, 3>> apply(const FlowImage3DT& ff, const Vessel& v)
+  std::unique_ptr<DicomImage<double, 3>> VesselSegmentationInFlowFieldSizeImageFilter::apply(const FlowImage3DT& ff, const Vessel& v)
   {
       const auto& size = ff.size();
 
