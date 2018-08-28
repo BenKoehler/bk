@@ -467,6 +467,8 @@ set(SOURCE_FILES
         # localization
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkTools/localization/LocalizationManager.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkTools/localization/GlobalLocalizationManager.cpp
+        # options
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkTools/options/Options.cpp
         # progress
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkTools/progress/Progress.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkTools/progress/ProgressManager.cpp
@@ -547,6 +549,10 @@ if (BUILD_EXAMPLES)
     add_executable(cpimpl_example ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/cpimpl.cpp)
     _bk_make_example(cpimpl_example ${BK_CURRENT_LIBRARY})
 
+    # options
+    add_executable(options_example ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/options.cpp)
+    _bk_make_example(options_example ${BK_CURRENT_LIBRARY})
+        
     # progress
     add_executable(progress_example ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/progress.cpp)
     _bk_make_example(progress_example ${BK_CURRENT_LIBRARY})

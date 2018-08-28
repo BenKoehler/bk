@@ -33,6 +33,8 @@
 #include <bk/Clock>
 #include <bk/CopyablePIMPL>
 
+#include <bkCMR/lib/bkCMR_export.h>
+
 namespace bk
 {
   inline namespace cmr
@@ -41,7 +43,7 @@ namespace bk
     class FlowImage3DT;
     // -------------------- forward declaration END
 
-    class PhaseUnwrapping3DT
+    class BKCMR_EXPORT PhaseUnwrapping3DT
     {
         //====================================================================================================
         //===== MEMBERS
