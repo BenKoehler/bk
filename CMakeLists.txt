@@ -281,6 +281,8 @@ if (GDCM_FOUND)
     target_link_libraries(bkDicom bk::bkTools)
     target_link_libraries(bkDicom GDCM::GDCM)
 
+    target_compile_definitions(bkDicom PUBLIC BK_LIB_GDCM_AVAILABLE)
+
     _bk_install_lib(dicom Dicom DICOM)
 endif()
 
@@ -359,6 +361,7 @@ set(SOURCE_FILES # BUFFER
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/Camera.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/gl_error.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/Interactor.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/KeyBoard.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/Mouse.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/OrderIndependentTransparency.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/SuperSampler.cpp

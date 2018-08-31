@@ -78,22 +78,22 @@ namespace bk
   struct Renderer::Impl
   {
       //std::shared_ptr<GradientBackground> background;
-      std::shared_ptr<details::AbstractRenderable> background;
-      details::UBOGlobal ubo_global;
-      OrderIndependentTransparency oit;
-      SuperSampler supersampler;
-      WindowGeometry window_geometry;
-      Interactor interactor;
-      Camera camera;
-      bk::ColMat4<GLfloat> modelview_matrix;
-      bool modelview_matrix_changed;
-      GLuint fbo_default_id;
-      bk::Vec3<GLfloat> center_translation;
-      std::vector<std::shared_ptr<details::AbstractSceneRenderable>> scene_renderables;
-      std::vector<bk::Vec3<GLfloat>> centers;
-      std::vector<std::shared_ptr<details::AbstractRenderable>> renderables;
-      Animator animator;
-      bk::Signal<> s_update_required;
+      std::shared_ptr<details::AbstractRenderable>                                        background;
+      details::UBOGlobal                                                                  ubo_global;
+      OrderIndependentTransparency                                                        oit;
+      SuperSampler                                                                        supersampler;
+      WindowGeometry                                                                      window_geometry;
+      Interactor                                                                          interactor;
+      Camera                                                                              camera;
+      bk::ColMat4<GLfloat>                                                                modelview_matrix;
+      bool                                                                                modelview_matrix_changed;
+      GLuint                                                                              fbo_default_id;
+      bk::Vec3<GLfloat>                                                                   center_translation;
+      std::vector<std::shared_ptr<details::AbstractSceneRenderable>>                      scene_renderables;
+      std::vector<bk::Vec3<GLfloat>>                                                      centers;
+      std::vector<std::shared_ptr<details::AbstractRenderable>>                           renderables;
+      Animator                                                                            animator;
+      bk::Signal<>                                                                        s_update_required;
       bk::Signal<std::string, std::shared_ptr<bk::CartesianImage<bk::Vec<3, double>, 2>>> s_video_rendering_new_frame;
 
           #ifndef BK_LIB_QT_AVAILABLE
@@ -587,10 +587,10 @@ namespace bk
   std::unique_ptr<CartesianImage<Vec<3, double>, 2>> Renderer::render_screenshot(int ssaafac, int sizex, int sizey)
   {
       const bk::Vec2i oldSize(_pdata->window_geometry.width(), _pdata->window_geometry.height());
-      const int oldSSAAFactor = _pdata->supersampler.factor();
+      const int       oldSSAAFactor = _pdata->supersampler.factor();
       const bk::Vec2i newSize(sizex > 0 ? sizex : oldSize[0], sizey > 0 ? sizey : oldSize[1]);
-      const int newSSAAFactor = ssaafac > 0 ? ssaafac : oldSSAAFactor;
-      const bool changeSize = newSSAAFactor != oldSSAAFactor || newSize[0] != oldSize[0] || newSize[1] != oldSize[1];
+      const int       newSSAAFactor = ssaafac > 0 ? ssaafac : oldSSAAFactor;
+      const bool      changeSize    = newSSAAFactor != oldSSAAFactor || newSize[0] != oldSize[0] || newSize[1] != oldSize[1];
 
       if (changeSize)
       {
@@ -655,10 +655,10 @@ namespace bk
       // setup new rendering image size & animation parameters
       //------------------------------------------------------------------------------------------------------
       const bk::Vec2i oldSize(_pdata->window_geometry.width(), _pdata->window_geometry.height());
-      const int oldSSAAFactor = _pdata->supersampler.factor();
+      const int       oldSSAAFactor  = _pdata->supersampler.factor();
       const bk::Vec2i newSize(sizex > 0 ? sizex : oldSize[0], sizey > 0 ? sizey : oldSize[1]);
-      const int newSSAAFactor = ssaafac > 0 ? ssaafac : oldSSAAFactor;
-      const bool changeSize = newSSAAFactor != oldSSAAFactor || newSize[0] != oldSize[0] || newSize[1] != oldSize[1];
+      const int       newSSAAFactor  = ssaafac > 0 ? ssaafac : oldSSAAFactor;
+      const bool      changeSize     = newSSAAFactor != oldSSAAFactor || newSize[0] != oldSize[0] || newSize[1] != oldSize[1];
 
       if (changeSize)
       {
@@ -667,10 +667,10 @@ namespace bk
       }
 
       const bk::Vec2i size_ssaa(_pdata->supersampler.width_upsampled(), _pdata->supersampler.height_upsampled());
-      const GLfloat oldFPS = _pdata->animator.target_fps();
-      const GLfloat oldSpeedFactor = _pdata->animator.speed_factor();
-      const GLfloat newFPS = fps;
-      const GLfloat newSpeedFactor = _pdata->animator.max_time()/*in ms*/ / (length_in_s * 1000);
+      const GLfloat   oldFPS         = _pdata->animator.target_fps();
+      const GLfloat   oldSpeedFactor = _pdata->animator.speed_factor();
+      const GLfloat   newFPS         = fps;
+      const GLfloat   newSpeedFactor = _pdata->animator.max_time()/*in ms*/ / (length_in_s * 1000);
       _pdata->animator.set_parameters(newSpeedFactor, newFPS);
 
       //------------------------------------------------------------------------------------------------------
@@ -679,7 +679,7 @@ namespace bk
       _pdata->animator.set_enabled(true);
       _pdata->animator.set_paused(true);
 
-      const int N = std::floor(length_in_s * newFPS);
+      const int           N                    = std::floor(length_in_s * newFPS);
       constexpr const int num_values_per_pixel = 3;
       GLubyte* buf = new GLubyte[size_ssaa[0] * size_ssaa[1] * num_values_per_pixel];
 
@@ -733,7 +733,7 @@ namespace bk
 
           _bind_default_fbo();
 
-          std::string filename = "";
+          std::string        filename           = "";
           const unsigned int currentIndexLength = num_digits_int(i);
 
           for (unsigned int k = 0; k < fileIndexLength - currentIndexLength; ++k)
@@ -898,7 +898,6 @@ namespace bk
       for (const auto& r: _pdata->renderables)
       { r->draw(); }
 
-
       _pdata->ubo_global.set_window_width(_pdata->window_geometry.width());
       _pdata->ubo_global.set_window_height(_pdata->window_geometry.height());
       _pdata->ubo_global.release();
@@ -923,11 +922,27 @@ namespace bk
   void Renderer::mouse_move(GLint x, GLint y)
   { _pdata->interactor.mouse_move(x, y); }
 
-  void Renderer::mouse_pressed(MouseButton btn)
+  void Renderer::mouse_pressed(MouseButton_ btn)
   { _pdata->interactor.mouse_pressed(btn); }
 
-  void Renderer::mouse_released(MouseButton btn)
+  void Renderer::mouse_released(MouseButton_ btn)
   { _pdata->interactor.mouse_released(btn); }
+
+  /// @{ -------------------------------------------------- WHEEL EVENTS
+  void Renderer::wheel_down()
+  { _pdata->interactor.wheel_down(); }
+
+  void Renderer::wheel_up()
+  { _pdata->interactor.wheel_up(); }
+  /// @}
+
+  /// @{ -------------------------------------------------- KEY EVENTS
+  void Renderer::key_pressed(Key_ k)
+  { _pdata->interactor.key_pressed(k); }
+
+  void Renderer::key_released(Key_ k)
+  { _pdata->interactor.key_released(k); }
+  /// @}
 
   void Renderer::resize(GLint w, GLint h)
   {

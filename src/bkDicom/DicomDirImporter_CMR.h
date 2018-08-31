@@ -75,7 +75,7 @@ namespace bk
        * (considering flow image ordering)
        */
     private:
-      std::vector<unsigned int> ids_of_image_class(details::DicomImageClass tag) const;
+      std::vector<unsigned int> ids_of_image_class(DicomImageClass_ tag) const;
     public:
       std::vector<unsigned int> class_3dt_flow_images(bool sort_xyz = true) const;
       std::vector<unsigned int> class_3dt_magnitude_images(bool sort_xyz = true) const;
@@ -89,7 +89,7 @@ namespace bk
 
       /// @{ -------------------------------------------------- IS CLASS
     private:
-      [[nodiscard]] bool is_class(unsigned int dcm_img_id, details::DicomImageClass tag) const;
+      [[nodiscard]] bool is_class(unsigned int dcm_img_id, DicomImageClass_ tag) const;
     public:
       [[nodiscard]] bool is_3dt_flow_image(unsigned int dcm_img_id) const;
       [[nodiscard]] bool is_3dt_magnitude_image(unsigned int dcm_img_id) const;
@@ -97,6 +97,7 @@ namespace bk
       [[nodiscard]] bool is_3dt_signal_intensity_image(unsigned int dcm_img_id) const;
       [[nodiscard]] bool is_3d_anatomical_image(unsigned int dcm_img_id) const;
       [[nodiscard]] bool is_2dt_flow_image(unsigned int dcm_img_id) const;
+      [[nodiscard]] bool is_2dt_magnitude_image(unsigned int dcm_img_id) const;
       [[nodiscard]] bool is_2dt_anatomical_image(unsigned int dcm_img_id) const;
       [[nodiscard]] bool is_2d_anatomical_image(unsigned int dcm_img_id) const;
       /// @}
@@ -120,7 +121,7 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- ADD IMAGE TO CLASS
     private:
-      [[maybe_unused]] bool add_to_class(unsigned int dcm_img_id, details::DicomImageClass tag);
+      [[maybe_unused]] bool add_to_class(unsigned int dcm_img_id, DicomImageClass_ tag);
     public:
       [[maybe_unused]] bool add_3dt_flow_image(unsigned int dcm_img_id);
       [[maybe_unused]] bool add_3dt_magnitude_image(unsigned int dcm_img_id);
@@ -128,6 +129,7 @@ namespace bk
       [[maybe_unused]] bool add_3dt_signal_intensity_image(unsigned int dcm_img_id);
       [[maybe_unused]] bool add_3d_anatomical_image(unsigned int dcm_img_id);
       [[maybe_unused]] bool add_2dt_flow_image(unsigned int dcm_img_id);
+      [[maybe_unused]] bool add_2dt_magnitude_image(unsigned int dcm_img_id);
       [[maybe_unused]] bool add_2dt_anatomical_image(unsigned int dcm_img_id);
       [[maybe_unused]] bool add_2d_anatomical_image(unsigned int dcm_img_id);
       /// @}

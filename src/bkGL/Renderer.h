@@ -230,11 +230,21 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- MOUSE BUTTON PRESSED
-      void mouse_pressed(MouseButton btn);
+      void mouse_pressed(MouseButton_ btn);
       /// @}
 
       /// @{ -------------------------------------------------- MOUSE BUTTON RELEASED
-      void mouse_released(MouseButton btn);
+      void mouse_released(MouseButton_ btn);
+      /// @}
+
+      /// @{ -------------------------------------------------- WHEEL EVENTS
+      void wheel_down();
+      void wheel_up();
+      /// @}
+
+      /// @{ -------------------------------------------------- KEY EVENTS
+      void key_pressed(Key_ k);
+      void key_released(Key_ k);
       /// @}
 
       /// @{ -------------------------------------------------- RESIZE

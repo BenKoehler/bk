@@ -483,16 +483,21 @@ namespace bk
       this->emit_signal_update_required();
   }
 
-  void TriangularMesh3DCenterlineExtractionView::on_mouse_button_pressed(MouseButton btn)
+  void TriangularMesh3DCenterlineExtractionView::on_mouse_button_pressed(MouseButton_ btn)
   {
-      if (btn == MouseButton::Left)
+      if (btn == MouseButton_Left)
       { set_current_point_id_as_start_point(); }
-      else if (btn == MouseButton::Right)
+      else if (btn == MouseButton_Right)
       { add_current_point_id_as_end_point(); }
   }
 
-  void TriangularMesh3DCenterlineExtractionView::on_mouse_button_released(MouseButton /*btn*/)
+  void TriangularMesh3DCenterlineExtractionView::on_mouse_button_released(MouseButton_ /*btn*/)
   { /* do nothing */ }
+
+  void TriangularMesh3DCenterlineExtractionView::on_key_pressed(Key_ /*k*/){ /* do nothing */ }
+  void TriangularMesh3DCenterlineExtractionView::on_key_released(Key_ /*k*/){ /* do nothing */ }
+  void TriangularMesh3DCenterlineExtractionView::on_mouse_wheel_up(){ /* do nothing */ }
+  void TriangularMesh3DCenterlineExtractionView::on_mouse_wheel_down(){ /* do nothing */ }
 
   void TriangularMesh3DCenterlineExtractionView::on_ssaa_factor_changed(GLint ssaa_factor)
   { _pdata->ssaa_factor = ssaa_factor; }

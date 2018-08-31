@@ -156,8 +156,12 @@ namespace bk
   void Texture2DView::on_modelview_changed(bool /*b*/) { /* do nothing */ }
   void Texture2DView::on_visible_changed(bool /*b*/) { /* do nothing */ }
   void Texture2DView::on_mouse_pos_changed(GLint /*x*/, GLint /*y*/) { /* do nothing */ }
-  void Texture2DView::on_mouse_button_pressed(MouseButton /*btn*/) { /* do nothing */ }
-  void Texture2DView::on_mouse_button_released(MouseButton /*btn*/) { /* do nothing */ }
+  void Texture2DView::on_mouse_button_pressed(MouseButton_ /*btn*/) { /* do nothing */ }
+  void Texture2DView::on_mouse_button_released(MouseButton_ /*btn*/) { /* do nothing */ }
+  void Texture2DView::on_key_pressed(Key_ /*k*/){ /* do nothing */ }
+  void Texture2DView::on_key_released(Key_ /*k*/){ /* do nothing */ }
+  void Texture2DView::on_mouse_wheel_up(){ /* do nothing */ }
+  void Texture2DView::on_mouse_wheel_down(){ /* do nothing */ }
   void Texture2DView::on_ssaa_factor_changed(GLint /*ssaa_factor*/) { /* do nothing */ }
   /// @}
 

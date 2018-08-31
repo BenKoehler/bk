@@ -39,16 +39,17 @@
 
 #define BK_OPTIONS_DECLARE(T, x) \
 private:\
-T x;\
+inline static T x;\
 public:\
-    bk::Signal<T> signal_##x##_changed;\
+    inline static bk::Signal<T> signal_##x##_changed;\
     T get_##x() const {return x;}\
     void set_##x(T _##x) {if (x != _##x){x = _##x; signal_##x##_changed.emit_signal(x);}}
 
-#define BK_OPTION_SET_DEFAULT(x, DEFAULT) x = DEFAULT;
+#define BK_OPTION_SET_DEFAULT(x, DEFAULT) _set_default.push_back([&](){x = DEFAULT;});
 
 #define BK_OPTION_REGISTER_STRING(x, DEFAULT) _params_string.emplace(#x, std::addressof(x)); BK_OPTION_SET_DEFAULT(x,DEFAULT)
 #define BK_OPTION_REGISTER_DOUBLE(x, DEFAULT) _params_double.emplace(#x, std::addressof(x)); BK_OPTION_SET_DEFAULT(x,DEFAULT)
+#define BK_OPTION_REGISTER_FLOAT(x, DEFAULT) _params_float.emplace(#x, std::addressof(x)); BK_OPTION_SET_DEFAULT(x,DEFAULT)
 #define BK_OPTION_REGISTER_INT(x, DEFAULT) _params_int.emplace(#x, std::addressof(x)); BK_OPTION_SET_DEFAULT(x,DEFAULT)
 #define BK_OPTION_REGISTER_UINT(x, DEFAULT) _params_uint.emplace(#x, std::addressof(x)); BK_OPTION_SET_DEFAULT(x,DEFAULT)
 #define BK_OPTION_REGISTER_BOOL(x, DEFAULT) _params_bool.emplace(#x, std::addressof(x)); BK_OPTION_SET_DEFAULT(x,DEFAULT)
@@ -66,6 +67,9 @@ namespace bk
       std::unordered_map<std::string, int*, bk::string_utils::hash_obj>          _params_int;
       std::unordered_map<std::string, unsigned int*, bk::string_utils::hash_obj> _params_uint;
       std::unordered_map<std::string, double*, bk::string_utils::hash_obj>       _params_double;
+      std::unordered_map<std::string, float*, bk::string_utils::hash_obj>        _params_float;
+
+      std::vector<std::function<void()>> _set_default;
 
     public:
       //====================================================================================================
@@ -76,7 +80,7 @@ namespace bk
       //====================================================================================================
       //===== FUNCTIONS
       //====================================================================================================
-      //virtual void init();
+      void set_default();
 
       //====================================================================================================
       //===== I/O

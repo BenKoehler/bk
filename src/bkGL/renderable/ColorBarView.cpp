@@ -770,7 +770,7 @@ namespace bk
       { _pdata->textview_ticks[i].on_mouse_pos_changed(x, y); }
   }
 
-  void ColorBarView::on_mouse_button_pressed(MouseButton btn)
+  void ColorBarView::on_mouse_button_pressed(MouseButton_ btn)
   {
       _pdata->textview_title.on_mouse_button_pressed(btn);
       _pdata->textview_min.on_mouse_button_pressed(btn);
@@ -779,7 +779,7 @@ namespace bk
       { _pdata->textview_ticks[i].on_mouse_button_pressed(btn); }
   }
 
-  void ColorBarView::on_mouse_button_released(MouseButton btn)
+  void ColorBarView::on_mouse_button_released(MouseButton_ btn)
   {
       _pdata->textview_title.on_mouse_button_released(btn);
       _pdata->textview_min.on_mouse_button_released(btn);
@@ -787,6 +787,11 @@ namespace bk
       for (unsigned int i = 0; i < _pdata->textview_ticks.size(); ++i)
       { _pdata->textview_ticks[i].on_mouse_button_released(btn); }
   }
+
+  void ColorBarView::on_key_pressed(Key_ /*k*/){ /* do nothing */ }
+  void ColorBarView::on_key_released(Key_ /*k*/){ /* do nothing */ }
+  void ColorBarView::on_mouse_wheel_up(){ /* do nothing */ }
+  void ColorBarView::on_mouse_wheel_down(){ /* do nothing */ }
 
   void ColorBarView::on_ssaa_factor_changed(GLint ssaa_factor)
   {

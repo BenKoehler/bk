@@ -2969,16 +2969,16 @@ namespace bk::details
   {
       std::stringstream s;
 
-      s << "   const float qqi_ratio = float(" << bk::details::UBOSliceView::name_image_height() << ") / float(" << bk::details::UBOSliceView::name_image_width() << ");\n\\n";
+      s << "   const float qqi_ratio = float(" << bk::details::UBOSliceView::name_window_height() << ") / float(" << bk::details::UBOSliceView::name_window_width() << ");\n\n";
 
       s << "   const float voxelscale_ratio = " << bk::details::UBOSliceView::name_voxel_scale0() << " / " << bk::details::UBOSliceView::name_voxel_scale1() << ";\n";
       s << "   const float xratio = min(1, voxelscale_ratio*qqi_ratio*float(" << bk::details::UBOSliceView::name_xyzt_max0() << ")/float(" << bk::details::UBOSliceView::name_xyzt_max1() << "));\n";
-      s << "   const float yratio = min(1, float(" << bk::details::UBOSliceView::name_xyzt_max1() << ")/(voxelscale_ratio*qqi_ratio*float(" << bk::details::UBOSliceView::name_xyzt_max0() << ")));\n\\n";
+      s << "   const float yratio = min(1, float(" << bk::details::UBOSliceView::name_xyzt_max1() << ")/(voxelscale_ratio*qqi_ratio*float(" << bk::details::UBOSliceView::name_xyzt_max0() << ")));\n\n";
 
       s << "   gl_Position.x = xratio*2*position_in.x/float(" << bk::details::UBOSliceView::name_xyzt_max0() << "-1) - xratio;\n";
       s << "   gl_Position.y = yratio*2*position_in.y/float(" << bk::details::UBOSliceView::name_xyzt_max1() << "-1) - yratio;\n";
       s << "   gl_Position.z = 0;\n";
-      s << "   gl_Position.w = 1;\n\\n";
+      s << "   gl_Position.w = 1;\n\n";
 
       return s.str();
   }
@@ -2994,7 +2994,7 @@ namespace bk::details
       s << "layout(location = 0) in vec2 position_in;\n";
       s << ubo_definition_sliceview();
 
-      s << "layout(binding = 1, std430) readonly buffer _Intensity\n";
+      s << "layout(binding = 2, std430) readonly buffer _Intensity\n";
       s << "{ float intensity[]; };\n";
 
       s << comment_region_output();
@@ -3044,7 +3044,7 @@ namespace bk::details
       s << "layout(location = 0) in vec2 position_in;\n";
       s << ubo_definition_sliceview();
 
-      s << "layout(binding = 1, std430) readonly buffer _Intensity\n";
+      s << "layout(binding = 2, std430) readonly buffer _Intensity\n";
       s << "{ float intensity[]; };\n";
 
       s << comment_region_output();
@@ -3072,8 +3072,6 @@ namespace bk::details
   //====================================================================================================
   //===== SEGMENTATION
   //====================================================================================================
-
-
   std::string ShaderLibrary::segmentation::inout_overlay::vert()
   {
       std::stringstream s;
@@ -3086,7 +3084,7 @@ namespace bk::details
       s << "layout(location = 0) in vec2 position_in;\n";
       s << ubo_definition_sliceview();
 
-      s << "layout(binding = 1, std430) readonly buffer _InOutSeg\n";
+      s << "layout(binding = 2, std430) readonly buffer _InOutSeg\n";
       s << "{ uint inoutseg[]; };\n";
 
       s << comment_region_output();
@@ -3143,7 +3141,7 @@ namespace bk::details
       s << "layout(location = 0) in vec2 position_in;\n";
       s << ubo_definition_sliceview();
 
-      s << "layout(binding = 1, std430) readonly buffer _InOutSeg\n";
+      s << "layout(binding = 2, std430) readonly buffer _InOutSeg\n";
       s << "{ uint inoutseg[]; };\n";
 
       s << comment_region_output();
@@ -3219,7 +3217,7 @@ namespace bk::details
       s << "layout(location = 0) in vec2 position_in;\n";
       s << ubo_definition_sliceview();
 
-      s << "layout(binding = 1, std430) readonly buffer _Intensity\n";
+      s << "layout(binding = 2, std430) readonly buffer _Intensity\n";
       s << "{ float intensity[]; };\n";
 
       s << comment_region_output();

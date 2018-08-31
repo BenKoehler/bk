@@ -115,7 +115,7 @@ namespace bk
   //====================================================================================================
   void RGBDICOMSliceView::clear_image()
   {
-      _pdata->image.set_size(0, 0);
+      _pdata->image.set_size(1, 1);
       _pdata->image.geometry().transformation().set_scale(1, 1);
       _xmax() = 0;
       _ymax() = 0;

@@ -164,11 +164,16 @@ namespace bk
   void ScreenQuad::on_mouse_pos_changed(GLint /*x*/, GLint /*y*/)
   { /* do nothing */ }
 
-  void ScreenQuad::on_mouse_button_pressed(MouseButton /*btn*/)
+  void ScreenQuad::on_mouse_button_pressed(MouseButton_ /*btn*/)
   { /* do nothing */ }
 
-  void ScreenQuad::on_mouse_button_released(MouseButton /*btn*/)
+  void ScreenQuad::on_mouse_button_released(MouseButton_ /*btn*/)
   { /* do nothing */ }
+
+  void ScreenQuad::on_key_pressed(Key_ /*k*/){ /* do nothing */ }
+  void ScreenQuad::on_key_released(Key_ /*k*/){ /* do nothing */ }
+  void ScreenQuad::on_mouse_wheel_up(){ /* do nothing */ }
+  void ScreenQuad::on_mouse_wheel_down(){ /* do nothing */ }
 
   void ScreenQuad::on_ssaa_factor_changed(GLint /*ssaa_factor*/)
   { /* do nothing */ }

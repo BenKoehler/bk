@@ -30,12 +30,14 @@
 #include <bk/CopyablePIMPL>
 #include <bk/Matrix>
 #include <bkGL/gl_definitions.h>
+#include <bkGL/EKey.h>
 #include <bkGL/EMouseButton.h>
 #include <bkGL/lib/bkGL_export.h>
 
 namespace bk
 {
   // -------------------- forward declaration
+  class KeyBoard;
   class Mouse;
 
   class TrackBall;
@@ -103,6 +105,11 @@ namespace bk
       [[nodiscard]] GLfloat scale_fixed() const;
       /// @}
 
+      /// @{ -------------------------------------------------- GET KEYBOARD
+      [[nodiscard]] KeyBoard& keyboard();
+      [[nodiscard]] const KeyBoard& keyboard() const;
+      /// @}
+
       /// @{ -------------------------------------------------- GET MOUSE
       [[nodiscard]] Mouse& mouse();
       [[nodiscard]] const Mouse& mouse() const;
@@ -123,11 +130,23 @@ namespace bk
       [[nodiscard]] bk::Signal<GLint, GLint>& signal_mouse_position_changed();
       [[nodiscard]] const bk::Signal<GLint, GLint>& signal_mouse_position_changed() const;
 
-      [[nodiscard]] bk::Signal<MouseButton>& signal_mouse_button_pressed();
-      [[nodiscard]] const bk::Signal<MouseButton>& signal_mouse_button_pressed() const;
+      [[nodiscard]] bk::Signal<MouseButton_>& signal_mouse_button_pressed();
+      [[nodiscard]] const bk::Signal<MouseButton_>& signal_mouse_button_pressed() const;
 
-      [[nodiscard]] bk::Signal<MouseButton>& signal_mouse_button_released();
-      [[nodiscard]] const bk::Signal<MouseButton>& signal_mouse_button_released() const;
+      [[nodiscard]] bk::Signal<MouseButton_>& signal_mouse_button_released();
+      [[nodiscard]] const bk::Signal<MouseButton_>& signal_mouse_button_released() const;
+
+      [[nodiscard]] bk::Signal<Key_>& signal_key_pressed();
+      [[nodiscard]] const bk::Signal<Key_>& signal_key_pressed() const;
+
+      [[nodiscard]] bk::Signal<Key_>& signal_key_released();
+      [[nodiscard]] const bk::Signal<Key_>& signal_key_released() const;
+
+      [[nodiscard]] bk::Signal<>& signal_wheel_down();
+      [[nodiscard]] const bk::Signal<>& signal_wheel_down() const;
+
+      [[nodiscard]] bk::Signal<>& signal_wheel_up();
+      [[nodiscard]] const bk::Signal<>& signal_wheel_up() const;
       /// @}
 
       //====================================================================================================
@@ -189,16 +208,20 @@ namespace bk
       void connect_signals(std::shared_ptr<details::AbstractSceneRenderable>& r);
       /// @}
 
-      /// @{ -------------------------------------------------- MOUSE MOVE EVENT
+      /// @{ -------------------------------------------------- MOUSE EVENTS
       void mouse_move(GLint x, GLint y);
+      void mouse_pressed(MouseButton_ btn);
+      void mouse_released(MouseButton_ btn);
       /// @}
 
-      /// @{ -------------------------------------------------- MOUSE PRESSED EVENT
-      void mouse_pressed(MouseButton btn);
+      /// @{ -------------------------------------------------- WHEEL EVENTS
+      void wheel_up();
+      void wheel_down();
       /// @}
 
-      /// @{ -------------------------------------------------- MOUSE RELEASED EVENT
-      void mouse_released(MouseButton btn);
+      /// @{ -------------------------------------------------- KEY EVENTS
+      void key_pressed(Key_ k);
+      void key_released(Key_ k);
       /// @}
   }; // class Interactor
 } // namespace bk

@@ -83,7 +83,7 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- GET BUTTON INFORMATION
-      [[nodiscard]] bool button_is_pressed(MouseButton btn) const;
+      [[nodiscard]] bool button_is_pressed(MouseButton_ btn) const;
       [[nodiscard]] bool left_button_is_pressed() const;
       [[nodiscard]] bool right_button_is_pressed() const;
       [[nodiscard]] bool middle_button_is_pressed() const;
@@ -104,7 +104,7 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- SET BUTTON PRESSED
-      void set_button_pressed(MouseButton btn, bool pressed);
+      void set_button_pressed(MouseButton_ btn, bool pressed);
       void set_left_button_pressed();
       void set_right_button_pressed();
       void set_middle_button_pressed();

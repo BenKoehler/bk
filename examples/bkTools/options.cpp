@@ -31,11 +31,12 @@
 
 struct MyOptions : public bk::Options
 {
-  BK_OPTIONS_DECLARE(int, N);
+  BK_OPTIONS_DECLARE(int, N)
+  BK_OPTIONS_DECLARE(std::string, path)
 
     struct Algorithms
     {
-      friend MyOptions;
+        friend MyOptions;
       BK_OPTIONS_DECLARE(unsigned int, numIterations);
       BK_OPTIONS_DECLARE(double, factor);
     } algorithms;
@@ -46,8 +47,11 @@ struct MyOptions : public bk::Options
 void MyOptions::init()
 {
     BK_OPTION_REGISTER_INT(N, 5)
+    BK_OPTION_REGISTER_STRING(path, "/my/example/dir/")
     BK_OPTION_REGISTER_UINT(algorithms.numIterations, 1000)
     BK_OPTION_REGISTER_DOUBLE(algorithms.factor, 0.25)
+
+    myopt.set_default();
 }
 
 int main(int, char**)
@@ -60,7 +64,20 @@ int main(int, char**)
     std::cout << "N " << myopt.get_N() << std::endl;
     myopt.set_N(1337);
     std::cout << "N " << myopt.get_N() << std::endl;
+    std::cout << "path " << myopt.get_path() << std::endl;
+    std::cout << "algorithms.numIterations " << myopt.algorithms.get_numIterations() << std::endl;
+    std::cout << "algorithms.factor " << myopt.algorithms.get_factor() << std::endl;
+    myopt.set_path("");
+    std::cout << "path " << myopt.get_path() << std::endl;
 
+    // --------
+
+    myopt.set_default();
+
+    std::cout << std::endl;
+    std::cout << "reset to default:" << std::endl;
+    std::cout << "N " << myopt.get_N() << std::endl;
+    std::cout << "path " << myopt.get_path() << std::endl;
     std::cout << "algorithms.numIterations " << myopt.algorithms.get_numIterations() << std::endl;
     std::cout << "algorithms.factor " << myopt.algorithms.get_factor() << std::endl;
 

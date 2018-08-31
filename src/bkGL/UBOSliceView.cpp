@@ -32,7 +32,7 @@ namespace bk::details
   /// @{ -------------------------------------------------- CTOR
   #ifndef BK_LIB_QT_AVAILABLE
   UBOSliceView::UBOSliceView()
-      : base_type("UBOSliceView", 0)
+      : base_type("UBOSliceView", 1)
   #else
   UBOSliceView::UBOSliceView(bk::qt_gl_functions* gl) 
       : base_type(gl, "UBOSliceView", 1)
@@ -43,8 +43,8 @@ namespace bk::details
       BK_UBO_SPECIALIZATION_REGISTER(xyzt_max0, GL_INT)
       BK_UBO_SPECIALIZATION_REGISTER(xyzt_max1, GL_INT)
       //BK_UBO_SPECIALIZATION_REGISTER(orientation, GL_INT) // todo
-      BK_UBO_SPECIALIZATION_REGISTER(image_width, GL_INT)
-      BK_UBO_SPECIALIZATION_REGISTER(image_height, GL_INT)
+      BK_UBO_SPECIALIZATION_REGISTER(window_width, GL_INT)
+      BK_UBO_SPECIALIZATION_REGISTER(window_height, GL_INT)
       BK_UBO_SPECIALIZATION_REGISTER(voxel_scale0, GL_FLOAT)
       BK_UBO_SPECIALIZATION_REGISTER(voxel_scale1, GL_FLOAT)
       BK_UBO_SPECIALIZATION_REGISTER(tf_center, GL_FLOAT)
@@ -72,8 +72,8 @@ namespace bk::details
   BK_UBO_SPECIALIZATION_DEFINE(UBOSliceView, xyzt_max0, GL_INT)
   BK_UBO_SPECIALIZATION_DEFINE(UBOSliceView, xyzt_max1, GL_INT)
   //BK_UBO_SPECIALIZATION_DEFINE(UBOSliceView, orientation, GL_INT) // todo
-  BK_UBO_SPECIALIZATION_DEFINE(UBOSliceView, image_width, GL_INT)
-  BK_UBO_SPECIALIZATION_DEFINE(UBOSliceView, image_height, GL_INT)
+  BK_UBO_SPECIALIZATION_DEFINE(UBOSliceView, window_width, GL_INT)
+  BK_UBO_SPECIALIZATION_DEFINE(UBOSliceView, window_height, GL_INT)
   BK_UBO_SPECIALIZATION_DEFINE(UBOSliceView, voxel_scale0, GL_FLOAT)
   BK_UBO_SPECIALIZATION_DEFINE(UBOSliceView, voxel_scale1, GL_FLOAT)
   BK_UBO_SPECIALIZATION_DEFINE(UBOSliceView, tf_center, GL_FLOAT)

@@ -90,14 +90,18 @@ namespace bk
   {
       if (_pdata->dcm_importer == nullptr)
       { return false; }
+
       const unsigned int nImages = _pdata->dcm_importer->num_images();
+
       if (dcm_image_id >= nImages)
       { return false; }
+
       _pdata->dcm_image_id = dcm_image_id;
       const DicomImageInfos& info = _pdata->dcm_importer->image_infos(_pdata->dcm_image_id);
       _pdata->image.set_size(info.Columns, info.Rows);
       _pdata->image.geometry().transformation().set_scale(info.ColSpacing, info.RowSpacing);
       _pdata->size.set(info.Columns, info.Rows, info.Slices > 1 ? info.Slices : 1, info.TemporalPositions > 1 ? info.TemporalPositions : 1);
+
       return _pdata->image.num_values() > 1;
   }
 
@@ -108,7 +112,7 @@ namespace bk
   //====================================================================================================
   void GrayDICOMSliceView::clear_image()
   {
-      _pdata->image.set_size(0, 0);
+      _pdata->image.set_size(1, 1);
       _pdata->image.geometry().transformation().set_scale(1, 1);
       _xmax() = 0;
       _ymax() = 0;
@@ -127,14 +131,15 @@ namespace bk
   {
       if (_pdata->dcm_importer == nullptr)
       { return; }
-      GLfloat* intensities = _ssbo_intensity().map_write_only<GLfloat>();
-      if (intensities != nullptr)
+
+      if (GLfloat* intensities = _ssbo_intensity().map_write_only<GLfloat>(); intensities != nullptr)
       {
           //const auto& size = _image.size();
           const auto img = _pdata->dcm_importer->read_image_block(_pdata->dcm_image_id, 0, _pdata->size[0] - 1, 0, _pdata->size[1] - 1, z, z, t, t);
           _intensitymax() = -std::numeric_limits<GLfloat>::max();
           _intensitymin() = std::numeric_limits<GLfloat>::max();
           GLuint cnt = 0;
+
           //for (GLuint y = 0; y < static_cast<GLuint>(_size[1]); ++y)
           for (int y = static_cast<int>(_pdata->size[1] - 1); y >= 0; --y) // y is inverted, because GL coord system starts top left and image coord system starts bottom left
           {

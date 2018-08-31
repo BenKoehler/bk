@@ -49,8 +49,10 @@
 #include <bkGL/buffer/SSBO.h>
 #include <bkGL/vao/VAO.h>
 #include <bkGL/shader/Shader.h>
+#include <bkGL/Mouse.h>
 #include <bkGL/WindowGeometry.h>
 #include <bkGL/renderable/transfer_function/WindowingTransferFunctionView.h>
+#include <src/bkGL/renderable/ScreenQuad.h>
 
 namespace bk::details
 {
@@ -59,34 +61,36 @@ namespace bk::details
   //====================================================================================================
   struct AbstractSliceView::Impl
   {
-      VBO vbo;
-      IBO ibo;
-      VAO vao;
-      details::UBOSliceView ubo;
-      SSBO ssbo_intensity;
-      Shader shader;
+      VBO                           vbo;
+      IBO                           ibo;
+      VAO                           vao;
+      details::UBOSliceView         ubo;
+      SSBO                          ssbo_intensity;
+      Shader                        shader;
       // transfer function
-      WindowingTransferFunction tf;
+      WindowingTransferFunction     tf;
       WindowingTransferFunctionView tf_view;
-      bool show_tf;
+      bool                          show_tf;
       // general
-      GLsizei sizeInd;
-      WindowGeometry window_geometry;
+      GLsizei                       sizeInd;
+      WindowGeometry                window_geometry;
       // image
-      Vec2<GLfloat> voxel_scale;
-      Vec4<GLuint> xyzt_max;
-      Vec4<GLuint> xyzt_current;
-      GLfloat intensitymax;
-      GLfloat intensitymin;
+      Vec2<GLfloat>                 voxel_scale;
+      Vec4<GLuint>                  xyzt_max;
+      Vec4<GLuint>                  xyzt_current;
+      GLfloat                       intensitymax;
+      GLfloat                       intensitymin;
       // signals
-      bk::Signal<GLuint> s_xmax_changed;
-      bk::Signal<GLuint> s_xcurrent_changed;
-      bk::Signal<GLuint> s_ymax_changed;
-      bk::Signal<GLuint> s_ycurrent_changed;
-      bk::Signal<GLuint> s_zmax_changed;
-      bk::Signal<GLuint> s_zcurrent_changed;
-      bk::Signal<GLuint> s_tmax_changed;
-      bk::Signal<GLuint> s_tcurrent_changed;
+      bk::Signal<GLuint>            s_xmax_changed;
+      bk::Signal<GLuint>            s_xcurrent_changed;
+      bk::Signal<GLuint>            s_ymax_changed;
+      bk::Signal<GLuint>            s_ycurrent_changed;
+      bk::Signal<GLuint>            s_zmax_changed;
+      bk::Signal<GLuint>            s_zcurrent_changed;
+      bk::Signal<GLuint>            s_tmax_changed;
+      bk::Signal<GLuint>            s_tcurrent_changed;
+      //
+      Mouse                         mouse;
 
           #ifndef BK_LIB_QT_AVAILABLE
 
@@ -284,8 +288,8 @@ namespace bk::details
 
       if (this->is_initialized())
       {
-          _pdata->ubo.set_xyzt_max0(_pdata->window_geometry.width());
-          _pdata->ubo.set_xyzt_max1(_pdata->window_geometry.height());
+          _pdata->ubo.set_window_width(_pdata->window_geometry.width());
+          _pdata->ubo.set_window_height(_pdata->window_geometry.height());
           _pdata->ubo.release();
       }
   }
@@ -296,8 +300,8 @@ namespace bk::details
   {
       _pdata->voxel_scale[0] = std::max(vx, static_cast<GLfloat>(0.0001));
       _pdata->voxel_scale[1] = std::max(vy, static_cast<GLfloat>(0.0001));
-      _pdata->ubo.write_registered_value("_voxel_scale[0]", &_pdata->voxel_scale[0]);
-      _pdata->ubo.write_registered_value("_voxel_scale[1]", &_pdata->voxel_scale[1]);
+      _pdata->ubo.set_voxel_scale0(_pdata->voxel_scale[0]);
+      _pdata->ubo.set_voxel_scale1(_pdata->voxel_scale[1]);
       _pdata->ubo.release();
   }
   /// @}
@@ -364,10 +368,8 @@ namespace bk::details
   void AbstractSliceView::reset_transfer_function(bool tolerant)
   {
       _pdata->tf.reset(tolerant);
-      GLfloat ftemp = _pdata->tf.center();
-      _pdata->ubo.write_registered_value("tf_center", &ftemp);
-      ftemp = _pdata->tf.width();
-      _pdata->ubo.write_registered_value("tf_width", &ftemp);
+      _pdata->ubo.set_tf_center(_pdata->tf.center());
+      _pdata->ubo.set_tf_width(_pdata->tf.width());
       _pdata->ubo.release();
       _pdata->tf_view.update_tf();
       this->emit_signal_update_required();
@@ -376,8 +378,7 @@ namespace bk::details
   void AbstractSliceView::transfer_function_shift_center_left(double percent)
   {
       _pdata->tf.shift_center_left(percent);
-      GLfloat ftemp = _pdata->tf.center();
-      _pdata->ubo.write_registered_value("tf_center", &ftemp);
+      _pdata->ubo.set_tf_center(_pdata->tf.center());
       _pdata->ubo.release();
       _pdata->tf_view.update_tf();
       this->emit_signal_update_required();
@@ -386,8 +387,7 @@ namespace bk::details
   void AbstractSliceView::transfer_function_shift_center_right(double percent)
   {
       _pdata->tf.shift_center_right(percent);
-      GLfloat ftemp = _pdata->tf.center();
-      _pdata->ubo.write_registered_value("tf_center", &ftemp);
+      _pdata->ubo.set_tf_center(_pdata->tf.center());
       _pdata->ubo.release();
       _pdata->tf_view.update_tf();
       this->emit_signal_update_required();
@@ -396,8 +396,7 @@ namespace bk::details
   void AbstractSliceView::transfer_function_increase_width(double percent)
   {
       _pdata->tf.increase_width(percent);
-      GLfloat ftemp = _pdata->tf.width();
-      _pdata->ubo.write_registered_value("tf_width", &ftemp);
+      _pdata->ubo.set_tf_width(_pdata->tf.width());
       _pdata->ubo.release();
       _pdata->tf_view.update_tf();
       this->emit_signal_update_required();
@@ -406,8 +405,7 @@ namespace bk::details
   void AbstractSliceView::transfer_function_decrease_width(double percent)
   {
       _pdata->tf.decrease_width(percent);
-      GLfloat ftemp = _pdata->tf.width();
-      _pdata->ubo.write_registered_value("tf_width", &ftemp);
+      _pdata->ubo.set_tf_width(_pdata->tf.width());
       _pdata->ubo.release();
       _pdata->tf_view.update_tf();
       this->emit_signal_update_required();
@@ -471,7 +469,7 @@ namespace bk::details
   }
 
   bool AbstractSliceView::init_shader()
-  { return _pdata->shader.init(vertex_shader_source(), fragment_shader_source()); }
+  { return _pdata->shader.init_from_sources(vertex_shader_source(), fragment_shader_source()); }
 
   void AbstractSliceView::init_image()
   {
@@ -494,6 +492,9 @@ namespace bk::details
           #ifdef BK_EMIT_PROGRESS
           prog.set_finished();
           #endif
+
+          std::cerr << "AbstractSliceView::init_image - image is empty; abort" << std::endl;
+
           return;
       }
 
@@ -578,20 +579,16 @@ namespace bk::details
       /*
        * setup ubo
        */
-      _pdata->ubo.write_registered_value("_xyzt_max[0]", &_pdata->xyzt_max[0]);
-      _pdata->ubo.write_registered_value("_xyzt_max[1]", &_pdata->xyzt_max[1]);
-      GLuint _orientation = 0;
-      _pdata->ubo.write_registered_value("_orientation", &_orientation); // todo
-      GLuint itemp = _pdata->window_geometry.width();
-      _pdata->ubo.write_registered_value("_width", &itemp);
-      itemp = _pdata->window_geometry.height();
-      _pdata->ubo.write_registered_value("_height", &itemp);
-      _pdata->ubo.write_registered_value("_voxel_scale[0]", &_pdata->voxel_scale[0]);
-      _pdata->ubo.write_registered_value("_voxel_scale[1]", &_pdata->voxel_scale[1]);
-      GLfloat ftemp = _pdata->tf.center();
-      _pdata->ubo.write_registered_value("tf_center", &ftemp);
-      ftemp = _pdata->tf.width();
-      _pdata->ubo.write_registered_value("tf_width", &ftemp);
+      _pdata->ubo.set_xyzt_max0(_pdata->xyzt_max[0]);
+      _pdata->ubo.set_xyzt_max1(_pdata->xyzt_max[1]);
+      //GLuint _orientation = 0;
+      //_pdata->ubo.write_registered_value("_orientation", &_orientation); // todo
+      _pdata->ubo.set_window_width(_pdata->window_geometry.width());
+      _pdata->ubo.set_window_height(_pdata->window_geometry.height());
+      _pdata->ubo.set_voxel_scale0(_pdata->voxel_scale[0]);
+      _pdata->ubo.set_voxel_scale1(_pdata->voxel_scale[1]);
+      _pdata->ubo.set_tf_center(_pdata->tf.center());
+      _pdata->ubo.set_tf_width(_pdata->tf.width());
 
       //itemp = 4;
       //_pdata->ubo.write_registered_value("nDims", &itemp);
@@ -620,10 +617,8 @@ namespace bk::details
       _pdata->tf.set_intensity_min_max(_pdata->intensitymin, _pdata->intensitymax);
       //_pdata->tf.reset();
       _pdata->tf_view.update_tf();
-      GLfloat ftemp = _pdata->tf.center();
-      _pdata->ubo.write_registered_value("tf_center", &ftemp);
-      ftemp = _pdata->tf.width();
-      _pdata->ubo.write_registered_value("tf_width", &ftemp);
+      _pdata->ubo.set_tf_center(_pdata->tf.center());
+      _pdata->ubo.set_tf_width(_pdata->tf.width());
       _pdata->ubo.release();
       this->emit_signal_update_required();
   }
@@ -644,9 +639,9 @@ namespace bk::details
   /// @{ -------------------------------------------------- CURRENT INTENSITY
   void AbstractSliceView::mouseXY_to_imageXY(int mouseX, int mouseY, unsigned int& imgX, unsigned int& imgY) const
   {
-      const GLuint w = _pdata->window_geometry.width();
-      const GLuint h = _pdata->window_geometry.height();
-      const GLfloat qqi_ratio = static_cast<GLfloat>(h) / static_cast<GLfloat>(w);
+      const GLuint  w                = _pdata->window_geometry.width();
+      const GLuint  h                = _pdata->window_geometry.height();
+      const GLfloat qqi_ratio        = static_cast<GLfloat>(h) / static_cast<GLfloat>(w);
       const GLfloat voxelscale_ratio = _pdata->voxel_scale[0] / _pdata->voxel_scale[1];
       if (mouseX < 0)
       { imgX = 0; }
@@ -654,9 +649,9 @@ namespace bk::details
       { imgX = _pdata->xyzt_max[0]; }
       else
       {
-          const GLfloat xratio = std::min(static_cast<GLfloat>(1), voxelscale_ratio * qqi_ratio * static_cast<GLfloat>(_pdata->xyzt_max[0]) / static_cast<GLfloat>(_pdata->xyzt_max[1]));
+          const GLfloat xratio  = std::min(static_cast<GLfloat>(1), voxelscale_ratio * qqi_ratio * static_cast<GLfloat>(_pdata->xyzt_max[0]) / static_cast<GLfloat>(_pdata->xyzt_max[1]));
           const GLfloat screenX = static_cast<GLfloat>(2 * mouseX) / static_cast<GLfloat>(w) - static_cast<GLfloat>(1);
-          const GLfloat tempx = (static_cast<GLfloat>(screenX) + xratio) * (static_cast<GLfloat>(_pdata->xyzt_max[0] - 1)) / (static_cast<GLfloat>(2) * xratio);
+          const GLfloat tempx   = (static_cast<GLfloat>(screenX) + xratio) * (static_cast<GLfloat>(_pdata->xyzt_max[0] - 1)) / (static_cast<GLfloat>(2) * xratio);
           imgX = static_cast<unsigned int>(std::max(0, std::min(static_cast<int>(std::floor(tempx + 0.5f)), static_cast<int>(_pdata->xyzt_max[0]))));
       }
       if (mouseY < 0)
@@ -665,9 +660,9 @@ namespace bk::details
       { imgY = _pdata->xyzt_max[1]; }
       else
       {
-          const GLfloat yratio = std::min(static_cast<GLfloat>(1), static_cast<GLfloat>(_pdata->xyzt_max[1]) / (voxelscale_ratio * qqi_ratio * static_cast<GLfloat>(_pdata->xyzt_max[0])));
+          const GLfloat yratio  = std::min(static_cast<GLfloat>(1), static_cast<GLfloat>(_pdata->xyzt_max[1]) / (voxelscale_ratio * qqi_ratio * static_cast<GLfloat>(_pdata->xyzt_max[0])));
           const GLfloat screenY = static_cast<GLfloat>(2 * mouseY) / static_cast<GLfloat>(h) - static_cast<GLfloat>(1);
-          const GLfloat tempy = (static_cast<GLfloat>(screenY) + yratio) * (static_cast<GLfloat>(_pdata->xyzt_max[1] - 1)) / (static_cast<GLfloat>(2) * yratio);
+          const GLfloat tempy   = (static_cast<GLfloat>(screenY) + yratio) * (static_cast<GLfloat>(_pdata->xyzt_max[1] - 1)) / (static_cast<GLfloat>(2) * yratio);
           imgY = static_cast<unsigned int>(std::max(0, std::min(static_cast<int>(std::floor(tempy + 0.5f)), static_cast<int>(_pdata->xyzt_max[1]))));
       }
   }
@@ -688,7 +683,10 @@ namespace bk::details
 
   /// @{ -------------------------------------------------- EVENTS
   void AbstractSliceView::on_resize(GLint w, GLint h)
-  { _pdata->tf_view.on_resize(w, h); }
+  {
+      set_screen_size(w, h);
+      _pdata->tf_view.on_resize(w, h);
+  }
 
   void AbstractSliceView::on_oit_enabled(bool b)
   { _pdata->tf_view.set_oit_available(b); }
@@ -702,14 +700,73 @@ namespace bk::details
   void AbstractSliceView::on_visible_changed(bool)
   { /* do nothing */ }
 
-  void AbstractSliceView::on_mouse_pos_changed(GLint /*x*/, GLint /*y*/)
+  void AbstractSliceView::on_mouse_pos_changed(GLint x, GLint y)
+  {
+      _pdata->mouse.set_pos(x, y);
+
+      if (_pdata->mouse.middle_button_is_pressed())
+      {
+          if (_pdata->mouse.last_move_was_down())
+          { previousSlice(x, y); }
+          else if (_pdata->mouse.last_move_was_up())
+          { nextSlice(x, y); }
+
+          if (_pdata->mouse.last_move_was_left())
+          { previousTime(x, y); }
+          else if (_pdata->mouse.last_move_was_right())
+          { nextTime(x, y); }
+      }
+
+      if (_pdata->mouse.right_button_is_pressed())
+      {
+          static constexpr const GLfloat percent = 0.4; // todo: something more advanced?
+          
+          if (_pdata->mouse.last_move_was_down())
+          { transfer_function_decrease_width(percent * std::abs(_pdata->mouse.dy())); }
+          else if (_pdata->mouse.last_move_was_up())
+          { transfer_function_increase_width(percent * std::abs(_pdata->mouse.dy())); }
+
+          if (_pdata->mouse.last_move_was_left())
+          { transfer_function_shift_center_left(percent * std::abs(_pdata->mouse.dx())); }
+          else if (_pdata->mouse.last_move_was_right())
+          { transfer_function_shift_center_right(percent * std::abs(_pdata->mouse.dx())); }
+      }
+
+      determine_currentIntensity(x, y);
+  }
+
+  void AbstractSliceView::on_mouse_button_pressed(MouseButton_ btn)
+  {
+      _pdata->mouse.set_button_pressed(btn, true);
+      _pdata->show_tf = _pdata->mouse.right_button_is_pressed();
+  }
+
+  void AbstractSliceView::on_mouse_button_released(MouseButton_ btn)
+  {
+      _pdata->mouse.set_button_pressed(btn, false);
+      _pdata->show_tf = _pdata->mouse.right_button_is_pressed();
+  }
+
+  void AbstractSliceView::on_key_pressed(Key_ k)
+  {
+      if (k == Key_LeftArrow)
+      { previousTime(); }
+      else if (k == Key_RightArrow)
+      { nextTime(); }
+      else if (k == Key_UpArrow)
+      { nextSlice(); }
+      else if (k == Key_DownArrow)
+      { previousSlice(); }
+  }
+
+  void AbstractSliceView::on_key_released(Key_ /*k*/)
   { /* do nothing */ }
 
-  void AbstractSliceView::on_mouse_button_pressed(MouseButton /*btn*/)
-  { /* do nothing */ }
+  void AbstractSliceView::on_mouse_wheel_up()
+  { nextSlice(); }
 
-  void AbstractSliceView::on_mouse_button_released(MouseButton /*btn*/)
-  { /* do nothing */ }
+  void AbstractSliceView::on_mouse_wheel_down()
+  { previousSlice(); }
 
   void AbstractSliceView::on_ssaa_factor_changed(GLint /*ssaa_factor*/)
   { /* do nothing */ }
@@ -724,7 +781,7 @@ namespace bk::details
       BK_QT_GL glPrimitiveRestartIndex(std::numeric_limits<GLuint>::max());
 
       _pdata->ubo.bind_to_default_base();
-      _pdata->ssbo_intensity.bind_to_base(1);
+      _pdata->ssbo_intensity.bind_to_base(2);
 
       _pdata->vao.bind();
       _pdata->shader.bind();

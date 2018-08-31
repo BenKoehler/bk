@@ -29,6 +29,7 @@
 #include <bk/Matrix>
 #include <bk/Signal>
 
+#include <bkGL/KeyBoard.h>
 #include <bkGL/Mouse.h>
 #include <bkGL/WindowGeometry.h>
 #include <bkGL/renderable/AbstractRenderable.h>
@@ -43,20 +44,25 @@ namespace bk
   class Interactor::Impl
   {
     public:
-      bool rotation_enabled;
-      bool translation_enabled;
-      bool zoom_enabled;
-      bk::Vec3<GLfloat> translation;
-      bk::Vec3<GLfloat> scale_manual;
-      GLfloat scale_fixed;
-      GLfloat translation_speed;
-      Mouse mouse;
-      TrackBall trackball;
-      bk::Signal<> s_do_update;
-      bk::Signal<> s_require_modelview_update;
+      bool                     rotation_enabled;
+      bool                     translation_enabled;
+      bool                     zoom_enabled;
+      bk::Vec3<GLfloat>        translation;
+      bk::Vec3<GLfloat>        scale_manual;
+      GLfloat                  scale_fixed;
+      GLfloat                  translation_speed;
+      KeyBoard                 keyboard;
+      Mouse                    mouse;
+      TrackBall                trackball;
+      bk::Signal<>             s_do_update;
+      bk::Signal<>             s_require_modelview_update;
       bk::Signal<GLint, GLint> s_mouse_pos_changed;
-      bk::Signal<MouseButton> s_mouse_button_pressed;
-      bk::Signal<MouseButton> s_mouse_button_released;
+      bk::Signal<MouseButton_> s_mouse_button_pressed;
+      bk::Signal<MouseButton_> s_mouse_button_released;
+      bk::Signal<Key_>         s_key_pressed;
+      bk::Signal<Key_>         s_key_released;
+      bk::Signal<>             s_wheel_up;
+      bk::Signal<>             s_wheel_down;
 
       Impl()
           : rotation_enabled(true),
@@ -70,16 +76,7 @@ namespace bk
 
       Impl(const Impl&) = delete;
       Impl(Impl&&) = default;
-
-      ~Impl()
-      {
-          s_do_update.disconnect_all();
-          s_require_modelview_update.disconnect_all();
-          s_mouse_pos_changed.disconnect_all();
-          s_mouse_button_pressed.disconnect_all();
-          s_mouse_button_released.disconnect_all();
-      }
-
+      ~Impl() = default;
       [[maybe_unused]] Impl& operator=(const Impl&) = delete;
       [[maybe_unused]] Impl& operator=(Impl&&) = default;
   };
@@ -129,6 +126,14 @@ namespace bk
   { return _pdata->scale_fixed; }
   /// @}
 
+  /// @{ -------------------------------------------------- GET KEYBOARD
+  KeyBoard& Interactor::keyboard()
+  { return _pdata->keyboard; }
+
+  const KeyBoard& Interactor::keyboard() const
+  { return _pdata->keyboard; }
+  /// @}
+
   /// @{ -------------------------------------------------- GET MOUSE
   Mouse& Interactor::mouse()
   { return _pdata->mouse; }
@@ -164,17 +169,41 @@ namespace bk
   const bk::Signal<GLint, GLint>& Interactor::signal_mouse_position_changed() const
   { return _pdata->s_mouse_pos_changed; }
 
-  bk::Signal<MouseButton>& Interactor::signal_mouse_button_pressed()
+  bk::Signal<MouseButton_>& Interactor::signal_mouse_button_pressed()
   { return _pdata->s_mouse_button_pressed; }
 
-  const bk::Signal<MouseButton>& Interactor::signal_mouse_button_pressed() const
+  const bk::Signal<MouseButton_>& Interactor::signal_mouse_button_pressed() const
   { return _pdata->s_mouse_button_pressed; }
 
-  bk::Signal<MouseButton>& Interactor::signal_mouse_button_released()
+  bk::Signal<MouseButton_>& Interactor::signal_mouse_button_released()
   { return _pdata->s_mouse_button_released; }
 
-  const bk::Signal<MouseButton>& Interactor::signal_mouse_button_released() const
+  const bk::Signal<MouseButton_>& Interactor::signal_mouse_button_released() const
   { return _pdata->s_mouse_button_released; }
+
+  bk::Signal<Key_>& Interactor::signal_key_pressed()
+  { return _pdata->s_key_pressed; }
+
+  const bk::Signal<Key_>& Interactor::signal_key_pressed() const
+  { return _pdata->s_key_pressed; }
+
+  bk::Signal<Key_>& Interactor::signal_key_released()
+  { return _pdata->s_key_released; }
+
+  const bk::Signal<Key_>& Interactor::signal_key_released() const
+  { return _pdata->s_key_released; }
+
+  bk::Signal<>& Interactor::signal_wheel_down()
+  { return _pdata->s_wheel_down; }
+
+  const bk::Signal<>& Interactor::signal_wheel_down() const
+  { return _pdata->s_wheel_down; }
+
+  bk::Signal<>& Interactor::signal_wheel_up()
+  { return _pdata->s_wheel_up; }
+
+  const bk::Signal<>& Interactor::signal_wheel_up() const
+  { return _pdata->s_wheel_up; }
   /// @}
 
   //====================================================================================================
@@ -276,11 +305,23 @@ namespace bk
       _pdata->s_mouse_pos_changed.connect([=](GLint x, GLint y)
                                           { r->on_mouse_pos_changed(x, y); });
 
-      _pdata->s_mouse_button_pressed.connect([=](MouseButton btn)
+      _pdata->s_mouse_button_pressed.connect([=](MouseButton_ btn)
                                              { r->on_mouse_button_pressed(btn); });
 
-      _pdata->s_mouse_button_released.connect([=](MouseButton btn)
+      _pdata->s_mouse_button_released.connect([=](MouseButton_ btn)
                                               { r->on_mouse_button_released(btn); });
+
+      _pdata->s_wheel_down.connect([=]()
+                                   { r->on_mouse_wheel_down(); });
+
+      _pdata->s_wheel_up.connect([=]()
+                                 { r->on_mouse_wheel_up(); });
+
+      _pdata->s_key_pressed.connect([=](Key_ k)
+                                    { r->on_key_pressed(k); });
+
+      _pdata->s_key_released.connect([=](Key_ k)
+                                     { r->on_key_released(k); });
   }
 
   void Interactor::connect_signals(std::shared_ptr<details::AbstractSceneRenderable>& r)
@@ -288,15 +329,27 @@ namespace bk
       _pdata->s_mouse_pos_changed.connect([=](GLint x, GLint y)
                                           { r->on_mouse_pos_changed(x, y); });
 
-      _pdata->s_mouse_button_pressed.connect([=](MouseButton btn)
+      _pdata->s_mouse_button_pressed.connect([=](MouseButton_ btn)
                                              { r->on_mouse_button_pressed(btn); });
 
-      _pdata->s_mouse_button_released.connect([=](MouseButton btn)
+      _pdata->s_mouse_button_released.connect([=](MouseButton_ btn)
                                               { r->on_mouse_button_released(btn); });
+
+      _pdata->s_wheel_down.connect([=]()
+                                   { r->on_mouse_wheel_down(); });
+
+      _pdata->s_wheel_up.connect([=]()
+                                 { r->on_mouse_wheel_up(); });
+
+      _pdata->s_key_pressed.connect([=](Key_ k)
+                                    { r->on_key_pressed(k); });
+
+      _pdata->s_key_released.connect([=](Key_ k)
+                                     { r->on_key_released(k); });
   }
   /// @}
 
-  /// @{ -------------------------------------------------- EVENTS
+  /// @{ -------------------------------------------------- MOUSE EVENTS
   void Interactor::mouse_move(GLint x, GLint y)
   {
       set_mouse_position(x, y);
@@ -324,8 +377,8 @@ namespace bk
           if (_pdata->zoom_enabled)
           {
               constexpr GLfloat minScale = static_cast<GLfloat>(0.05);
-              constexpr GLfloat s = 0.02; // TODO: more sophisticated choice
-              const GLfloat dy = s * static_cast<GLfloat>(_pdata->mouse.dy());
+              constexpr GLfloat s        = 0.02; // TODO: more sophisticated choice
+              const GLfloat     dy       = s * static_cast<GLfloat>(_pdata->mouse.dy());
               _pdata->scale_manual[0] = std::max(_pdata->scale_manual[0] - dy, minScale);
               _pdata->scale_manual[1] = std::max(_pdata->scale_manual[1] - dy, minScale);
               _pdata->scale_manual[2] = std::max(_pdata->scale_manual[2] - dy, minScale);
@@ -340,11 +393,11 @@ namespace bk
           _pdata->s_do_update.emit_signal();
       }
   }
-  /// @}
 
-  /// @{ -------------------------------------------------- MOUSE PRESSED EVENT
-  void Interactor::mouse_pressed(MouseButton btn)
+  void Interactor::mouse_pressed(MouseButton_ btn)
   {
+      const bool emitSignal = !_pdata->mouse.button_is_pressed(btn);
+
       _pdata->mouse.set_button_pressed(btn, true);
 
       bool do_update = false;
@@ -366,17 +419,19 @@ namespace bk
       //else if (_pdata->mouse.middle_button_is_pressed())
       //{ /* do nothing */ }
 
-      _pdata->s_mouse_button_pressed.emit_signal(btn);
+      if (emitSignal)
+      { _pdata->s_mouse_button_pressed.emit_signal(btn); }
 
       if (do_update)
       { _pdata->s_do_update.emit_signal(); }
   }
-  /// @}
 
-  /// @{ -------------------------------------------------- MOUSE RELEASED EVENT
-  void Interactor::mouse_released(MouseButton btn)
+  void Interactor::mouse_released(MouseButton_ btn)
   {
+      const bool emitSignal = _pdata->mouse.button_is_pressed(btn);
+
       _pdata->mouse.set_button_pressed(btn, false);
+
       bool do_update = false;
       if (!_pdata->mouse.left_button_is_pressed())
       {
@@ -395,10 +450,33 @@ namespace bk
       //else if (_pdata->mouse.middle_button_is_released())
       //{ /* do nothing */ }
 
-      _pdata->s_mouse_button_released.emit_signal(btn);
+      if (emitSignal)
+      { _pdata->s_mouse_button_released.emit_signal(btn); }
 
       if (do_update)
       { _pdata->s_do_update.emit_signal(); }
+  }
+  /// @}
+
+  /// @{ -------------------------------------------------- WHEEL EVENTS
+  void Interactor::wheel_up()
+  { _pdata->s_wheel_up.emit_signal(); }
+
+  void Interactor::wheel_down()
+  { _pdata->s_wheel_down.emit_signal(); }
+  /// @}
+
+  /// @{ -------------------------------------------------- KEY EVENTS
+  void Interactor::key_pressed(Key_ k)
+  {
+      if (!_pdata->keyboard.key_is_pressed(k))
+      { _pdata->s_key_pressed.emit_signal(k); }
+  }
+
+  void Interactor::key_released(Key_ k)
+  {
+      if (_pdata->keyboard.key_is_pressed(k))
+      { _pdata->s_key_released.emit_signal(k); }
   }
   /// @}
 } // namespace bk

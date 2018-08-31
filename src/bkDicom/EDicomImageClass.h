@@ -27,13 +27,22 @@
 #ifndef BKDICOM_DICOMIMAGECLASS_H
 #define BKDICOM_DICOMIMAGECLASS_H
 
-namespace bk::details
+namespace bk
 {
-  enum class DicomImageClass : int
+  enum DicomImageClass_ : unsigned char
   {
-      FlowImage_3DT = 1, AnatomicalImage_3DT = 2, MagnitudeImage_3DT = 3, SignalIntensityImage_3DT = 4, AnatomicalImage_3D = 5, FlowImage_2DT = 6, AnatomicalImage_2DT = 7, AnatomicalImage_2D = 8
+      DicomImageClass_None                = 0, //
+      DicomImageClass_3DT_Flow            = 1, //
+      DicomImageClass_3DT_Anatomy         = 2, //
+      DicomImageClass_3DT_Magnitude       = 3, //
+      DicomImageClass_3DT_SignalIntensity = 4, //
+      DicomImageClass_3D_Anatomy          = 5, //
+      DicomImageClass_2DT_Flow            = 6, //
+      DicomImageClass_2DT_Anatomy         = 7, //
+      DicomImageClass_2D_Anatomy          = 8, //
+      DicomImageClass_2DT_Magnitude       = 9, //
   };
-} // namespace bk::details
+} // namespace bk
 
 #endif //BKDICOM_DICOMIMAGECLASS_H
 

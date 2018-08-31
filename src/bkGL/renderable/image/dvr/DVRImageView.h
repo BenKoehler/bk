@@ -189,8 +189,12 @@ namespace bk
       virtual void on_visible_changed(bool b) override;
       virtual void on_animation_time_changed(double d) = 0;
       virtual void on_mouse_pos_changed(GLint x, GLint y) override;
-      virtual void on_mouse_button_pressed(MouseButton btn) override;
-      virtual void on_mouse_button_released(MouseButton btn) override;
+      virtual void on_mouse_button_pressed(MouseButton_ btn) override;
+      virtual void on_mouse_button_released(MouseButton_ btn) override;
+      virtual void on_key_pressed(Key_ k) override;
+      virtual void on_key_released(Key_ k) override;
+      virtual void on_mouse_wheel_up() override;
+      virtual void on_mouse_wheel_down() override;
       virtual void on_ssaa_factor_changed(GLint ssaa_factor) override;
       /// @}
 

@@ -37,7 +37,7 @@ namespace bk
     public:
       std::array<GLint, 2> pos;
       std::array<GLint, 2> last_pos;
-      std::unordered_set<MouseButton> pressed_buttons;
+      std::unordered_set<MouseButton_> pressed_buttons;
 
       Impl()
           : pos{{0, 0}},
@@ -98,23 +98,23 @@ namespace bk
   /// @}
 
   /// @{ -------------------------------------------------- GET BUTTON INFORMATION
-  bool Mouse::button_is_pressed(MouseButton btn) const
+  bool Mouse::button_is_pressed(MouseButton_ btn) const
   { return _pdata->pressed_buttons.find(btn) != _pdata->pressed_buttons.end(); }
   
   bool Mouse::left_button_is_pressed() const
-  { return button_is_pressed(MouseButton::Left); }
+  { return button_is_pressed(MouseButton_Left); }
 
   bool Mouse::right_button_is_pressed() const
-  { return button_is_pressed(MouseButton::Right); }
+  { return button_is_pressed(MouseButton_Right); }
 
   bool Mouse::middle_button_is_pressed() const
-  { return button_is_pressed(MouseButton::Middle); }
+  { return button_is_pressed(MouseButton_Middle); }
 
   bool Mouse::forward_button_is_pressed() const
-  { return button_is_pressed(MouseButton::Forward); }
+  { return button_is_pressed(MouseButton_Forward); }
 
   bool Mouse::backward_button_is_pressed() const
-  { return button_is_pressed(MouseButton::Backward); }
+  { return button_is_pressed(MouseButton_Backward); }
   /// @}
 
   //====================================================================================================
@@ -135,7 +135,7 @@ namespace bk
   /// @}
 
   /// @{ -------------------------------------------------- SET BUTTON PRESSED
-  void Mouse::set_button_pressed(MouseButton btn, bool pressed)
+  void Mouse::set_button_pressed(MouseButton_ btn, bool pressed)
   {
       if (pressed)
       { _pdata->pressed_buttons.insert(btn); }
@@ -144,36 +144,36 @@ namespace bk
   }
       
   void Mouse::set_left_button_pressed()
-  { set_button_pressed(MouseButton::Left, true); }
+  { set_button_pressed(MouseButton_Left, true); }
 
   void Mouse::set_right_button_pressed()
-  { set_button_pressed(MouseButton::Right, true); }
+  { set_button_pressed(MouseButton_Right, true); }
 
   void Mouse::set_middle_button_pressed()
-  { set_button_pressed(MouseButton::Middle, true); }
+  { set_button_pressed(MouseButton_Middle, true); }
 
   void Mouse::set_forward_button_pressed()
-  { set_button_pressed(MouseButton::Forward, true); }
+  { set_button_pressed(MouseButton_Forward, true); }
 
   void Mouse::set_backward_button_pressed()
-  { set_button_pressed(MouseButton::Backward, true); }
+  { set_button_pressed(MouseButton_Backward, true); }
   /// @}
 
   /// @{ -------------------------------------------------- SET BUTTON RELEASED
   void Mouse::set_left_button_released()
-  { set_button_pressed(MouseButton::Left, false); }
+  { set_button_pressed(MouseButton_Left, false); }
 
   void Mouse::set_right_button_released()
-  { set_button_pressed(MouseButton::Right, false); }
+  { set_button_pressed(MouseButton_Right, false); }
 
   void Mouse::set_middle_button_released()
-  { set_button_pressed(MouseButton::Middle, false); }
+  { set_button_pressed(MouseButton_Middle, false); }
 
   void Mouse::set_forward_button_released()
-  { set_button_pressed(MouseButton::Forward, false); }
+  { set_button_pressed(MouseButton_Forward, false); }
 
   void Mouse::set_backward_button_released()
-  { set_button_pressed(MouseButton::Backward, false); }
+  { set_button_pressed(MouseButton_Backward, false); }
   /// @}
 } // namespace bk
 

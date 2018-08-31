@@ -44,7 +44,7 @@ namespace bk
   //====================================================================================================
   struct DicomDirImporter_CMR::Impl
   {
-      std::map<unsigned int /*dcm_img_id*/, details::DicomImageClass> classification;
+      std::map<unsigned int /*dcm_img_id*/, DicomImageClass_> classification;
       details::FlowImageOrdering flow_image_order;
       double venc_3dt_in_m_per_s;
       double venc_2dt_in_m_per_s;
@@ -82,7 +82,7 @@ namespace bk
   //===== GETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- GET IDS OF IMAGE CLASS
-  std::vector<unsigned int> DicomDirImporter_CMR::ids_of_image_class(details::DicomImageClass tag) const
+  std::vector<unsigned int> DicomDirImporter_CMR::ids_of_image_class(DicomImageClass_ tag) const
   {
       std::vector<unsigned int> ids;
       for (auto it = _pdata->classification.begin(); it != _pdata->classification.end(); ++it)
@@ -96,7 +96,7 @@ namespace bk
 
   std::vector<unsigned int> DicomDirImporter_CMR::class_3dt_flow_images(bool sort_xyz) const
   {
-      std::vector<unsigned int> ids = ids_of_image_class(details::DicomImageClass::FlowImage_3DT);
+      std::vector<unsigned int> ids = ids_of_image_class(DicomImageClass_3DT_Flow);
 
       if (sort_xyz)
       {
@@ -133,7 +133,7 @@ namespace bk
   {
       // the magnitude images should have the same ordering as the flow images
 
-      std::vector<unsigned int> ids = ids_of_image_class(details::DicomImageClass::MagnitudeImage_3DT);
+      std::vector<unsigned int> ids = ids_of_image_class(DicomImageClass_3DT_Magnitude);
 
       if (sort_xyz)
       {
@@ -167,54 +167,57 @@ namespace bk
   }
 
   std::vector<unsigned int> DicomDirImporter_CMR::class_3dt_anatomical_images() const
-  { return ids_of_image_class(details::DicomImageClass::AnatomicalImage_3DT); }
+  { return ids_of_image_class(DicomImageClass_3DT_Anatomy); }
 
   std::vector<unsigned int> DicomDirImporter_CMR::class_3dt_signal_intensity_images() const
-  { return ids_of_image_class(details::DicomImageClass::SignalIntensityImage_3DT); }
+  { return ids_of_image_class(DicomImageClass_3DT_SignalIntensity); }
 
   std::vector<unsigned int> DicomDirImporter_CMR::class_3d_anatomical_images() const
-  { return ids_of_image_class(details::DicomImageClass::AnatomicalImage_3D); }
+  { return ids_of_image_class(DicomImageClass_3D_Anatomy); }
 
   std::vector<unsigned int> DicomDirImporter_CMR::class_2dt_flow_images() const
-  { return ids_of_image_class(details::DicomImageClass::FlowImage_2DT); }
+  { return ids_of_image_class(DicomImageClass_2DT_Flow); }
 
   std::vector<unsigned int> DicomDirImporter_CMR::class_2dt_anatomical_images() const
-  { return ids_of_image_class(details::DicomImageClass::AnatomicalImage_2DT); }
+  { return ids_of_image_class(DicomImageClass_2DT_Anatomy); }
 
   std::vector<unsigned int> DicomDirImporter_CMR::class_2d_anatomical_images() const
-  { return ids_of_image_class(details::DicomImageClass::AnatomicalImage_2D); }
+  { return ids_of_image_class(DicomImageClass_2D_Anatomy); }
   /// @}
 
   /// @{ -------------------------------------------------- IS CLASS
-  bool DicomDirImporter_CMR::is_class(unsigned int dcm_img_id, details::DicomImageClass tag) const
+  bool DicomDirImporter_CMR::is_class(unsigned int dcm_img_id, DicomImageClass_ tag) const
   {
       const auto it = _pdata->classification.find(dcm_img_id);
       return it != _pdata->classification.end() ? it->second == tag : false;
   }
 
   bool DicomDirImporter_CMR::is_3dt_flow_image(unsigned int dcm_img_id) const
-  { return is_class(dcm_img_id, details::DicomImageClass::FlowImage_3DT); }
+  { return is_class(dcm_img_id, DicomImageClass_3DT_Flow); }
 
   bool DicomDirImporter_CMR::is_3dt_magnitude_image(unsigned int dcm_img_id) const
-  { return is_class(dcm_img_id, details::DicomImageClass::MagnitudeImage_3DT); }
+  { return is_class(dcm_img_id, DicomImageClass_3DT_Magnitude); }
 
   bool DicomDirImporter_CMR::is_3dt_anatomical_image(unsigned int dcm_img_id) const
-  { return is_class(dcm_img_id, details::DicomImageClass::AnatomicalImage_3DT); }
+  { return is_class(dcm_img_id, DicomImageClass_3DT_Anatomy); }
 
   bool DicomDirImporter_CMR::is_3dt_signal_intensity_image(unsigned int dcm_img_id) const
-  { return is_class(dcm_img_id, details::DicomImageClass::SignalIntensityImage_3DT); }
+  { return is_class(dcm_img_id, DicomImageClass_3DT_SignalIntensity); }
 
   bool DicomDirImporter_CMR::is_3d_anatomical_image(unsigned int dcm_img_id) const
-  { return is_class(dcm_img_id, details::DicomImageClass::AnatomicalImage_3D); }
+  { return is_class(dcm_img_id, DicomImageClass_3D_Anatomy); }
 
   bool DicomDirImporter_CMR::is_2dt_flow_image(unsigned int dcm_img_id) const
-  { return is_class(dcm_img_id, details::DicomImageClass::FlowImage_2DT); }
+  { return is_class(dcm_img_id, DicomImageClass_2DT_Flow); }
+
+  bool DicomDirImporter_CMR::is_2dt_magnitude_image(unsigned int dcm_img_id) const
+  { return is_class(dcm_img_id, DicomImageClass_2DT_Magnitude); }
 
   bool DicomDirImporter_CMR::is_2dt_anatomical_image(unsigned int dcm_img_id) const
-  { return is_class(dcm_img_id, details::DicomImageClass::AnatomicalImage_2DT); }
+  { return is_class(dcm_img_id, DicomImageClass_2DT_Anatomy); }
 
   bool DicomDirImporter_CMR::is_2d_anatomical_image(unsigned int dcm_img_id) const
-  { return is_class(dcm_img_id, details::DicomImageClass::AnatomicalImage_2D); }
+  { return is_class(dcm_img_id, DicomImageClass_2D_Anatomy); }
   /// @}
 
   /// @{ -------------------------------------------------- GET FLOW IMAGE ORDER
@@ -249,32 +252,35 @@ namespace bk
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- ADD IMAGE TO CLASS
-  bool DicomDirImporter_CMR::add_to_class(unsigned int dcm_img_id, details::DicomImageClass tag)
-  { return _pdata->classification.insert(std::pair<unsigned int, details::DicomImageClass>(dcm_img_id, tag)).second; }
+  bool DicomDirImporter_CMR::add_to_class(unsigned int dcm_img_id, DicomImageClass_ tag)
+  { return _pdata->classification.insert(std::pair<unsigned int, DicomImageClass_>(dcm_img_id, tag)).second; }
 
   bool DicomDirImporter_CMR::add_3dt_flow_image(unsigned int dcm_img_id)
-  { return add_to_class(dcm_img_id, details::DicomImageClass::FlowImage_3DT); }
+  { return add_to_class(dcm_img_id, DicomImageClass_3DT_Flow); }
 
   bool DicomDirImporter_CMR::add_3dt_magnitude_image(unsigned int dcm_img_id)
-  { return add_to_class(dcm_img_id, details::DicomImageClass::MagnitudeImage_3DT); }
+  { return add_to_class(dcm_img_id, DicomImageClass_3DT_Magnitude); }
 
   bool DicomDirImporter_CMR::add_3dt_anatomical_image(unsigned int dcm_img_id)
-  { return add_to_class(dcm_img_id, details::DicomImageClass::AnatomicalImage_3DT); }
+  { return add_to_class(dcm_img_id, DicomImageClass_3DT_Anatomy); }
 
   bool DicomDirImporter_CMR::add_3dt_signal_intensity_image(unsigned int dcm_img_id)
-  { return add_to_class(dcm_img_id, details::DicomImageClass::SignalIntensityImage_3DT); }
+  { return add_to_class(dcm_img_id, DicomImageClass_3DT_SignalIntensity); }
 
   bool DicomDirImporter_CMR::add_3d_anatomical_image(unsigned int dcm_img_id)
-  { return add_to_class(dcm_img_id, details::DicomImageClass::AnatomicalImage_3D); }
+  { return add_to_class(dcm_img_id, DicomImageClass_3D_Anatomy); }
 
   bool DicomDirImporter_CMR::add_2dt_flow_image(unsigned int dcm_img_id)
-  { return add_to_class(dcm_img_id, details::DicomImageClass::FlowImage_2DT); }
+  { return add_to_class(dcm_img_id, DicomImageClass_2DT_Flow); }
+
+  bool DicomDirImporter_CMR::add_2dt_magnitude_image(unsigned int dcm_img_id)
+  { return add_to_class(dcm_img_id, DicomImageClass_2DT_Magnitude); }
 
   bool DicomDirImporter_CMR::add_2dt_anatomical_image(unsigned int dcm_img_id)
-  { return add_to_class(dcm_img_id, details::DicomImageClass::AnatomicalImage_2DT); }
+  { return add_to_class(dcm_img_id, DicomImageClass_2DT_Anatomy); }
 
   bool DicomDirImporter_CMR::add_2d_anatomical_image(unsigned int dcm_img_id)
-  { return add_to_class(dcm_img_id, details::DicomImageClass::AnatomicalImage_2D); }
+  { return add_to_class(dcm_img_id, DicomImageClass_2D_Anatomy); }
   /// @}
 
   /// @{ -------------------------------------------------- SET FLOW IMAGE ORDERING
@@ -758,7 +764,7 @@ namespace bk
               file.read(reinterpret_cast<char*>(&temp), sizeof(file_size_type));
               file.read(reinterpret_cast<char*>(&temp2), sizeof(file_size_type));
 
-              _pdata->classification.insert(std::pair<unsigned int, details::DicomImageClass>(static_cast<unsigned int>(temp), static_cast<details::DicomImageClass>(temp2)));
+              _pdata->classification.insert(std::pair<unsigned int, DicomImageClass_>(static_cast<unsigned int>(temp), static_cast<DicomImageClass_>(temp2)));
           }
 
           file.read(reinterpret_cast<char*>(&temp), sizeof(file_size_type));

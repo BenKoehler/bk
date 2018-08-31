@@ -29,6 +29,7 @@
 
 #include <bk/CopyablePIMPL>
 #include <bkGL/AbstractObject.h>
+#include <bkGL/EKey.h>
 #include <bkGL/EMouseButton.h>
 
 namespace bk
@@ -150,8 +151,12 @@ namespace bk::details
       virtual void on_modelview_changed(bool b) = 0;
       virtual void on_visible_changed(bool b) = 0;
       virtual void on_mouse_pos_changed(GLint x, GLint y) = 0;
-      virtual void on_mouse_button_pressed(MouseButton btn) = 0;
-      virtual void on_mouse_button_released(MouseButton btn) = 0;
+      virtual void on_mouse_button_pressed(MouseButton_ btn) = 0;
+      virtual void on_mouse_button_released(MouseButton_ btn) = 0;
+      virtual void on_key_pressed(Key_ k) = 0;
+      virtual void on_key_released(Key_ k) = 0;
+      virtual void on_mouse_wheel_up() = 0;
+      virtual void on_mouse_wheel_down() = 0;
       virtual void on_ssaa_factor_changed(GLint ssaa_factor) = 0;
       /// @}
 

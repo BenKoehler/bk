@@ -22,16 +22,20 @@
  * SOFTWARE.
  */
 
- #pragma once
+#pragma once
 
 #ifndef BKGL_MOUSEBUTTON_H
 #define BKGL_MOUSEBUTTON_H
 
 namespace bk
 {
-  enum class MouseButton : unsigned int
+  enum MouseButton_ : unsigned int
   {
-      Left = 0, Right = 1, Middle = 2, Forward = 3, Backward = 4
+      MouseButton_Left     = 0, //
+      MouseButton_Right    = 1, //
+      MouseButton_Middle   = 2, //
+      MouseButton_Forward  = 3, //
+      MouseButton_Backward = 4 //
   };
 } // namespace bk
 
