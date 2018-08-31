@@ -202,7 +202,6 @@ namespace bk
       public:
 
         [[maybe_unused]] bool save_local_dcmbyte_image_copies() const;
-
         [[maybe_unused]] bool save_local_image_copy(std::string_view filepath, const DicomImage<double, 3>& img) const;
         [[maybe_unused]] bool save_pressure_map(PressureMapImageFilter pmf) const;
         [[maybe_unused]] bool save_pressure_map() const;

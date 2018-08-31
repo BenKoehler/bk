@@ -112,6 +112,33 @@ namespace bk
   { return _pdata->info.size(); }
   /// @}
 
+  /// @{ -------------------------------------------------- GET ALL IMAGE IDS
+  std::vector<unsigned int> DicomDirImporter::all_image_ids() const
+  {
+      std::vector<unsigned int> ids;
+
+      const auto insert_images = [&](const std::vector<unsigned int>& newIds)
+      {
+          for (unsigned int id: newIds)
+          { ids.push_back(id); }
+      };
+
+      for (const std::pair<Vec2ui, std::vector<unsigned int>>& p: _pdata->images_2d)
+      { insert_images(p.second); }
+
+      for (const std::pair<Vec3ui, std::vector<unsigned int>>& p: _pdata->images_2dt)
+      { insert_images(p.second); }
+
+      for (const std::pair<Vec3ui, std::vector<unsigned int>>& p: _pdata->images_3d)
+      { insert_images(p.second); }
+
+      for (const std::pair<Vec4ui, std::vector<unsigned int>>& p: _pdata->images_3dt)
+      { insert_images(p.second); }
+
+      return ids;
+  }
+  /// @}
+
   /// @{ -------------------------------------------------- GET IMAGE INFOS
   DicomImageInfos& DicomDirImporter::image_infos(unsigned int id)
   {

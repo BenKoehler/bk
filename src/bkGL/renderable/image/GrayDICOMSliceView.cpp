@@ -27,6 +27,7 @@
     #include <bkGL/renderable/image/GrayDICOMSliceView.h>
 
     #include <algorithm>
+    #include <memory>
 
     #include <bk/Dicom>
     #include <bk/Matrix>
@@ -134,10 +135,11 @@ namespace bk
 
       if (GLfloat* intensities = _ssbo_intensity().map_write_only<GLfloat>(); intensities != nullptr)
       {
-          //const auto& size = _image.size();
-          const auto img = _pdata->dcm_importer->read_image_block(_pdata->dcm_image_id, 0, _pdata->size[0] - 1, 0, _pdata->size[1] - 1, z, z, t, t);
+          const std::unique_ptr<DicomImage<double,-1>> img = _pdata->dcm_importer->read_image_block(_pdata->dcm_image_id, 0, _pdata->size[0] - 1, 0, _pdata->size[1] - 1, z, z, t, t);
+
           _intensitymax() = -std::numeric_limits<GLfloat>::max();
           _intensitymin() = std::numeric_limits<GLfloat>::max();
+
           GLuint cnt = 0;
 
           //for (GLuint y = 0; y < static_cast<GLuint>(_size[1]); ++y)
@@ -152,6 +154,7 @@ namespace bk
                   _intensitymax() = std::max(intensitymax(), val);
               }
           }
+
           _ssbo_intensity().unmap_and_release();
       }
   }

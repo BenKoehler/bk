@@ -93,6 +93,10 @@ namespace bk
       [[nodiscard]] unsigned int num_images() const;
       /// @}
 
+      /// @{ -------------------------------------------------- GET ALL IMAGE IDS
+      [[nodiscard]] std::vector<unsigned int> all_image_ids() const;
+      /// @}
+
       /// @{ -------------------------------------------------- GET IMAGE INFOS
       //! Mainly a collection of Dicom Tags
       [[nodiscard]] DicomImageInfos& image_infos(unsigned int id);
