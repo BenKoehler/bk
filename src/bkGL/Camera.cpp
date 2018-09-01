@@ -74,10 +74,10 @@ namespace bk
       { /* do nothing */ }
 
       Impl(const Impl&) = delete;
-      Impl(Impl&&) = default;
+      Impl(Impl&&) noexcept = default;
       ~Impl() {s_projection_matrix_changed.disconnect_all();s_lookat_matrix_changed.disconnect_all();}
       [[maybe_unused]] Impl& operator=(const Impl&) = delete;
-      [[maybe_unused]] Impl& operator=(Impl&&) = default;
+      [[maybe_unused]] Impl& operator=(Impl&&) noexcept = default;
   };
 
   //====================================================================================================

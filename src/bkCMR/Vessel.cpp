@@ -74,7 +74,7 @@ namespace bk
         { /* do nothing */ }
 
         Impl(const Impl&) = default;
-        Impl(Impl&&) = default;
+        Impl(Impl&&) noexcept = default;
         ~Impl() = default;
         Impl& operator=(const Impl&) = default;
         Impl& operator=(Impl&&) noexcept = default;

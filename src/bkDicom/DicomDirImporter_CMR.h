@@ -112,8 +112,7 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- GET VENC
-      [[nodiscard]] double venc_3dt_in_m_per_s() const;
-      [[nodiscard]] double venc_2dt_in_m_per_s() const;
+      [[nodiscard]] double venc_in_m_per_s(unsigned int dcm_img_id) const;
       /// @}
 
       //====================================================================================================
@@ -144,8 +143,7 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- SET VENC
-      void set_venc_3dt_in_m_per_s(double venc_3dt_in_m_per_s);
-      void set_venc_2dt_in_m_per_s(double venc_2dt_in_m_per_s);
+      void set_venc_in_m_per_s(unsigned int dcm_img_id, double venc_in_m_per_s);
       /// @}
 
       /// @{ -------------------------------------------------- OPERATOR =

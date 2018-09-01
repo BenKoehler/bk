@@ -28,8 +28,10 @@
 #include <utility>
 
 #ifdef BK_EMIT_PROGRESS
+
     #include <bk/Localization>
     #include <bk/Progress>
+
 #endif
 
 #include <bkDicom/DicomDirImporter_CMR.h>
@@ -45,21 +47,18 @@ namespace bk
   struct DicomDirImporter_CMR::Impl
   {
       std::map<unsigned int /*dcm_img_id*/, DicomImageClass_> classification;
-      details::FlowImageOrdering flow_image_order;
-      double venc_3dt_in_m_per_s;
-      double venc_2dt_in_m_per_s;
+      details::FlowImageOrdering                              flow_image_order;
+      std::map<unsigned int /*dcm_img_id*/, double>           venc;
 
       Impl()
-          : flow_image_order(details::FlowImageOrdering::XYZ),
-            venc_3dt_in_m_per_s(1),
-            venc_2dt_in_m_per_s(1)
+          : flow_image_order(details::FlowImageOrdering::XYZ)
       { /* do nothing */ }
 
       Impl(const Impl&) = default;
-      Impl(Impl&&) = default;
+      Impl(Impl&&) noexcept = default;
       ~Impl() = default;
       Impl& operator=(const Impl&) = default;
-      Impl& operator=(Impl&&) = default;
+      Impl& operator=(Impl&&) noexcept = default;
   };
 
   //====================================================================================================
@@ -69,6 +68,7 @@ namespace bk
   DicomDirImporter_CMR::DicomDirImporter_CMR() = default;
   DicomDirImporter_CMR::DicomDirImporter_CMR(const self_type&) = default;
   DicomDirImporter_CMR::DicomDirImporter_CMR(self_type&&) noexcept = default;
+
   DicomDirImporter_CMR::DicomDirImporter_CMR(const std::string& dir)
       : base_type(dir)
   { /* do nothing */ }
@@ -85,7 +85,7 @@ namespace bk
   std::vector<unsigned int> DicomDirImporter_CMR::ids_of_image_class(DicomImageClass_ tag) const
   {
       std::vector<unsigned int> ids;
-      for (auto it = _pdata->classification.begin(); it != _pdata->classification.end(); ++it)
+      for (auto                 it = _pdata->classification.begin(); it != _pdata->classification.end(); ++it)
       {
           if (it->second == tag)
           { ids.push_back(it->first); }
@@ -241,11 +241,13 @@ namespace bk
   /// @}
 
   /// @{ -------------------------------------------------- GET VENC
-  double DicomDirImporter_CMR::venc_3dt_in_m_per_s() const
-  { return _pdata->venc_3dt_in_m_per_s; }
+  double DicomDirImporter_CMR::venc_in_m_per_s(unsigned int dcm_img_id) const
+  {
+      const auto it = _pdata->venc.find(dcm_img_id);
+      assert(it != _pdata->venc.end() && "DicomDirImporter_CMR::venc_in_m_per_s - dcm image has no venc assigned");
 
-  double DicomDirImporter_CMR::venc_2dt_in_m_per_s() const
-  { return _pdata->venc_2dt_in_m_per_s; }
+      return it != _pdata->venc.end() ? it->second : 0;
+  }
   /// @}
 
   //====================================================================================================
@@ -304,11 +306,16 @@ namespace bk
   /// @}
 
   /// @{ -------------------------------------------------- SET VENC
-  void DicomDirImporter_CMR::set_venc_3dt_in_m_per_s(double venc_3dt_in_m_per_s)
-  { _pdata->venc_3dt_in_m_per_s = std::max(0.01, venc_3dt_in_m_per_s); }
+  void DicomDirImporter_CMR::set_venc_in_m_per_s(unsigned int dcm_img_id, double venc_3dt_in_m_per_s)
+  {
+      const double v  = std::max(0.01, venc_3dt_in_m_per_s);
+      auto         it = _pdata->venc.find(dcm_img_id);
 
-  void DicomDirImporter_CMR::set_venc_2dt_in_m_per_s(double venc_2dt_in_m_per_s)
-  { _pdata->venc_2dt_in_m_per_s = std::max(0.01, venc_2dt_in_m_per_s); }
+      if (it == _pdata->venc.end())
+      { _pdata->venc.emplace(dcm_img_id, v); }
+      else
+      { it->second = v; }
+  }
   /// @}
 
   /// @{ -------------------------------------------------- OPERATOR =
@@ -324,8 +331,7 @@ namespace bk
   {
       clear_classification();
       set_flow_image_ordering_xyz();
-      _pdata->venc_3dt_in_m_per_s = 1;
-      _pdata->venc_2dt_in_m_per_s = 1;
+      _pdata->venc.clear();
   }
 
   void DicomDirImporter_CMR::clear_classification()
@@ -346,7 +352,7 @@ namespace bk
           {
               for (unsigned int z = zfrom; z <= zto; ++z)
               {
-                  double mean = 0;
+                  double mean   = 0;
                   double tstdev = 0;
 
                   for (unsigned int t = tfrom; t <= tto; ++t)
@@ -414,57 +420,57 @@ namespace bk
           corner_size.max_cwise_internal(2);
 
           constexpr const unsigned int xmin0 = 0;
-          const unsigned int xmax0 = corner_size[0] - 1;
-          const unsigned int xmin1 = grid_size[0] - corner_size[0];
-          const unsigned int xmax1 = grid_size[0] - 1;
+          const unsigned int           xmax0 = corner_size[0] - 1;
+          const unsigned int           xmin1 = grid_size[0] - corner_size[0];
+          const unsigned int           xmax1 = grid_size[0] - 1;
 
           constexpr const unsigned int ymin0 = 0;
-          const unsigned int ymax0 = corner_size[1] - 1;
-          const unsigned int ymin1 = grid_size[1] - corner_size[1];
-          const unsigned int ymax1 = grid_size[1] - 1;
+          const unsigned int           ymax0 = corner_size[1] - 1;
+          const unsigned int           ymin1 = grid_size[1] - corner_size[1];
+          const unsigned int           ymax1 = grid_size[1] - 1;
 
           constexpr const unsigned int zmin0 = 0;
-          const unsigned int zmax0 = corner_size[2] - 1;
-          const unsigned int zmin1 = grid_size[2] - corner_size[2];
-          const unsigned int zmax1 = grid_size[2] - 1;
+          const unsigned int           zmax0 = corner_size[2] - 1;
+          const unsigned int           zmin1 = grid_size[2] - corner_size[2];
+          const unsigned int           zmax1 = grid_size[2] - 1;
 
           constexpr const unsigned int tmin = 0;
-          const unsigned int tmax = grid_size[3] - 1;
+          const unsigned int           tmax = grid_size[3] - 1;
 
           for (unsigned int k = 0; k < group_size; ++k)
           {
-              const auto img0 = this->read_image_block(ids[k], xmin0, xmax0, ymin0, ymax0, zmin0, zmax0, tmin, tmax);
+              const auto          img0 = this->read_image_block(ids[k], xmin0, xmax0, ymin0, ymax0, zmin0, zmax0, tmin, tmax);
               std::future<double> fut0 = threadpool.enqueue([&]()
                                                             { return eval_corner_tstdev(img0, xmin0, xmax0, ymin0, ymax0, zmin0, zmax0, tmin, tmax); });
 
-              const auto img1 = this->read_image_block(ids[k], xmin0, xmax0, ymin0, ymax0, zmin1, zmax1, tmin, tmax);
+              const auto          img1 = this->read_image_block(ids[k], xmin0, xmax0, ymin0, ymax0, zmin1, zmax1, tmin, tmax);
               std::future<double> fut1 = threadpool.enqueue([&]()
                                                             { return eval_corner_tstdev(img1, xmin0, xmax0, ymin0, ymax0, zmin1, zmax1, tmin, tmax); });
 
-              const auto img2 = this->read_image_block(ids[k], xmin0, xmax0, ymin1, ymax1, zmin0, zmax0, tmin, tmax);
+              const auto          img2 = this->read_image_block(ids[k], xmin0, xmax0, ymin1, ymax1, zmin0, zmax0, tmin, tmax);
               std::future<double> fut2 = threadpool.enqueue([&]()
                                                             { return eval_corner_tstdev(img2, xmin0, xmax0, ymin1, ymax1, zmin0, zmax0, tmin, tmax); });
 
-              const auto img3 = this->read_image_block(ids[k], xmin0, xmax0, ymin1, ymax1, zmin1, zmax1, tmin, tmax);
+              const auto          img3 = this->read_image_block(ids[k], xmin0, xmax0, ymin1, ymax1, zmin1, zmax1, tmin, tmax);
               std::future<double> fut3 = threadpool.enqueue([&]()
                                                             { return eval_corner_tstdev(img3, xmin0, xmax0, ymin1, ymax1, zmin1, zmax1, tmin, tmax); });
 
-              const auto img4 = this->read_image_block(ids[k], xmin1, xmax1, ymin0, ymax0, zmin0, zmax0, tmin, tmax);
+              const auto          img4 = this->read_image_block(ids[k], xmin1, xmax1, ymin0, ymax0, zmin0, zmax0, tmin, tmax);
               std::future<double> fut4 = threadpool.enqueue([&]()
                                                             { return eval_corner_tstdev(img4, xmin1, xmax1, ymin0, ymax0, zmin0, zmax0, tmin, tmax); });
 
-              const auto img5 = this->read_image_block(ids[k], xmin1, xmax1, ymin0, ymax0, zmin1, zmax1, tmin, tmax);
+              const auto          img5 = this->read_image_block(ids[k], xmin1, xmax1, ymin0, ymax0, zmin1, zmax1, tmin, tmax);
               std::future<double> fut5 = threadpool.enqueue([&]()
                                                             { return eval_corner_tstdev(img5, xmin1, xmax1, ymin0, ymax0, zmin1, zmax1, tmin, tmax); });
 
-              const auto img6 = this->read_image_block(ids[k], xmin1, xmax1, ymin1, ymax1, zmin0, zmax0, tmin, tmax);
+              const auto          img6 = this->read_image_block(ids[k], xmin1, xmax1, ymin1, ymax1, zmin0, zmax0, tmin, tmax);
               std::future<double> fut6 = threadpool.enqueue([&]()
                                                             { return eval_corner_tstdev(img6, xmin1, xmax1, ymin1, ymax1, zmin0, zmax0, tmin, tmax); });
 
-              const auto img7 = this->read_image_block(ids[k], xmin1, xmax1, ymin1, ymax1, zmin1, zmax1, tmin, tmax);
-              std::future<double> fut7 = threadpool.enqueue([&]()
-                                                            { return eval_corner_tstdev(img7, xmin1, xmax1, ymin1, ymax1, zmin1, zmax1, tmin, tmax); });
-              const double tstdev_sum = (fut0.get() + fut1.get() + fut2.get() + fut3.get() + fut4.get() + fut5.get() + fut6.get() + fut7.get()) / 8; // num corners
+              const auto          img7       = this->read_image_block(ids[k], xmin1, xmax1, ymin1, ymax1, zmin1, zmax1, tmin, tmax);
+              std::future<double> fut7       = threadpool.enqueue([&]()
+                                                                  { return eval_corner_tstdev(img7, xmin1, xmax1, ymin1, ymax1, zmin1, zmax1, tmin, tmax); });
+              const double        tstdev_sum = (fut0.get() + fut1.get() + fut2.get() + fut3.get() + fut4.get() + fut5.get() + fut6.get() + fut7.get()) / 8; // num corners
 
               tstdev[i].push_back(std::make_pair(ids[k], tstdev_sum));
 
@@ -527,7 +533,7 @@ namespace bk
           // find min stdev
           const auto minstdev = std::min_element(tstdev[i].begin(), tstdev[i].end(), [](const auto& x, const auto& y)
           { return x.second < y.second; })->second;
-          const auto thresh = 100 * minstdev; // todo: options
+          const auto thresh   = 100 * minstdev; // todo: options
 
           // are there 3 images with a significantly higher stdev than the rest?
           for (unsigned int k = 0; k < tstdev[i].size(); ++k)
@@ -664,13 +670,13 @@ namespace bk
       if (n2DTGroups == 0)
       { return; }
 
-      double avg_heartbeat_ms = 0;
-      unsigned int cnt = 0;
-      const unsigned int n3DTGroups = this->num_image_3d_plus_time_groups();
+      double             avg_heartbeat_ms = 0;
+      unsigned int       cnt              = 0;
+      const unsigned int n3DTGroups       = this->num_image_3d_plus_time_groups();
 
       for (unsigned int i = 0; i < n3DTGroups; ++i)
       {
-          const auto group = this->image_3d_plus_time_group(i);
+          const auto         group   = this->image_3d_plus_time_group(i);
           const unsigned int nImages = group.size();
 
           for (unsigned int k = 0; k < nImages; ++k)
@@ -701,7 +707,7 @@ namespace bk
 
       for (unsigned int i = 0; i < n2DTGroups; ++i)
       {
-          const auto group = this->image_2d_plus_time_group(i);
+          const auto         group   = this->image_2d_plus_time_group(i);
           const unsigned int nImages = group.size();
 
           for (unsigned int k = 0; k < nImages; ++k)
@@ -743,8 +749,17 @@ namespace bk
           file.write(reinterpret_cast<const char*>(&temp), sizeof(file_size_type));
 
           // venc
-          file.write(reinterpret_cast<const char*>(&_pdata->venc_3dt_in_m_per_s), sizeof(double));
-          file.write(reinterpret_cast<const char*>(&_pdata->venc_2dt_in_m_per_s), sizeof(double));
+          const file_size_type nVencs = static_cast<file_size_type>(_pdata->venc.size());
+          file.write(reinterpret_cast<const char*>(&nVencs), sizeof(file_size_type));
+
+          for (auto[dcm_img_id, venc]: _pdata->venc)
+          {
+              const file_size_type id = static_cast<file_size_type>(dcm_img_id);
+              const double v = static_cast<double>(venc);
+
+              file.write(reinterpret_cast<const char*>(&id), sizeof(file_size_type));
+              file.write(reinterpret_cast<const char*>(&v), sizeof(double));
+          }
       }
   }
 
@@ -754,8 +769,8 @@ namespace bk
       {
           using file_size_type = std::uint16_t;
 
-          file_size_type temp = 0;
-          file_size_type temp2 = 0;
+          file_size_type temp     = 0;
+          file_size_type temp2    = 0;
           file_size_type nClasses = 0;
           file.read(reinterpret_cast<char*>(&nClasses), sizeof(file_size_type));
 
@@ -771,8 +786,21 @@ namespace bk
           _pdata->flow_image_order = static_cast<details::FlowImageOrdering>(temp);
 
           // venc
-          file.read(reinterpret_cast<char*>(&_pdata->venc_3dt_in_m_per_s), sizeof(double));
-          file.read(reinterpret_cast<char*>(&_pdata->venc_2dt_in_m_per_s), sizeof(double));
+          _pdata->venc.clear();
+
+          file_size_type nVencs = 0;
+          file.read(reinterpret_cast<char*>(&nVencs), sizeof(file_size_type));
+          
+          for (file_size_type i = 0; i < nVencs; ++i)
+          {
+              file_size_type id = 0;
+              double v = 0;
+
+              file.read(reinterpret_cast<char*>(&id), sizeof(file_size_type));
+              file.read(reinterpret_cast<char*>(&v), sizeof(double));
+
+              _pdata->venc.emplace(id,v);
+          }
       }
   }
   /// @}

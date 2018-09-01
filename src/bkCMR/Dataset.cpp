@@ -436,6 +436,12 @@ namespace bk
         if (flow_image_ids.size() != 3)
         { return false; }
 
+        std::array<double, 3> venc = {//
+            _pdata->importer.venc_in_m_per_s(flow_image_ids[0]),//
+            _pdata->importer.venc_in_m_per_s(flow_image_ids[1]),//
+            _pdata->importer.venc_in_m_per_s(flow_image_ids[2])//
+        };
+
         const std::reference_wrapper<DicomImageInfos> info[3] = {_pdata->importer.image_infos(flow_image_ids[0]), _pdata->importer.image_infos(flow_image_ids[1]), _pdata->importer.image_infos(flow_image_ids[2])};
 
         #ifdef BK_EMIT_PROGRESS
@@ -518,11 +524,9 @@ namespace bk
                         const unsigned int lid = grid_to_list_id(size, x, y, z, t);
                         Vec3d              v((*f[order[0]])[lid] - info[order[0]].get().LargestImagePixelValue / 2, (*f[order[1]])[lid] - info[order[1]].get().LargestImagePixelValue / 2, (*f[order[2]])[lid] - info[order[2]].get().LargestImagePixelValue / 2);
 
-                        v[0] /= static_cast<double>(info[order[0]].get().LargestImagePixelValue / 2) * dirfac[0];
-                        v[1] /= static_cast<double>(info[order[1]].get().LargestImagePixelValue / 2) * dirfac[1];
-                        v[2] /= static_cast<double>(info[order[2]].get().LargestImagePixelValue / 2) * dirfac[2];
-
-                        v *= _pdata->importer.venc_3dt_in_m_per_s();
+                        v[0] /= static_cast<double>(info[order[0]].get().LargestImagePixelValue / 2) * dirfac[0] * venc[0];
+                        v[1] /= static_cast<double>(info[order[1]].get().LargestImagePixelValue / 2) * dirfac[1] * venc[1];
+                        v[2] /= static_cast<double>(info[order[2]].get().LargestImagePixelValue / 2) * dirfac[2] * venc[2];
 
                         _pdata->flow_image_3dt[lid] = std::move(v);
                     }
@@ -541,7 +545,7 @@ namespace bk
         if (flags & DatasetFilter_PhaseUnwrapping)
         {
             load_phase_unwrapping_3dt();
-            _pdata->phase_unwrapping_3dt.apply(_pdata->flow_image_3dt, _pdata->importer.venc_3dt_in_m_per_s());
+            _pdata->phase_unwrapping_3dt.apply(_pdata->flow_image_3dt, venc);
         }
 
         if (flags & DatasetFilter_VelocityOffset)
@@ -585,7 +589,7 @@ namespace bk
         if (flags | DatasetFilter_PhaseUnwrapping)
         {
             PhaseUnwrapping2DT pu;
-            pu.apply(*ff, _pdata->importer.venc_2dt_in_m_per_s());
+            pu.apply(*ff, _pdata->importer.venc_in_m_per_s(dcm_id));
         }
 
         if (flags | DatasetFilter_VelocityOffset)
@@ -777,7 +781,7 @@ namespace bk
             std::unique_ptr<FlowImage2DT> ff = flow_image_2dt(id, DatasetFilter_None);
 
             PhaseUnwrapping2DT pu;
-            pu.init(*ff, _pdata->importer.venc_2dt_in_m_per_s());
+            pu.init(*ff, _pdata->importer.venc_in_m_per_s(id));
 
             _pdata->phase_unwrapping_2dt.emplace(id, std::move(pu));
         }
@@ -793,7 +797,15 @@ namespace bk
         if (!is_flow_image_3dt_loaded())
         { return false; }
 
-        _pdata->phase_unwrapping_3dt.init(_pdata->flow_image_3dt, _pdata->importer.venc_3dt_in_m_per_s());
+        std::vector<unsigned int> flow_img_ids = _pdata->importer.class_3dt_flow_images();
+
+        std::array<double,3> venc = {//
+            _pdata->importer.venc_in_m_per_s(flow_img_ids[0]),//
+            _pdata->importer.venc_in_m_per_s(flow_img_ids[1]),//
+            _pdata->importer.venc_in_m_per_s(flow_img_ids[2])//
+        };
+
+        _pdata->phase_unwrapping_3dt.init(_pdata->flow_image_3dt, venc);
 
         return true;
     }

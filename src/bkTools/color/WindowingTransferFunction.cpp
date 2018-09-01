@@ -53,7 +53,7 @@ namespace bk
       { /* do nothing */ }
 
       Impl(const Impl&) = default;
-      Impl(Impl&&) = default;
+      Impl(Impl&&) noexcept = default;
 
       Impl(double intensity_min_, double intensity_max_, double center_, double width_)
           : cols(color_type(0, 0, 0, 0), color_type(0, 0, 0, 0), color_type(1, 1, 1, 1), color_type(1, 1, 1, 1)),
@@ -68,7 +68,7 @@ namespace bk
       { /* do nothing */ }
 
       Impl& operator=(const Impl&) = default;
-      Impl& operator=(Impl&&) = default;
+      Impl& operator=(Impl&&) noexcept = default;
   };
 
   //====================================================================================================

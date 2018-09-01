@@ -36,7 +36,7 @@ namespace bk::details
 
       Impl() = default;
       Impl(const Impl&) = delete;
-      Impl(Impl&&) = default;
+      Impl(Impl&&) noexcept = default;
 
       Impl(std::string_view _bufferName, unsigned int _bufferBaseId)
           : bufferName(_bufferName),
@@ -45,7 +45,7 @@ namespace bk::details
 
       ~Impl() = default;
       [[maybe_unused]] Impl& operator=(const Impl&) = delete;
-      [[maybe_unused]] Impl& operator=(Impl&&) = default;
+      [[maybe_unused]] Impl& operator=(Impl&&) noexcept = default;
   }; // UBOSpecialization::Impl
 
   //====================================================================================================

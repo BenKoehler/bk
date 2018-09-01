@@ -117,10 +117,10 @@ namespace bk::details
       { /* do nothing */ }
 
       Impl(const Impl&) = delete;
-      Impl(Impl&&) = default;
+      Impl(Impl&&) noexcept = default;
       ~Impl() = default;
       Impl& operator=(const Impl&) = delete;
-      Impl& operator=(Impl&&) = default;
+      Impl& operator=(Impl&&) noexcept = default;
   };
 
   //====================================================================================================
