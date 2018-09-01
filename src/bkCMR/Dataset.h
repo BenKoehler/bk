@@ -66,10 +66,10 @@ namespace bk
         //====================================================================================================
         //===== DEFINITIONS
         //====================================================================================================
-        static const std::string dcmbytes;
         static const std::string vessel_dir;
 
       public:
+        static const std::string dcmbytes;
 
         //====================================================================================================
         //===== MEMBERS
@@ -92,6 +92,7 @@ namespace bk
         //===== GETTER
         //====================================================================================================
         [[nodiscard]] const std::string& project_path() const;
+        [[nodiscard]] std::string project_path_without_slash_ending() const;
 
         [[nodiscard]] DicomDirImporter_CMR& importer();
         [[nodiscard]] const DicomDirImporter_CMR& importer() const;
@@ -196,6 +197,7 @@ namespace bk
         //===== I/O
         //====================================================================================================
       private:
+        [[nodiscard]] std::string filepath_importer() const;
         [[nodiscard]] std::string filepath_flow_dir_correction() const;
         [[nodiscard]] std::string filepath_phase_unwrapping_2dt() const;
         [[nodiscard]] std::string filepath_phase_unwrapping_3dt() const;
@@ -203,6 +205,10 @@ namespace bk
 
         [[maybe_unused]] bool save_local_dcmbyte_image_copies() const;
         [[maybe_unused]] bool save_local_image_copy(std::string_view filepath, const DicomImage<double, 3>& img) const;
+
+        [[maybe_unused]] bool save_importer() const;
+        [[maybe_unused]] bool load_importer();
+
         [[maybe_unused]] bool save_pressure_map(PressureMapImageFilter pmf) const;
         [[maybe_unused]] bool save_pressure_map() const;
 

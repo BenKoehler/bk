@@ -93,6 +93,9 @@ namespace bk
     const std::string& Dataset::project_path() const
     { return _pdata->project_path; }
 
+    std::string Dataset::project_path_without_slash_ending() const
+    { return _pdata->project_path.back() == '/' ? string_utils::chop_back(_pdata->project_path, 1) : _pdata->project_path; }
+
     DicomDirImporter_CMR& Dataset::importer()
     { return _pdata->importer; }
 
@@ -846,6 +849,9 @@ namespace bk
     //====================================================================================================
     //===== I/O
     //====================================================================================================
+    std::string Dataset::filepath_importer() const
+    { return _pdata->project_path + _pdata->importer.dataset_name() + ".cmr"; }
+
     std::string Dataset::filepath_flow_dir_correction() const
     { return _pdata->project_path + "dir.fdc"; }
 
@@ -862,7 +868,7 @@ namespace bk
         std::vector<std::future<void>>  tasks;
 
         if (ids.empty())
-        {return false;}
+        { return false; }
 
         #ifdef BK_EMIT_PROGRESS
         bk::Progress& prog = bk_progress.emplace_task(ids.size(), ___("saving local dicom image copies"));
@@ -950,6 +956,12 @@ namespace bk
 
         return true;
     }
+
+    bool Dataset::save_importer() const
+    { return _pdata->importer.save(filepath_importer()); }
+
+    bool Dataset::load_importer()
+    { return _pdata->importer.load(filepath_importer()); }
 
     bool Dataset::save_pressure_map(PressureMapImageFilter pmf) const
     {
