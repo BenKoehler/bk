@@ -46,10 +46,18 @@ namespace bk
   {
     // -------------------- forward declaration END
     class FlowDirCorrection;
+
     class FlowImage2DT;
+
     class FlowImage3DT;
+
     class PressureMapImageFilter;
+
     class Vessel;
+
+    class PhaseUnwrapping2DT;
+
+    class PhaseUnwrapping3DT;
 
     enum DatasetFilter_ : unsigned int
     {
@@ -129,6 +137,11 @@ namespace bk
         [[nodiscard]] FlowDirCorrection& flow_image_3dt_dir_correction();
         [[nodiscard]] const FlowDirCorrection& flow_image_3dt_dir_correction() const;
 
+        [[nodiscard]] const PhaseUnwrapping3DT& phase_unwrapping_3dt() const;
+
+        [[nodiscard]] const std::map<unsigned int, PhaseUnwrapping2DT>& phase_unwrapping_2dt() const;
+        [[nodiscard]] const PhaseUnwrapping2DT* phase_unwrapping_2dt(unsigned int imgId) const;
+
         //====================================================================================================
         //===== SETTER
         //====================================================================================================
@@ -146,7 +159,7 @@ namespace bk
         //====================================================================================================
       private:
         [[nodiscard]] std::string filepath_flow_image(unsigned int v) const;
-        [[nodiscard]] std::string filepath_tmip_magnitude() const;
+        [[nodiscard]] std::string filepath_tmip_magnitude_3dt() const;
         [[nodiscard]] std::string filepath_lpc() const;
         [[nodiscard]] std::string filepath_ivsd() const;
         [[nodiscard]] std::string filepath_tmip_signal() const;
@@ -220,6 +233,9 @@ namespace bk
 
         [[maybe_unused]] bool save_phase_unwrapping_3dt();
         [[maybe_unused]] bool load_phase_unwrapping_3dt();
+
+        [[maybe_unused]] bool save_ivsd();
+        [[maybe_unused]] bool save_magnitude_tmip_3dt();
     }; // class Dataset
   } // inline namespace cmr
 } // namespace bk

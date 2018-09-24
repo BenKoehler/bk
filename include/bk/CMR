@@ -23,7 +23,11 @@
  */
 
 #include <bkCMR/Dataset.h>
+#include <bkCMR/FlowDirCorrection.h>
 #include <bkCMR/Vessel.h>
 #include <bkCMR/FlowImage2DT.h>
 #include <bkCMR/FlowImage3DT.h>
 #include <bkCMR/FlowJet.h>
+#include <bkCMR/PhaseUnwrapping2DT.h>
+#include <bkCMR/PhaseUnwrapping3DT.h>
+#include <bkCMR/Segmentation3DInfo.h>

@@ -83,6 +83,9 @@ namespace bk
     bool PhaseUnwrapping2DT::is_wrapped() const
     { return num_wrapped_voxels() != 0; }
 
+    bool PhaseUnwrapping2DT::is_initialized() const
+    { return _pdata->is_initialized; }
+
     unsigned int PhaseUnwrapping2DT::num_wrapped_voxels() const
     { return _pdata->lids.size(); }
 

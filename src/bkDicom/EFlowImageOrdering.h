@@ -27,7 +27,7 @@
 #ifndef BKDICOM_FLOWIMAGEORDERING_H
 #define BKDICOM_FLOWIMAGEORDERING_H
 
-namespace bk::details
+namespace bk
 {
   enum class FlowImageOrdering : int
   {

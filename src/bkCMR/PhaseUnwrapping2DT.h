@@ -64,6 +64,7 @@ namespace bk
         //===== GETTER
         //====================================================================================================
         [[nodiscard]] bool is_wrapped() const;
+        [[nodiscard]] bool is_initialized() const;
         [[nodiscard]] unsigned int num_wrapped_voxels() const;
 
         //====================================================================================================

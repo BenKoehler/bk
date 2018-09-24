@@ -138,7 +138,7 @@ namespace bk
           { _size[i] = sizes[i]; }
       }
 
-      template<typename... TSizes, std::enable_if_t<std::conjunction_v<std::is_integral<TSizes>...>>* = nullptr>
+      template<typename... TSizes, std::enable_if_t<std::conjunction_v<std::is_integral<std::decay_t<TSizes>>...>>* = nullptr>
       void set_size(TSizes... sizes)
       {
           static_assert(TDims == -1 || sizeof...(TSizes) == TDims, "invalid number of arguments");

@@ -82,7 +82,7 @@ namespace bk
       NDVector(const self_type&) = default;
       NDVector(self_type&&) noexcept = default;
 
-      template<typename... TSizes, std::enable_if_t<std::conjunction_v<std::is_integral<TSizes>...>>* = nullptr>
+      template<typename... TSizes, std::enable_if_t<std::conjunction_v<std::is_integral<std::decay_t<TSizes>>...>>* = nullptr>
       NDVector(TSizes... sizes)
           : _sizes({static_cast<size_type>(sizes)...}),
             _values(num_values_from_sizes(), static_cast<value_type>(0))
@@ -92,11 +92,11 @@ namespace bk
           assert(num_values_from_sizes() != 0 && "all size arguments must be >= 1");
       }
 
-      template<typename Iter, std::enable_if_t<std::is_class_v<Iter> || std::is_pointer_v<Iter>>* = nullptr>
+      template<typename Iter, std::enable_if_t<std::is_class_v<std::decay_t<Iter>> || std::is_pointer_v<std::decay_t<Iter>>>* = nullptr>
       NDVector(Iter firstSize, Iter lastSize)
       { resize(firstSize, lastSize); }
 
-      template<typename TArray, std::enable_if_t<std::is_class_v<TArray>>* = nullptr>
+      template<typename TArray, std::enable_if_t<std::is_class_v<std::decay_t<TArray>>>* = nullptr>
       NDVector(TArray arr)
       {
           resize(arr.size());
@@ -439,7 +439,7 @@ namespace bk
       void resize(const TIteratable& size)
       { resize(size.begin(), size.end()); }
 
-      template<typename Iter, std::enable_if_t<std::is_class_v<Iter> || std::is_pointer_v<Iter>>* = nullptr>
+      template<typename Iter, std::enable_if_t<std::is_class_v<std::decay_t<Iter>> || std::is_pointer_v<std::decay_t<Iter>>>* = nullptr>
       void resize(Iter first, Iter last)
       {
           _sizes.assign(first, last);

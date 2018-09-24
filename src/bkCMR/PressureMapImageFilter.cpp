@@ -132,6 +132,7 @@ namespace bk
         auto res = std::make_unique<DicomImage<double, 4>>();
         res->set_size(gs);
         res->geometry().transformation().set_world_matrix(ff.geometry().transformation().world_matrix_with_time());
+        res->geometry().transformation().set_dicom_image_type_3dt();
 
         const unsigned int numVessels = vessels.size();
 

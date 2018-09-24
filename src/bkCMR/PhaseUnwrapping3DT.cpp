@@ -81,6 +81,9 @@ namespace bk
     bool PhaseUnwrapping3DT::is_wrapped() const
     { return num_wrapped_voxels() != 0; }
 
+    bool PhaseUnwrapping3DT::is_initialized() const
+    { return _pdata->is_initialized; }
+
     unsigned int PhaseUnwrapping3DT::num_wrapped_voxels() const
     { return num_wrapped_voxels(0) + num_wrapped_voxels(1) + num_wrapped_voxels(2); }
 
@@ -130,8 +133,8 @@ namespace bk
         #pragma omp parallel for
         for (unsigned int i = 0; i < ff.num_values(); ++i)
         {
-            for (unsigned int k = 0; k < 3; ++k)
-            { ff[k] /= venc[k]; }
+            for (unsigned int v = 0; v < 3; ++v)
+            { ff[i][v] /= venc[v]; }
 
             ff[i] *= pi<double>;
         }
@@ -161,31 +164,28 @@ namespace bk
          * laplace kernel in frequency space
          */
         std::vector<std::complex<double>> laplacefft(N2);
+        auto                              task_laplace = bk_threadpool.enqueue([&]()
+                                                                               {
+                                                                                   for (unsigned int x = (size2[0] / 2) - 1; x <= (size2[0] / 2) + 1; ++x)
+                                                                                   {
+                                                                                       for (unsigned int y = (size2[1] / 2) - 1; y <= (size2[1] / 2) + 1; ++y)
+                                                                                       {
+                                                                                           for (unsigned int z = (size2[2] / 2) - 1; z <= (size2[2] / 2) + 1; ++z)
+                                                                                           {
+                                                                                               for (unsigned int t = (size2[3] / 2) - 1; t <= (size2[3] / 2) + 1; ++t)
+                                                                                               { laplacefft[grid_to_list_id(size2, x, y, z, t)] = -1; }
+                                                                                           }
+                                                                                       }
+                                                                                   }
 
-        auto task_laplace = bk_threadpool.enqueue([&]()
-                                                  {
-                                                      for (unsigned int x = (size2[0] / 2) - 1; x <= (size2[0] / 2) + 1; ++x)
-                                                      {
-                                                          for (unsigned int y = (size2[1] / 2) - 1; y <= (size2[1] / 2) + 1; ++y)
-                                                          {
-                                                              for (unsigned int z = (size2[2] / 2) - 1; z <= (size2[2] / 2) + 1; ++z)
-                                                              {
-                                                                  for (unsigned int t = (size2[3] / 2) - 1; t <= (size2[3] / 2) + 1; ++t)
-                                                                  {
-                                                                      laplacefft[grid_to_list_id(size2, x, y, z, t)] = -1;
-                                                                  }
-                                                              }
-                                                          }
-                                                      }
+                                                                                   laplacefft[grid_to_list_id(size2, size2[0] / 2, size2[1] / 2, size2[2] / 2, size2[3] / 2)] = 80; //3*3*3*3 - 1;
 
-                                                      laplacefft[grid_to_list_id(size2, size2[0] / 2, size2[1] / 2, size2[2] / 2, size2[3] / 2)] = 80; //3*3*3*3 - 1;
+                                                                                   FFT4D(laplacefft.data(), size2[0], size2[1], size2[2], size2[3]);
 
-                                                      FFT4D(laplacefft.data(), size2[0], size2[1], size2[2], size2[3]);
-
-                                                      #ifdef BK_EMIT_PROGRESS
-                                                      prog.increment(1);
-                                                      #endif
-                                                  });
+                                                                                   #ifdef BK_EMIT_PROGRESS
+                                                                                   prog.increment(1);
+                                                                                   #endif
+                                                                               });
 
         #ifdef BK_EMIT_PROGRESS
         prog.increment(1);
@@ -228,9 +228,9 @@ namespace bk
                         for (unsigned int t = off[3]; t < off[3] + size[3]; ++t)
                         {
                             const unsigned int lid  = grid_to_list_id(size2, x, y, z, t);
-                            const double       fvec = ff(x - off[0], y - off[1], z - off[2], t - off[3])[v];
-                            temp0[lid] = std::sin(fvec);
-                            temp1[lid] = std::cos(fvec);
+                            const double       fval = ff(x - off[0], y - off[1], z - off[2], t - off[3])[v];
+                            temp0[lid] = std::sin(fval);
+                            temp1[lid] = std::cos(fval);
                         } // for t
                     } // for z
                 } // for y
@@ -260,10 +260,8 @@ namespace bk
                                                           #endif
                                                       });
 
-            if (v == 0)
-            {
-                task_laplace.get(); // calculation of laplace kernel fft
-            }
+            if (v == 0) // calculation of laplace kernel fft
+            { task_laplace.get(); }
 
             task_sin_fft.get();
             task_cos_fft.get();
@@ -345,12 +343,12 @@ namespace bk
                         for (unsigned int t = off[3]; t < off[3] + size[3]; ++t)
                         {
                             const unsigned int lid  = grid_to_list_id(size2, x, y, z, t);
-                            const double       fvec = ff(x - off[0], y - off[1], z - off[2], t - off[3])[v];
+                            const double       fval = ff(x - off[0], y - off[1], z - off[2], t - off[3])[v];
 
-                            temp0[lid] *= std::cos(fvec);
-                            temp0[lid] -= std::sin(fvec) * temp1[lid].real();
+                            temp0[lid] *= std::cos(fval);
+                            temp0[lid] -= std::sin(fval) * temp1[lid].real();
 
-                            temp1[lid] = fvec;
+                            temp1[lid] = fval;
                         } // for t
                     } // for z
                 } // for y

@@ -264,6 +264,20 @@ namespace bk
     const FlowDirCorrection& Dataset::flow_image_3dt_dir_correction() const
     { return _pdata->flow_dir_correction; }
 
+    const PhaseUnwrapping3DT& Dataset::phase_unwrapping_3dt() const
+    { return _pdata->phase_unwrapping_3dt; }
+
+    const std::map<unsigned int, PhaseUnwrapping2DT>& Dataset::phase_unwrapping_2dt() const
+    { return _pdata->phase_unwrapping_2dt; }
+
+    const PhaseUnwrapping2DT* Dataset::phase_unwrapping_2dt(unsigned int imgId) const
+    {
+        if (auto it = _pdata->phase_unwrapping_2dt.find(imgId); it != _pdata->phase_unwrapping_2dt.end())
+        { return &it->second; }
+
+        return nullptr;
+    }
+
     //====================================================================================================
     //===== SETTER
     //====================================================================================================
@@ -311,7 +325,7 @@ namespace bk
     std::string Dataset::filepath_flow_image(unsigned int v) const
     { return _pdata->project_path + dcmbytes + string_utils::from_number(_pdata->importer.class_3dt_flow_images()[v]); }
 
-    std::string Dataset::filepath_tmip_magnitude() const
+    std::string Dataset::filepath_tmip_magnitude_3dt() const
     { return _pdata->project_path + "tmip_mag"; }
 
     std::string Dataset::filepath_lpc() const
@@ -359,10 +373,10 @@ namespace bk
                 file.read(reinterpret_cast<char*>(sz), 3 * sizeof(std::uint16_t));
 
                 // world matrix
-                double w[16]        = {0};
-                file.read(reinterpret_cast<char*>(&w), 16 * sizeof(double));
-                Mat4d             W;
-                for (unsigned int i = 0; i < 16; ++i)
+                double w[25]        = {0};
+                file.read(reinterpret_cast<char*>(&w), 25 * sizeof(double));
+                Mat5d             W;
+                for (unsigned int i = 0; i < 25; ++i)
                 { W[i] = w[i]; }
 
                 #ifdef BK_EMIT_PROGRESS
@@ -372,6 +386,7 @@ namespace bk
                 auto img = std::make_unique<DicomImage<double, 3>>();
                 img->set_size(sz[0], sz[1], sz[2]);
                 img->geometry().transformation().set_world_matrix(W);
+                img->geometry().transformation().set_dicom_image_type_3d();
 
                 #ifdef BK_EMIT_PROGRESS
                 prog.increment((sz[0] * sz[1] * sz[2]) / 4);
@@ -411,18 +426,12 @@ namespace bk
     {
         if (has_local_image_copy_dcmbytes(imgId))
         {
-            const std::string dcmpath = _pdata->project_path + dcmbytes + string_utils::from_number(imgId);
-            std::ifstream     file(dcmpath, std::ios_base::binary | std::ios_base::in);
+            const std::string       dcmpath  = _pdata->project_path + dcmbytes + string_utils::from_number(imgId);
+            bool                    success  = false;
+            const std::vector<char> imgBytes = _pdata->importer.load_dcm_image_bytes(dcmpath, &success);
 
-            if (file.good())
-            {
-                const unsigned int filesize = std::filesystem::file_size(dcmpath);
-                std::vector<char>  imgBytes(filesize);
-                file.read(imgBytes.data(), filesize * sizeof(char));
-                file.close();
-
-                return _pdata->importer.read_image_from_bytes(imgId, imgBytes);
-            }
+            if (success)
+            { return _pdata->importer.read_image_from_bytes(imgId, imgBytes); }
         }
 
         // no local image copy or file not good -> read from original data
@@ -434,7 +443,10 @@ namespace bk
         const std::vector<unsigned int> flow_image_ids = _pdata->importer.class_3dt_flow_images();
 
         if (flow_image_ids.size() != 3)
-        { return false; }
+        {
+            std::cerr << "Dataset::load_flow_image_3dt - number of flow images != 3" << std::endl;
+            return false;
+        }
 
         std::array<double, 3> venc = {//
             _pdata->importer.venc_in_m_per_s(flow_image_ids[0]),//
@@ -458,16 +470,12 @@ namespace bk
         {
             for (unsigned int v = 0; v < 3; ++v)
             {
-                const std::string  filepath = filepath_flow_image(v);
-                const unsigned int filesize = std::filesystem::file_size(filepath);
+                bool success = true;
 
-                std::vector<char> imgbytes(filesize);
+                f[v] = std::move(_pdata->importer.read_image_from_bytes(flow_image_ids[v], _pdata->importer.load_dcm_image_bytes(filepath_flow_image(v), &success)));
 
-                std::ifstream file(filepath, std::ios_base::in | std::ios_base::binary);
-                file.read(imgbytes.data(), filesize * sizeof(char));
-                file.close();
-
-                f[v] = std::move(_pdata->importer.read_image_from_bytes(flow_image_ids[v], imgbytes));
+                if (!success)
+                { std::cerr << "Dataset::load_flow_image_3dt - could not read local flow image copy " << v << std::endl; }
 
                 #ifdef BK_EMIT_PROGRESS
                 prog.increment(numel);
@@ -512,6 +520,8 @@ namespace bk
             }
         }
 
+        const int lipv[3] = {info[0].get().LargestImagePixelValue / 2, info[1].get().LargestImagePixelValue / 2, info[2].get().LargestImagePixelValue / 2};
+
         #pragma omp parallel for
         for (unsigned int z = 0; z < size[2]; ++z)
         {
@@ -522,11 +532,16 @@ namespace bk
                     for (unsigned int t = 0; t < size[3]; ++t)
                     {
                         const unsigned int lid = grid_to_list_id(size, x, y, z, t);
-                        Vec3d              v((*f[order[0]])[lid] - info[order[0]].get().LargestImagePixelValue / 2, (*f[order[1]])[lid] - info[order[1]].get().LargestImagePixelValue / 2, (*f[order[2]])[lid] - info[order[2]].get().LargestImagePixelValue / 2);
+                        Vec3d              v((*f[order[0]])[lid] - lipv[order[0]], (*f[order[1]])[lid] - lipv[order[1]], (*f[order[2]])[lid] - lipv[order[2]]);
 
-                        v[0] /= static_cast<double>(info[order[0]].get().LargestImagePixelValue / 2) * dirfac[0] * venc[0];
-                        v[1] /= static_cast<double>(info[order[1]].get().LargestImagePixelValue / 2) * dirfac[1] * venc[1];
-                        v[2] /= static_cast<double>(info[order[2]].get().LargestImagePixelValue / 2) * dirfac[2] * venc[2];
+                        v[0] /= static_cast<double>(lipv[order[0]]) * dirfac[0];
+                        v[0] *= venc[0];
+
+                        v[1] /= static_cast<double>(lipv[order[1]]) * dirfac[1];
+                        v[1] *= venc[1];
+
+                        v[2] /= static_cast<double>(lipv[order[2]]) * dirfac[2];
+                        v[2] *= venc[2];
 
                         _pdata->flow_image_3dt[lid] = std::move(v);
                     }
@@ -586,13 +601,13 @@ namespace bk
         for (unsigned int i = 0; i < img->num_values(); ++i)
         { (*ff)[i] = (*img)[i]; }
 
-        if (flags | DatasetFilter_PhaseUnwrapping)
+        if (flags & DatasetFilter_PhaseUnwrapping)
         {
             PhaseUnwrapping2DT pu;
             pu.apply(*ff, _pdata->importer.venc_in_m_per_s(dcm_id));
         }
 
-        if (flags | DatasetFilter_VelocityOffset)
+        if (flags & DatasetFilter_VelocityOffset)
         {
             // todo
         }
@@ -644,8 +659,8 @@ namespace bk
 
     std::unique_ptr<DicomImage<double, 3>> Dataset::tmip_magnitude_3dt() const
     {
-        if (has_local_image_copy(filepath_tmip_magnitude()))
-        { return load_local_image_copy(filepath_tmip_magnitude()); }
+        if (has_local_image_copy(filepath_tmip_magnitude_3dt()))
+        { return load_local_image_copy(filepath_tmip_magnitude_3dt()); }
 
         const std::vector<unsigned int> magnitudeImageIds  = _pdata->importer.class_3dt_magnitude_images();
         const unsigned int              numMagnitudeImages = magnitudeImageIds.size();
@@ -781,7 +796,11 @@ namespace bk
             std::unique_ptr<FlowImage2DT> ff = flow_image_2dt(id, DatasetFilter_None);
 
             PhaseUnwrapping2DT pu;
-            pu.init(*ff, _pdata->importer.venc_in_m_per_s(id));
+
+            const bk::Clock clock = pu.init(*ff, _pdata->importer.venc_in_m_per_s(id));
+            std::cout << "phase unwrapping 2D+T (img " << id << "):" << std::endl;
+            std::cout << "\tN wrapped voxels: " << pu.num_wrapped_voxels() << std::endl;
+            std::cout << "\ttime: " << clock.time_in_milli_sec() << " ms" << std::endl;
 
             _pdata->phase_unwrapping_2dt.emplace(id, std::move(pu));
         }
@@ -792,20 +811,28 @@ namespace bk
     bool Dataset::determine_phase_wraps_3dt(bool reload_flow_image)
     {
         if (reload_flow_image)
-        { load_flow_image_3dt(DatasetFilter_FlowDirCorrection); }
+        {
+            //load_flow_image_3dt(DatasetFilter_None);
+            load_flow_image_3dt(DatasetFilter_FlowDirCorrection);
+        }
 
         if (!is_flow_image_3dt_loaded())
         { return false; }
 
         std::vector<unsigned int> flow_img_ids = _pdata->importer.class_3dt_flow_images();
 
-        std::array<double,3> venc = {//
+        std::array<double, 3> venc = {//
             _pdata->importer.venc_in_m_per_s(flow_img_ids[0]),//
             _pdata->importer.venc_in_m_per_s(flow_img_ids[1]),//
             _pdata->importer.venc_in_m_per_s(flow_img_ids[2])//
         };
 
-        _pdata->phase_unwrapping_3dt.init(_pdata->flow_image_3dt, venc);
+        const bk::Clock clock = _pdata->phase_unwrapping_3dt.init(_pdata->flow_image_3dt, venc);
+        std::cout << "phase unwrapping 3D+T:" << std::endl;
+        std::cout << "\tN wrapped voxels in x: " << _pdata->phase_unwrapping_3dt.num_wrapped_voxels(0) << std::endl;
+        std::cout << "\tN wrapped voxels in y: " << _pdata->phase_unwrapping_3dt.num_wrapped_voxels(1) << std::endl;
+        std::cout << "\tN wrapped voxels in z: " << _pdata->phase_unwrapping_3dt.num_wrapped_voxels(2) << std::endl;
+        std::cout << "\ttime: " << clock.time_in_sec() << " s" << std::endl;
 
         return true;
     }
@@ -835,7 +862,7 @@ namespace bk
     void Dataset::delete_local_image_copies() const
     {
         std::vector<std::string> paths = filepaths_of_local_image_copies();
-        paths.emplace_back(filepath_tmip_magnitude());
+        paths.emplace_back(filepath_tmip_magnitude_3dt());
         paths.emplace_back(filepath_lpc());
         paths.emplace_back(filepath_ivsd());
         paths.emplace_back(filepath_tmip_signal());
@@ -923,7 +950,7 @@ namespace bk
         { return false; }
 
         #ifdef BK_EMIT_PROGRESS
-        bk::Progress& prog = bk_progress.emplace_task(100, ___("saving local image copy"));
+        bk::Progress& prog = bk_progress.emplace_task(3, ___("saving local image copy"));
         #endif
 
         std::uint16_t ui16temp = 0;
@@ -1113,6 +1140,18 @@ namespace bk
 
     bool Dataset::load_phase_unwrapping_3dt()
     { return _pdata->phase_unwrapping_3dt.load(filepath_phase_unwrapping_3dt()); }
+
+    bool Dataset::save_ivsd()
+    {
+        auto img = ivsd();
+        return save_local_image_copy(filepath_ivsd(), *img);
+    }
+
+    bool Dataset::save_magnitude_tmip_3dt()
+    {
+        auto img = tmip_magnitude_3dt();
+        return save_local_image_copy(filepath_tmip_magnitude_3dt(), *img);
+    }
   } // inline namespace cmr
 } // namespace bk
 

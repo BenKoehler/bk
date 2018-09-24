@@ -121,23 +121,35 @@ namespace bk
   {
       if (_pdata->dcm_importer == nullptr)
       { return false; }
+
       const unsigned int nImages = _pdata->dcm_importer->num_images();
+
       if (dcm_image_r_id >= nImages || dcm_image_g_id >= nImages || dcm_image_b_id >= nImages)
       { return false; }
+
       _pdata->dcm_image_r_id = dcm_image_r_id;
       _pdata->dcm_image_g_id = dcm_image_g_id;
       _pdata->dcm_image_b_id = dcm_image_b_id;
       const DicomImageInfos& info_r = _pdata->dcm_importer->image_infos(_pdata->dcm_image_r_id);
       const DicomImageInfos& info_g = _pdata->dcm_importer->image_infos(_pdata->dcm_image_g_id);
       const DicomImageInfos& info_b = _pdata->dcm_importer->image_infos(_pdata->dcm_image_b_id);
+
       if (info_r.Columns != info_g.Columns || info_r.Columns != info_b.Columns || info_g.Columns != info_b.Columns || info_r.Rows != info_g.Rows || info_r.Rows != info_b.Rows || info_g.Rows != info_b.Rows)
       { return false; }
+
       _pdata->lipv_r = info_r.LargestImagePixelValue;
       _pdata->lipv_g = info_g.LargestImagePixelValue;
       _pdata->lipv_b = info_b.LargestImagePixelValue;
       _pdata->image.set_size(info_r.Columns, info_r.Rows);
       _pdata->image.geometry().transformation().set_scale(info_r.ColSpacing, info_r.RowSpacing);
       _pdata->size.set(info_r.Columns, info_r.Rows, info_r.Slices > 1 ? info_r.Slices : 1, info_r.TemporalPositions > 1 ? info_r.TemporalPositions : 1);
+
+      if (this->is_initialized())
+      {
+          this->update_ssbo_intensity_and_determine_intensity_min_max();
+          this->emit_signal_update_required();
+      }
+
       return _pdata->image.num_values() > 1;
   }
 
@@ -146,6 +158,12 @@ namespace bk
       _pdata->flip_image_r = flip_image_r;
       _pdata->flip_image_g = flip_image_g;
       _pdata->flip_image_b = flip_image_b;
+
+      if (this->is_initialized())
+      {
+          this->update_ssbo_intensity_and_determine_intensity_min_max();
+          this->emit_signal_update_required();
+      }
   }
 
   void RGBDICOMFlowImageSliceView::set_use_abs(bool abs_image_r, bool abs_image_g, bool abs_image_b)
@@ -153,6 +171,12 @@ namespace bk
       _pdata->abs_image_r = abs_image_r;
       _pdata->abs_image_g = abs_image_g;
       _pdata->abs_image_b = abs_image_b;
+
+      if (this->is_initialized())
+      {
+          this->update_ssbo_intensity_and_determine_intensity_min_max();
+          this->emit_signal_update_required();
+      }
   }
 
   void RGBDICOMFlowImageSliceView::set_use_for_coloring(bool col_image_r, bool col_image_g, bool col_image_b)
@@ -160,6 +184,12 @@ namespace bk
       _pdata->col_image_r = col_image_r;
       _pdata->col_image_g = col_image_g;
       _pdata->col_image_b = col_image_b;
+
+      if (this->is_initialized())
+      {
+          this->update_ssbo_intensity_and_determine_intensity_min_max();
+          this->emit_signal_update_required();
+      }
   }
 
   auto RGBDICOMFlowImageSliceView::operator=(self_type&& other) noexcept -> self_type& = default;

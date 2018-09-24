@@ -60,7 +60,7 @@ namespace bk
       : base_type()
   #else
 
-      GrayDICOMSliceView::GrayDICOMSliceView(bk::qt_gl_functions* gl) : base_type(gl)
+  GrayDICOMSliceView::GrayDICOMSliceView(bk::qt_gl_functions* gl) : base_type(gl)
   #endif
   { /* do nothing */ }
 
@@ -115,16 +115,16 @@ namespace bk
   {
       _pdata->image.set_size(1, 1);
       _pdata->image.geometry().transformation().set_scale(1, 1);
-      _xmax() = 0;
-      _ymax() = 0;
-      _zmax() = 0;
-      _tmax() = 0;
-      _xcurrent() = 0;
-      _ycurrent() = 0;
-      _zcurrent() = 0;
-      _tcurrent() = 0;
-      _intensitymax() = -std::numeric_limits<GLfloat>::max();
-      _intensitymin() = std::numeric_limits<GLfloat>::max();
+      _xmax()            = 0;
+      _ymax()            = 0;
+      _zmax()            = 0;
+      _tmax()            = 0;
+      _xcurrent()        = 0;
+      _ycurrent()        = 0;
+      _zcurrent()        = 0;
+      _tcurrent()        = 0;
+      _intensitymax()    = -std::numeric_limits<GLfloat>::max();
+      _intensitymin()    = std::numeric_limits<GLfloat>::max();
       intensitycurrent() = 0;
   }
 
@@ -135,7 +135,7 @@ namespace bk
 
       if (GLfloat* intensities = _ssbo_intensity().map_write_only<GLfloat>(); intensities != nullptr)
       {
-          const std::unique_ptr<DicomImage<double,-1>> img = _pdata->dcm_importer->read_image_block(_pdata->dcm_image_id, 0, _pdata->size[0] - 1, 0, _pdata->size[1] - 1, z, z, t, t);
+          const std::unique_ptr<DicomImage<double, -1>> img = _pdata->dcm_importer->read_image_block(_pdata->dcm_image_id, 0, _pdata->size[0] - 1, 0, _pdata->size[1] - 1, z, z, t, t);
 
           _intensitymax() = -std::numeric_limits<GLfloat>::max();
           _intensitymin() = std::numeric_limits<GLfloat>::max();
@@ -150,8 +150,8 @@ namespace bk
                   const GLfloat val = static_cast<GLfloat>(img->operator()(x, y));
                   intensities[cnt++] = val;
                   _pdata->image(x, y) = val;
-                  _intensitymin() = std::min(intensitymin(), val);
-                  _intensitymax() = std::max(intensitymax(), val);
+                  _intensitymin()     = std::min(intensitymin(), val);
+                  _intensitymax()     = std::max(intensitymax(), val);
               }
           }
 
@@ -164,5 +164,3 @@ namespace bk
 } // namespace bk
 
 #endif // BK_LIB_GDCM_AVAILABLE
-
-

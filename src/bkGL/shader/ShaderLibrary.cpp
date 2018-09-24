@@ -158,7 +158,7 @@ namespace bk::details
   std::string ShaderLibrary::function_linearize_depth()
   {
       const std::string znear = UBOGlobal::name_cam_znear();
-      const std::string zfar = UBOGlobal::name_cam_zfar();
+      const std::string zfar  = UBOGlobal::name_cam_zfar();
 
       std::stringstream s;
 
@@ -3094,7 +3094,7 @@ namespace bk::details
       s << function_main_begin();
       s << slice_view::details::default_glposition_vert();
 
-      s << "   const uint id = uint(position_in.y*(xmax+1) + position_in.x);\n\\n";
+      s << "   const uint id = uint(position_in.y*(" << UBOSliceView::name_xyzt_max0() << "+1) + position_in.x);\n\n";
 
       s << "   if (uint(inoutseg[id] & " << segmentation_name_inside_bit() << ") != 0)\n";
       s << "   { color_frag = vec4(0, 1, 0, 0.125); }\n";

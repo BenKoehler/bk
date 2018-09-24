@@ -66,6 +66,7 @@ namespace bk
       auto res = std::make_unique<DicomImage<double, 3>>();
       res->set_size(size[0], size[1], size[2]);
       res->geometry().transformation().set_world_matrix(ff.geometry().transformation().world_matrix());
+      res->geometry().transformation().set_dicom_image_type_3d();
 
       const auto& vseg = v.segmentation3D();
       const auto vsegsize = vseg.size();

@@ -204,23 +204,16 @@ namespace bk
    *             }
    *         } 
    */
-  namespace
-  {
-    template<typename TIndexAccessible>
-    constexpr unsigned int _stride_of_dim(const TIndexAccessible& size, unsigned int numDims, unsigned int dim)
-    {
-        unsigned int s = 1;
-
-        for (unsigned int i = dim + 1; i < numDims; ++i)
-        { s *= size[i]; }
-
-        return s;
-    }
-  } // anonymous namespace
-
   template<typename TIndexAccessible>
   constexpr unsigned int stride_of_dim(const TIndexAccessible& size, unsigned int dimId, unsigned int numDims)
-  { return _stride_of_dim(size, numDims, dimId); }
+  {
+      unsigned int s = 1;
+
+      for (unsigned int i = dimId + 1; i < numDims; ++i)
+      { s *= size[i]; }
+
+      return s;
+  }
   /// @}
 } // namespace bk
 

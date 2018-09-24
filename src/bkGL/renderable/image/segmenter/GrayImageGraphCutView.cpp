@@ -34,6 +34,7 @@
 
 #include <bkGL/buffer/SSBO.h>
 #include <bkGL/UBOSliceView.h>
+#include <bkGL/Mouse.h>
 #include <bkGL/vao/VAO.h>
 #include <bkGL/shader/Shader.h>
 #include <bkGL/shader/ShaderLibrary.h>
@@ -44,25 +45,34 @@
 namespace bk
 {
   //====================================================================================================
+  //===== ENUMS
+  //====================================================================================================
+  enum GraphCutInteractionMode_ : int
+  {
+      GraphCutInteractionMode_TransferFunction = 1, GraphCutInteractionMode_GraphCut = 2
+  };
+
+  //====================================================================================================
   //===== MEMBERS
   //====================================================================================================
   struct GrayImageGraphCutView::Impl
   {
-      SSBO ssbo_gc;
+      SSBO   ssbo_gc;
       Shader shader_gc;
       Shader shader_seg_contour;
       graph_cut_type* gc;
-      unsigned int pencil_size;
+      unsigned int              pencil_size;
       details::GraphCutDrawMode draw_mode;
-      bool auto_update_segmentation;
-      bool inout_changed;
-      bool gc_is_running;
-      bool seg_changed;
-      bool slice_changed;
-      segmentation_type seg;
-      segmentation_type in;
-      segmentation_type out;
-      bk::Signal<> s_gc_finished;
+      bool                      auto_update_segmentation;
+      bool                      inout_changed;
+      bool                      gc_is_running;
+      bool                      seg_changed;
+      bool                      slice_changed;
+      segmentation_type         seg;
+      segmentation_type         in;
+      segmentation_type         out;
+      bk::Signal<>              s_gc_finished;
+      GraphCutInteractionMode_  interaction_mode;
 
           #ifndef BK_LIB_QT_AVAILABLE
 
@@ -82,8 +92,9 @@ namespace bk
           inout_changed(false),
           gc_is_running(false),
           seg_changed(false),
-          slice_changed(false)
-      {}
+          slice_changed(false),
+          interaction_mode(GraphCutInteractionMode_GraphCut)
+      { /* do nothing */ }
 
       Impl(const Impl&) = delete;
       Impl& operator=(const Impl&) = delete;
@@ -135,6 +146,12 @@ namespace bk
 
   bk::Signal<>& GrayImageGraphCutView::signal_graph_cut_finished()
   { return _pdata->s_gc_finished; }
+
+  bool GrayImageGraphCutView::interaction_mode_is_graph_cut() const
+  { return _pdata->interaction_mode == GraphCutInteractionMode_GraphCut; }
+
+  bool GrayImageGraphCutView::interaction_mode_is_transfer_function() const
+  { return _pdata->interaction_mode == GraphCutInteractionMode_TransferFunction; }
 
   //====================================================================================================
   //===== SETTER
@@ -220,6 +237,12 @@ namespace bk
       }
   }
 
+  void GrayImageGraphCutView::set_interaction_mode_graph_cut()
+  { _pdata->interaction_mode = GraphCutInteractionMode_GraphCut; }
+
+  void GrayImageGraphCutView::set_interaction_mode_transfer_function()
+  { _pdata->interaction_mode = GraphCutInteractionMode_TransferFunction; }
+
   //====================================================================================================
   //===== FUNCTIONS
   //====================================================================================================
@@ -243,7 +266,7 @@ namespace bk
       //const int rmax = -rmin + (_pdata->pencil_size % 2 ? 1 : 0);
       const int rmin = -static_cast<int>(_pdata->pencil_size / 2);
       const int rmax = -rmin + (_pdata->pencil_size % 2 ? 0 : -1);
-      for (int dy = rmin; dy <= rmax; ++dy)
+      for (int  dy   = rmin; dy <= rmax; ++dy)
       {
           for (int dx = rmin; dx <= rmax; ++dx)
           {
@@ -255,7 +278,7 @@ namespace bk
               {
                   case details::GraphCutDrawMode::Inside:
                   {
-                      _pdata->in(idx, idy, zcurrent()) = 1;
+                      _pdata->in(idx, idy, zcurrent())  = 1;
                       _pdata->out(idx, idy, zcurrent()) = 0;
                       //_seg_in_out(idx, idy, zcurrent()) &= ~OutsideBit;
                       //_seg_in_out(idx, idy, zcurrent()) |= InsideBit;
@@ -265,7 +288,7 @@ namespace bk
                   }
                   case details::GraphCutDrawMode::Outside:
                   {
-                      _pdata->in(idx, idy, zcurrent()) = 0;
+                      _pdata->in(idx, idy, zcurrent())  = 0;
                       _pdata->out(idx, idy, zcurrent()) = 1;
                       //_seg_in_out(idx, idy, zcurrent()) &= ~InsideBit;
                       //_seg_in_out(idx, idy, zcurrent()) |= OutsideBit;
@@ -275,7 +298,7 @@ namespace bk
                   }
                   case details::GraphCutDrawMode::Erase:
                   {
-                      _pdata->in(idx, idy, zcurrent()) = 0;
+                      _pdata->in(idx, idy, zcurrent())  = 0;
                       _pdata->out(idx, idy, zcurrent()) = 0;
                       //_seg_in_out(idx, idy, zcurrent()) &= ~InsideBit;
                       //_seg_in_out(idx, idy, zcurrent()) &= ~OutsideBit;
@@ -322,7 +345,7 @@ namespace bk
   void GrayImageGraphCutView::init_ssbo_gc()
   {
       clear_ssbo_gc();
-      const unsigned int N = (xmax() + 1) * (ymax() + 1);
+      const unsigned int        N = (xmax() + 1) * (ymax() + 1);
       std::vector<ssbo_GLfloat> zero(N, 0);
       _pdata->ssbo_gc.init(zero.data(), N * sizeof(ssbo_GLfloat));
   }
@@ -338,7 +361,7 @@ namespace bk
       _pdata->in.set_size(1, 1, 1);
       _pdata->out.set_size(1, 1, 1);
       _pdata->seg[0] = 0;
-      _pdata->in[0] = 0;
+      _pdata->in[0]  = 0;
       _pdata->out[0] = 0;
   }
 
@@ -364,7 +387,7 @@ namespace bk
       };
 
       _pdata->inout_changed = true;
-      _pdata->seg_changed = true;
+      _pdata->seg_changed   = true;
       _pdata->gc_is_running = false;
 
       if (_image.num_values() <= 1)
@@ -374,7 +397,7 @@ namespace bk
       if (inout != nullptr)
       {
           unsigned int cnt = 0;
-          for (int y = static_cast<int>(_image.geometry().size(1) - 1); y >= 0; --y) // y is inverted, because GL coord system starts top left and image coord system starts bottom left
+          for (int     y   = static_cast<int>(_image.geometry().size(1) - 1); y >= 0; --y) // y is inverted, because GL coord system starts top left and image coord system starts bottom left
           {
               for (GLuint x = 0; x < static_cast<GLuint>(_image.geometry().size(0)); ++x)
               { inout[cnt++] = 0; }
@@ -436,7 +459,7 @@ namespace bk
                   /*
                    * perform 3x3x3 closing and opening
                    */
-                  bk::MorphologicalClosingAndOpeningImageFilter f_morph(3,3);
+                  bk::MorphologicalClosingAndOpeningImageFilter f_morph(3, 3);
                   _pdata->seg = _pdata->seg.filter(f_morph);
 
                   _pdata->seg = bk::ConnectedComponentAnalysisKeepLargestRegionImageFilter::apply(_pdata->seg);
@@ -494,7 +517,7 @@ namespace bk
           }
           _pdata->ssbo_gc.unmap_and_release();
       }
-      _pdata->seg_changed = false;
+      _pdata->seg_changed   = false;
       _pdata->slice_changed = false;
       if (do_update)
       { this->emit_signal_update_required(); }
@@ -511,7 +534,7 @@ namespace bk
 
       _vao().bind();
 
-      _ssbo_intensity().bind_to_base(1);
+      _ssbo_intensity().bind_to_base(2);
       _shader().bind();
       BK_QT_GL glDrawElements(GL_TRIANGLE_STRIP, _sizeInd(), GL_UNSIGNED_INT, nullptr);
       _shader().release();
@@ -520,7 +543,7 @@ namespace bk
       BK_QT_GL glEnable(GL_BLEND);
       BK_QT_GL glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-      _pdata->ssbo_gc.bind_to_base(1);
+      _pdata->ssbo_gc.bind_to_base(2);
       _pdata->shader_gc.bind();
       BK_QT_GL glDrawElements(GL_TRIANGLE_STRIP, _sizeInd(), GL_UNSIGNED_INT, nullptr);
       _pdata->shader_gc.release();
@@ -538,6 +561,76 @@ namespace bk
 
       if (_show_tf())
       { _tf_view().draw(); }
+  }
+
+  bool GrayImageGraphCutView::on_mouse_pos_changed_impl(GLint x, GLint y)
+  {
+      if (interaction_mode_is_graph_cut())
+      {
+          determine_currentIntensity(x, y);
+
+          const bool process_drawing = _mouse().middle_button_is_pressed() || _mouse().right_button_is_pressed() || _mouse().left_button_is_pressed();
+
+          if (process_drawing)
+          { process_onscreen_drawing(x, y, false /*mouse was released*/); }
+          else if (interaction_mode_is_graph_cut())
+          { update_ssbo_gc(); }
+
+          //this->doneCurrent();
+      }
+
+      return !interaction_mode_is_graph_cut();
+  }
+
+  bool GrayImageGraphCutView::on_mouse_button_pressed_impl(MouseButton_ btn)
+  {
+      bool process_drawing = false;
+
+      if (btn == MouseButton_Left)
+      {
+          if (interaction_mode_is_graph_cut())
+          {
+              set_draw_mode_inside();
+              process_drawing = true;
+          }
+      }
+      else if (btn == MouseButton_Middle)
+      {
+          if (interaction_mode_is_graph_cut())
+          {
+              set_draw_mode_erase();
+              process_drawing = true;
+          }
+      }
+      else if (btn == MouseButton_Right)
+      {
+          if (interaction_mode_is_transfer_function())
+          { show_transfer_function(); }
+          else
+          {
+              set_draw_mode_outside();
+              process_drawing = true;
+          }
+      }
+
+      if (process_drawing)
+      { process_onscreen_drawing(_mouse().x(), _mouse().y(), false /*mouse was released*/); }
+
+      return !interaction_mode_is_graph_cut();
+  }
+
+  bool GrayImageGraphCutView::on_mouse_button_released_impl(MouseButton_ btn)
+  {
+      if (btn == MouseButton_Right)
+      {
+          if (interaction_mode_is_transfer_function())
+          { hide_transfer_function(); }
+      }
+
+      if (interaction_mode_is_graph_cut())
+      { process_onscreen_drawing(_mouse().x(), _mouse().y(), true /*mouse was released*/); }
+
+      return !interaction_mode_is_graph_cut();
   }
 } // namespace bk
 

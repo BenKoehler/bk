@@ -41,8 +41,13 @@ namespace bk
     struct FlowDirCorrection::Impl
     {
         std::array<int, 3> correction_factors;
+        bool               is_initialized;
 
-        Impl() : correction_factors{+1, +1, +1} { /* do nothing */ }
+        Impl()
+            : correction_factors{+1, +1, +1},
+              is_initialized(false)
+        { /* do nothing */ }
+
         Impl(const Impl&) = default;
         Impl(Impl&&) noexcept = default;
         ~Impl() = default;
@@ -61,6 +66,9 @@ namespace bk
     //====================================================================================================
     //===== GETTER
     //====================================================================================================
+    bool FlowDirCorrection::is_initialized() const
+    { return _pdata->is_initialized; }
+
     int FlowDirCorrection::correction_x() const
     { return _pdata->correction_factors[0]; }
 
@@ -81,6 +89,8 @@ namespace bk
         _pdata->correction_factors[0] = x_forward ? +1 : -1;
         _pdata->correction_factors[1] = y_forward ? +1 : -1;
         _pdata->correction_factors[2] = z_forward ? +1 : -1;
+
+        _pdata->is_initialized = true;
     }
 
     //====================================================================================================
@@ -132,6 +142,8 @@ namespace bk
         }
 
         file.close();
+
+        _pdata->is_initialized = true;
 
         return true;
     }

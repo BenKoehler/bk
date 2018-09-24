@@ -40,12 +40,12 @@ namespace bk
   {
       static_assert(bk::is_image_v<Image_>, "PARAMETER MUST BE AN IMAGE");
 
-      const unsigned int N = img.num_dimensions();
-      Vec4<GLuint> size_ = MatrixFactory::One_Vec_4D<GLuint>();
-      Vec4<GLfloat> scale_ = MatrixFactory::One_Vec_4D<GLfloat>();
-      for (unsigned int i = 0; i < N; ++i)
+      const unsigned int N      = img.num_dimensions();
+      Vec4<GLuint>       size_  = MatrixFactory::One_Vec_4D<GLuint>();
+      Vec4<GLfloat>      scale_ = MatrixFactory::One_Vec_4D<GLfloat>();
+      for (unsigned int  i      = 0; i < N; ++i)
       {
-          size_[i] = img.geometry().size(i);
+          size_[i]  = img.geometry().size(i);
           scale_[i] = img.geometry().transformation().scale(i);
       }
 
@@ -57,7 +57,7 @@ namespace bk
       #pragma omp parallel for
       for (unsigned int t = 0; t < size_[3]; ++t)
       {
-          Vec4<GLuint> gid(0,0,0,t);
+          Vec4<GLuint> gid(0, 0, 0, t);
           gid[3] = t;
           for (unsigned int z = 0; z < size_[2]; ++z)
           {
@@ -79,6 +79,12 @@ namespace bk
                   }
               }
           }
+      }
+
+      if (this->is_initialized())
+      {
+          this->update_ssbo_intensity_and_determine_intensity_min_max();
+          this->reset_transfer_function();
       }
 
       return _image.num_values() > 1;

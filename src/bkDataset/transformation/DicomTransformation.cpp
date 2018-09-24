@@ -176,19 +176,18 @@ namespace bk
           { wt(r, c) = w(r, c); }
       }
 
-      // copy 3 elements of bottom row
-      for (unsigned int c = 0; c < 3; ++c)
-      { wt(4, c) = w(3, c); }
-
-      // copy 3 elements of rightmost col
-      for (unsigned int r = 0; r < 3; ++r)
-      { wt(r, 4) = w(r, 3); }
-
-      // copy bottom left element
-      wt(4, 4) = w(3, 3);
+      // copy 3 elements of bottom row and rightmost col
+      for (unsigned int i = 0; i < 3; ++i)
+      {
+          wt(4, i) = w(3, i);
+          wt(i, 4) = w(i, 3);
+      }
 
       // set temporal resolution
       wt(3, 3) = temporal_resolution;
+
+      // copy bottom right element
+      wt(4, 4) = w(3, 3);
 
       set_world_matrix(wt);
   }

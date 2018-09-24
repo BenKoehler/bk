@@ -89,25 +89,28 @@ namespace bk
       //===== GETTER
       //====================================================================================================
       /// @{ -------------------------------------------------- GET GRAPH CUT
-      auto graph_cut() const -> const graph_cut_type*;
+      [[nodiscard]] auto graph_cut() const -> const graph_cut_type*;
       /// @}
 
     private:
-      auto _seg() -> segmentation_type&;
-      bool& _seg_changed();
+      [[nodiscard]] auto _seg() -> segmentation_type&;
+      [[nodiscard]] bool& _seg_changed();
     public:
 
       /// @{ -------------------------------------------------- GET PENCILSIZE
-      unsigned int pencil_size() const;
+      [[nodiscard]] unsigned int pencil_size() const;
       /// @}
 
       /// @{ -------------------------------------------------- GET SEGMENTATION
-      auto segmentation() const -> const segmentation_type&;
+      [[nodiscard]] auto segmentation() const -> const segmentation_type&;
       /// @}
 
       /// @{ -------------------------------------------------- SIGNALS
-      bk::Signal<>& signal_graph_cut_finished();
+      [[nodiscard]] bk::Signal<>& signal_graph_cut_finished();
       /// @}
+
+      [[nodiscard]] bool interaction_mode_is_graph_cut() const;
+      [[nodiscard]] bool interaction_mode_is_transfer_function() const;
 
       //====================================================================================================
       //===== SETTER
@@ -145,6 +148,9 @@ namespace bk
       void set_inside_outside_from_graph_cut();
       template<typename Img3_>
       void set_segmentation(const Img3_& seg);
+
+      void set_interaction_mode_graph_cut();
+      void set_interaction_mode_transfer_function();
 
       //====================================================================================================
       //===== FUNCTIONS
@@ -190,6 +196,14 @@ namespace bk
 
       /// @{ -------------------------------------------------- DRAW
       virtual void draw_impl() override;
+      /// @}
+
+      /// @{ -------------------------------------------------- EVENTS
+    protected:
+      virtual bool on_mouse_pos_changed_impl(GLint x, GLint y) override;
+      virtual bool on_mouse_button_pressed_impl(MouseButton_ btn) override;
+      virtual bool on_mouse_button_released_impl(MouseButton_ btn) override;
+    public:
       /// @}
 
   }; // class GrayImageGraphCutView

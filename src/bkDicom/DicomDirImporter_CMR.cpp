@@ -23,6 +23,7 @@
  */
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cstdint>
 #include <utility>
@@ -38,6 +39,7 @@
 #include <bkDicom/DicomImageInfos.h>
 #include <bkDicom/EFlowImageOrdering.h>
 #include <bk/ThreadPool>
+#include <bk/StringUtils>
 
 namespace bk
 {
@@ -47,11 +49,11 @@ namespace bk
   struct DicomDirImporter_CMR::Impl
   {
       std::map<unsigned int /*dcm_img_id*/, DicomImageClass_> classification;
-      details::FlowImageOrdering                              flow_image_order;
+      FlowImageOrdering                                       flow_image_order;
       std::map<unsigned int /*dcm_img_id*/, double>           venc;
 
       Impl()
-          : flow_image_order(details::FlowImageOrdering::XYZ)
+          : flow_image_order(FlowImageOrdering::XYZ)
       { /* do nothing */ }
 
       Impl(const Impl&) = default;
@@ -222,22 +224,22 @@ namespace bk
 
   /// @{ -------------------------------------------------- GET FLOW IMAGE ORDER
   bool DicomDirImporter_CMR::flow_images_are_ordered_xyz() const
-  { return _pdata->flow_image_order == details::FlowImageOrdering::XYZ; }
+  { return _pdata->flow_image_order == FlowImageOrdering::XYZ; }
 
   bool DicomDirImporter_CMR::flow_images_are_ordered_xzy() const
-  { return _pdata->flow_image_order == details::FlowImageOrdering::XZY; }
+  { return _pdata->flow_image_order == FlowImageOrdering::XZY; }
 
   bool DicomDirImporter_CMR::flow_images_are_ordered_yxz() const
-  { return _pdata->flow_image_order == details::FlowImageOrdering::YXZ; }
+  { return _pdata->flow_image_order == FlowImageOrdering::YXZ; }
 
   bool DicomDirImporter_CMR::flow_images_are_ordered_yzx() const
-  { return _pdata->flow_image_order == details::FlowImageOrdering::YZX; }
+  { return _pdata->flow_image_order == FlowImageOrdering::YZX; }
 
   bool DicomDirImporter_CMR::flow_images_are_ordered_zxy() const
-  { return _pdata->flow_image_order == details::FlowImageOrdering::ZXY; }
+  { return _pdata->flow_image_order == FlowImageOrdering::ZXY; }
 
   bool DicomDirImporter_CMR::flow_images_are_ordered_zyx() const
-  { return _pdata->flow_image_order == details::FlowImageOrdering::ZYX; }
+  { return _pdata->flow_image_order == FlowImageOrdering::ZYX; }
   /// @}
 
   /// @{ -------------------------------------------------- GET VENC
@@ -287,22 +289,22 @@ namespace bk
 
   /// @{ -------------------------------------------------- SET FLOW IMAGE ORDERING
   void DicomDirImporter_CMR::set_flow_image_ordering_xyz()
-  { _pdata->flow_image_order = details::FlowImageOrdering::XYZ; }
+  { _pdata->flow_image_order = FlowImageOrdering::XYZ; }
 
   void DicomDirImporter_CMR::set_flow_image_ordering_xzy()
-  { _pdata->flow_image_order = details::FlowImageOrdering::XZY; }
+  { _pdata->flow_image_order = FlowImageOrdering::XZY; }
 
   void DicomDirImporter_CMR::set_flow_image_ordering_yxz()
-  { _pdata->flow_image_order = details::FlowImageOrdering::YXZ; }
+  { _pdata->flow_image_order = FlowImageOrdering::YXZ; }
 
   void DicomDirImporter_CMR::set_flow_image_ordering_yzx()
-  { _pdata->flow_image_order = details::FlowImageOrdering::YZX; }
+  { _pdata->flow_image_order = FlowImageOrdering::YZX; }
 
   void DicomDirImporter_CMR::set_flow_image_ordering_zxy()
-  { _pdata->flow_image_order = details::FlowImageOrdering::ZXY; }
+  { _pdata->flow_image_order = FlowImageOrdering::ZXY; }
 
   void DicomDirImporter_CMR::set_flow_image_ordering_zyx()
-  { _pdata->flow_image_order = details::FlowImageOrdering::ZYX; }
+  { _pdata->flow_image_order = FlowImageOrdering::ZYX; }
   /// @}
 
   /// @{ -------------------------------------------------- SET VENC
@@ -721,6 +723,125 @@ namespace bk
   }
   /// @}
 
+  bool DicomDirImporter_CMR::guess_flow_image_ordering_from_dicom_tags()
+  {
+      const std::vector<unsigned int> flowImgIds = class_3dt_flow_images(false);
+
+      if (flowImgIds.size() != 3)
+      { return false; }
+
+      const std::array<std::reference_wrapper<DicomImageInfos>, 3> info = {image_infos(flowImgIds[0]),//
+                                                                           image_infos(flowImgIds[1]),//
+                                                                           image_infos(flowImgIds[2])};
+
+      /*
+      * scan sequence names for tags
+      */
+      int xid = -1;
+      int yid = -1;
+      int zid = -1;
+
+      const std::array<std::string, 4> tags_rl{{"rl", "lr", "left", "right"}};
+      const std::array<std::string, 3> tags_ap{{"ap", "anter", "poster"}};
+      const std::array<std::string, 4> tags_fh{{"fh", "feet", "foot", "head"}};
+
+      bool tagDuplication = false;
+
+      for (int i = 0; i < 3 && !tagDuplication; ++i)
+      {
+          bool foundTag = false;
+
+          for (std::string dcmtag: {info[i].get().SequenceName, info[i].get().StudyDescription})
+          {
+              for (const std::string& dirtag: tags_rl)
+              {
+                  if (bk::string_utils::contains(dcmtag, dirtag, false))
+                  {
+                      if (foundTag)
+                      {
+                          tagDuplication = true;
+                          break;
+                      }
+
+                      xid      = i;
+                      foundTag = true;
+                  }
+              }
+
+              //if (foundTag){continue;}
+
+              for (const std::string& dirtag: tags_ap)
+              {
+                  if (bk::string_utils::contains(dcmtag, dirtag, false))
+                  {
+                      if (foundTag)
+                      {
+                          tagDuplication = true;
+                          break;
+                      }
+
+                      yid      = i;
+                      foundTag = true;
+                  }
+              }
+
+              //if (foundTag){continue;}
+
+              for (const std::string& dirtag: tags_fh)
+              {
+                  if (bk::string_utils::contains(dcmtag, dirtag, false))
+                  {
+                      if (foundTag)
+                      {
+                          tagDuplication = true;
+                          break;
+                      }
+
+                      zid      = i;
+                      foundTag = true;
+                  }
+              }
+          }
+      }
+
+      if (tagDuplication)
+      { return false; }
+
+      // were at least two directions found?
+      if ((xid == 0 && yid == 1) || (xid == 0 && zid == 2) || (yid == 1 && zid == 2))
+      {
+          set_flow_image_ordering_xyz();
+          return true;
+      }
+      else if ((xid == 0 && zid == 1) || (xid == 0 && yid == 2) || (zid == 1 && yid == 2))
+      {
+          set_flow_image_ordering_xzy();
+          return true;
+      }
+      else if ((yid == 0 && xid == 1) || (yid == 0 && zid == 2) || (xid == 1 && zid == 2))
+      {
+          set_flow_image_ordering_yxz();
+          return true;
+      }
+      else if ((yid == 0 && zid == 1) || (yid == 0 && xid == 2) || (zid == 1 && xid == 2))
+      {
+          set_flow_image_ordering_yzx();
+          return true;
+      }
+      else if ((zid == 0 && xid == 1) || (zid == 0 && yid == 2) || (xid == 1 && yid == 2))
+      {
+          set_flow_image_ordering_zxy();
+          return true;
+      }
+      else if ((zid == 0 && yid == 1) || (zid == 0 && xid == 2) || (yid == 1 && xid == 2))
+      {
+          set_flow_image_ordering_zyx();
+          return true;
+      }
+
+      return false;
+  }
+
   //====================================================================================================
   //===== I/O
   //====================================================================================================
@@ -755,7 +876,7 @@ namespace bk
           for (auto[dcm_img_id, venc]: _pdata->venc)
           {
               const file_size_type id = static_cast<file_size_type>(dcm_img_id);
-              const double v = static_cast<double>(venc);
+              const double         v  = static_cast<double>(venc);
 
               file.write(reinterpret_cast<const char*>(&id), sizeof(file_size_type));
               file.write(reinterpret_cast<const char*>(&v), sizeof(double));
@@ -783,23 +904,23 @@ namespace bk
           }
 
           file.read(reinterpret_cast<char*>(&temp), sizeof(file_size_type));
-          _pdata->flow_image_order = static_cast<details::FlowImageOrdering>(temp);
+          _pdata->flow_image_order = static_cast<FlowImageOrdering>(temp);
 
           // venc
           _pdata->venc.clear();
 
           file_size_type nVencs = 0;
           file.read(reinterpret_cast<char*>(&nVencs), sizeof(file_size_type));
-          
+
           for (file_size_type i = 0; i < nVencs; ++i)
           {
               file_size_type id = 0;
-              double v = 0;
+              double         v  = 0;
 
               file.read(reinterpret_cast<char*>(&id), sizeof(file_size_type));
               file.read(reinterpret_cast<char*>(&v), sizeof(double));
 
-              _pdata->venc.emplace(id,v);
+              _pdata->venc.emplace(id, v);
           }
       }
   }

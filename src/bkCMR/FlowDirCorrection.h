@@ -62,6 +62,8 @@ namespace bk
         //====================================================================================================
         //===== GETTER
         //====================================================================================================
+        [[nodiscard]] bool is_initialized() const;
+
         [[nodiscard]] int correction_x() const;
         [[nodiscard]] int correction_y() const;
         [[nodiscard]] int correction_z() const;

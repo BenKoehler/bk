@@ -28,6 +28,7 @@
 #include <cassert>
 #include <cinttypes>
 #include <cmath>
+#include <filesystem>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -2678,6 +2679,22 @@ namespace bk
 
   void DicomDirImporter::save_impl(std::ofstream& /*file*/) const
   { /* overridden by derived class if necessary */ }
+
+  bool DicomDirImporter::save_dcm_image_bytes(unsigned int id, std::string_view filepath) const
+  { return save_dcm_image_bytes(read_image_bytes(id), filepath); }
+
+  bool DicomDirImporter::save_dcm_image_bytes(const std::vector<char>& bytes, std::string_view filepath) const
+  {
+      std::ofstream file(filepath.data(), std::ios_base::out | std::ios_base::binary);
+
+      if (!file.good())
+      { return false; }
+
+      file.write(bytes.data(), bytes.size() * sizeof(char));
+      file.close();
+
+      return true;
+  }
   /// @}
 
   /// @{ -------------------------------------------------- LOAD
@@ -2828,5 +2845,20 @@ namespace bk
 
   void DicomDirImporter::load_impl(std::ifstream& /*file*/)
   { /* overridden by derived class if necessary */ }
+
+  std::vector<char> DicomDirImporter::load_dcm_image_bytes(std::string_view filepath, bool* success) const
+  {
+      const unsigned int filesize = std::filesystem::file_size(filepath);
+      std::vector<char>  bytes(filesize);
+
+      std::ifstream file(filepath.data(), std::ios_base::in | std::ios_base::binary);
+      file.read(bytes.data(), filesize * sizeof(char));
+      file.close();
+
+      if (success != nullptr)
+      { *success = filesize != 0; }
+
+      return bytes;
+  }
   /// @}
 } // namespace bk

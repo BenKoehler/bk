@@ -53,6 +53,8 @@ namespace bk
 
   class VAO;
 
+  class Mouse;
+
   class Shader;
 
   class WindowingTransferFunctionView;
@@ -153,6 +155,7 @@ namespace bk
         [[nodiscard]] Shader& _shader();
         [[nodiscard]] WindowingTransferFunctionView& _tf_view();
         [[nodiscard]] bool _show_tf() const;
+        [[nodiscard]] const Mouse& _mouse() const;
       public:
         /// @}
 
@@ -261,6 +264,13 @@ namespace bk
         virtual void on_mouse_wheel_up() override;
         virtual void on_mouse_wheel_down() override;
         virtual void on_ssaa_factor_changed(GLint ssaa_factor) override;
+
+      protected:
+        // required for graph cut
+        virtual bool on_mouse_pos_changed_impl(GLint x, GLint y);
+        virtual bool on_mouse_button_pressed_impl(MouseButton_ btn);
+        virtual bool on_mouse_button_released_impl(MouseButton_ btn);
+      public:
         /// @}
 
         /// @{ -------------------------------------------------- DRAW

@@ -61,8 +61,8 @@ namespace bk
     public:
       /// @{ -------------------------------------------------- CONSTRUCTORS
       AttributeMap() = default;
-      AttributeMap(const self_type& other) = default;
-      AttributeMap(self_type&& other) noexcept = default;
+      AttributeMap(const self_type&) = default;
+      AttributeMap(self_type&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DESTRUCTOR
@@ -163,10 +163,20 @@ namespace bk
       { return _attrib.try_emplace(attribute_hash, data_type()).first->second; }
 
       [[maybe_unused]] data_type& add_attribute(const key_type& attribute_hash, const data_type& value)
-      { return _attrib.try_emplace(attribute_hash, value).first->second; }
+      {
+          if (auto it = _attrib.find(attribute_hash); it != _attrib.end())
+          { it->second = value; return it->second;}
+          else
+          {return _attrib.emplace(attribute_hash, value).first->second;}
+      }
 
       [[maybe_unused]] data_type& add_attribute(const key_type& attribute_hash, data_type&& value)
-      { return _attrib.try_emplace(attribute_hash, std::move(value)).first->second; }
+      {
+          if (auto it = _attrib.find(attribute_hash); it != _attrib.end())
+          { it->second = std::move(value); return it->second;}
+          else
+          {return _attrib.emplace(attribute_hash, std::move(value)).first->second;}
+      }
       /// @}
 
       /// @{ -------------------------------------------------- REMOVE ATTRIBUTE
@@ -184,8 +194,8 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- OPERATOR =
-      [[maybe_unused]] self_type& operator=(const self_type& other) = default;
-      [[maybe_unused]] self_type& operator=(self_type&& other) noexcept = default;
+      [[maybe_unused]] self_type& operator=(const self_type&) = default;
+      [[maybe_unused]] self_type& operator=(self_type&&) noexcept = default;
       /// @}
   }; // class AttributeMap
 } // namespace bk

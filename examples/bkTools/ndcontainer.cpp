@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+#include <array>
 #include <iostream>
 
 #include <bk/NDContainer>
@@ -169,6 +170,14 @@ void ndvector_example()
     const bk::NDVector<int> w(2,3);
     //std::cout << w(std::array<int,2>{0,3}) << std::endl; // crash; assertion fails because of invalid ids
     //std::cout << w.at(std::array<int,2>{0,3}) << std::endl; // throws std::out_of_range
+
+    std::cout << std::endl;
+
+    std::array<unsigned int,3> size2{3,4,5};
+    std::cout << "custom size via std::array<int,3>: " << size2[0] << " " << size2[1] << " " << size2[2] << std::endl;
+    bk::NDVector<double> c(size2.begin(), size2.end());
+    std::cout << "bk::NDVector size via std::array<int,3>: " << c.size(0) << " " << c.size(1) << " " << c.size(2) << std::endl;
+    std::cout << "\tnum values: " << c.num_values() << std::endl; // 60
 }
 
 void ndcontainer_example()

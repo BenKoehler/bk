@@ -120,12 +120,12 @@ namespace bk
           : NDArray(other, std::make_index_sequence<NumElementsAtCompileTime()>())
       { /* do nothing */ }
 
-      template<typename TIndexAccessible, std::enable_if_t<std::is_class_v<TIndexAccessible> && !std::is_same_v<TIndexAccessible, value_type>>* = nullptr>
+      template<typename TIndexAccessible, std::enable_if_t<std::is_class_v<std::decay_t<TIndexAccessible>> && !std::is_same_v<std::decay_t<TIndexAccessible>, value_type>>* = nullptr>
       constexpr NDArray(const TIndexAccessible& other) noexcept
           : NDArray(other, std::make_index_sequence<NumElementsAtCompileTime()>())
       { /* do nothing */ }
 
-      template<typename... TValues, std::enable_if_t<!std::conjunction_v<std::is_class<TValues>...> || std::conjunction_v<std::is_same<TValues, value_type>...>>* = nullptr>
+      template<typename... TValues, std::enable_if_t<!std::conjunction_v<std::is_class<std::decay_t<TValues>>...> || std::conjunction_v<std::is_same<std::decay_t<TValues>, value_type>...>>* = nullptr>
       constexpr NDArray(TValues ... values) noexcept
           : _values{static_cast<value_type>(values)...}
       { static_assert(sizeof...(TValues) == NumElementsAtCompileTime(), "invalid number of arguments"); }

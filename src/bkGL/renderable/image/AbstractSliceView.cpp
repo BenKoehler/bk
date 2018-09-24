@@ -267,6 +267,9 @@ namespace bk::details
 
   bool AbstractSliceView::_show_tf() const
   { return _pdata->show_tf; }
+
+  const Mouse& AbstractSliceView::_mouse() const
+  { return _pdata->mouse; }
   /// @}
 
   /// @{ -------------------------------------------------- IS INITIALIZED
@@ -704,32 +707,35 @@ namespace bk::details
   {
       _pdata->mouse.set_pos(x, y);
 
-      if (_pdata->mouse.middle_button_is_pressed())
+      if (on_mouse_pos_changed_impl(x, y))
       {
-          if (_pdata->mouse.last_move_was_down())
-          { previousSlice(x, y); }
-          else if (_pdata->mouse.last_move_was_up())
-          { nextSlice(x, y); }
+          if (_pdata->mouse.middle_button_is_pressed())
+          {
+              if (_pdata->mouse.last_move_was_down())
+              { previousSlice(x, y); }
+              else if (_pdata->mouse.last_move_was_up())
+              { nextSlice(x, y); }
 
-          if (_pdata->mouse.last_move_was_left())
-          { previousTime(x, y); }
-          else if (_pdata->mouse.last_move_was_right())
-          { nextTime(x, y); }
-      }
+              if (_pdata->mouse.last_move_was_left())
+              { previousTime(x, y); }
+              else if (_pdata->mouse.last_move_was_right())
+              { nextTime(x, y); }
+          }
 
-      if (_pdata->mouse.right_button_is_pressed())
-      {
-          static constexpr const GLfloat percent = 0.4; // todo: something more advanced?
-          
-          if (_pdata->mouse.last_move_was_down())
-          { transfer_function_decrease_width(percent * std::abs(_pdata->mouse.dy())); }
-          else if (_pdata->mouse.last_move_was_up())
-          { transfer_function_increase_width(percent * std::abs(_pdata->mouse.dy())); }
+          if (_pdata->mouse.right_button_is_pressed())
+          {
+              static constexpr const GLfloat percent = 0.4; // todo: something more advanced?
 
-          if (_pdata->mouse.last_move_was_left())
-          { transfer_function_shift_center_left(percent * std::abs(_pdata->mouse.dx())); }
-          else if (_pdata->mouse.last_move_was_right())
-          { transfer_function_shift_center_right(percent * std::abs(_pdata->mouse.dx())); }
+              if (_pdata->mouse.last_move_was_down())
+              { transfer_function_decrease_width(percent * std::abs(_pdata->mouse.dy())); }
+              else if (_pdata->mouse.last_move_was_up())
+              { transfer_function_increase_width(percent * std::abs(_pdata->mouse.dy())); }
+
+              if (_pdata->mouse.last_move_was_left())
+              { transfer_function_shift_center_left(percent * std::abs(_pdata->mouse.dx())); }
+              else if (_pdata->mouse.last_move_was_right())
+              { transfer_function_shift_center_right(percent * std::abs(_pdata->mouse.dx())); }
+          }
       }
 
       determine_currentIntensity(x, y);
@@ -738,13 +744,17 @@ namespace bk::details
   void AbstractSliceView::on_mouse_button_pressed(MouseButton_ btn)
   {
       _pdata->mouse.set_button_pressed(btn, true);
-      _pdata->show_tf = _pdata->mouse.right_button_is_pressed();
+
+      if (on_mouse_button_pressed_impl(btn))
+      {_pdata->show_tf = _pdata->mouse.right_button_is_pressed();}
   }
 
   void AbstractSliceView::on_mouse_button_released(MouseButton_ btn)
   {
       _pdata->mouse.set_button_pressed(btn, false);
-      _pdata->show_tf = _pdata->mouse.right_button_is_pressed();
+
+      if (on_mouse_button_released_impl(btn))
+      {_pdata->show_tf = _pdata->mouse.right_button_is_pressed();}
   }
 
   void AbstractSliceView::on_key_pressed(Key_ k)
@@ -770,6 +780,15 @@ namespace bk::details
 
   void AbstractSliceView::on_ssaa_factor_changed(GLint /*ssaa_factor*/)
   { /* do nothing */ }
+
+  bool AbstractSliceView::on_mouse_pos_changed_impl(GLint /*x*/, GLint /*y*/)
+  { return true; }
+
+  bool AbstractSliceView::on_mouse_button_pressed_impl(MouseButton_ /*btn*/)
+  { return true; }
+
+  bool AbstractSliceView::on_mouse_button_released_impl(MouseButton_ /*btn*/)
+  { return true; }
   /// @}
 
   /// @{ -------------------------------------------------- DRAW

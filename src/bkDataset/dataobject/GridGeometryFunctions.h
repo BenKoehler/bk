@@ -81,15 +81,13 @@ namespace bk::details
       template<typename T>
       [[nodiscard]] NDVector<T>& point_attribute_vector_of_type(unsigned long long attribute_hash)
       {
-          return *std::any_cast<NDVector < T>>
-          (&deriv()->point_attribute_map().attribute(attribute_hash));
+          return *std::any_cast<NDVector<T>>(&deriv()->point_attribute_map().attribute(attribute_hash));
       }
 
       template<typename T>
       [[nodiscard]] const NDVector<T>& point_attribute_vector_of_type(unsigned long long attribute_hash) const
       {
-          return *std::any_cast<NDVector < T>>
-          (&deriv()->point_attribute_map().attribute(attribute_hash));
+          return *std::any_cast<NDVector<T>>(&deriv()->point_attribute_map().attribute(attribute_hash));
       }
 
       template<typename T>
@@ -174,11 +172,10 @@ namespace bk::details
       template<typename T>
       [[maybe_unused]] NDVector<T>& add_point_attribute_vector_of_type(unsigned long long attribute_hash)
       {
-          const auto s = deriv()->geometry().size();
-          NDVector <T> v(s.begin(), s.end());
+          const auto  s = deriv()->geometry().size();
+          NDVector<T> v(s.begin(), s.end());
           std::any& a = deriv()->point_attribute_map().add_attribute(attribute_hash, std::any(std::move(v)));
-          return *std::any_cast<NDVector < T>>
-          (&a);
+          return *std::any_cast<NDVector<T>>(&a);
       }
 
       template<typename T>

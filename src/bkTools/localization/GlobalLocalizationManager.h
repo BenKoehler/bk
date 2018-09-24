@@ -110,5 +110,6 @@ namespace bk::details
 
 #define GET_MACRO(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, NAME, ...) NAME
 #define ___(...) GET_MACRO(__VA_ARGS__, ___11, ___10, ___9, ___8, ___7, ___6, ___5, ___4, ___3, ___2, ___1)(__VA_ARGS__)
+#define c___(...) ___(__VA_ARGS__).c_str()
 
 #endif //TES// TPROJECT_GLOBALLOCALIZATIONMANAGER_H

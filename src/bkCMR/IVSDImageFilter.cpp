@@ -71,6 +71,7 @@ namespace bk
       auto res = std::make_unique<DicomImage<double, 3>>();
       res->set_size(size[0], size[1], size[2]);
       res->geometry().transformation().set_world_matrix(ff.geometry().transformation().world_matrix());
+      res->geometry().transformation().set_dicom_image_type_3d();
 
       const unsigned int stride_t = bk::stride_of_dim(size, 3, 4);
 

@@ -226,6 +226,9 @@ namespace bk
     protected:
       virtual void save_impl(std::ofstream& file) const;
     public:
+
+      [[maybe_unused]] bool save_dcm_image_bytes(unsigned int id, std::string_view filepath) const;
+      [[maybe_unused]] bool save_dcm_image_bytes(const std::vector<char>& bytes, std::string_view filepath) const;
       /// @}
 
       /// @{ -------------------------------------------------- LOAD
@@ -233,6 +236,8 @@ namespace bk
     protected:
       virtual void load_impl(std::ifstream& file);
     public:
+
+      [[nodiscard]] std::vector<char> load_dcm_image_bytes(std::string_view filepath, bool* success = nullptr) const;
       /// @}
   }; // class DicomDirImporter
 } // namespace bk

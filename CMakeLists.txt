@@ -276,10 +276,11 @@ if (GDCM_FOUND)
     add_library(bkDicom ${SOURCE_FILES})
     _bk_make_lib(dicom Dicom)
 
-    target_link_libraries(bkDicom bk::bkMath)
-    target_link_libraries(bkDicom bk::bkDataset)
-    target_link_libraries(bkDicom bk::bkTools)
-    target_link_libraries(bkDicom GDCM::GDCM)
+    target_link_libraries(bkDicom PUBLIC stdc++fs)
+    target_link_libraries(bkDicom PUBLIC bk::bkMath)
+    target_link_libraries(bkDicom PUBLIC bk::bkDataset)
+    target_link_libraries(bkDicom PUBLIC bk::bkTools)
+    target_link_libraries(bkDicom PUBLIC GDCM::GDCM)
 
     target_compile_definitions(bkDicom PUBLIC BK_LIB_GDCM_AVAILABLE)
 
