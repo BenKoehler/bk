@@ -33,7 +33,7 @@ find_package(Threads REQUIRED)
 find_package(PNG REQUIRED)
 if (NOT PNG_FOUND)
     message(WARNING "LIBPNG NOT FOUND!")
-else()
+else ()
     message(STATUS "DETECTED LIBPNG!")
 endif ()
 
@@ -41,7 +41,7 @@ endif ()
 find_package(OpenMP REQUIRED)
 if (NOT OPENMP_FOUND)
     message(WARNING "OPENMP NOT FOUND!")
-else()
+else ()
     message(STATUS "DETECTED OPENMP!")
 endif ()
 
@@ -55,10 +55,17 @@ else ()
     if (NOT TARGET GDCM::GDCM)
         add_library(GDCM::GDCM INTERFACE IMPORTED)
 
-        set_target_properties(GDCM::GDCM PROPERTIES
-                INTERFACE_INCLUDE_DIRECTORIES "${GDCM_INCLUDE_DIRS}"
-                INTERFACE_LINK_DIRECTORIES "${GDCM_LIBRARY_DIRS}"
-                INTERFACE_LINK_LIBRARIES "gdcmCommon;gdcmDICT;gdcmDSED;gdcmIOD;gdcmMSFF;gdcmMEXD;gdcmjpeg8;gdcmjpeg12;gdcmjpeg16;gdcmexpat;gdcmcharls;gdcmzlib;gdcmuuid")
+#        if (UNIX)
+#            set_target_properties(GDCM::GDCM PROPERTIES
+#                    INTERFACE_INCLUDE_DIRECTORIES "${GDCM_INCLUDE_DIRS}"
+#                    INTERFACE_LINK_DIRECTORIES "${GDCM_LIBRARY_DIRS}"
+#                    INTERFACE_LINK_LIBRARIES "gdcmCommon;gdcmDICT;gdcmDSED;gdcmIOD;gdcmMSFF;gdcmMEXD;gdcmjpeg8;gdcmjpeg12;gdcmjpeg16;gdcmexpat;gdcmcharls;gdcmzlib;gdcmuuid")
+#        else ()
+            set_target_properties(GDCM::GDCM PROPERTIES
+                    INTERFACE_INCLUDE_DIRECTORIES "${GDCM_INCLUDE_DIRS}"
+                    INTERFACE_LINK_DIRECTORIES "${GDCM_LIBRARY_DIRS}"
+                    INTERFACE_LINK_LIBRARIES "gdcmCommon;gdcmDICT;gdcmDSED;gdcmIOD;gdcmMSFF;gdcmMEXD;gdcmjpeg8;gdcmjpeg12;gdcmjpeg16;gdcmcharls")
+#        endif ()
 
     endif ()
 endif ()
@@ -81,7 +88,7 @@ if (NOT Eigen3_FOUND AND NOT TARGET Eigen3::Eigen AND ${ENABLE_SUPERBUILD})
     endif ()
 
     add_subdirectory(dep/Eigen3)
-else()
+else ()
     message(STATUS "DETECTED EIGEN3!")
 endif ()
 
@@ -89,7 +96,7 @@ endif ()
 find_package(OpenGL REQUIRED)
 if (NOT OpenGL_FOUND)
     message(WARNING "OpenGL NOT FOUND!")
-else()
+else ()
     message(STATUS "DETECTED OpenGL!")
 endif ()
 
@@ -109,17 +116,16 @@ if (GLEW_FOUND)
                 INTERFACE_LINK_DIRECTORIES "${GLEW_LIBRARY_DIRS}"
                 INTERFACE_LINK_LIBRARIES "GLEW")
     endif ()
-else()
+else ()
     message(WARNING "GLEW NOT FOUND!")
-endif()
-
+endif ()
 
 
 # FREETYPE
 find_package(Freetype REQUIRED)
 if (NOT Freetype_FOUND)
     message(WARNING "FREETYPE NOT FOUND!")
-else()
+else ()
     message(STATUS "DETECTED FREETYPE!")
 endif ()
 
@@ -131,10 +137,10 @@ if (GL_USE_QT)
 
     if (NOT Qt5Core_FOUND OR NOT Qt5Widgets_FOUND OR NOT Qt5Gui_FOUND OR NOT Qt5OpenGL_FOUND)
         message(WARNING "QT5 NOT FOUND!")
-    else()
+    else ()
         message(STATUS "DETECTED QT5!")
     endif ()
-endif()
+endif ()
 
 # ------------------------------------------------------------------------------------------------------------------------------------
 # definitions
@@ -173,7 +179,7 @@ if (BUILD_EXAMPLES)
     # threshold
     add_executable(threshold_example ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/threshold.cpp)
     _bk_make_example(threshold_example ${BK_CURRENT_LIBRARY})
-endif()
+endif ()
 
 # ------------------------------------------------------------------------------------------------------------------------------------
 # add library bkCMR
@@ -285,7 +291,7 @@ if (GDCM_FOUND)
     target_compile_definitions(bkDicom PUBLIC BK_LIB_GDCM_AVAILABLE)
 
     _bk_install_lib(dicom Dicom DICOM)
-endif()
+endif ()
 
 # ------------------------------------------------------------------------------------------------------------------------------------
 # add library bkGL
@@ -326,18 +332,18 @@ set(SOURCE_FILES # BUFFER
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/RGBDICOMFlowImageSliceView.cpp # TODO
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/RGBDICOMSliceView.cpp # TODO
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/RGBImageSliceView.cpp # TODO
-#        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/imageplane/ImagePlanePreviewView.cpp # TODO
-#        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/imageplane/ImagePlaneView.cpp # TODO
+        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/imageplane/ImagePlanePreviewView.cpp # TODO
+        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/imageplane/ImagePlaneView.cpp # TODO
 
-#        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/AreaPlotView.cpp # TODO
-#        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/MultiLinePlotView.cpp # TODO
-#        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotAbstractDataVectorView.cpp # TODO
-#        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotAxis.cpp # TODO
-#        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotBase.cpp # TODO
-#        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotDataVector.cpp # TODO
-#        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotLine.cpp # TODO
-#        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotMarker.cpp # TODO
-#        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/SingleLinePlotView.cpp # TODO
+        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/AreaPlotView.cpp # TODO
+        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/MultiLinePlotView.cpp # TODO
+        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotAbstractDataVectorView.cpp # TODO
+        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotAxis.cpp # TODO
+        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotBase.cpp # TODO
+        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotDataVector.cpp # TODO
+        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotLine.cpp # TODO
+        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotMarker.cpp # TODO
+        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/SingleLinePlotView.cpp # TODO
 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/line/LineView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/mesh/TriangularMesh3DView.cpp
@@ -386,17 +392,17 @@ endif ()
 
 if (GL_USE_QT)
     target_compile_definitions(bkGL PUBLIC BK_LIB_QT_AVAILABLE)
-endif()
+endif ()
 
 if (GDCM_FOUND)
     target_compile_definitions(bkGL PUBLIC BK_LIB_GDCM_AVAILABLE)
-endif()
+endif ()
 
 if (UNIX) # TODO something more sophisticated
     target_compile_definitions(bkGL PUBLIC BK_GL_FONT_PATH="/usr/share/fonts/TTF/DejaVuSans.ttf")
-else()
+else ()
     target_compile_definitions(bkGL PUBLIC BK_GL_FONT_PATH="C:/Windows/Fonts/arial.ttf")
-endif()
+endif ()
 
 target_link_libraries(bkGL PUBLIC bk::bkAlgorithm)
 target_link_libraries(bkGL PUBLIC bk::bkDataset)
@@ -411,17 +417,17 @@ if (OpenMP_CXX_FOUND)
 endif ()
 if (GDCM_FOUND)
     target_link_libraries(bkGL PUBLIC GDCM::GDCM)
-endif()
+endif ()
 
 if (GL_USE_QT)
     target_link_libraries(bkGL PUBLIC Qt5::Core)
     target_link_libraries(bkGL PUBLIC Qt5::Gui)
     target_link_libraries(bkGL PUBLIC Qt5::Widgets)
     target_link_libraries(bkGL PUBLIC Qt5::OpenGL)
-else()
+else ()
     target_link_libraries(bkGL PUBLIC OpenGL::GL)
     target_link_libraries(bkGL PUBLIC GLEW::GLEW)
-endif()
+endif ()
 
 target_link_libraries(bkGL PUBLIC Freetype::Freetype)
 target_link_libraries(bkGL PUBLIC stdc++fs)
@@ -451,7 +457,7 @@ if (BUILD_EXAMPLES)
     # matrix
     add_executable(matrix_example ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/matrix.cpp)
     _bk_make_example(matrix_example ${BK_CURRENT_LIBRARY})
-endif()
+endif ()
 
 # ------------------------------------------------------------------------------------------------------------------------------------
 # add library bkTools
@@ -494,16 +500,15 @@ add_executable(localization_crawler ${CMAKE_CURRENT_SOURCE_DIR}/src/bkTools/loca
 target_link_libraries(localization_crawler PRIVATE bk::bkTools)
 target_link_libraries(localization_crawler PRIVATE stdc++fs)
 
-if(WIN32) # .exe for binaries
+if (WIN32) # .exe for binaries
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/localization_crawler.exe
             PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
             DESTINATION ${CMAKE_INSTALL_BINDIR}/bkTools)
-else()
+else ()
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/localization_crawler
             PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
             DESTINATION ${CMAKE_INSTALL_BINDIR}/bkTools)
-endif()
-
+endif ()
 
 
 if (BUILD_EXAMPLES)
@@ -544,7 +549,7 @@ if (BUILD_EXAMPLES)
             ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/localization/my_custom_localization.cpp)
     _bk_make_example(localization_example ${BK_CURRENT_LIBRARY})
     target_compile_definitions(localization_example PRIVATE BK_LOCALIZATION)
-        
+
     # ndcontainer
     add_executable(ndcontainer_example ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/ndcontainer.cpp)
     _bk_make_example(ndcontainer_example ${BK_CURRENT_LIBRARY})
@@ -556,7 +561,7 @@ if (BUILD_EXAMPLES)
     # options
     add_executable(options_example ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/options.cpp)
     _bk_make_example(options_example ${BK_CURRENT_LIBRARY})
-        
+
     # progress
     add_executable(progress_example ${CMAKE_CURRENT_SOURCE_DIR}/examples/${BK_CURRENT_LIBRARY}/progress.cpp)
     _bk_make_example(progress_example ${BK_CURRENT_LIBRARY})
