@@ -121,7 +121,7 @@ int main(int argc, const char** argv)
 
     unsigned int i  = 0;
     for (auto it = string_to_translate.begin(); it != string_to_translate.end(); ++i, ++it)
-    { file << "\"" << *it << "\"" << std::endl; }
+    { file << "set_text(\"" << *it << "\");" << std::endl; }
 
     file.close();
 
