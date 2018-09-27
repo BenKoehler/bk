@@ -50,6 +50,14 @@
 #include <bkTools/graphcut/GraphCutBase_Run.h>
 #include <bkTools/graphcut/gc_definitions.h>
 
+#ifdef BK_EMIT_PROGRESS
+
+    #include <bkTools/progress/GlobalProgressManager.h>
+    #include <bkTools/progress/Progress.h>
+    #include <bkTools/localization/GlobalLocalizationManager.h>
+
+#endif
+
 namespace bk
 {
   template<int TDims> class GraphCut
@@ -116,7 +124,7 @@ namespace bk
       { return node[dimId] > 0; }
 
       [[nodiscard]] bool is_valid_upper_bound(int dimId, const id_type& node) const
-      { return node[dimId] < this->_size[dimId]-1; }
+      { return node[dimId] < this->_size[dimId] - 1; }
       /// @}
 
       //====================================================================================================
@@ -156,7 +164,15 @@ namespace bk
               return;
           }
 
+          #ifdef BK_EMIT_PROGRESS
+          bk::Progress& prog = bk_progress.emplace_task(25, ___("Performing graph cut"));
+          #endif
+
           this->reset();
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(1);
+          #endif
 
           this->_current_timestamp = 1;
 
@@ -173,6 +189,10 @@ namespace bk
               this->timestamp(s) = timestamp_init;
           }
 
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(1);
+          #endif
+
           for (unsigned int i = 0; i < this->_connected_to_sink.size(); ++i)
           {
               const id_type& s = this->_connected_to_sink[i];
@@ -181,6 +201,10 @@ namespace bk
               this->distance_to_terminal(s) = 0;
               this->timestamp(s) = timestamp_init;
           }
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(1);
+          #endif
 
           while (this->grow())
           {
@@ -194,9 +218,17 @@ namespace bk
           for (unsigned int i = 0; i < this->_connected_to_source.size(); ++i)
           { this->set_source_set(this->_connected_to_source[i]); }
 
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(1);
+          #endif
+
           #pragma omp parallel for
           for (unsigned int i = 0; i < this->_connected_to_sink.size(); ++i)
           { this->set_sink_set(this->_connected_to_sink[i]); }
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.set_finished();
+          #endif
 
           const std::chrono::system_clock::time_point clock_stop = std::chrono::system_clock::now();
           const unsigned int time_in_sec = static_cast<unsigned int>(std::chrono::duration_cast<std::chrono::seconds>(clock_stop - clock_start).count());
