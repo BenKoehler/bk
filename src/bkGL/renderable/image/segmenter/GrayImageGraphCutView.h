@@ -54,10 +54,9 @@ namespace bk
 
       using graph_cut_type = GraphCutParallel<3>;
 
-      using ssbo_GLfloat = GLuint;
-      static constexpr const ssbo_GLfloat SegmentationBit = 1;
-      static constexpr const ssbo_GLfloat InsideBit = 2;
-      static constexpr const ssbo_GLfloat OutsideBit = 4;
+      static constexpr const GLuint SegmentationBit = 1;
+      static constexpr const GLuint InsideBit = 2;
+      static constexpr const GLuint OutsideBit = 4;
 
       //====================================================================================================
       //===== MEMBERS
@@ -194,10 +193,6 @@ namespace bk
       void update_ssbo_gc();
       /// @}
 
-      /// @{ -------------------------------------------------- DRAW
-      virtual void draw_impl() override;
-      /// @}
-
       /// @{ -------------------------------------------------- EVENTS
     protected:
       virtual bool on_mouse_pos_changed_impl(GLint x, GLint y) override;
@@ -206,6 +201,9 @@ namespace bk
     public:
       /// @}
 
+      /// @{ -------------------------------------------------- DRAW
+      virtual void draw_impl() override;
+      /// @}
   }; // class GrayImageGraphCutView
 } // namespace bk
 

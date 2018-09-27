@@ -3122,8 +3122,8 @@ namespace bk::details
 
       s << comment_region_functions();
       s << function_main_begin();
-      s << discard_low_alpha();
       s << "   color_out = color_frag;\n";
+      s << discard_low_alpha();
       s << function_main_end();
 
       return s.str();

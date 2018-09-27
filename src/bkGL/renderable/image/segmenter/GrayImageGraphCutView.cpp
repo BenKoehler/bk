@@ -117,6 +117,7 @@ namespace bk
                                                //this->update_ssbo_gc();
 
                                                _pdata->seg_changed = true;
+
                                                if (this->_pdata->inout_changed && _pdata->auto_update_segmentation)
                                                { this->update_gc(); }
                                            });
@@ -248,9 +249,7 @@ namespace bk
   //====================================================================================================
   void GrayImageGraphCutView::process_onscreen_drawing(GLuint screen_x, GLuint screen_y, bool mouse_was_released)
   {
-      if (_pdata->gc == nullptr)
-      { return; }
-      if (_image.num_values() <= 1)
+      if (_pdata->gc == nullptr || _image.num_values() <= 1)
       { return; }
 
       GLuint img_x;
@@ -280,9 +279,6 @@ namespace bk
                   {
                       _pdata->in(idx, idy, zcurrent())  = 1;
                       _pdata->out(idx, idy, zcurrent()) = 0;
-                      //_seg_in_out(idx, idy, zcurrent()) &= ~OutsideBit;
-                      //_seg_in_out(idx, idy, zcurrent()) |= InsideBit;
-
                       _pdata->inout_changed = true;
                       break;
                   }
@@ -290,9 +286,6 @@ namespace bk
                   {
                       _pdata->in(idx, idy, zcurrent())  = 0;
                       _pdata->out(idx, idy, zcurrent()) = 1;
-                      //_seg_in_out(idx, idy, zcurrent()) &= ~InsideBit;
-                      //_seg_in_out(idx, idy, zcurrent()) |= OutsideBit;
-
                       _pdata->inout_changed = true;
                       break;
                   }
@@ -300,9 +293,6 @@ namespace bk
                   {
                       _pdata->in(idx, idy, zcurrent())  = 0;
                       _pdata->out(idx, idy, zcurrent()) = 0;
-                      //_seg_in_out(idx, idy, zcurrent()) &= ~InsideBit;
-                      //_seg_in_out(idx, idy, zcurrent()) &= ~OutsideBit;
-
                       _pdata->inout_changed = true;
                       break;
                   }
@@ -345,9 +335,11 @@ namespace bk
   void GrayImageGraphCutView::init_ssbo_gc()
   {
       clear_ssbo_gc();
+
       const unsigned int        N = (xmax() + 1) * (ymax() + 1);
-      std::vector<ssbo_GLfloat> zero(N, 0);
-      _pdata->ssbo_gc.init(zero.data(), N * sizeof(ssbo_GLfloat));
+      std::vector<GLuint> zero(N, 0);
+
+      _pdata->ssbo_gc.init(zero.data(), N * sizeof(GLuint));
   }
 
   void GrayImageGraphCutView::clear()
@@ -393,7 +385,7 @@ namespace bk
       if (_image.num_values() <= 1)
       { return; }
 
-      ssbo_GLfloat* inout = _pdata->ssbo_gc.map_write_only<ssbo_GLfloat>();
+      GLuint* inout = _pdata->ssbo_gc.map_write_only<GLuint>();
       if (inout != nullptr)
       {
           unsigned int cnt = 0;
@@ -488,7 +480,7 @@ namespace bk
       { return; }
 
       bool do_update = false;
-      ssbo_GLfloat* inout = _pdata->ssbo_gc.map_write_only<ssbo_GLfloat>();
+      GLuint* inout = _pdata->ssbo_gc.map_write_only<GLuint>();
       if (inout != nullptr)
       {
           do_update = true;
@@ -499,11 +491,11 @@ namespace bk
           {
               for (GLuint x = 0; x < static_cast<GLuint>(_image.geometry().size(0)); ++x)
               {
-                  ssbo_GLfloat b = 0;
+                  GLuint b = 0;
 
                   //if ((_seg_in_out(x,y,zcurrent()) & InsideBit) != 0)
                   if (_pdata->in(x, y, zcurrent()) != 0)
-                  { b |= InsideBit; }
+                  {b |= InsideBit;}
 
                   //if ((_seg_in_out(x,y,zcurrent()) & OutsideBit) != 0)
                   if (_pdata->out(x, y, zcurrent()) != 0)
@@ -512,55 +504,19 @@ namespace bk
                   //if (_seg_in_out(x,y,zcurrent()) & SegmentationBit) != 0)
                   if (_pdata->seg(x, y, zcurrent()) != 0)
                   { b |= SegmentationBit; }
+
                   inout[cnt++] = b;
               }
           }
+
           _pdata->ssbo_gc.unmap_and_release();
       }
+
       _pdata->seg_changed   = false;
       _pdata->slice_changed = false;
+
       if (do_update)
       { this->emit_signal_update_required(); }
-  }
-
-  void GrayImageGraphCutView::draw_impl()
-  {
-      _ubo().bind_to_default_base();
-
-      BK_QT_GL glPushAttrib(GL_DEPTH_TEST | GL_PRIMITIVE_RESTART | GL_BLEND);
-      BK_QT_GL glDisable(GL_DEPTH_TEST);
-      BK_QT_GL glEnable(GL_PRIMITIVE_RESTART);
-      BK_QT_GL glPrimitiveRestartIndex(std::numeric_limits<GLuint>::max());
-
-      _vao().bind();
-
-      _ssbo_intensity().bind_to_base(2);
-      _shader().bind();
-      BK_QT_GL glDrawElements(GL_TRIANGLE_STRIP, _sizeInd(), GL_UNSIGNED_INT, nullptr);
-      _shader().release();
-      _ssbo_intensity().release_from_base();
-
-      BK_QT_GL glEnable(GL_BLEND);
-      BK_QT_GL glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-      _pdata->ssbo_gc.bind_to_base(2);
-      _pdata->shader_gc.bind();
-      BK_QT_GL glDrawElements(GL_TRIANGLE_STRIP, _sizeInd(), GL_UNSIGNED_INT, nullptr);
-      _pdata->shader_gc.release();
-
-      _pdata->shader_seg_contour.bind();
-      BK_QT_GL glDrawElements(GL_TRIANGLE_STRIP, _sizeInd(), GL_UNSIGNED_INT, nullptr);
-      _pdata->shader_seg_contour.release();
-      _pdata->ssbo_gc.release_from_base();
-
-      _vao().release();
-
-      _ubo().release_from_base();
-
-      BK_QT_GL glPopAttrib();
-
-      if (_show_tf())
-      { _tf_view().draw(); }
   }
 
   bool GrayImageGraphCutView::on_mouse_pos_changed_impl(GLint x, GLint y)
@@ -573,8 +529,6 @@ namespace bk
 
           if (process_drawing)
           { process_onscreen_drawing(x, y, false /*mouse was released*/); }
-          else if (interaction_mode_is_graph_cut())
-          { update_ssbo_gc(); }
 
           //this->doneCurrent();
       }
@@ -631,6 +585,46 @@ namespace bk
       { process_onscreen_drawing(_mouse().x(), _mouse().y(), true /*mouse was released*/); }
 
       return !interaction_mode_is_graph_cut();
+  }
+
+  void GrayImageGraphCutView::draw_impl()
+  {
+      _ubo().bind_to_default_base();
+
+      BK_QT_GL glPushAttrib(GL_DEPTH_TEST | GL_PRIMITIVE_RESTART | GL_BLEND);
+      BK_QT_GL glDisable(GL_DEPTH_TEST);
+      BK_QT_GL glEnable(GL_PRIMITIVE_RESTART);
+      BK_QT_GL glPrimitiveRestartIndex(std::numeric_limits<GLuint>::max());
+
+      _vao().bind();
+
+      _ssbo_intensity().bind_to_base(2);
+      _shader().bind();
+      BK_QT_GL glDrawElements(GL_TRIANGLE_STRIP, _sizeInd(), GL_UNSIGNED_INT, nullptr);
+      _shader().release();
+      _ssbo_intensity().release_from_base();
+
+      BK_QT_GL glEnable(GL_BLEND);
+      BK_QT_GL glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+      _pdata->ssbo_gc.bind_to_base(2);
+      _pdata->shader_gc.bind();
+      BK_QT_GL glDrawElements(GL_TRIANGLE_STRIP, _sizeInd(), GL_UNSIGNED_INT, nullptr);
+      _pdata->shader_gc.release();
+
+      _pdata->shader_seg_contour.bind();
+      BK_QT_GL glDrawElements(GL_TRIANGLE_STRIP, _sizeInd(), GL_UNSIGNED_INT, nullptr);
+      _pdata->shader_seg_contour.release();
+      _pdata->ssbo_gc.release_from_base();
+
+      _vao().release();
+
+      _ubo().release_from_base();
+
+      BK_QT_GL glPopAttrib();
+
+      if (_show_tf())
+      { _tf_view().draw(); }
   }
 } // namespace bk
 
