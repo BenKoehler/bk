@@ -36,6 +36,7 @@
 #endif
 
 #include <array>
+#include <chrono>
 #include <cstdint>
 #include <iostream>
 #include <limits>
@@ -49,6 +50,14 @@
 #include <bkTools/graphcut/GraphCutParallelBlock.h>
 #include <bkTools/graphcut/Edge.h>
 #include <bkTools/graphcut/gc_definitions.h>
+
+#ifdef BK_EMIT_PROGRESS
+
+    #include <bkTools/progress/Progress.h>
+    #include <bkTools/progress/GlobalProgressManager.h>
+    #include <bkTools/localization/GlobalLocalizationManager.h>
+
+#endif
 
 namespace bk
 {
@@ -193,6 +202,7 @@ namespace bk
               if (e.size_to[I] - e.size_from[I] == 1)
               {
                   id_type p;
+                  p.fill(0);
                   p[I] = e.size_from[I];
 
                   unsigned int score = 0;
@@ -321,7 +331,15 @@ namespace bk
               numEdgesTotal += tempNumEdges;
           }
 
+          #ifdef BK_EMIT_PROGRESS
+          bk::Progress& prog = bk_progress.emplace_task(8 + numBlocksTotal + numEdgesTotal, ___("Performing graph cut"));
+          #endif
+
           this->reset();
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(1);
+          #endif
 
           constexpr int timestamp_init = 1;
           const std::chrono::system_clock::time_point clock_start = std::chrono::system_clock::now(); // todo
@@ -347,6 +365,13 @@ namespace bk
                       this->timestamp(s) = timestamp_init;
                   }
 
+                      #pragma omp critical (gc_progress)
+                  {
+                          #ifdef BK_EMIT_PROGRESS
+                      prog.increment(1);
+                          #endif
+                  }
+
                   for (unsigned int i = 0; i < this->_connected_to_sink.size(); ++i)
                   {
                       const id_type& s = this->_connected_to_sink[i];
@@ -354,6 +379,13 @@ namespace bk
                       _set_active(s);
                       this->distance_to_terminal(s) = 0;
                       this->timestamp(s) = timestamp_init;
+                  }
+
+                      #pragma omp critical (gc_progress)
+                  {
+                          #ifdef BK_EMIT_PROGRESS
+                      prog.increment(1);
+                          #endif
                   }
               } // omp section
 
@@ -372,6 +404,13 @@ namespace bk
 
                       _init_blocks<1>(p, numBlocks, blocks, edges, edgecnt, blockidcnt);
                   }
+
+                      #pragma omp critical (gc_progress)
+                  {
+                          #ifdef BK_EMIT_PROGRESS
+                      prog.increment(1);
+                          #endif
+                  }
               } // omp section
           }; // omp parallel sections
 
@@ -384,6 +423,10 @@ namespace bk
           #pragma omp parallel for schedule(dynamic, 1)
           for (unsigned int blockid = 0; blockid < blocks.size(); ++blockid)
           { blocks[blockid].run(); }
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(numBlocksTotal);
+          #endif
 
           //------------------------------------------------------------------------------------------------------
           // Phase 2 preparation
@@ -411,6 +454,10 @@ namespace bk
               e.score = count_potential_augmentations<0>(e);
           }
 
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(1);
+          #endif
+
           /*
            * sort edge scores (descending)
            */
@@ -421,6 +468,10 @@ namespace bk
           #endif
           ::sort(edges.begin(), edges.end(), [](const edge_type& a, const edge_type& b) -> bool
           { return b.score < a.score; });
+
+              #ifdef BK_EMIT_PROGRESS
+          prog.increment(1);
+              #endif
 
           //------------------------------------------------------------------------------------------------------
           // Phase 2: Adaptive Merging
@@ -519,6 +570,13 @@ namespace bk
 
                   #pragma omp critical (edge_lock)
                   { newblock->_locked = false; }
+
+                  #pragma omp critical (gc_progress)
+                  {
+                      #ifdef BK_EMIT_PROGRESS
+                      prog.increment(current_edges.size());
+                      #endif
+                  }
               } // while true
           } // for threads
 
@@ -526,9 +584,17 @@ namespace bk
           for (unsigned int i = 0; i < this->_connected_to_source.size(); ++i)
           { this->set_source_set(this->_connected_to_source[i]); }
 
+              #ifdef BK_EMIT_PROGRESS
+          prog.increment(1);
+              #endif
+
               #pragma omp parallel for
           for (unsigned int i = 0; i < this->_connected_to_sink.size(); ++i)
           { this->set_sink_set(this->_connected_to_sink[i]); }
+
+              #ifdef BK_EMIT_PROGRESS
+          prog.set_finished();
+              #endif
 
           const std::chrono::system_clock::time_point clock_stop = std::chrono::system_clock::now();
           const unsigned int time_in_sec = static_cast<unsigned int>(std::chrono::duration_cast<std::chrono::seconds>(clock_stop - clock_start).count());

@@ -31,6 +31,7 @@
 #include <cmath>
 #include <cstdint>
 #include <type_traits>
+#include <vector>
 
 namespace bk::gc_details
 {
