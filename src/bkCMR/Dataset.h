@@ -162,7 +162,8 @@ namespace bk
         [[nodiscard]] std::string filepath_tmip_magnitude_3dt() const;
         [[nodiscard]] std::string filepath_lpc() const;
         [[nodiscard]] std::string filepath_ivsd() const;
-        [[nodiscard]] std::string filepath_tmip_signal() const;
+        [[nodiscard]] std::string filepath_tmip_signal_3dt() const;
+        [[nodiscard]] std::string filepath_tmip_anatomical_3dt(unsigned int imgId) const;
         [[nodiscard]] std::vector<std::string> filepaths_of_local_image_copies() const;
         [[nodiscard]] std::string filepath_pressure_map_of_vessel(const Vessel& v) const;
 
@@ -184,6 +185,7 @@ namespace bk
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> ivsd() const;
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> tmip_magnitude_3dt() const;
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> tmip_signal_intensity_3dt() const;
+        [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> tmip_anatomical_3dt(unsigned int dcmImgId) const;
         [[nodiscard]] std::unique_ptr<DicomImage<double, 4>> pressure_map(PressureMapImageFilter pmf) const;
         [[nodiscard]] std::unique_ptr<DicomImage<double, 4>> pressure_map() const;
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> vessel_segmentation_in_flow_field_3dt_size(const Vessel& v) const;
@@ -236,6 +238,7 @@ namespace bk
 
         [[maybe_unused]] bool save_ivsd();
         [[maybe_unused]] bool save_magnitude_tmip_3dt();
+        [[maybe_unused]] bool save_anatomical_tmip_3dt(unsigned int imgId);
     }; // class Dataset
   } // inline namespace cmr
 } // namespace bk

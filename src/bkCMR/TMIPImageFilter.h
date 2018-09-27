@@ -24,8 +24,8 @@
 
 #pragma once
 
-#ifndef BK_MAGTMIPIMAGEFILTER_H
-#define BK_MAGTMIPIMAGEFILTER_H
+#ifndef BK_TMIPIMAGEFILTER_H
+#define BK_TMIPIMAGEFILTER_H
 
 #include <memory>
 
@@ -36,27 +36,27 @@ namespace bk
 {
   inline namespace cmr
   {
-    class BKCMR_EXPORT MagTMIPImageFilter
+    class BKCMR_EXPORT TMIPImageFilter
     {
         //====================================================================================================
         //===== DEFINITIONS
         //====================================================================================================
-        using self_type = MagTMIPImageFilter;
+        using self_type = TMIPImageFilter;
 
         //====================================================================================================
         //===== CONSTRUCTORS & DESTRUCTOR
         //====================================================================================================
       public:
-        MagTMIPImageFilter();
-        MagTMIPImageFilter(const MagTMIPImageFilter&);
-        MagTMIPImageFilter(MagTMIPImageFilter&&) noexcept;
-        ~MagTMIPImageFilter();
+        TMIPImageFilter();
+        TMIPImageFilter(const TMIPImageFilter&);
+        TMIPImageFilter(TMIPImageFilter&&) noexcept;
+        ~TMIPImageFilter();
 
         //====================================================================================================
         //===== SETTER
         //====================================================================================================
-        [[maybe_unused]] MagTMIPImageFilter& operator=(const MagTMIPImageFilter&);
-        [[maybe_unused]] MagTMIPImageFilter& operator=(MagTMIPImageFilter&&) noexcept;
+        [[maybe_unused]] TMIPImageFilter& operator=(const TMIPImageFilter&);
+        [[maybe_unused]] TMIPImageFilter& operator=(TMIPImageFilter&&) noexcept;
 
         //====================================================================================================
         //===== FUNCTIONS
@@ -65,8 +65,8 @@ namespace bk
         [[nodiscard]] static std::unique_ptr<DicomImage<double, 3>> apply(const DicomImage<double, -1>& mag);
         [[nodiscard]] static std::unique_ptr<DicomImage<double, 3>> apply(const DicomImage<double, 4>& mag_x, const DicomImage<double, 4>& mag_y, const DicomImage<double, 4>& mag_z);
         [[nodiscard]] static std::unique_ptr<DicomImage<double, 3>> apply(const DicomImage<double, -1>& mag_x, const DicomImage<double, -1>& mag_y, const DicomImage<double, -1>& mag_z);
-    }; // class MagTMIPImageFilter
+    }; // class TMIPImageFilter
   } // inline namespace cmr
 } // namespace bk
 
-#endif //BK_MAGTMIPIMAGEFILTER_H
+#endif //BK_TMIPIMAGEFILTER_H

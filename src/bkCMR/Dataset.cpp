@@ -33,7 +33,7 @@
 #include <bkCMR/FlowImage2DT.h>
 #include <bkCMR/FlowImage3DT.h>
 #include <bkCMR/IVSDImageFilter.h>
-#include <bkCMR/MagTMIPImageFilter.h>
+#include <bkCMR/TMIPImageFilter.h>
 #include <bkCMR/LPCImageFilter.h>
 #include <bkCMR/PhaseUnwrapping2DT.h>
 #include <bkCMR/PhaseUnwrapping3DT.h>
@@ -334,8 +334,18 @@ namespace bk
     std::string Dataset::filepath_ivsd() const
     { return _pdata->project_path + "ivsd"; }
 
-    std::string Dataset::filepath_tmip_signal() const
+    std::string Dataset::filepath_tmip_signal_3dt() const
     { return _pdata->project_path + "tmip_signal"; }
+
+    std::string Dataset::filepath_tmip_anatomical_3dt(unsigned int imgId) const
+    {
+        std::stringstream s;
+        s <<  _pdata->project_path;
+        s << "tmip_anatomy";
+        s << imgId;
+
+        return s.str();
+    }
 
     std::vector<std::string> Dataset::filepaths_of_local_image_copies() const
     {
@@ -687,15 +697,59 @@ namespace bk
         #endif
 
         if (numMagnitudeImages == 1)
-        { return MagTMIPImageFilter::apply(*m[0]); }
+        { return TMIPImageFilter::apply(*m[0]); }
         else //if (numMagnitudeImages == 3)
-        { return MagTMIPImageFilter::apply(*m[0], *m[1], *m[2]); }
+        { return TMIPImageFilter::apply(*m[0], *m[1], *m[2]); }
     }
 
     std::unique_ptr<DicomImage<double, 3>> Dataset::tmip_signal_intensity_3dt() const
     {
-        // todo
-        return nullptr;
+        if (has_local_image_copy(filepath_tmip_signal_3dt()))
+        { return load_local_image_copy(filepath_tmip_signal_3dt()); }
+
+        const std::vector<unsigned int> imageIds = _pdata->importer.class_3dt_signal_intensity_images();
+        if (imageIds.empty())
+        {
+            std::cerr << "signal intensity images not found! (image id not present in importer's class)" << std::endl;
+            return nullptr;
+        }
+
+        #ifdef BK_EMIT_PROGRESS
+        bk::Progress& prog = bk_progress.emplace_task(1, ___("loading signal intensity image"));
+        #endif
+
+        std::unique_ptr<DicomImage<double, -1>> m = load_local_image_copy_dcmbytes(imageIds[0]);
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        return TMIPImageFilter::apply(*m);
+    }
+
+    std::unique_ptr<DicomImage<double, 3>> Dataset::tmip_anatomical_3dt(unsigned int dcmImgId) const
+    {
+        if (has_local_image_copy(filepath_tmip_anatomical_3dt(dcmImgId)))
+        { return load_local_image_copy(filepath_tmip_anatomical_3dt(dcmImgId)); }
+
+        const std::vector<unsigned int> imageIds = _pdata->importer.class_3dt_anatomical_images();
+        if (std::find(imageIds.begin(), imageIds.end(), dcmImgId) == imageIds.end())
+        {
+            std::cerr << "anatomical image " << dcmImgId << " not found! (image id not present in importer's class)" << std::endl;
+            return nullptr;
+        }
+
+        #ifdef BK_EMIT_PROGRESS
+        bk::Progress& prog = bk_progress.emplace_task(1, ___("loading anatomical image"));
+        #endif
+
+        std::unique_ptr<DicomImage<double, -1>> m = load_local_image_copy_dcmbytes(dcmImgId);
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        return TMIPImageFilter::apply(*m);
     }
 
     std::unique_ptr<DicomImage<double, 4>> Dataset::pressure_map(PressureMapImageFilter pmf) const
@@ -865,7 +919,7 @@ namespace bk
         paths.emplace_back(filepath_tmip_magnitude_3dt());
         paths.emplace_back(filepath_lpc());
         paths.emplace_back(filepath_ivsd());
-        paths.emplace_back(filepath_tmip_signal());
+        paths.emplace_back(filepath_tmip_signal_3dt());
 
         #ifdef BK_EMIT_PROGRESS
         Progress& prog = bk_progress.emplace_task(paths.size(), ___("removing local image copies"));
@@ -1151,6 +1205,12 @@ namespace bk
     {
         auto img = tmip_magnitude_3dt();
         return save_local_image_copy(filepath_tmip_magnitude_3dt(), *img);
+    }
+
+    bool Dataset::save_anatomical_tmip_3dt(unsigned int imgId)
+    {
+        auto img = tmip_anatomical_3dt(imgId);
+        return save_local_image_copy(filepath_tmip_anatomical_3dt(imgId), *img);
     }
   } // inline namespace cmr
 } // namespace bk

@@ -26,7 +26,7 @@
 #include <cassert>
 #include <cmath>
 
-#include <bkCMR/MagTMIPImageFilter.h>
+#include <bkCMR/TMIPImageFilter.h>
 
 #include <bkMath/functions/list_grid_id_conversion.h>
 #include <bk/Matrix>
@@ -43,16 +43,16 @@ namespace bk
   //====================================================================================================
   //===== CONSTRUCTORS & DESTRUCTOR
   //====================================================================================================
-  MagTMIPImageFilter::MagTMIPImageFilter() = default;
-  MagTMIPImageFilter::MagTMIPImageFilter(const MagTMIPImageFilter&) = default;
-  MagTMIPImageFilter::MagTMIPImageFilter(MagTMIPImageFilter&&) noexcept = default;
-  MagTMIPImageFilter::~MagTMIPImageFilter() = default;
+  TMIPImageFilter::TMIPImageFilter() = default;
+  TMIPImageFilter::TMIPImageFilter(const TMIPImageFilter&) = default;
+  TMIPImageFilter::TMIPImageFilter(TMIPImageFilter&&) noexcept = default;
+  TMIPImageFilter::~TMIPImageFilter() = default;
 
   //====================================================================================================
   //===== SETTER
   //====================================================================================================
-  MagTMIPImageFilter& MagTMIPImageFilter::operator=(const MagTMIPImageFilter&) = default;
-  MagTMIPImageFilter& MagTMIPImageFilter::operator=(MagTMIPImageFilter&&) noexcept = default;
+  TMIPImageFilter& TMIPImageFilter::operator=(const TMIPImageFilter&) = default;
+  TMIPImageFilter& TMIPImageFilter::operator=(TMIPImageFilter&&) noexcept = default;
 
   //====================================================================================================
   //===== FUNCTIONS
@@ -115,10 +115,10 @@ namespace bk
     {
         const auto& size = mag_x.size();
 
-        assert(size[0] == mag_y.size(0) && size[0] == mag_z.size(0) && "MagTMIPImageFilter::apply - magnitude image size x mismatch");
-        assert(size[1] == mag_y.size(1) && size[1] == mag_z.size(1) && "MagTMIPImageFilter::apply - magnitude image size y mismatch");
-        assert(size[2] == mag_y.size(2) && size[2] == mag_z.size(2) && "MagTMIPImageFilter::apply - magnitude image size z mismatch");
-        assert(size[3] == mag_y.size(3) && size[3] == mag_z.size(3) && "MagTMIPImageFilter::apply - magnitude image size t mismatch");
+        assert(size[0] == mag_y.size(0) && size[0] == mag_z.size(0) && "TMIPImageFilter::apply - magnitude image size x mismatch");
+        assert(size[1] == mag_y.size(1) && size[1] == mag_z.size(1) && "TMIPImageFilter::apply - magnitude image size y mismatch");
+        assert(size[2] == mag_y.size(2) && size[2] == mag_z.size(2) && "TMIPImageFilter::apply - magnitude image size z mismatch");
+        assert(size[3] == mag_y.size(3) && size[3] == mag_z.size(3) && "TMIPImageFilter::apply - magnitude image size t mismatch");
 
         #ifdef BK_EMIT_PROGRESS
         bk::Progress& prog = bk_progress.emplace_task(mag_x.num_values() / size[3], ___("calculating magnitude tmip"));
@@ -165,15 +165,15 @@ namespace bk
     }
   } // anonymous namespace
 
-  std::unique_ptr<DicomImage<double, 3>> MagTMIPImageFilter::apply(const DicomImage<double, 4>& mag)
+  std::unique_ptr<DicomImage<double, 3>> TMIPImageFilter::apply(const DicomImage<double, 4>& mag)
   { return _apply(mag); }
 
-  std::unique_ptr<DicomImage<double, 3>> MagTMIPImageFilter::apply(const DicomImage<double, -1>& mag)
+  std::unique_ptr<DicomImage<double, 3>> TMIPImageFilter::apply(const DicomImage<double, -1>& mag)
   { return _apply(mag); }
 
-  std::unique_ptr<DicomImage<double, 3>> MagTMIPImageFilter::apply(const DicomImage<double, 4>& mag_x, const DicomImage<double, 4>& mag_y, const DicomImage<double, 4>& mag_z)
+  std::unique_ptr<DicomImage<double, 3>> TMIPImageFilter::apply(const DicomImage<double, 4>& mag_x, const DicomImage<double, 4>& mag_y, const DicomImage<double, 4>& mag_z)
   { return _apply(mag_x, mag_y, mag_z); }
 
-  std::unique_ptr<DicomImage<double, 3>> MagTMIPImageFilter::apply(const DicomImage<double, -1>& mag_x, const DicomImage<double, -1>& mag_y, const DicomImage<double, -1>& mag_z)
+  std::unique_ptr<DicomImage<double, 3>> TMIPImageFilter::apply(const DicomImage<double, -1>& mag_x, const DicomImage<double, -1>& mag_y, const DicomImage<double, -1>& mag_z)
   { return _apply(mag_x, mag_y, mag_z); }
 } // namespace bk

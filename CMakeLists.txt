@@ -193,7 +193,7 @@ set(SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowJet.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/IVSDImageFilter.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/LPCImageFilter.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/MagTMIPImageFilter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/TMIPImageFilter.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/PhaseUnwrapping2DT.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/PhaseUnwrapping3DT.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/PressureMapImageFilter.cpp
