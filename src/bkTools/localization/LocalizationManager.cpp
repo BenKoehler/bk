@@ -39,12 +39,26 @@ namespace bk
   //===== GETTER
   //====================================================================================================
   std::string LocalizationManager::get_tag(unsigned int id) const
-  { return id < _tags.size() ? _tags[id] : "UNKNOWN-TAG"; }
+  {
+      if (id < _tags.size())return _tags[id];
+
+      std::stringstream s;
+      s << "UNKNOWN-TAG(";
+      s << id;
+      s << ")";
+      return s.str();
+  }
 
   std::string LocalizationManager::get_text(unsigned long long hash) const
   {
-      const auto it = _text.find(hash);
-      return it != _text.end() ? it->second : "UNKNOWN-HASH";
+      if (const auto it = _text.find(hash); it != _text.end())
+      {return it->second;}
+
+      std::stringstream s;
+      s << "UNKNOWN-HASH(";
+      s << hash;
+      s << ")";
+      return s.str();
   }
 
   std::string LocalizationManager::get_text(std::string_view referenceText) const
@@ -56,7 +70,14 @@ namespace bk
       if (_text.find(hash) == _text.end())
       { std::cerr << "text \"" << referenceText << "\" was not found in the database!" << std::endl; }
 
-      return it != _text.end() ? it->second : "UNKNOWN-HASH";
+      if (it != _text.end())
+      {return it->second;}
+
+      std::stringstream s;
+      s << "UNKNOWN-TEXT(";
+      s << referenceText;
+      s << ")";
+      return s.str();
   }
 
   bool LocalizationManager::is_tag_at_position(std::string_view text, unsigned int pos)
