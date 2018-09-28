@@ -28,7 +28,6 @@ if (GDCM_FOUND AND NOT TARGET GDCM::GDCM)
 set_target_properties(GDCM::GDCM PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${GDCM_INCLUDE_DIRS}"
         INTERFACE_LINK_DIRECTORIES "${GDCM_LIBRARY_DIRS}"
-        #INTERFACE_LINK_LIBRARIES "gdcmCommon;gdcmDICT;gdcmDSED;gdcmIOD;gdcmMSFF;gdcmMEXD;gdcmjpeg8;gdcmjpeg12;gdcmjpeg16;gdcmexpat;gdcmcharls;gdcmzlib;gdcmuuid")
         INTERFACE_LINK_LIBRARIES "gdcmCommon;gdcmDICT;gdcmDSED;gdcmIOD;gdcmMSFF;gdcmMEXD;gdcmjpeg8;gdcmjpeg12;gdcmjpeg16;gdcmcharls")
 endif ()
 

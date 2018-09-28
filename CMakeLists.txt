@@ -55,17 +55,10 @@ else ()
     if (NOT TARGET GDCM::GDCM)
         add_library(GDCM::GDCM INTERFACE IMPORTED)
 
-#        if (UNIX)
-#            set_target_properties(GDCM::GDCM PROPERTIES
-#                    INTERFACE_INCLUDE_DIRECTORIES "${GDCM_INCLUDE_DIRS}"
-#                    INTERFACE_LINK_DIRECTORIES "${GDCM_LIBRARY_DIRS}"
-#                    INTERFACE_LINK_LIBRARIES "gdcmCommon;gdcmDICT;gdcmDSED;gdcmIOD;gdcmMSFF;gdcmMEXD;gdcmjpeg8;gdcmjpeg12;gdcmjpeg16;gdcmexpat;gdcmcharls;gdcmzlib;gdcmuuid")
-#        else ()
-            set_target_properties(GDCM::GDCM PROPERTIES
-                    INTERFACE_INCLUDE_DIRECTORIES "${GDCM_INCLUDE_DIRS}"
-                    INTERFACE_LINK_DIRECTORIES "${GDCM_LIBRARY_DIRS}"
-                    INTERFACE_LINK_LIBRARIES "gdcmCommon;gdcmDICT;gdcmDSED;gdcmIOD;gdcmMSFF;gdcmMEXD;gdcmjpeg8;gdcmjpeg12;gdcmjpeg16;gdcmcharls")
-#        endif ()
+        set_target_properties(GDCM::GDCM PROPERTIES
+                INTERFACE_INCLUDE_DIRECTORIES "${GDCM_INCLUDE_DIRS}"
+                INTERFACE_LINK_DIRECTORIES "${GDCM_LIBRARY_DIRS}"
+                INTERFACE_LINK_LIBRARIES "gdcmCommon;gdcmDICT;gdcmDSED;gdcmIOD;gdcmMSFF;gdcmMEXD;gdcmjpeg8;gdcmjpeg12;gdcmjpeg16;gdcmcharls")
 
     endif ()
 endif ()
