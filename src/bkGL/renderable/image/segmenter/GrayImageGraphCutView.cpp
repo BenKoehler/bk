@@ -42,6 +42,13 @@
 #include <bkGL/renderable/image/segmenter/GraphCutDrawMode.h>
 #include <bkGL/renderable/transfer_function/WindowingTransferFunctionView.h>
 
+#ifdef BK_EMIT_PROGRESS
+
+    #include <bk/Progress>
+    #include <bk/Localization>
+
+#endif
+
 namespace bk
 {
   //====================================================================================================
@@ -57,22 +64,24 @@ namespace bk
   //====================================================================================================
   struct GrayImageGraphCutView::Impl
   {
-      SSBO   ssbo_gc;
+      SSBO ssbo_gc;
       Shader shader_gc;
       Shader shader_seg_contour;
       graph_cut_type* gc;
-      unsigned int              pencil_size;
+      unsigned int pencil_size;
       details::GraphCutDrawMode draw_mode;
-      bool                      auto_update_segmentation;
-      bool                      inout_changed;
-      bool                      gc_is_running;
-      bool                      seg_changed;
-      bool                      slice_changed;
-      segmentation_type         seg;
-      segmentation_type         in;
-      segmentation_type         out;
-      bk::Signal<>              s_gc_finished;
-      GraphCutInteractionMode_  interaction_mode;
+      bool auto_update_segmentation;
+      bool inout_changed;
+      bool gc_is_running;
+      bool seg_changed;
+      bool slice_changed;
+      segmentation_type seg;
+      segmentation_type in;
+      segmentation_type out;
+      bk::Signal<> s_gc_finished;
+      bk::Signal<> s_input_changed;
+      GraphCutInteractionMode_ interaction_mode;
+      bool show_inout_overlay;
 
           #ifndef BK_LIB_QT_AVAILABLE
 
@@ -93,7 +102,8 @@ namespace bk
           gc_is_running(false),
           seg_changed(false),
           slice_changed(false),
-          interaction_mode(GraphCutInteractionMode_GraphCut)
+          interaction_mode(GraphCutInteractionMode_GraphCut),
+          show_inout_overlay(true)
       { /* do nothing */ }
 
       Impl(const Impl&) = delete;
@@ -148,11 +158,17 @@ namespace bk
   bk::Signal<>& GrayImageGraphCutView::signal_graph_cut_finished()
   { return _pdata->s_gc_finished; }
 
+  bk::Signal<>& GrayImageGraphCutView::signal_input_changed()
+  { return _pdata->s_input_changed; }
+
   bool GrayImageGraphCutView::interaction_mode_is_graph_cut() const
   { return _pdata->interaction_mode == GraphCutInteractionMode_GraphCut; }
 
   bool GrayImageGraphCutView::interaction_mode_is_transfer_function() const
   { return _pdata->interaction_mode == GraphCutInteractionMode_TransferFunction; }
+
+  bool GrayImageGraphCutView::input_changed() const
+  { return _pdata->inout_changed; }
 
   //====================================================================================================
   //===== SETTER
@@ -244,6 +260,17 @@ namespace bk
   void GrayImageGraphCutView::set_interaction_mode_transfer_function()
   { _pdata->interaction_mode = GraphCutInteractionMode_TransferFunction; }
 
+  void GrayImageGraphCutView::set_show_inout_overlay(bool show)
+  {
+      if (_pdata->show_inout_overlay != show)
+      {
+          _pdata->show_inout_overlay = show;
+
+          if (this->is_initialized())
+          {this->emit_signal_update_required();}
+      }
+  }
+
   //====================================================================================================
   //===== FUNCTIONS
   //====================================================================================================
@@ -265,7 +292,7 @@ namespace bk
       //const int rmax = -rmin + (_pdata->pencil_size % 2 ? 1 : 0);
       const int rmin = -static_cast<int>(_pdata->pencil_size / 2);
       const int rmax = -rmin + (_pdata->pencil_size % 2 ? 0 : -1);
-      for (int  dy   = rmin; dy <= rmax; ++dy)
+      for (int dy = rmin; dy <= rmax; ++dy)
       {
           for (int dx = rmin; dx <= rmax; ++dx)
           {
@@ -277,21 +304,21 @@ namespace bk
               {
                   case details::GraphCutDrawMode::Inside:
                   {
-                      _pdata->in(idx, idy, zcurrent())  = 1;
+                      _pdata->in(idx, idy, zcurrent()) = 1;
                       _pdata->out(idx, idy, zcurrent()) = 0;
                       _pdata->inout_changed = true;
                       break;
                   }
                   case details::GraphCutDrawMode::Outside:
                   {
-                      _pdata->in(idx, idy, zcurrent())  = 0;
+                      _pdata->in(idx, idy, zcurrent()) = 0;
                       _pdata->out(idx, idy, zcurrent()) = 1;
                       _pdata->inout_changed = true;
                       break;
                   }
                   case details::GraphCutDrawMode::Erase:
                   {
-                      _pdata->in(idx, idy, zcurrent())  = 0;
+                      _pdata->in(idx, idy, zcurrent()) = 0;
                       _pdata->out(idx, idy, zcurrent()) = 0;
                       _pdata->inout_changed = true;
                       break;
@@ -301,9 +328,15 @@ namespace bk
       }
 
       update_ssbo_gc();
-      if (mouse_was_released && _pdata->auto_update_segmentation)
+
+      if (mouse_was_released)
       {
-          update_gc(); // runs in thread
+          _pdata->s_input_changed.emit_signal();
+
+          if (_pdata->auto_update_segmentation)
+          {
+              update_gc(); // runs in thread
+          }
       }
   }
 
@@ -336,7 +369,7 @@ namespace bk
   {
       clear_ssbo_gc();
 
-      const unsigned int        N = (xmax() + 1) * (ymax() + 1);
+      const unsigned int N = (xmax() + 1) * (ymax() + 1);
       std::vector<GLuint> zero(N, 0);
 
       _pdata->ssbo_gc.init(zero.data(), N * sizeof(GLuint));
@@ -353,7 +386,7 @@ namespace bk
       _pdata->in.set_size(1, 1, 1);
       _pdata->out.set_size(1, 1, 1);
       _pdata->seg[0] = 0;
-      _pdata->in[0]  = 0;
+      _pdata->in[0] = 0;
       _pdata->out[0] = 0;
   }
 
@@ -379,7 +412,7 @@ namespace bk
       };
 
       _pdata->inout_changed = true;
-      _pdata->seg_changed   = true;
+      _pdata->seg_changed = true;
       _pdata->gc_is_running = false;
 
       if (_image.num_values() <= 1)
@@ -389,7 +422,7 @@ namespace bk
       if (inout != nullptr)
       {
           unsigned int cnt = 0;
-          for (int     y   = static_cast<int>(_image.geometry().size(1) - 1); y >= 0; --y) // y is inverted, because GL coord system starts top left and image coord system starts bottom left
+          for (int y = static_cast<int>(_image.geometry().size(1) - 1); y >= 0; --y) // y is inverted, because GL coord system starts top left and image coord system starts bottom left
           {
               for (GLuint x = 0; x < static_cast<GLuint>(_image.geometry().size(0)); ++x)
               { inout[cnt++] = 0; }
@@ -409,7 +442,7 @@ namespace bk
   void GrayImageGraphCutView::clear_ssbo_gc()
   { _pdata->ssbo_gc.clear(); }
 
-  void GrayImageGraphCutView::update_gc()
+  void GrayImageGraphCutView::update_gc(double narrow_band_width_percent)
   {
       if (!_pdata->gc_is_running && _pdata->gc != nullptr)
       {
@@ -420,8 +453,16 @@ namespace bk
           {
               #pragma omp single nowait
               {
+                  #ifdef BK_EMIT_PROGRESS
+                  bk::Progress& prog_input = bk_progress.emplace_task(5, ___("Setting graph cut input"));
+                  #endif
+
                   _pdata->gc->clear_source_nodes();
                   _pdata->gc->clear_sink_nodes();
+
+                  #ifdef BK_EMIT_PROGRESS
+                  prog_input.increment(1);
+                  #endif
 
                   for (GLuint i = 0; i < static_cast<GLuint>(_pdata->seg.num_values()); ++i)
                   {
@@ -437,9 +478,20 @@ namespace bk
                       }
                   }
 
+                  if (narrow_band_width_percent < 1)
+                  { _pdata->gc->narrow_band_sink_ids(narrow_band_width_percent); }
+
+                  #ifdef BK_EMIT_PROGRESS
+                  prog_input.set_finished();
+                  #endif
+
                   //_pdata->gc->reset();
                   //_pdata->gc->update_inside_outside();
                   _pdata->gc->run();
+
+                  #ifdef BK_EMIT_PROGRESS
+                  bk::Progress& prog_postpro = bk_progress.emplace_task(6, ___("Post-processing graph cut result"));
+                  #endif
 
                   //_gc->write_segmentation(_seg);
                   for (GLuint i = 0; i < static_cast<GLuint>(_pdata->seg.num_values()); ++i)
@@ -448,13 +500,25 @@ namespace bk
                       _pdata->seg[i] = _pdata->gc->is_in_segmentation(gid[0], gid[1], gid[2]) ? 1 : 0;
                   }
 
+                  #ifdef BK_EMIT_PROGRESS
+                  prog_postpro.increment(1);
+                  #endif
+
                   /*
                    * perform 3x3x3 closing and opening
                    */
                   bk::MorphologicalClosingAndOpeningImageFilter f_morph(3, 3);
                   _pdata->seg = _pdata->seg.filter(f_morph);
 
+                  #ifdef BK_EMIT_PROGRESS
+                  prog_postpro.increment(2);
+                  #endif
+
                   _pdata->seg = bk::ConnectedComponentAnalysisKeepLargestRegionImageFilter::apply(_pdata->seg);
+
+                  #ifdef BK_EMIT_PROGRESS
+                  prog_postpro.increment(2);
+                  #endif
 
                   /*
                    * enforce that regions drawn as inside/outside are 1/0 in segmentation
@@ -466,6 +530,10 @@ namespace bk
                       else if (_pdata->out[i] != 0)
                       { _pdata->seg[i] = 0; }
                   }
+
+                  #ifdef BK_EMIT_PROGRESS
+                  prog_postpro.set_finished();
+                  #endif
 
                   _pdata->gc_is_running = false;
                   _pdata->s_gc_finished.emit_signal();
@@ -486,6 +554,10 @@ namespace bk
           do_update = true;
           GLuint cnt = 0;
 
+          #ifdef BK_EMIT_PROGRESS
+          bk::Progress& prog = bk_progress.emplace_task(1 + _image.geometry().size(1) * _image.geometry().size(0));
+          #endif
+
           //for (GLuint y = 0; y < static_cast<GLuint>(_size[1]); ++y)
           for (int y = static_cast<int>(_image.geometry().size(1) - 1); y >= 0; --y) // y is inverted, because GL coord system starts top left and image coord system starts bottom left
           {
@@ -493,26 +565,31 @@ namespace bk
               {
                   GLuint b = 0;
 
-                  //if ((_seg_in_out(x,y,zcurrent()) & InsideBit) != 0)
                   if (_pdata->in(x, y, zcurrent()) != 0)
-                  {b |= InsideBit;}
+                  { b |= InsideBit; }
 
-                  //if ((_seg_in_out(x,y,zcurrent()) & OutsideBit) != 0)
                   if (_pdata->out(x, y, zcurrent()) != 0)
                   { b |= OutsideBit; }
 
-                  //if (_seg_in_out(x,y,zcurrent()) & SegmentationBit) != 0)
                   if (_pdata->seg(x, y, zcurrent()) != 0)
                   { b |= SegmentationBit; }
 
                   inout[cnt++] = b;
               }
+
+              #ifdef BK_EMIT_PROGRESS
+              prog.increment(_image.geometry().size(0));
+              #endif
           }
 
           _pdata->ssbo_gc.unmap_and_release();
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.set_finished();
+          #endif
       }
 
-      _pdata->seg_changed   = false;
+      _pdata->seg_changed = false;
       _pdata->slice_changed = false;
 
       if (do_update)
@@ -582,7 +659,7 @@ namespace bk
       }
 
       if (interaction_mode_is_graph_cut())
-      { process_onscreen_drawing(_mouse().x(), _mouse().y(), true /*mouse was released*/); }
+      {  process_onscreen_drawing(_mouse().x(), _mouse().y(), true /*mouse was released*/); }
 
       return !interaction_mode_is_graph_cut();
   }
@@ -608,9 +685,13 @@ namespace bk
       BK_QT_GL glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
       _pdata->ssbo_gc.bind_to_base(2);
-      _pdata->shader_gc.bind();
-      BK_QT_GL glDrawElements(GL_TRIANGLE_STRIP, _sizeInd(), GL_UNSIGNED_INT, nullptr);
-      _pdata->shader_gc.release();
+
+      if (_pdata->show_inout_overlay)
+      {
+          _pdata->shader_gc.bind();
+          BK_QT_GL glDrawElements(GL_TRIANGLE_STRIP, _sizeInd(), GL_UNSIGNED_INT, nullptr);
+          _pdata->shader_gc.release();
+      }
 
       _pdata->shader_seg_contour.bind();
       BK_QT_GL glDrawElements(GL_TRIANGLE_STRIP, _sizeInd(), GL_UNSIGNED_INT, nullptr);

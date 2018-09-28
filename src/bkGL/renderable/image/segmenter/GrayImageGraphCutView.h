@@ -106,10 +106,13 @@ namespace bk
 
       /// @{ -------------------------------------------------- SIGNALS
       [[nodiscard]] bk::Signal<>& signal_graph_cut_finished();
+      [[nodiscard]] bk::Signal<>& signal_input_changed();
       /// @}
 
       [[nodiscard]] bool interaction_mode_is_graph_cut() const;
       [[nodiscard]] bool interaction_mode_is_transfer_function() const;
+
+      [[nodiscard]] bool input_changed() const;
 
       //====================================================================================================
       //===== SETTER
@@ -151,6 +154,8 @@ namespace bk
       void set_interaction_mode_graph_cut();
       void set_interaction_mode_transfer_function();
 
+      void set_show_inout_overlay(bool show);
+
       //====================================================================================================
       //===== FUNCTIONS
       //====================================================================================================
@@ -186,7 +191,7 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- UPDATE SEGMENTATION (RUN GC)
-      void update_gc();
+      void update_gc(double narrow_band_width_percent = 1);
       /// @}
 
       /// @{ -------------------------------------------------- UPDATE SSBO GC
