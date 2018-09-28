@@ -10,8 +10,8 @@ function(_bk_make_lib name Name)
     target_compile_options(bk${Name} PRIVATE
             $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:
             -pipe -march=native
-            $<$<CONFIG:Release>:-O3 -flto>
-            $<$<CONFIG:Debug>:-O0 -Wall -Wextra>>
+            $<$<CONFIG:Release>:-O3 -flto -msse -msse2 -msse3 -mssse3 -msse4 -msse4.1 -msse4.2 -mmmx -m3dnow>
+            $<$<CONFIG:Debug>:-O0 -Wall -Wextra -g -ggdb>>
             $<$<CXX_COMPILER_ID:MSVC>:
             $<$<CONFIG:Debug>:/Od /Wall /Zi>>)
 
