@@ -420,12 +420,23 @@ namespace bk
           /*
            * process blocks
            */
+          #ifdef BK_EMIT_PROGRESS
+          int cnt = 0;
+          #endif
+
           #pragma omp parallel for schedule(dynamic, 1)
           for (unsigned int blockid = 0; blockid < blocks.size(); ++blockid)
-          { blocks[blockid].run(); }
+          {
+              blocks[blockid].run();
+
+              #ifdef BK_EMIT_PROGRESS
+              prog.increment(1);
+              ++cnt;
+              #endif
+          }
 
           #ifdef BK_EMIT_PROGRESS
-          prog.increment(numBlocksTotal);
+          prog.increment(numBlocksTotal-cnt);
           #endif
 
           //------------------------------------------------------------------------------------------------------

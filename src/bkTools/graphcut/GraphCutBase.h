@@ -29,6 +29,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstdint>
 #include <functional>
 #include <iostream>
@@ -41,6 +42,14 @@
 
 #include <bkTools/graphcut/GraphCutBase_MemberAccess.h>
 #include <bkTools/graphcut/gc_definitions.h>
+
+#ifdef BK_EMIT_PROGRESS
+
+    #include <bkTools/progress/Progress.h>
+    #include <bkTools/progress/GlobalProgressManager.h>
+    #include <bkTools/localization/GlobalLocalizationManager.h>
+
+#endif
 
 namespace bk::gc_details
 {
@@ -434,6 +443,113 @@ namespace bk::gc_details
               id[0] = x;
               _init_from_weight_image<1>(img, function_weight_at, id);
           }
+      }
+      /// @}
+
+      /// @{ -------------------------------------------------- HELPERS: AUTOMATIC OUTSIDE IDS WITHIN NARROW BAND
+    private:
+      template<int I>
+      void _create_narrow_band(const id_type& source_node, const id_type& band_radius, vector_grid_type<bool>& band, id_type& p)
+      {
+          if constexpr (I != TDims - 1)
+          {
+              for (int i = std::max(0, source_node[I] - band_radius[I]); i < std::min(_size[I], source_node[I] + band_radius[I]); ++i)
+              {
+                  p[I] = i;
+                  _create_narrow_band<I + 1>(source_node, band_radius, band, p);
+              }
+          }
+          else
+          {
+              for (int i = std::max(0, source_node[I] - band_radius[I]); i < std::min(_size[I], source_node[I] + band_radius[I]); ++i)
+              {
+                  p[I] = i;
+
+                  #pragma omp critical (gc_narrow_band)
+                  { this->get_from_vector_grid(band, p) = false; }
+              }
+          }
+      }
+
+      template<int I>
+      void _sink_from_narrow_band(const vector_grid_type<bool>& band, id_type& p)
+      {
+          if constexpr (I != TDims - 1)
+          {
+              for (int i = 0; i < _size[I]; ++i)
+              {
+                  p[I] = i;
+                  _sink_from_narrow_band<I + 1>(band, p);
+              }
+          }
+          else
+          {
+              for (int i = 0; i < _size[I]; ++i)
+              {
+                  p[I] = i;
+
+                  const bool make_sink = this->get_from_vector_grid(band, p);
+
+                  if (make_sink)
+                  {
+                      #pragma omp critical (gc_narrow_band)
+                      { add_sink_node(p); }
+                  }
+              }
+          }
+      }
+
+    public:
+      /// @}
+
+      /// @{ -------------------------------------------------- AUTOMATIC OUTSIDE IDS WITHIN NARROW BAND
+      void narrow_band_sink_ids(double band_width_percent)
+      {
+          constexpr int boundary_width = 3;
+
+          id_type band_radius;
+          for (int i = 0; i < TDims; ++i)
+          { band_radius[i] = std::max(boundary_width, static_cast<int>(std::round(static_cast<double>(_size[i]) * band_width_percent))); }
+
+          #ifdef BK_EMIT_PROGRESS
+          bk::Progress& prog = bk_progress.emplace_task(_connected_to_source.size() + 1 + _size[0], ___("Creating graph cut narrow band"));
+          #endif
+
+          vector_grid_type<bool> band;
+          resize_wrapped_vector<TDims>(band, _size, true);
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(1);
+          #endif
+
+          #pragma omp parallel for
+          for (unsigned int i = 0; i < _connected_to_source.size(); ++i)
+          {
+              id_type p;
+              _create_narrow_band<0>(_connected_to_source[i], band_radius, band, p);
+
+              #ifdef BK_EMIT_PROGRESS
+              #pragma omp critical
+              { prog.increment(1); }
+              #endif
+          }
+
+          #pragma omp parallel for
+          for (int i = 0; i < _size[0]; ++i)
+          {
+              id_type p;
+              p[0] = i;
+              _sink_from_narrow_band<1>(band, p);
+
+              #ifdef BK_EMIT_PROGRESS
+              #pragma omp critical
+              { prog.increment(1); }
+              #endif
+          }
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.set_finished();
+          #endif
       }
       /// @}
 
