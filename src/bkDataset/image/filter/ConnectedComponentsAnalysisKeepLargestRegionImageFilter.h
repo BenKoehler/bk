@@ -34,6 +34,12 @@
 #include <bkDataset/image/filter/ConnectedComponentsAnalysisImageFilter.h>
 #include <bkDataset/lib/bkDataset_export.h>
 
+#ifdef BK_EMIT_PROGRESS
+    #include <bk/Progress>
+    #include <bk/Localization>
+#endif
+
+
 namespace bk
 {
   class BKDATASET_EXPORT ConnectedComponentAnalysisKeepLargestRegionImageFilter
@@ -72,8 +78,16 @@ namespace bk
       template<typename TImage>
       [[nodiscard]] static typename TImage::template self_template_type<int> apply(const TImage& img)
       {
+          #ifdef BK_EMIT_PROGRESS
+          bk::Progress& prog = bk_progress.emplace_task(9, ___("CCA largest region"));
+          #endif
+
           ConnectedComponentAnalysisImageFilter f_cca;
           auto labels = img.filter(f_cca);
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(5);
+          #endif
 
           // determine max size label
 
@@ -89,9 +103,17 @@ namespace bk
               }
           }
 
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(1);
+          #endif
+
           #pragma omp parallel for
           for (unsigned int i = 0; i < labels.num_values(); ++i)
           { labels[i] = labels[i] != static_cast<int>(maxSizeLabelId )? 0 : 1; }
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.set_finished();
+          #endif
 
           return labels;
       }

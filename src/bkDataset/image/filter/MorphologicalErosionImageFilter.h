@@ -38,6 +38,11 @@
 #include <bkDataset/image/filter/DistanceMapImageFilter.h>
 #include <bkDataset/lib/bkDataset_export.h>
 
+#ifdef BK_EMIT_PROGRESS
+    #include <bk/Progress>
+    #include <bk/Localization>
+#endif
+
 namespace bk
 {
   class BKDATASET_EXPORT MorphologicalErosionImageFilter
@@ -108,20 +113,36 @@ namespace bk
 
           if (kernel_has_isotropic_size)
           {
+              #ifdef BK_EMIT_PROGRESS
+              bk::Progress& prog = bk_progress.emplace_task(3, ___("Morphological erosion filtering"));
+              #endif
+
               TImage res;
               res.set_size(img.size());
 
               const auto minVal = img.min_value();
 
+              #ifdef BK_EMIT_PROGRESS
+              prog.increment(1);
+              #endif
+
               DistanceMapImageFilter f;
               f.set_value(minVal);
               auto distance_map = img.filter(f);
+
+              #ifdef BK_EMIT_PROGRESS
+              prog.increment(1);
+              #endif
 
               const unsigned int halfKernelSize = _kernel_size.front() >> 1;
 
               #pragma omp parallel for
               for (unsigned int i = 0; i < img.num_values(); ++i)
               { res[i] = distance_map[i] <= halfKernelSize ? minVal : img[i]; }
+
+              #ifdef BK_EMIT_PROGRESS
+              prog.set_finished();
+              #endif
 
               return res;
           }

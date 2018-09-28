@@ -98,7 +98,7 @@ namespace bk
           const value_type structel = *itMinVal + (*itMaxVal - *itMinVal) * kernel[kernel.num_values() / 2];
 
           #ifdef BK_EMIT_PROGRESS
-          Progress& prog = bk_progress.emplace_task(img.num_values(), ___("morphological image filtering"));
+          Progress& prog = bk_progress.emplace_task(img.num_values(), ___("Morphological image filtering"));
           #endif
 
           #pragma omp parallel for

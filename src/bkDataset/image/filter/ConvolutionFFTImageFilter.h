@@ -109,7 +109,7 @@ namespace bk
           { return img; }
 
           #ifdef BK_EMIT_PROGRESS
-          Progress& prog = bk_progress.emplace_task(numIterations + 2 * 3, ___("image convolution filtering"));
+          Progress& prog = bk_progress.emplace_task(numIterations + 2 * 3, ___("Image convolution filtering"));
           #endif
 
           FFTImageFilter filter_fft;

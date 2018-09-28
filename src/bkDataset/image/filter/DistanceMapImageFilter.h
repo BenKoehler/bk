@@ -31,8 +31,12 @@
 #include <vector>
 
 #include <bkMath/functions/list_grid_id_conversion.h>
-
 #include <bkDataset/lib/bkDataset_export.h>
+
+#ifdef BK_EMIT_PROGRESS
+    #include <bk/Progress>
+    #include <bk/Localization>
+#endif
 
 namespace bk
 {
@@ -143,8 +147,16 @@ namespace bk
       template<typename TImage>
       [[nodiscard]] typename TImage::template self_template_type<unsigned int> apply(const TImage& img)
       {
+          #ifdef BK_EMIT_PROGRESS
+          bk::Progress& prog = bk_progress.emplace_task(4 + img.num_dimensions(), ___("Creating distance map"));
+          #endif
+
           if (!_value_was_set)
           { _val = img.max_value(); }
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(1);
+          #endif
 
           const unsigned int numValues = img.num_values();
           const unsigned int maxdst = numValues;
@@ -152,10 +164,18 @@ namespace bk
           typename TImage::template self_template_type<unsigned int> dst;
           dst.set_size(img.size());
 
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(1);
+          #endif
+
           // init
           #pragma omp parallel for
           for (unsigned int i = 0; i < numValues; ++i)
           { dst[i] = img[i] == _val ? 0 : maxdst; }
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(2);
+          #endif
 
           // process dims
           for (unsigned int dimId = 0; dimId < img.num_dimensions(); ++dimId)
@@ -164,7 +184,15 @@ namespace bk
               std::vector<unsigned int> gid(dst.num_dimensions(), 0);
 
               _distance_map(dst, 0, dimId, stride, gid, true);
+
+              #ifdef BK_EMIT_PROGRESS
+              prog.increment(1);
+              #endif
           } // for dimId
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.set_finished();
+          #endif
 
           return dst;
       }

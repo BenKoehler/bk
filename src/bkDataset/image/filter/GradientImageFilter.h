@@ -31,6 +31,14 @@
 
 #include <bkMath/functions/list_grid_id_conversion.h>
 
+#ifdef BK_EMIT_PROGRESS
+
+    #include <bk/Progress>
+    #include <bk/Localization>
+
+#endif
+
+
 namespace bk
 {
   class GradientImageFilter
@@ -71,12 +79,31 @@ namespace bk
       {
           using gradient_type = std::decay_t<decltype(img.jacobian(bk::list_to_grid_id(img.size(), 0)))>;
 
+          #ifdef BK_EMIT_PROGRESS
+          bk::Progress& prog = bk_progress.emplace_task(10 + img.num_values(), ___("Gradient image filter"));
+          #endif
+
           typename TImage::template self_template_type<gradient_type> res;
           res.set_size(img.size());
 
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(10);
+          #endif
+
           #pragma omp parallel for
           for (unsigned int i = 0; i < img.num_values(); ++i)
-          { res[i] = img.jacobian(bk::list_to_grid_id(img.size(), i)); }
+          {
+              res[i] = img.jacobian(bk::list_to_grid_id(img.size(), i));
+
+              #ifdef BK_EMIT_PROGRESS
+              #pragma omp critical(filter_gradient_strength)
+              { prog.increment(1); }
+              #endif
+          }
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.set_finished();
+          #endif
 
           return res;
       }

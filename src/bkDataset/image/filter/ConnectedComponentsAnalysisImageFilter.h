@@ -32,8 +32,12 @@
 #include <vector>
 
 #include <bkMath/functions/list_grid_id_conversion.h>
-
 #include <bkDataset/lib/bkDataset_export.h>
+
+#ifdef BK_EMIT_PROGRESS
+    #include <bk/Progress>
+    #include <bk/Localization>
+#endif
 
 namespace bk
 {
@@ -97,6 +101,10 @@ namespace bk
           const unsigned int numValues = img.num_values();
           const auto size = img.size();
 
+          #ifdef BK_EMIT_PROGRESS
+          bk::Progress& prog = bk_progress.emplace_task(10 + numValues, ___("Connected component analysis"));
+          #endif
+
           std::vector<int> stride(numDimensions, 0);
           for (unsigned int dimId = 0; dimId < numDimensions; ++dimId)
           { stride[dimId] = bk::stride_of_dim(size, dimId, img.num_dimensions()); }
@@ -105,6 +113,10 @@ namespace bk
           labels.set_size(size);
           labels.set_constant(-1);
 
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(10);
+          #endif
+
           unsigned int currentLabel = 0;
 
           _labels.clear();
@@ -112,10 +124,20 @@ namespace bk
           for (unsigned int lid = 0; lid < numValues; ++lid)
           {
               if (labels[lid] != -1) // already visited and labeled
-              { continue; }
+              {
+                  #ifdef BK_EMIT_PROGRESS
+                  prog.increment(1);
+                  #endif
+
+                  continue;
+              }
 
               if (img[lid] == 0) // not in segmentation
               {
+                  #ifdef BK_EMIT_PROGRESS
+                  prog.increment(1);
+                  #endif
+
                   labels[lid] = 0;
                   continue;
               }
@@ -160,7 +182,15 @@ namespace bk
               } // while
 
               _labels.insert(std::make_pair(currentLabel, regionSizeCnt));
+
+              #ifdef BK_EMIT_PROGRESS
+              prog.increment(1);
+              #endif
           } // for lid
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.set_finished();
+          #endif
 
           return labels;
       }

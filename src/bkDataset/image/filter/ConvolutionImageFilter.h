@@ -114,7 +114,7 @@ namespace bk
       [[nodiscard]] static TImage apply(const TImage& img, const TKernel& kernel, unsigned int numIterations)
       {
           #ifdef BK_EMIT_PROGRESS
-          Progress& prog = bk_progress.emplace_task(numIterations * img.num_values(), ___("image convolution filtering"));
+          Progress& prog = bk_progress.emplace_task(numIterations * img.num_values(), ___("Image convolution filtering"));
           #endif
 
           const unsigned int numValues = img.num_values();
@@ -168,7 +168,7 @@ namespace bk
       [[nodiscard]] static TImage apply_separable(const TImage& img, const TKernel& kernel, unsigned int numIterations)
       {
           #ifdef BK_EMIT_PROGRESS
-          Progress& prog = bk_progress.emplace_task(numIterations * img.num_values() * img.num_dimensions(), ___("image convolution filtering"));
+          Progress& prog = bk_progress.emplace_task(numIterations * img.num_values() * img.num_dimensions(), ___("Image convolution filtering"));
           #endif
 
           TImage res;
