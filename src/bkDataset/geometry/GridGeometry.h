@@ -93,6 +93,10 @@ namespace bk
       template<typename... TVecOrNumbers, std::enable_if_t<(sizeof...(TVecOrNumbers) > 1) || std::conjunction_v<bk::has_index_operator<std::decay_t<TVecOrNumbers>>...>>* = nullptr>
       [[nodiscard]] point_type point(TVecOrNumbers&& ... gidvec_or_ids)
       { return point_type(std::forward<TVecOrNumbers>(gidvec_or_ids)...); }
+
+      template<typename... TVecOrNumbers, std::enable_if_t<(sizeof...(TVecOrNumbers) > 1) || std::conjunction_v<bk::has_index_operator<std::decay_t<TVecOrNumbers>>...>>* = nullptr>
+      [[nodiscard]] point_type point(TVecOrNumbers&& ... gidvec_or_ids) const
+      { return point_type(std::forward<TVecOrNumbers>(gidvec_or_ids)...); }
       /// @}
 
       /// @{ -------------------------------------------------- GET ITERATORS

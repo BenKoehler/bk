@@ -226,6 +226,7 @@ set(SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkDataset/image/filter/IntervalThresholdImageFilter.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkDataset/image/filter/LaplaceBinomialImageFilter.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkDataset/image/filter/LaplaceImageFilter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkDataset/image/filter/MarchingCubesFilter.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkDataset/image/filter/MaximumImageFilter.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkDataset/image/filter/MedianImageFilter.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkDataset/image/filter/MinimumImageFilter.cpp

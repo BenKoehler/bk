@@ -156,23 +156,24 @@ namespace bk
       void calc_normals_per_point()
       {
           const std::vector<attribute_info::normal3d_value_type>& cell_normals = this->cell_attribute_vector<attribute_info::normal3d()>();
-          assert(!cell_normals.empty() && "call calc_normals_per_triangle() first");
-
           std::vector<attribute_info::normal3d_value_type>& point_normals = this->add_point_attribute_vector<attribute_info::normal3d()>();
 
-          #pragma omp parallel for
-          for (unsigned int pointId = 0; pointId < this->geometry().num_points(); ++pointId)
+          if (!cell_normals.empty())
           {
-              const std::vector<unsigned int>& triangles = this->topology().cells_of_point(pointId);
-              assert(!triangles.empty() && "this point does not belong to any triangle");
+              #pragma omp parallel for
+              for (unsigned int pointId = 0; pointId < this->geometry().num_points(); ++pointId)
+              {
+                  const std::vector<unsigned int>& triangles = this->topology().cells_of_point(pointId);
+                  assert(!triangles.empty() && "this point does not belong to any triangle");
 
-              point_normals[pointId].set_zero();
+                  point_normals[pointId].set_zero();
 
-              for (unsigned int trianglePointId = 0; trianglePointId < triangles.size(); ++trianglePointId)
-              { point_normals[pointId] += cell_normals[triangles[trianglePointId]]; }
+                  for (unsigned int trianglePointId = 0; trianglePointId < triangles.size(); ++trianglePointId)
+                  { point_normals[pointId] += cell_normals[triangles[trianglePointId]]; }
 
-              point_normals[pointId] /= triangles.size();
-              //point_normals[pointId].normalize_internal(); // not necessary because the cell normals are already normalized
+                  point_normals[pointId] /= triangles.size();
+                  //point_normals[pointId].normalize_internal(); // not necessary because the cell normals are already normalized
+              }
           }
       }
 

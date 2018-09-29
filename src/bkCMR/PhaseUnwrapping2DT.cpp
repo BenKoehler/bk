@@ -112,7 +112,7 @@ namespace bk
         clear();
 
         #ifdef BK_EMIT_PROGRESS
-        Progress& prog = bk_progress.emplace_task(22, ___("analyzing phase wraps (2D+T)"));
+        Progress& prog = bk_progress.emplace_task(22, ___("Analyzing phase wraps (2D+T)"));
         #endif
 
         FlowImage2DT ff(_ff);

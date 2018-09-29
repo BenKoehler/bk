@@ -67,7 +67,7 @@ namespace bk
         const auto& size = mag.size();
 
         #ifdef BK_EMIT_PROGRESS
-        bk::Progress& prog = bk_progress.emplace_task(mag.num_values() / size[3], ___("calculating magnitude tmip"));
+        bk::Progress& prog = bk_progress.emplace_task(mag.num_values() / size[3], ___("Calculating magnitude TMIP"));
         #endif
 
         auto res = std::make_unique<DicomImage<double, 3>>();
@@ -121,7 +121,7 @@ namespace bk
         assert(size[3] == mag_y.size(3) && size[3] == mag_z.size(3) && "TMIPImageFilter::apply - magnitude image size t mismatch");
 
         #ifdef BK_EMIT_PROGRESS
-        bk::Progress& prog = bk_progress.emplace_task(mag_x.num_values() / size[3], ___("calculating magnitude tmip"));
+        bk::Progress& prog = bk_progress.emplace_task(mag_x.num_values() / size[3], ___("Calculating magnitude TMIP"));
         #endif
 
         auto res = std::make_unique<DicomImage<double, 3>>();

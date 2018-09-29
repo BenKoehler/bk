@@ -376,7 +376,7 @@ namespace bk
       _pdata->files.reserve(dcmfilenames.size());
 
       #ifdef BK_EMIT_PROGRESS
-      bk::Progress& prog1 = bk_progress.emplace_task(dcmfilenames.size() - 1, ___("scanning dicom files"));
+      bk::Progress& prog1 = bk_progress.emplace_task(dcmfilenames.size() - 1, ___("Scanning DICOM files"));
       #endif
 
       for (unsigned int i = 0; i < dcmfilenames.size(); ++i)
@@ -461,7 +461,7 @@ namespace bk
   void DicomDirImporter::_scandir_classic_sort_images_by_dicomtags()
   {
       #ifdef BK_EMIT_PROGRESS
-      bk::Progress& prog2 = bk_progress.emplace_task(_pdata->files.size() - 1, ___("sorting dicom images"));
+      bk::Progress& prog2 = bk_progress.emplace_task(_pdata->files.size() - 1, ___("Sorting DICOM images"));
       #endif
 
       //------------------------------------------------------------------------------------------------------
@@ -775,7 +775,7 @@ namespace bk
                           unsigned int                              expectedNumFilesBeforeSplitting = 0;
 
                           #ifdef BK_EMIT_PROGRESS
-                          bk::Progress& prog = bk_progress.emplace_task(seqOfItems->GetNumberOfItems(), ___("scanning dicomdir"));
+                          bk::Progress& prog = bk_progress.emplace_task(seqOfItems->GetNumberOfItems(), ___("Scanning DICOMDIR"));
                           prog.set_current(1);
                           #endif
 
@@ -1147,7 +1147,7 @@ namespace bk
   void DicomDirImporter::scan_image_infos()
   {
       #ifdef BK_EMIT_PROGRESS
-      bk::Progress& prog = bk_progress.emplace_task(num_images() - 1, ___("scanning dicom tags"));
+      bk::Progress& prog = bk_progress.emplace_task(num_images() - 1, ___("Scanning DICOM tags"));
       #endif
 
       //------------------------------------------------------------------------------------------------------
@@ -1780,7 +1780,7 @@ namespace bk
       const unsigned int nImages = this->num_images();
 
       #ifdef BK_EMIT_PROGRESS
-      bk::Progress& prog = bk_progress.emplace_task(nImages - 1 + 4, ___("scanning image dimensions"));
+      bk::Progress& prog = bk_progress.emplace_task(nImages - 1 + 4, ___("Scanning image dimensions"));
       #endif
 
       /*
@@ -2242,7 +2242,7 @@ namespace bk
       { return img; }
 
       #ifdef BK_EMIT_PROGRESS
-      Progress& prog = bk_progress.emplace_task(imgInfo.id_file_end - imgInfo.id_file_start + 1, ___("reading dicom image @0", bk::string_utils::from_number(id)));
+      Progress& prog = bk_progress.emplace_task(imgInfo.id_file_end - imgInfo.id_file_start + 1, ___("Reading DICOM image @0", bk::string_utils::from_number(id)));
       #endif
 
       nDim = nDimExpected;
@@ -2351,7 +2351,7 @@ namespace bk
       { return imgbytes; }
 
       #ifdef BK_EMIT_PROGRESS
-      Progress& prog = bk_progress.emplace_task(imgInfo.id_file_end - imgInfo.id_file_start + 1, ___("reading dicom image bytes @0", bk::string_utils::from_number(id)));
+      Progress& prog = bk_progress.emplace_task(imgInfo.id_file_end - imgInfo.id_file_start + 1, ___("Reading DICOM image bytes @0", bk::string_utils::from_number(id)));
       #endif
 
       const int nPixelsPerSlice = imgInfo.Rows * imgInfo.Columns;
@@ -2457,7 +2457,7 @@ namespace bk
       }
 
       #ifdef BK_EMIT_PROGRESS
-      Progress& prog = bk_progress.emplace_task(imgInfo.id_file_end - imgInfo.id_file_start + 1, ___("reading dicom image bytes @0", bk::string_utils::from_number(id)));
+      Progress& prog = bk_progress.emplace_task(imgInfo.id_file_end - imgInfo.id_file_start + 1, ___("Reading DICOM image bytes @0", bk::string_utils::from_number(id)));
       #endif
 
       nDim = nDimExpected;

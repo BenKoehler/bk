@@ -40,6 +40,13 @@
 #include <bk/Matrix>
 #include <bk/StringUtils>
 
+#ifdef BK_EMIT_PROGRESS
+
+    #include <bk/Localization>
+    #include <bk/Progress>
+
+#endif
+
 namespace bk
 {
   template<int TDims = -1, typename TValue = double> class ExplicitGeometry

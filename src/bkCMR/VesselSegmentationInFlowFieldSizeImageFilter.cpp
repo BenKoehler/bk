@@ -87,7 +87,7 @@ namespace bk
           // => sample new segmentation
 
           #ifdef BK_EMIT_PROGRESS
-          bk::Progress& prog = bk_progress.emplace_task(ff.num_values() / size[3], ___("sampling vessel segmentation in flow field size"));
+          bk::Progress& prog = bk_progress.emplace_task(ff.num_values() / size[3], ___("Sampling vessel segmentation in flow field size"));
           #endif
 
           #pragma omp parallel for

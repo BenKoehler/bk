@@ -477,7 +477,7 @@ namespace bk::details
   void AbstractSliceView::init_image()
   {
       #ifdef BK_EMIT_PROGRESS
-      Progress& prog = bk_progress.emplace_task(5, ___("initializing slice viewer"));
+      Progress& prog = bk_progress.emplace_task(5, ___("Initializing slice viewer"));
       #endif
       clear_imageBuffers();
 

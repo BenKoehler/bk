@@ -41,6 +41,7 @@
 #include <bkDataset/mesh/TriangularMesh3D.h>
 #include <bkDataset/lib/bkDataset_export.h>
 #include <bkMath/functions/list_grid_id_conversion.h>
+#include <bkMath/functions/equals_approx.h>
 #include <bk/Image>
 #include <bk/Matrix>
 #include <bk/ThreadPool>
@@ -109,7 +110,8 @@ namespace bk
 
           #ifdef BK_EMIT_PROGRESS
           const unsigned int N = img.geometry().size(2) + 2;
-          bk::Progress& prog = bk_progress.emplace_task(N * (7 + (img.geometry().size(0) + 2) * (img.geometry().size(1) + 2)), ___("Extracing surface via Marching Cubes"));
+          const unsigned int N2 = (img.geometry().size(0) + 2) * (img.geometry().size(1) + 2);
+          bk::Progress& prog = bk_progress.emplace_task(N * (7 + N2), ___("Extracing surface via Marching Cubes"));
           #endif
 
           /*
@@ -249,17 +251,32 @@ namespace bk
               if (it == edge_with_intersection.end())
               {
                   int intersection_is_datapoint = -1;
-                  Vec3d intersection = VertexInterp(tempimg.geometry().point_in_world_coordinates(pid0), tempimg.geometry().point_in_world_coordinates(pid1), tempimg[pid0], tempimg[pid1], intersection_is_datapoint);
+
+                  //Vec3d intersection = VertexInterp(//
+                  //    tempimg.geometry().point_in_world_coordinates(pid0), //
+                  //    tempimg.geometry().point_in_world_coordinates(pid1), //
+                  //    tempimg[pid0], //
+                  //    tempimg[pid1], //
+                  //    intersection_is_datapoint);
+
+                  Vec3d intersection = VertexInterp(//
+                      img.geometry().transformation().to_world_coordinates(tempimg.geometry().point(pid0)), //
+                      img.geometry().transformation().to_world_coordinates(tempimg.geometry().point(pid1)), //
+                      tempimg[pid0], //
+                      tempimg[pid1], //
+                      intersection_is_datapoint);
+
                   switch (intersection_is_datapoint)
                   {
                       case 0:
                       {
-                          auto it2 = points_as_intersection.find(pid0);
+                          const auto it2 = points_as_intersection.find(pid0);
                           if (it2 == points_as_intersection.end())
                           {
-                              mesh.geometry().push_back(intersection);
-                              int id = cnt;
-                              points_as_intersection.insert(std::pair<unsigned int, unsigned int>(pid0, cnt++));
+                              mesh.geometry().emplace_back(std::move(intersection));
+                              const int id = cnt;
+                              //points_as_intersection.insert(std::pair<unsigned int, unsigned int>(pid0, cnt++));
+                              points_as_intersection.emplace(pid0, cnt++);
                               return id;
                           }
                           else
@@ -267,12 +284,13 @@ namespace bk
                       }
                       case 1:
                       {
-                          auto it2 = points_as_intersection.find(pid1);
+                          const auto it2 = points_as_intersection.find(pid1);
                           if (it2 == points_as_intersection.end())
                           {
-                              mesh.geometry().push_back(intersection);
-                              int id = cnt;
-                              points_as_intersection.insert(std::pair<unsigned int, unsigned int>(pid1, cnt++));
+                              mesh.geometry().emplace_back(std::move(intersection));
+                              const int id = cnt;
+                              //points_as_intersection.insert(std::pair<unsigned int, unsigned int>(pid1, cnt++));
+                              points_as_intersection.emplace(pid1, cnt++);
                               return id;
                           }
                           else
@@ -280,9 +298,10 @@ namespace bk
                       }
                       default:
                       {
-                          mesh.geometry().push_back(intersection);
-                          int id = cnt;
-                          edge_with_intersection.insert(std::pair<key_type, unsigned int>(key, cnt++));
+                          mesh.geometry().emplace_back(std::move(intersection));
+                          const int id = cnt;
+                          //edge_with_intersection.insert(std::pair<key_type, unsigned int>(key, cnt++));
+                          edge_with_intersection.emplace(key, cnt++);
                           return id;
                       }
                   }
@@ -311,23 +330,34 @@ namespace bk
                       /*
                           determine edge table index
                        */
+
                       unsigned int index = 0;
-                      if (tempimg[current_cell[0]] < _iso)
-                      { index |= 1; }
-                      if (tempimg[current_cell[1]] < _iso)
-                      { index |= 2; }
-                      if (tempimg[current_cell[2]] < _iso)
-                      { index |= 4; }
-                      if (tempimg[current_cell[3]] < _iso)
-                      { index |= 8; }
-                      if (tempimg[current_cell[4]] < _iso)
-                      { index |= 16; }
-                      if (tempimg[current_cell[5]] < _iso)
-                      { index |= 32; }
-                      if (tempimg[current_cell[6]] < _iso)
-                      { index |= 64; }
-                      if (tempimg[current_cell[7]] < _iso)
-                      { index |= 128; }
+                      unsigned int flag = 1;
+
+                      for (unsigned int i = 0; i < 8; ++i, flag <<= 1)
+                      {
+                          if (tempimg[current_cell[i]] < _iso)
+                          { index |= flag; }
+                      }
+
+                      // alternative version to the for-loop above
+
+                      //if (tempimg[current_cell[0]] < _iso)
+                      //{ index |= 1; }
+                      //if (tempimg[current_cell[1]] < _iso)
+                      //{ index |= 2; }
+                      //if (tempimg[current_cell[2]] < _iso)
+                      //{ index |= 4; }
+                      //if (tempimg[current_cell[3]] < _iso)
+                      //{ index |= 8; }
+                      //if (tempimg[current_cell[4]] < _iso)
+                      //{ index |= 16; }
+                      //if (tempimg[current_cell[5]] < _iso)
+                      //{ index |= 32; }
+                      //if (tempimg[current_cell[6]] < _iso)
+                      //{ index |= 64; }
+                      //if (tempimg[current_cell[7]] < _iso)
+                      //{ index |= 128; }
 
                       /* edgeTable[index] == 0 means that cube is entirely in/out of the surface */
                       if (edgeTable[index] != 0)
@@ -364,7 +394,7 @@ namespace bk
               } // for y
 
               #ifdef BK_EMIT_PROGRESS
-              prog.increment(N);
+              prog.increment(N2);
               #endif
           } // for z
 

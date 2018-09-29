@@ -116,7 +116,7 @@ namespace bk
     Clock PhaseUnwrapping3DT::init(const FlowImage3DT& _ff, const std::array<double, 3>& venc)
     {
         #ifdef BK_EMIT_PROGRESS
-        Progress& prog = bk_progress.emplace_task(62, ___("analyzing phase wraps (3D+T)"));
+        Progress& prog = bk_progress.emplace_task(62, ___("Analyzing phase wraps (3D+T)"));
         #endif
 
         Clock clock;

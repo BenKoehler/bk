@@ -61,12 +61,12 @@ namespace bk
     //====================================================================================================
     struct Dataset::Impl
     {
-        std::string                                         project_path; //!< path of current directory; ends with /
-        DicomDirImporter_CMR                                importer;
-        FlowImage3DT                                        flow_image_3dt;
-        FlowDirCorrection                                   flow_dir_correction;
-        std::vector<Vessel>                                 vessels;
-        PhaseUnwrapping3DT                                  phase_unwrapping_3dt;
+        std::string project_path; //!< path of current directory; ends with /
+        DicomDirImporter_CMR importer;
+        FlowImage3DT flow_image_3dt;
+        FlowDirCorrection flow_dir_correction;
+        std::vector<Vessel> vessels;
+        PhaseUnwrapping3DT phase_unwrapping_3dt;
         std::map<unsigned int/*imgId*/, PhaseUnwrapping2DT> phase_unwrapping_2dt;
 
         // todo velocity offset correction
@@ -110,14 +110,14 @@ namespace bk
 
     std::vector<unsigned int> Dataset::ids_of_local_image_copies() const
     {
-        const std::vector<unsigned int> class_3dt_flow_images             = _pdata->importer.class_3dt_flow_images();
-        const std::vector<unsigned int> class_3dt_anatomical_images       = _pdata->importer.class_3dt_anatomical_images();
-        const std::vector<unsigned int> class_3dt_magnitude_images        = _pdata->importer.class_3dt_magnitude_images();
+        const std::vector<unsigned int> class_3dt_flow_images = _pdata->importer.class_3dt_flow_images();
+        const std::vector<unsigned int> class_3dt_anatomical_images = _pdata->importer.class_3dt_anatomical_images();
+        const std::vector<unsigned int> class_3dt_magnitude_images = _pdata->importer.class_3dt_magnitude_images();
         const std::vector<unsigned int> class_3dt_signal_intensity_images = _pdata->importer.class_3dt_signal_intensity_images();
-        const std::vector<unsigned int> class_2dt_flow_images             = _pdata->importer.class_2dt_flow_images();
-        const std::vector<unsigned int> class_2dt_anatomical_images       = _pdata->importer.class_2dt_anatomical_images();
-        const std::vector<unsigned int> class_2d_anatomical_images        = _pdata->importer.class_2d_anatomical_images();
-        const std::vector<unsigned int> class_3d_anatomical_images        = _pdata->importer.class_3d_anatomical_images();
+        const std::vector<unsigned int> class_2dt_flow_images = _pdata->importer.class_2dt_flow_images();
+        const std::vector<unsigned int> class_2dt_anatomical_images = _pdata->importer.class_2dt_anatomical_images();
+        const std::vector<unsigned int> class_2d_anatomical_images = _pdata->importer.class_2d_anatomical_images();
+        const std::vector<unsigned int> class_3d_anatomical_images = _pdata->importer.class_3d_anatomical_images();
 
         unsigned int N = 0;
         N += class_3dt_flow_images.size();
@@ -340,7 +340,7 @@ namespace bk
     std::string Dataset::filepath_tmip_anatomical_3dt(unsigned int imgId) const
     {
         std::stringstream s;
-        s <<  _pdata->project_path;
+        s << _pdata->project_path;
         s << "tmip_anatomy";
         s << imgId;
 
@@ -349,8 +349,8 @@ namespace bk
 
     std::vector<std::string> Dataset::filepaths_of_local_image_copies() const
     {
-        const std::string               filepath_base = string_utils::append(_pdata->project_path, dcmbytes);
-        const std::vector<unsigned int> ids           = ids_of_local_image_copies();
+        const std::string filepath_base = string_utils::append(_pdata->project_path, dcmbytes);
+        const std::vector<unsigned int> ids = ids_of_local_image_copies();
 
         std::vector<std::string> paths;
         paths.reserve(ids.size());
@@ -383,14 +383,15 @@ namespace bk
                 file.read(reinterpret_cast<char*>(sz), 3 * sizeof(std::uint16_t));
 
                 // world matrix
-                double w[25]        = {0};
+                double w[25] = {0};
                 file.read(reinterpret_cast<char*>(&w), 25 * sizeof(double));
-                Mat5d             W;
+                Mat5d W;
                 for (unsigned int i = 0; i < 25; ++i)
                 { W[i] = w[i]; }
 
                 #ifdef BK_EMIT_PROGRESS
-                Progress& prog = bk_progress.emplace_task((sz[0] * sz[1] * sz[2]) + (sz[0] * sz[1] * sz[2]) / 4, ___("loading local image"));
+                const unsigned int N = sz[0] * sz[1] * sz[2];
+                Progress& prog = bk_progress.emplace_task(N + N / 4, ___("Loading local image"));
                 #endif
 
                 auto img = std::make_unique<DicomImage<double, 3>>();
@@ -399,22 +400,30 @@ namespace bk
                 img->geometry().transformation().set_dicom_image_type_3d();
 
                 #ifdef BK_EMIT_PROGRESS
-                prog.increment((sz[0] * sz[1] * sz[2]) / 4);
+                prog.increment(N / 4);
                 #endif
 
                 // values
                 std::vector<double> buf(img->num_values());
                 file.read(reinterpret_cast<char*>(buf.data()), img->num_values() * sizeof(double));
 
+                #ifdef BK_EMIT_PROGRESS
+                prog.increment(N / 2);
+                #endif
+
                 #pragma omp parallel for
                 for (int i = 0; i < static_cast<int>(img->num_values()); ++i)
                 { (*img)[i] = buf[i]; }
+
+                #ifdef BK_EMIT_PROGRESS
+                prog.increment(N / 4);
+                #endif
 
                 buf.clear();
                 buf.shrink_to_fit();
 
                 #ifdef BK_EMIT_PROGRESS
-                prog.increment(sz[0] * sz[1] * sz[2]);
+                prog.increment(N / 4);
                 #endif
 
                 file.close();
@@ -436,8 +445,8 @@ namespace bk
     {
         if (has_local_image_copy_dcmbytes(imgId))
         {
-            const std::string       dcmpath  = _pdata->project_path + dcmbytes + string_utils::from_number(imgId);
-            bool                    success  = false;
+            const std::string dcmpath = _pdata->project_path + dcmbytes + string_utils::from_number(imgId);
+            bool success = false;
             const std::vector<char> imgBytes = _pdata->importer.load_dcm_image_bytes(dcmpath, &success);
 
             if (success)
@@ -468,7 +477,7 @@ namespace bk
 
         #ifdef BK_EMIT_PROGRESS
         const unsigned int numel = info[0].get().Rows * info[0].get().Columns * info[0].get().Slices * info[0].get().TemporalPositions;
-        Progress& prog = bk_progress.emplace_task(4 * numel + 10, ___("loading 3D+T flow images"));
+        Progress& prog = bk_progress.emplace_task(4 * numel + 10, ___("Loading 3D+T flow images"));
         #endif
 
         std::unique_ptr<DicomImage<double, -1>> f[3] = {nullptr, nullptr, nullptr};
@@ -512,19 +521,19 @@ namespace bk
         _pdata->flow_image_3dt.geometry().transformation().set_world_matrix(info[0].get().worldMatrix, info[0].get().TemporalResolution);
 
         // derive flow vector ordering from world matrix
-        unsigned int      order[3]  = {0, 1, 2};
-        double            dirfac[3] = {1, 1, 1};
-        for (unsigned int colid     = 0; colid < 3; ++colid)
+        unsigned int order[3] = {0, 1, 2};
+        double dirfac[3] = {1, 1, 1};
+        for (unsigned int colid = 0; colid < 3; ++colid)
         {
-            double            maxabsval = 0;
-            for (unsigned int rowid     = 0; rowid < 3; ++rowid)
+            double maxabsval = 0;
+            for (unsigned int rowid = 0; rowid < 3; ++rowid)
             {
                 const double tempval = info[0].get().worldMatrix(rowid, colid);
                 if (maxabsval < std::abs(tempval))
                 {
                     maxabsval = std::abs(tempval);
 
-                    order[colid]  = rowid;
+                    order[colid] = rowid;
                     dirfac[colid] = std::signbit(tempval) ? -1 : +1;
                 }
             }
@@ -542,7 +551,7 @@ namespace bk
                     for (unsigned int t = 0; t < size[3]; ++t)
                     {
                         const unsigned int lid = grid_to_list_id(size, x, y, z, t);
-                        Vec3d              v((*f[order[0]])[lid] - lipv[order[0]], (*f[order[1]])[lid] - lipv[order[1]], (*f[order[2]])[lid] - lipv[order[2]]);
+                        Vec3d v((*f[order[0]])[lid] - lipv[order[0]], (*f[order[1]])[lid] - lipv[order[1]], (*f[order[2]])[lid] - lipv[order[2]]);
 
                         v[0] /= static_cast<double>(lipv[order[0]]) * dirfac[0];
                         v[0] *= venc[0];
@@ -589,7 +598,7 @@ namespace bk
 
     std::vector<std::unique_ptr<FlowImage2DT>> Dataset::flow_images_2dt(DatasetFilter_ flags)
     {
-        const std::vector<unsigned int>            imgIds = _pdata->importer.class_2dt_flow_images();
+        const std::vector<unsigned int> imgIds = _pdata->importer.class_2dt_flow_images();
         std::vector<std::unique_ptr<FlowImage2DT>> images;
         images.reserve(imgIds.size());
 
@@ -658,6 +667,17 @@ namespace bk
         return LPCImageFilter::apply(_pdata->flow_image_3dt);
     }
 
+    std::unique_ptr<DicomImage<double, 3>> Dataset::lpc(bool load_flow_img_if_necessary)
+    {
+        if (has_local_image_copy(filepath_lpc()))
+        { return load_local_image_copy(filepath_lpc()); }
+
+        if (load_flow_img_if_necessary && !is_flow_image_3dt_loaded())
+        { load_flow_image_3dt(); }
+
+        return lpc();
+    }
+
     std::unique_ptr<DicomImage<double, 3>> Dataset::ivsd() const
     {
         if (has_local_image_copy(filepath_ivsd()))
@@ -667,18 +687,29 @@ namespace bk
         return IVSDImageFilter::apply(_pdata->flow_image_3dt);
     }
 
+    std::unique_ptr<DicomImage<double, 3>> Dataset::ivsd(bool load_flow_img_if_necessary)
+    {
+        if (has_local_image_copy(filepath_ivsd()))
+        { return load_local_image_copy(filepath_ivsd()); }
+
+        if (load_flow_img_if_necessary && !is_flow_image_3dt_loaded())
+        { load_flow_image_3dt(); }
+
+        return ivsd();
+    }
+
     std::unique_ptr<DicomImage<double, 3>> Dataset::tmip_magnitude_3dt() const
     {
         if (has_local_image_copy(filepath_tmip_magnitude_3dt()))
         { return load_local_image_copy(filepath_tmip_magnitude_3dt()); }
 
-        const std::vector<unsigned int> magnitudeImageIds  = _pdata->importer.class_3dt_magnitude_images();
-        const unsigned int              numMagnitudeImages = magnitudeImageIds.size();
+        const std::vector<unsigned int> magnitudeImageIds = _pdata->importer.class_3dt_magnitude_images();
+        const unsigned int numMagnitudeImages = magnitudeImageIds.size();
 
         assert((numMagnitudeImages == 1 || numMagnitudeImages == 3) && "invalid number of magnitude images (should be 1 or 3)!");
 
         #ifdef BK_EMIT_PROGRESS
-        bk::Progress& prog = bk_progress.emplace_task(numMagnitudeImages, ___("loading magnitude images"));
+        bk::Progress& prog = bk_progress.emplace_task(numMagnitudeImages, ___("Loading magnitude images"));
         #endif
 
         std::vector<std::unique_ptr<DicomImage<double, -1>>> m;
@@ -715,7 +746,7 @@ namespace bk
         }
 
         #ifdef BK_EMIT_PROGRESS
-        bk::Progress& prog = bk_progress.emplace_task(1, ___("loading signal intensity image"));
+        bk::Progress& prog = bk_progress.emplace_task(1, ___("Loading signal intensity image"));
         #endif
 
         std::unique_ptr<DicomImage<double, -1>> m = load_local_image_copy_dcmbytes(imageIds[0]);
@@ -740,7 +771,7 @@ namespace bk
         }
 
         #ifdef BK_EMIT_PROGRESS
-        bk::Progress& prog = bk_progress.emplace_task(1, ___("loading anatomical image"));
+        bk::Progress& prog = bk_progress.emplace_task(1, ___("Loading anatomical image"));
         #endif
 
         std::unique_ptr<DicomImage<double, -1>> m = load_local_image_copy_dcmbytes(dcmImgId);
@@ -752,14 +783,30 @@ namespace bk
         return TMIPImageFilter::apply(*m);
     }
 
+    std::unique_ptr<DicomImage<double, 3>> Dataset::anatomical_image_3d(unsigned int dcmImgId) const
+    {
+        const std::unique_ptr<DicomImage<double, -1>> m = load_local_image_copy_dcmbytes(dcmImgId);
+
+        auto res = std::make_unique<DicomImage<double, 3>>();
+        res->set_size(m->size());
+        res->geometry().transformation().set_world_matrix(m->geometry().transformation().world_matrix_with_time());
+        res->geometry().transformation().set_dicom_image_type_3d();
+
+        #pragma omp parallel for
+        for (unsigned int i = 0; i < m->num_values(); ++i)
+        { (*res)[i] = (*m)[i]; }
+
+        return res;
+    }
+
     std::unique_ptr<DicomImage<double, 4>> Dataset::pressure_map(PressureMapImageFilter pmf) const
     {
         #ifdef BK_EMIT_PROGRESS
-        bk::Progress& prog = bk_progress.emplace_task(_pdata->vessels.size(), ___("loading pressure map"));
+        bk::Progress& prog = bk_progress.emplace_task(_pdata->vessels.size(), ___("Loading pressure map"));
         #endif
 
         std::vector<std::reference_wrapper<const Vessel>> vesselsToProcess;
-        std::vector<bool>                                 hasPressureMap(_pdata->vessels.size(), false);
+        std::vector<bool> hasPressureMap(_pdata->vessels.size(), false);
 
         for (unsigned int i = 0; i < num_vessels(); ++i)
         {
@@ -799,7 +846,7 @@ namespace bk
 
                 if (file.good())
                 {
-                    std::uint16_t       pos[3] = {0, 0, 0};
+                    std::uint16_t pos[3] = {0, 0, 0};
                     std::vector<double> buf(_pdata->flow_image_3dt.size(3));
 
                     while (!file.eof())
@@ -922,7 +969,7 @@ namespace bk
         paths.emplace_back(filepath_tmip_signal_3dt());
 
         #ifdef BK_EMIT_PROGRESS
-        Progress& prog = bk_progress.emplace_task(paths.size(), ___("removing local image copies"));
+        Progress& prog = bk_progress.emplace_task(paths.size(), ___("Removing local image copies"));
         #endif
 
         for (const std::string& p: paths)
@@ -956,15 +1003,15 @@ namespace bk
 
     bool Dataset::save_local_dcmbyte_image_copies() const
     {
-        const std::vector<unsigned int> ids       = ids_of_local_image_copies();
-        const std::vector<std::string>  filepaths = filepaths_of_local_image_copies();
-        std::vector<std::future<void>>  tasks;
+        const std::vector<unsigned int> ids = ids_of_local_image_copies();
+        const std::vector<std::string> filepaths = filepaths_of_local_image_copies();
+        std::vector<std::future<void>> tasks;
 
         if (ids.empty())
         { return false; }
 
         #ifdef BK_EMIT_PROGRESS
-        bk::Progress& prog = bk_progress.emplace_task(ids.size(), ___("saving local dicom image copies"));
+        bk::Progress& prog = bk_progress.emplace_task(ids.size(), ___("Saving local DICOM image copies"));
         #endif
 
         for (unsigned int i = 0; i < ids.size(); ++i)
@@ -972,7 +1019,7 @@ namespace bk
             tasks.emplace_back(bk_threadpool.enqueue([&, i]()
                                                      {
                                                          std::vector<char> imgbytes = std::move(this->_pdata->importer.read_image_bytes(ids[i]));
-                                                         std::ofstream     file(filepaths[i], std::ios_base::out | std::ios_base::binary);
+                                                         std::ofstream file(filepaths[i], std::ios_base::out | std::ios_base::binary);
 
                                                          if (file.good())
                                                          {
@@ -1004,15 +1051,15 @@ namespace bk
         { return false; }
 
         #ifdef BK_EMIT_PROGRESS
-        bk::Progress& prog = bk_progress.emplace_task(3, ___("saving local image copy"));
+        bk::Progress& prog = bk_progress.emplace_task(3, ___("Saving local image copy"));
         #endif
 
         std::uint16_t ui16temp = 0;
-        double        dtemp    = 0;
+        double dtemp = 0;
 
         // size
-        const auto        size = img.geometry().size();
-        for (unsigned int i    = 0; i < 3; ++i)
+        const auto size = img.geometry().size();
+        for (unsigned int i = 0; i < 3; ++i)
         {
             ui16temp = size[i];
             file.write(reinterpret_cast<char*>(&ui16temp), sizeof(std::uint16_t));
@@ -1058,11 +1105,11 @@ namespace bk
 
     bool Dataset::save_pressure_map(PressureMapImageFilter pmf) const
     {
-        bool                                         success = true;
-        const std::unique_ptr<DicomImage<double, 4>> pm      = pressure_map(pmf);
+        bool success = true;
+        const std::unique_ptr<DicomImage<double, 4>> pm = pressure_map(pmf);
 
         #ifdef BK_EMIT_PROGRESS
-        bk::Progress& prog = bk_progress.emplace_task(_pdata->vessels.size() * 5, ___("saving pressure map"));
+        bk::Progress& prog = bk_progress.emplace_task(_pdata->vessels.size() * 5, ___("Saving pressure map"));
         #endif
 
         for (const Vessel& v: _pdata->vessels)
@@ -1075,9 +1122,9 @@ namespace bk
                 continue;
             }
 
-            double                                       dtemp = 0;
-            const auto                                   size  = pm->size();
-            const std::unique_ptr<DicomImage<double, 3>> seg   = vessel_segmentation_in_flow_field_3dt_size(v);
+            double dtemp = 0;
+            const auto size = pm->size();
+            const std::unique_ptr<DicomImage<double, 3>> seg = vessel_segmentation_in_flow_field_3dt_size(v);
 
             #ifdef BK_EMIT_PROGRESS
             prog.increment(1);

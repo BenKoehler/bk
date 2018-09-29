@@ -65,7 +65,7 @@ namespace bk
       const auto& size = ff.size();
 
       #ifdef BK_EMIT_PROGRESS
-      bk::Progress& prog = bk_progress.emplace_task(ff.num_values() / size[3], ___("calculating ivsd"));
+      bk::Progress& prog = bk_progress.emplace_task(ff.num_values() / size[3], ___("Calculating IVSD"));
       #endif
 
       auto res = std::make_unique<DicomImage<double, 3>>();

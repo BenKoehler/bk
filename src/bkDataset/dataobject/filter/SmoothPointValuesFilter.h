@@ -117,7 +117,7 @@ namespace bk
           { return std::vector<T>(); }
 
           #ifdef BK_EMIT_PROGRESS
-          Progress& prog = bk_progress.emplace_task(1 + _num_iterations, ___("smoothing point values"));
+          Progress& prog = bk_progress.emplace_task(1 + _num_iterations, ___("Smoothing point values"));
           #endif
 
           // determine neighbor ids of each point

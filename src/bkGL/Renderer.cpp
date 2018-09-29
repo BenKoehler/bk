@@ -688,7 +688,7 @@ namespace bk
       constexpr const unsigned int fileIndexLength = 5;
 
       #ifdef BK_EMIT_PROGRESS
-      Progress& prog = bk_progress.emplace_task(N, ___("rendering video frames"));
+      Progress& prog = bk_progress.emplace_task(N, ___("Rendering video frames"));
       #endif
 
       std::vector<std::future<void>> tasks_save_img;

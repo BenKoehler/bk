@@ -529,7 +529,7 @@ namespace bk
     bool Vessel::save_segmentation3D(std::string_view filepath) const
     {
         #ifdef BK_EMIT_PROGRESS
-        Progress& prog           = bk_progress.emplace_task(5, ___("saving 3d segmentation"));
+        Progress& prog           = bk_progress.emplace_task(5, ___("Saving 3D segmentation"));
         #endif
 
         //------------------------------------------------------------------------------------------------------
@@ -637,7 +637,7 @@ namespace bk
     bool Vessel::load_segmentation3D(std::string_view filepath)
     {
         #ifdef BK_EMIT_PROGRESS
-        Progress& prog = bk_progress.emplace_task(5, ___("loading 3d segmentation"));
+        Progress& prog = bk_progress.emplace_task(5, ___("Loading 3D segmentation"));
         #endif
 
         clear_segmentation();
@@ -754,7 +754,7 @@ namespace bk
     //bool Vessel::save_centerline_ids(std::string_view filepath) const
     //{
     //    #ifdef BK_EMIT_PROGRESS
-    //    Progress& prog           = bk_progress.emplace_task(0, 3, ___("saving centerline end points"));
+    //    Progress& prog           = bk_progress.emplace_task(0, 3, ___("Saving centerline end points"));
     //    #endif
     //
     //    //------------------------------------------------------------------------------------------------------
@@ -818,7 +818,7 @@ namespace bk
     //bool Vessel::load_centerline_ids(std::string_view filepath)
     //{
     //    #ifdef BK_EMIT_PROGRESS
-    //    Progress& prog = bk_progress.emplace_task(0, 3, ___("loading centerline end points"));
+    //    Progress& prog = bk_progress.emplace_task(0, 3, ___("Loading centerline end points"));
     //    #endif
     //
     //    _pdata->centerline_target_ids.clear();
@@ -887,7 +887,7 @@ namespace bk
     //bool Vessel::save_centerlines(std::string_view filepath) const
     //{
     //    #ifdef BK_EMIT_PROGRESS
-    //    Progress& prog           = bk_progress.emplace_task(0, 3, ___("saving centerlines"));
+    //    Progress& prog           = bk_progress.emplace_task(0, 3, ___("Saving centerlines"));
     //    #endif
     //
     //    //------------------------------------------------------------------------------------------------------
@@ -964,7 +964,7 @@ namespace bk
     //bool Vessel::load_centerlines(std::string_view filepath)
     //{
     //    #ifdef BK_EMIT_PROGRESS
-    //    Progress& prog = bk_progress.emplace_task(0, 3, ___("loading centerlines"));
+    //    Progress& prog = bk_progress.emplace_task(0, 3, ___("Loading centerlines"));
     //    #endif
     //
     //    //------------------------------------------------------------------------------------------------------
@@ -1061,7 +1061,7 @@ namespace bk
     //bool Vessel::save_measuringplanes(std::string_view filepath) const
     //{
     //    #ifdef BK_EMIT_PROGRESS
-    //    Progress& prog           = bk_progress.emplace_task(0, 3, ___("saving measuring planes"));
+    //    Progress& prog           = bk_progress.emplace_task(0, 3, ___("Saving measuring planes"));
     //    #endif
     //
     //    //------------------------------------------------------------------------------------------------------
@@ -1317,7 +1317,7 @@ namespace bk
     //bool Vessel::save_flowjets(std::string_view filepath) const
     //{
     //    #ifdef BK_EMIT_PROGRESS
-    //    Progress& prog           = bk_progress.emplace_task(0, 3, ___("saving flow jets"));
+    //    Progress& prog           = bk_progress.emplace_task(0, 3, ___("Saving flow jets"));
     //    #endif
     //
     //    //------------------------------------------------------------------------------------------------------
@@ -1454,7 +1454,7 @@ namespace bk
     //bool Vessel::load_flowjets(std::string_view filepath)
     //{
     //    #ifdef BK_EMIT_PROGRESS
-    //    Progress& prog = bk_progress.emplace_task(0, 3, ___("loading flow jets"));
+    //    Progress& prog = bk_progress.emplace_task(0, 3, ___("Loading flow jets"));
     //    #endif
     //
     //    //------------------------------------------------------------------------------------------------------

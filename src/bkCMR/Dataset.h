@@ -182,10 +182,13 @@ namespace bk
         [[nodiscard]] int anatomical_2dt_image_id_of_flow_image_2dt(unsigned int flowimg_dcm_id, bool* success = nullptr);
 
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> lpc() const;
+        [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> lpc(bool load_flow_img_if_necessary);
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> ivsd() const;
+        [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> ivsd(bool load_flow_img_if_necessary);
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> tmip_magnitude_3dt() const;
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> tmip_signal_intensity_3dt() const;
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> tmip_anatomical_3dt(unsigned int dcmImgId) const;
+        [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> anatomical_image_3d(unsigned int dcmImgId) const;
         [[nodiscard]] std::unique_ptr<DicomImage<double, 4>> pressure_map(PressureMapImageFilter pmf) const;
         [[nodiscard]] std::unique_ptr<DicomImage<double, 4>> pressure_map() const;
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> vessel_segmentation_in_flow_field_3dt_size(const Vessel& v) const;

@@ -141,7 +141,7 @@ namespace bk
         const auto scale_spatial_squared = scale_spatial.sqr_cwise();
 
         #ifdef BK_EMIT_PROGRESS
-        Progress& prog = bk_progress.emplace_task(numVessels * (gs[0] + 10 + _pdata->max_iterations + 10), ___("calculating relative pressure"));
+        Progress& prog = bk_progress.emplace_task(numVessels * (gs[0] + 10 + _pdata->max_iterations + 10), ___("Calculating relative pressure"));
         #endif
 
         _pdata->clock.start();
