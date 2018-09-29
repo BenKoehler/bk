@@ -42,6 +42,7 @@
 #include "bkDataset/image/filter/InvertIntensityImageFilter.h"
 #include "bkDataset/image/filter/LaplaceBinomialImageFilter.h"
 #include "bkDataset/image/filter/LaplaceImageFilter.h"
+#include "bkDataset/image/filter/MarchingCubesFilter.h"
 #include "bkDataset/image/filter/MaximumImageFilter.h"
 #include "bkDataset/image/filter/MedianImageFilter.h"
 #include "bkDataset/image/filter/MinimumImageFilter.h"
