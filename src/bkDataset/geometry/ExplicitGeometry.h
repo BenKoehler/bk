@@ -171,6 +171,7 @@ namespace bk
       /// @{ -------------------------------------------------- OPERATOR =
       [[maybe_unused]] self_type& operator=(const self_type& other)
       {
+          _points = other._points;
           _kdtree_is_up2date = false;
 
           if (other._kdtree_is_up2date)
