@@ -74,10 +74,9 @@ namespace bk
         //====================================================================================================
         //===== DEFINITIONS
         //====================================================================================================
-        static const std::string vessel_dir;
-
       public:
         static const std::string dcmbytes;
+        static const std::string vessel_dir;
 
         //====================================================================================================
         //===== MEMBERS
@@ -122,6 +121,7 @@ namespace bk
         [[nodiscard]] Vessel* vessel(const std::string& name, bool case_sensitive = true);
         [[nodiscard]] const Vessel* vessel(unsigned int i) const;
         [[nodiscard]] const Vessel* vessel(const std::string& name, bool case_sensitive = true) const;
+        [[nodiscard]] bool has_vessel(std::string_view name, bool case_sensitive = true) const;
 
         [[nodiscard]] bool vessel_has_centerline_ids(const Vessel* v) const;
         [[nodiscard]] bool vessel_has_centerlines(const Vessel* v) const;
@@ -153,6 +153,7 @@ namespace bk
         [[maybe_unused]] Vessel* add_vessel(std::string_view name);
         [[maybe_unused]] Vessel* add_vessel(Vessel&& v);
         [[maybe_unused]] bool remove_vessel(Vessel* v);
+        [[maybe_unused]] bool remove_vessel(std::string_view name);
 
         //====================================================================================================
         //===== IMAGES
@@ -219,6 +220,10 @@ namespace bk
         [[nodiscard]] std::string filepath_flow_dir_correction() const;
         [[nodiscard]] std::string filepath_phase_unwrapping_2dt() const;
         [[nodiscard]] std::string filepath_phase_unwrapping_3dt() const;
+        [[nodiscard]] std::string dirpath_vessel(const Vessel* v) const;
+        [[nodiscard]] std::string dirpath_vessel(std::string_view name) const;
+        [[nodiscard]] std::string dirpath_vessel_without_slash_ending(const Vessel* v) const;
+        [[nodiscard]] std::string dirpath_vessel_without_slash_ending(std::string_view name) const;
       public:
 
         [[maybe_unused]] bool save_local_dcmbyte_image_copies() const;
@@ -242,6 +247,8 @@ namespace bk
         [[maybe_unused]] bool save_ivsd();
         [[maybe_unused]] bool save_magnitude_tmip_3dt();
         [[maybe_unused]] bool save_anatomical_tmip_3dt(unsigned int imgId);
+
+        [[maybe_unused]] bool save_vessel(const Vessel* v) const;
     }; // class Dataset
   } // inline namespace cmr
 } // namespace bk

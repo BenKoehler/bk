@@ -55,12 +55,13 @@ namespace bk
     //====================================================================================================
     struct Vessel::Impl
     {
-        std::string                                 name;
-        segmentation3d_type                         seg3;
+        std::string name;
+        segmentation3d_type seg3;
         std::pair<Segmentation3DInfo, unsigned int> seg3info;
-        std::vector<unsigned int>                   seg3insideids;
-        std::vector<unsigned int>                   seg3outsideids;
-        mesh_type                                   mesh;
+        std::vector<unsigned int> seg3insideids;
+        std::vector<unsigned int> seg3outsideids;
+        VesselSemantic_ semantic;
+        mesh_type mesh;
         //pathlineset_type                            pathlines;
         //unsigned int                                centerline_seed_id;
         //std::vector<unsigned int>                   centerline_target_ids;
@@ -70,7 +71,7 @@ namespace bk
         //FlowJetSet_CMR flowjets;
 
         Impl()
-            : name("vessel")
+            : semantic(VesselSemantic_None)
         { /* do nothing */ }
 
         Impl(const Impl&) = default;
@@ -96,6 +97,45 @@ namespace bk
     const std::string& Vessel::name() const
     { return _pdata->name; }
 
+    VesselSemantic_ Vessel::semantic() const
+    { return _pdata->semantic; }
+
+    bool Vessel::is_semantic(VesselSemantic_ sem) const
+    { return _pdata->semantic & sem; }
+
+    bool Vessel::is_semantic_aorta() const
+    { return is_semantic(VesselSemantic_LeftHeart_Aorta); }
+
+    bool Vessel::is_semantic_left_ventricle() const
+    { return is_semantic(VesselSemantic_LeftHeart_Ventricle); }
+
+    bool Vessel::is_semantic_left_atrium() const
+    { return is_semantic(VesselSemantic_LeftHeart_Atrium); }
+
+    bool Vessel::is_semantic_pulmonary_veins() const
+    { return is_semantic(VesselSemantic_LeftHeart_PulmonaryVeins); }
+
+    bool Vessel::is_semantic_left_heart() const
+    { return is_semantic_aorta() || is_semantic_left_ventricle() || is_semantic_left_atrium() || is_semantic_pulmonary_veins(); }
+
+    bool Vessel::is_semantic_pulmonary_artery() const
+    { return is_semantic(VesselSemantic_RightHeart_PulmonaryArtery); }
+
+    bool Vessel::is_semantic_right_ventricle() const
+    { return is_semantic(VesselSemantic_RightHeart_Ventricle); }
+
+    bool Vessel::is_semantic_right_atrium() const
+    { return is_semantic(VesselSemantic_RightHeart_Atrium); }
+
+    bool Vessel::is_semantic_vena_cava() const
+    { return is_semantic(VesselSemantic_RightHeart_VenaCava); }
+
+    bool Vessel::is_semantic_right_heart() const
+    { return is_semantic_pulmonary_artery() || is_semantic_right_ventricle() || is_semantic_right_atrium() || is_semantic_vena_cava(); }
+
+    bool Vessel::has_segmentation3D() const
+    { return _pdata->seg3.num_values() > 1; }
+
     auto Vessel::segmentation3D() const -> const segmentation3d_type&
     { return _pdata->seg3; }
 
@@ -116,6 +156,9 @@ namespace bk
 
     const std::vector<unsigned int>& Vessel::segmentation3D_outside_ids() const
     { return _pdata->seg3outsideids; }
+
+    bool Vessel::has_mesh() const
+    { return _pdata->mesh.geometry().num_points() > 1 && _pdata->mesh.topology().num_cells() > 1; }
 
     auto Vessel::mesh() const -> const mesh_type&
     { return _pdata->mesh; }
@@ -191,8 +234,7 @@ namespace bk
     //====================================================================================================
     void Vessel::clear()
     {
-        _pdata->name = "";
-
+        clear_semantic();
         clear_mesh();
         clear_segmentation();
         clear_pathlines();
@@ -202,27 +244,30 @@ namespace bk
         clear_flowjets();
     }
 
+    void Vessel::clear_semantic()
+    { _pdata->semantic = VesselSemantic_None; }
+
     void Vessel::clear_segmentation()
     {
         //_pdata->seg3            = std::make_unique<segmentation3d_type>();
-        _pdata->seg3.set_size(1,1,1);
-        _pdata->seg3info.first  = Segmentation3DInfo::Magnitude4DTMIP;
+        _pdata->seg3.set_size(1, 1, 1);
+        _pdata->seg3info.first = Segmentation3DInfo::Magnitude4DTMIP;
         _pdata->seg3info.second = 0;
         _pdata->seg3insideids.clear();
         _pdata->seg3outsideids.clear();
     }
 
     void Vessel::clear_mesh()
-    {         _pdata->mesh.clear();    }
+    { _pdata->mesh.clear(); }
 
     void Vessel::clear_pathlines()
-    { 
+    {
         //_pdata->pathlines.clear();
         // todo
     }
 
     void Vessel::clear_centerlines()
-    { 
+    {
         //_pdata->centerlines.clear();
         // todo 
     }
@@ -233,7 +278,7 @@ namespace bk
     }
 
     void Vessel::clear_measuring_planes()
-    { 
+    {
         //_pdata->measuring_planes.clear();
         // todo
     }
@@ -244,42 +289,78 @@ namespace bk
         // todo
     }
 
-    void Vessel::set_name(const std::string& name)
+    void Vessel::set_name(std::string_view name)
     { _pdata->name = name; }
+
+    void Vessel::set_name_from_semantic()
+    { _pdata->name = Name_from_semantic(_pdata->semantic); }
+
+    std::string Vessel::Name_from_semantic(VesselSemantic_ s)
+    {
+        std::string name = "";
+
+        auto append_to_name = [&](bool semantic, std::string_view str)
+        {
+            if (semantic)
+            {
+                if (!name.empty())
+                { name += "-"; }
+
+                name += str;
+            }
+        };
+
+        append_to_name(s & VesselSemantic_LeftHeart_Aorta, "Aorta");
+        append_to_name(s & VesselSemantic_LeftHeart_Ventricle, "LeftVentricle");
+        append_to_name(s & VesselSemantic_LeftHeart_Atrium, "LeftAtrium");
+        append_to_name(s & VesselSemantic_LeftHeart_PulmonaryVeins, "PulmonaryVeins");
+        append_to_name(s & VesselSemantic_RightHeart_PulmonaryArtery, "PulmonaryArtery");
+        append_to_name(s & VesselSemantic_RightHeart_Ventricle, "RightVentricle");
+        append_to_name(s & VesselSemantic_RightHeart_Atrium, "RightAtrium");
+        append_to_name(s & VesselSemantic_RightHeart_VenaCava, "VenaCava");
+
+        return name;
+    }
+
+    void Vessel::set_semantic(VesselSemantic_ sem)
+    { _pdata->semantic = sem; }
+
+    void Vessel::add_semantic(VesselSemantic_ sem)
+    { _pdata->semantic = static_cast<VesselSemantic_>(static_cast<unsigned int>(_pdata->semantic) | static_cast<unsigned int>(sem)); }
 
     void Vessel::set_seg3d_was_performed_on_magnitude_TMIP()
     {
-        _pdata->seg3info.first  = Segmentation3DInfo::Magnitude4DTMIP;
+        _pdata->seg3info.first = Segmentation3DInfo::Magnitude4DTMIP;
         _pdata->seg3info.second = 0;
     }
 
     void Vessel::set_seg3d_was_performed_on_LPC()
     {
-        _pdata->seg3info.first  = Segmentation3DInfo::LPC;
+        _pdata->seg3info.first = Segmentation3DInfo::LPC;
         _pdata->seg3info.second = 0;
     }
 
     void Vessel::set_seg3d_was_performed_on_IVSD()
     {
-        _pdata->seg3info.first  = Segmentation3DInfo::IVSD;
+        _pdata->seg3info.first = Segmentation3DInfo::IVSD;
         _pdata->seg3info.second = 0;
     }
 
     void Vessel::set_seg3d_was_performed_on_3D_anatomical_image(unsigned int id)
     {
-        _pdata->seg3info.first  = Segmentation3DInfo::Anatomical3D;
+        _pdata->seg3info.first = Segmentation3DInfo::Anatomical3D;
         _pdata->seg3info.second = id;
     }
 
     void Vessel::set_seg3d_was_performed_on_4D_anatomical_image_TMIP(unsigned int id)
     {
-        _pdata->seg3info.first  = Segmentation3DInfo::Anatomical4DTMIP;
+        _pdata->seg3info.first = Segmentation3DInfo::Anatomical4DTMIP;
         _pdata->seg3info.second = id;
     }
 
     void Vessel::set_seg3d_was_performed_on_4D_signal_intensity_image_TMIP()
     {
-        _pdata->seg3info.first  = Segmentation3DInfo::SignalIntensity4DTMIP;
+        _pdata->seg3info.first = Segmentation3DInfo::SignalIntensity4DTMIP;
         _pdata->seg3info.second = 0;
     }
 
@@ -529,13 +610,13 @@ namespace bk
     bool Vessel::save_segmentation3D(std::string_view filepath) const
     {
         #ifdef BK_EMIT_PROGRESS
-        Progress& prog           = bk_progress.emplace_task(5, ___("Saving 3D segmentation"));
+        Progress& prog = bk_progress.emplace_task(5, ___("Saving 3D segmentation"));
         #endif
 
         //------------------------------------------------------------------------------------------------------
         // check filename
         //------------------------------------------------------------------------------------------------------
-        std::string       fname(filepath);
+        std::string fname(filepath);
         const std::string suffix = ".seg3";
         if (fname.empty())
         { fname = "segmentation3d" + suffix; }
@@ -561,7 +642,7 @@ namespace bk
         // temp
         std::uint16_t ui16temp = 0;
         std::uint32_t ui32temp = 0;
-        double        dtemp    = 0;
+        double dtemp = 0;
 
         // grid size
         const auto& gs = _pdata->seg3.geometry().size();
@@ -625,6 +706,10 @@ namespace bk
         ui16temp = static_cast<std::uint16_t>(_pdata->seg3info.second);
         file.write(reinterpret_cast<char*>(&ui16temp), sizeof(std::uint16_t));
 
+        // semantic
+        ui32temp = static_cast<std::uint32_t>(_pdata->semantic);
+        file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
+
         file.close();
 
         #ifdef BK_EMIT_PROGRESS
@@ -671,6 +756,7 @@ namespace bk
 
         // temp
         std::uint16_t ui16temp = 0;
+        std::uint32_t ui32temp = 0;
 
         // grid size
         std::uint16_t gs[3];
@@ -682,7 +768,7 @@ namespace bk
         // world matrix
         double wmat[16];
         file.read(reinterpret_cast<char*>(wmat), 16 * sizeof(double));
-        Mat4d             w;
+        Mat4d w;
         for (unsigned int i = 0; i < 16; ++i)
         { w[i] = wmat[i]; }
         _pdata->seg3.geometry().transformation().set_world_matrix(w);
@@ -738,6 +824,10 @@ namespace bk
 
         file.read(reinterpret_cast<char*>(&ui16temp), sizeof(std::uint16_t));
         _pdata->seg3info.second = ui16temp;
+
+        // semantic
+        file.read(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
+        _pdata->semantic = static_cast<VesselSemantic_>(ui32temp);
 
         fut_insideids.get();
         fut_outsideids.get();

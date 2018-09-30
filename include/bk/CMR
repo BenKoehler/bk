@@ -25,6 +25,7 @@
 #include <bkCMR/Dataset.h>
 #include <bkCMR/FlowDirCorrection.h>
 #include <bkCMR/Vessel.h>
+#include <bkCMR/EVesselSemantic.h>
 #include <bkCMR/FlowImage2DT.h>
 #include <bkCMR/FlowImage3DT.h>
 #include <bkCMR/FlowJet.h>

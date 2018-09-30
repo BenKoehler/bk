@@ -90,6 +90,8 @@ namespace bk
     //====================================================================================================
     //===== GETTER
     //====================================================================================================
+
+
     const std::string& Dataset::project_path() const
     { return _pdata->project_path; }
 
@@ -222,6 +224,23 @@ namespace bk
         return nullptr;
     }
 
+    bool Dataset::has_vessel(std::string_view name, bool case_sensitive) const
+    {
+        if (std::filesystem::exists(dirpath_vessel_without_slash_ending(name)))
+        { return true; }
+
+        if (_pdata->vessels.empty())
+        { return false; }
+
+        for (const Vessel& v: _pdata->vessels)
+        {
+            if (string_utils::equals(v.name(), name, case_sensitive))
+            { return true; }
+        }
+
+        return false;
+    }
+
     bool Dataset::vessel_has_centerline_ids(const Vessel* v) const
     {
         // todo
@@ -316,7 +335,34 @@ namespace bk
         _pdata->vessels.erase(std::remove_if(_pdata->vessels.begin(), _pdata->vessels.end(), [&](const Vessel& x) -> bool
         { return string_utils::equals(v->name(), x.name()); }), _pdata->vessels.end());
 
+        if (std::filesystem::exists(dirpath_vessel_without_slash_ending(v)))
+        { std::filesystem::remove_all(dirpath_vessel_without_slash_ending(v)); }
+
         return true;
+    }
+
+    bool Dataset::remove_vessel(std::string_view name)
+    {
+        bool success = false;
+
+        if (std::filesystem::exists(dirpath_vessel_without_slash_ending(name)))
+        {
+            std::filesystem::remove_all(dirpath_vessel_without_slash_ending(name));
+            success = true;
+        }
+
+        _pdata->vessels.erase(std::remove_if(_pdata->vessels.begin(), _pdata->vessels.end(), [&](const Vessel& v) -> bool
+        {
+            if (string_utils::equals(name, v.name()))
+            {
+                success = true;
+                return true;
+            }
+
+            return false;
+        }), _pdata->vessels.end());
+
+        return success;
     }
 
     //====================================================================================================
@@ -1001,6 +1047,26 @@ namespace bk
     std::string Dataset::filepath_phase_unwrapping_3dt() const
     { return _pdata->project_path + "phase_wraps_3dt.pu"; }
 
+    std::string Dataset::dirpath_vessel(const Vessel* v) const
+    { return dirpath_vessel_without_slash_ending(v) + "/"; }
+
+    std::string Dataset::dirpath_vessel(std::string_view name) const
+    { return dirpath_vessel_without_slash_ending(name) + "/"; }
+
+    std::string Dataset::dirpath_vessel_without_slash_ending(const Vessel* v) const
+    {
+        if (v == nullptr)
+        {
+            std::cerr << "Dataset::dirpath_vessel - vessel is nullptr" << std::endl;
+            return project_path() + "vessels/";
+        }
+
+        return project_path() + "vessels/" + v->name();
+    }
+
+    std::string Dataset::dirpath_vessel_without_slash_ending(std::string_view name) const
+    { return project_path() + "vessels/" + name.data(); }
+
     bool Dataset::save_local_dcmbyte_image_copies() const
     {
         const std::vector<unsigned int> ids = ids_of_local_image_copies();
@@ -1258,6 +1324,58 @@ namespace bk
     {
         auto img = tmip_anatomical_3dt(imgId);
         return save_local_image_copy(filepath_tmip_anatomical_3dt(imgId), *img);
+    }
+
+    bool Dataset::save_vessel(const Vessel* v) const
+    {
+        if (v == nullptr)
+        {
+            std::cerr << "Dataset::save_vessel - vessel is nullptr" << std::endl;
+            return false;
+        }
+
+        if (!std::filesystem::exists(dirpath_vessel_without_slash_ending(v)))
+        { std::filesystem::create_directories(dirpath_vessel_without_slash_ending(v)); }
+
+        const std::string path = dirpath_vessel(v);
+
+        #ifdef BK_EMIT_PROGRESS
+        bk::Progress& prog = bk_progress.emplace_task(5, ___("Saving vessel \"@0\"", v->name()));
+        #endif
+
+        if (v->has_segmentation3D())
+        { v->save_segmentation3D(path + v->name()); }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
+
+        if (v->has_mesh())
+        { v->save_mesh(path + v->name()); }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
+
+        // todo: centerline
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
+
+        // todo: flowjets
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
+
+        // (todo: pressure)
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        return true;
     }
   } // inline namespace cmr
 } // namespace bk

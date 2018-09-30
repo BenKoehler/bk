@@ -41,6 +41,7 @@
 #include <bk/Line>
 
 #include "Segmentation3DInfo.h"
+#include "EVesselSemantic.h"
 #include "lib/bkCMR_export.h"
 
 namespace bk
@@ -93,6 +94,18 @@ namespace bk
         //===== GETTER
         //====================================================================================================
         [[nodiscard]] const std::string& name() const;
+        [[nodiscard]] VesselSemantic_ semantic() const;
+        [[nodiscard]] bool is_semantic(VesselSemantic_ sem) const;
+        [[nodiscard]] bool is_semantic_aorta() const;
+        [[nodiscard]] bool is_semantic_left_ventricle() const;
+        [[nodiscard]] bool is_semantic_left_atrium() const;
+        [[nodiscard]] bool is_semantic_pulmonary_veins() const;
+        [[nodiscard]] bool is_semantic_left_heart() const;
+        [[nodiscard]] bool is_semantic_pulmonary_artery() const;
+        [[nodiscard]] bool is_semantic_right_ventricle() const;
+        [[nodiscard]] bool is_semantic_right_atrium() const;
+        [[nodiscard]] bool is_semantic_vena_cava() const;
+        [[nodiscard]] bool is_semantic_right_heart() const;
 
         [[nodiscard]] bool has_segmentation3D() const;
         [[nodiscard]] const segmentation3d_type& segmentation3D() const;
@@ -143,6 +156,7 @@ namespace bk
         [[maybe_unused]] Vessel& operator=(Vessel&&) noexcept;
 
         void clear();
+        void clear_semantic();
         void clear_segmentation();
         void clear_mesh();
         void clear_pathlines();
@@ -151,8 +165,13 @@ namespace bk
         void clear_measuring_planes();
         void clear_flowjets();
 
-        void set_name(const std::string& name);
+        void set_name(std::string_view name);
+        void set_name_from_semantic();
+        [[nodiscard]] static std::string Name_from_semantic(VesselSemantic_ s);
 
+        void set_semantic(VesselSemantic_ sem);
+        void add_semantic(VesselSemantic_ sem);
+        
         void set_seg3d_was_performed_on_magnitude_TMIP();
         void set_seg3d_was_performed_on_LPC();
         void set_seg3d_was_performed_on_IVSD();
