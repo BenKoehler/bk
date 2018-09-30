@@ -68,7 +68,7 @@ namespace bk
   //====================================================================================================
   void RGBImageSliceView::clear_image()
   {
-      _image.set_size(0, 0, 0, 0);
+      _image.set_size(1, 1, 1, 1);
       _image.geometry().transformation().set_scale(1, 1, 1, 1);
       _xmax() = 0;
       _ymax() = 0;
