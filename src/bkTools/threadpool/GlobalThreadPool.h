@@ -34,7 +34,7 @@
 #ifndef BKTOOLS_GLOBALTHREADPOOL_H
 #define BKTOOLS_GLOBALTHREADPOOL_H
 
-#include <bk/Singleton>
+#include <bkTools/singleton/Singleton.h>
 #include <bkTools/threadpool/ThreadPool.h>
 #include <bkTools/lib/bkTools_export.h>
 
