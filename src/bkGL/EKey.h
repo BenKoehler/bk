@@ -56,6 +56,7 @@ namespace bk
           Key_Y            = 89,
           Key_Z            = 90,
       // special
+          Key_Del          = 261,
           Key_Return       = 257,
           Key_Enter        = 335,
           Key_Space        = 32,
