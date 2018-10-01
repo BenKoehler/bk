@@ -95,6 +95,7 @@ namespace bk::gc_details
       std::vector<id_type> _connected_to_source;
       std::vector<id_type> _connected_to_sink;
       bool _up2date;
+      vector_grid_type<bool> _band;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR
@@ -301,6 +302,7 @@ namespace bk::gc_details
                   this->timestamp(p) = 0;
                   this->flag(p) = gc::FLAG_FREE_SET();
                   this->distance_to_terminal(p) = gc::invalid_distance;
+                  this->band(p) = true;
               }
           } // for x
       }
@@ -345,6 +347,7 @@ namespace bk::gc_details
           resize_wrapped_vector<TDims>(_distance_to_terminal, _size, gc::invalid_distance);
           resize_wrapped_vector<TDims>(_timestamp, _size, 0);
           resize_wrapped_vector<TDims>(_flags, _size, gc::FLAG_FREE_SET());
+          resize_wrapped_vector<TDims>(_band, _size, true);
 
           _up2date = false;
       }
@@ -388,7 +391,15 @@ namespace bk::gc_details
       template<typename TGrayImage, typename TFnPixelAt>
       void init_from_intensity_image(const TGrayImage& img, const std::array<unsigned int, TDims>& img_size, const std::array<double, TDims>& img_scale, const std::array<double, 2>& minmaxPixelValue, TFnPixelAt function_pixel_at, double weight_function_tolerance = 0.5)
       {
+          #ifdef BK_EMIT_PROGRESS
+          bk::Progress& prog = bk_progress.emplace_task(_size[0] + 1, ___("Initializing graph cut from intensity image"));
+          #endif
+
           _init(img_size);
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(1);
+          #endif
 
           auto fn_scale = [&](double x) -> double
           { return 255.0 * (x - static_cast<double>(minmaxPixelValue[0])) / (static_cast<double>(minmaxPixelValue[1]) - static_cast<double>(minmaxPixelValue[0])); };
@@ -399,7 +410,16 @@ namespace bk::gc_details
               id_type id;
               id[0] = x;
               _init_from_intensity_image<1>(img, img_scale, function_pixel_at, id, fn_scale, weight_function_tolerance);
+
+              #ifdef BK_EMIT_PROGRESS
+              #pragma omp critical(gc_init_from_intensity_image)
+              { prog.increment(1); }
+              #endif
           }
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.set_finished();
+          #endif
       }
       /// @}
 
@@ -434,7 +454,15 @@ namespace bk::gc_details
       template<typename TWeightImage, typename TFnPixelAt>
       void init_from_weight_image(const TWeightImage& img, const std::array<unsigned int, TDims>& img_size, TFnPixelAt function_weight_at)
       {
+          #ifdef BK_EMIT_PROGRESS
+          bk::Progress& prog = bk_progress.emplace_task(_size[0] + 1, ___("Initializing graph cut from weight image"));
+          #endif
+
           _init(img_size);
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(1);
+          #endif
 
           #pragma omp parallel for
           for (int x = 0; x < _size[0]; ++x)
@@ -442,21 +470,30 @@ namespace bk::gc_details
               id_type id;
               id[0] = x;
               _init_from_weight_image<1>(img, function_weight_at, id);
+
+              #ifdef BK_EMIT_PROGRESS
+              #pragma omp critical(gc_init_from_weight_image)
+              { prog.increment(1); }
+              #endif
           }
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.set_finished();
+          #endif
       }
       /// @}
 
       /// @{ -------------------------------------------------- HELPERS: AUTOMATIC OUTSIDE IDS WITHIN NARROW BAND
     private:
       template<int I>
-      void _create_narrow_band(const id_type& source_node, const id_type& band_radius, vector_grid_type<bool>& band, id_type& p)
+      void _create_narrow_band(const id_type& source_node, const id_type& band_radius, id_type& p)
       {
           if constexpr (I != TDims - 1)
           {
               for (int i = std::max(0, source_node[I] - band_radius[I]); i < std::min(_size[I], source_node[I] + band_radius[I]); ++i)
               {
                   p[I] = i;
-                  _create_narrow_band<I + 1>(source_node, band_radius, band, p);
+                  _create_narrow_band<I + 1>(source_node, band_radius, p);
               }
           }
           else
@@ -466,20 +503,20 @@ namespace bk::gc_details
                   p[I] = i;
 
                   #pragma omp critical (gc_narrow_band)
-                  { this->get_from_vector_grid(band, p) = false; }
+                  { this->band(p) = false; }
               }
           }
       }
 
       template<int I>
-      void _sink_from_narrow_band(const vector_grid_type<bool>& band, id_type& p)
+      void _sink_from_narrow_band(id_type& p)
       {
           if constexpr (I != TDims - 1)
           {
               for (int i = 0; i < _size[I]; ++i)
               {
                   p[I] = i;
-                  _sink_from_narrow_band<I + 1>(band, p);
+                  _sink_from_narrow_band<I + 1>(p);
               }
           }
           else
@@ -488,14 +525,45 @@ namespace bk::gc_details
               {
                   p[I] = i;
 
-                  const bool make_sink = this->get_from_vector_grid(band, p);
-
+                  const bool make_sink = this->band(p);
                   if (make_sink)
                   {
                       #pragma omp critical (gc_narrow_band)
                       { add_sink_node(p); }
                   }
               }
+          }
+      }
+
+    public:
+      /// @}
+
+      /// @{ -------------------------------------------------- HELPER: RESET NARROW BAND
+    private:
+      template<int I>
+      void _reset_narrow_band(id_type& p)
+      {
+          for (int x = 0; x < _size[I]; ++x)
+          {
+              p[I] = x;
+
+              if constexpr (I != TDims - 1)
+              { _reset_narrow_band<I + 1>(p); }
+              else
+              { this->band(p) = true; }
+          } // for x
+      }
+
+      void _reset_narrow_band()
+      {
+          #pragma omp parallel for
+          for (int x = 0; x < _size[0]; ++x)
+          {
+              id_type p;
+              p.fill(0);
+              p[0] = x;
+
+              _reset_narrow_band<1>(p);
           }
       }
 
@@ -515,8 +583,7 @@ namespace bk::gc_details
           bk::Progress& prog = bk_progress.emplace_task(_connected_to_source.size() + 1 + _size[0], ___("Creating graph cut narrow band"));
           #endif
 
-          vector_grid_type<bool> band;
-          resize_wrapped_vector<TDims>(band, _size, true);
+          _reset_narrow_band();
 
           #ifdef BK_EMIT_PROGRESS
           prog.increment(1);
@@ -526,10 +593,10 @@ namespace bk::gc_details
           for (unsigned int i = 0; i < _connected_to_source.size(); ++i)
           {
               id_type p;
-              _create_narrow_band<0>(_connected_to_source[i], band_radius, band, p);
+              _create_narrow_band<0>(_connected_to_source[i], band_radius, p);
 
               #ifdef BK_EMIT_PROGRESS
-              #pragma omp critical
+                  #pragma omp critical
               { prog.increment(1); }
               #endif
           }
@@ -539,10 +606,10 @@ namespace bk::gc_details
           {
               id_type p;
               p[0] = i;
-              _sink_from_narrow_band<1>(band, p);
+              _sink_from_narrow_band<1>(p);
 
               #ifdef BK_EMIT_PROGRESS
-              #pragma omp critical
+                  #pragma omp critical
               { prog.increment(1); }
               #endif
           }

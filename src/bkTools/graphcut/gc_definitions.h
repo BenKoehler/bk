@@ -217,12 +217,7 @@ namespace bk::gc_details
       { return 8U; }
 
       [[nodiscard]] static constexpr double weight_function(double x, double tolerance = 0.5) noexcept
-      {
-          //return std::abs(x) < 1e-10 ? std::numeric_limits<double>::max() : 255.0*255.0/(x*x);
-          //return std::abs(x) < 1e-10 ? std::numeric_limits<double>::max() : 1.0/(x*x);
-          //return 1.0/std::abs(x);
-          return std::exp(-tolerance * std::abs(x));
-      }
+      { return std::exp(-tolerance * std::abs(x)); }
   }; // class struct gcdef
 } // namespace bk::gc_details
 

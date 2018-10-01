@@ -135,6 +135,14 @@ namespace bk::gc_details
       { return get_from_vector_grid(deriv()->_flags, n); }
       /// @}
 
+      /// @{ -------------------------------------------------- NARROW BAND
+      [[nodiscard]] constexpr decltype(auto) band(const id_type& n)
+      { return get_from_vector_grid(deriv()->_band, n); }
+
+      [[nodiscard]] constexpr bool band(const id_type& n) const
+      { return get_from_vector_grid(deriv()->_band, n); }
+      /// @}
+
       //====================================================================================================
       //===== SETTER
       //====================================================================================================
