@@ -57,7 +57,7 @@ namespace bk
     {
         std::string name;
         segmentation3d_type seg3;
-        std::pair<Segmentation3DInfo, unsigned int> seg3info;
+        std::pair<Segmentation3DInfo_, unsigned int> seg3info;
         std::vector<unsigned int> seg3insideids;
         std::vector<unsigned int> seg3outsideids;
         VesselSemantic_ semantic;
@@ -142,7 +142,7 @@ namespace bk
     auto Vessel::segmentation3D() -> segmentation3d_type&
     { return _pdata->seg3; }
 
-    const std::pair<Segmentation3DInfo, unsigned int>& Vessel::segmentation3D_info() const
+    const std::pair<Segmentation3DInfo_, unsigned int>& Vessel::segmentation3D_info() const
     { return _pdata->seg3info; }
 
     std::vector<unsigned int>& Vessel::segmentation3D_inside_ids()
@@ -251,7 +251,7 @@ namespace bk
     {
         //_pdata->seg3            = std::make_unique<segmentation3d_type>();
         _pdata->seg3.set_size(1, 1, 1);
-        _pdata->seg3info.first = Segmentation3DInfo::Magnitude4DTMIP;
+        _pdata->seg3info.first = Segmentation3DInfo_Magnitude4DTMIP;
         _pdata->seg3info.second = 0;
         _pdata->seg3insideids.clear();
         _pdata->seg3outsideids.clear();
@@ -330,37 +330,37 @@ namespace bk
 
     void Vessel::set_seg3d_was_performed_on_magnitude_TMIP()
     {
-        _pdata->seg3info.first = Segmentation3DInfo::Magnitude4DTMIP;
+        _pdata->seg3info.first = Segmentation3DInfo_Magnitude4DTMIP;
         _pdata->seg3info.second = 0;
     }
 
     void Vessel::set_seg3d_was_performed_on_LPC()
     {
-        _pdata->seg3info.first = Segmentation3DInfo::LPC;
+        _pdata->seg3info.first = Segmentation3DInfo_LPC;
         _pdata->seg3info.second = 0;
     }
 
     void Vessel::set_seg3d_was_performed_on_IVSD()
     {
-        _pdata->seg3info.first = Segmentation3DInfo::IVSD;
+        _pdata->seg3info.first = Segmentation3DInfo_IVSD;
         _pdata->seg3info.second = 0;
     }
 
     void Vessel::set_seg3d_was_performed_on_3D_anatomical_image(unsigned int id)
     {
-        _pdata->seg3info.first = Segmentation3DInfo::Anatomical3D;
+        _pdata->seg3info.first = Segmentation3DInfo_Anatomical3D;
         _pdata->seg3info.second = id;
     }
 
     void Vessel::set_seg3d_was_performed_on_4D_anatomical_image_TMIP(unsigned int id)
     {
-        _pdata->seg3info.first = Segmentation3DInfo::Anatomical4DTMIP;
+        _pdata->seg3info.first = Segmentation3DInfo_Anatomical4DTMIP;
         _pdata->seg3info.second = id;
     }
 
     void Vessel::set_seg3d_was_performed_on_4D_signal_intensity_image_TMIP()
     {
-        _pdata->seg3info.first = Segmentation3DInfo::SignalIntensity4DTMIP;
+        _pdata->seg3info.first = Segmentation3DInfo_SignalIntensity4DTMIP;
         _pdata->seg3info.second = 0;
     }
 
@@ -820,7 +820,7 @@ namespace bk
 
         // info
         file.read(reinterpret_cast<char*>(&ui16temp), sizeof(std::uint16_t));
-        _pdata->seg3info.first = static_cast<Segmentation3DInfo>(ui16temp);
+        _pdata->seg3info.first = static_cast<Segmentation3DInfo_>(ui16temp);
 
         file.read(reinterpret_cast<char*>(&ui16temp), sizeof(std::uint16_t));
         _pdata->seg3info.second = ui16temp;

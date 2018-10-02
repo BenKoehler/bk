@@ -31,4 +31,4 @@
 #include <bkCMR/FlowJet.h>
 #include <bkCMR/PhaseUnwrapping2DT.h>
 #include <bkCMR/PhaseUnwrapping3DT.h>
-#include <bkCMR/Segmentation3DInfo.h>
+#include <bkCMR/ESegmentation3DInfo.h>

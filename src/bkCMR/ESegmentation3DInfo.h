@@ -31,14 +31,14 @@ namespace bk
 {
   inline namespace cmr
   {
-    enum class Segmentation3DInfo : int
+    enum Segmentation3DInfo_ : int
     {
-        Magnitude4DTMIP         = 0,
-        LPC                     = 1,
-        Anatomical3D            = 2,
-        Anatomical4DTMIP        = 3,
-        SignalIntensity4DTMIP   = 4,
-        IVSD                    = 5
+        Segmentation3DInfo_Magnitude4DTMIP         = 0,
+        Segmentation3DInfo_LPC                     = 1,
+        Segmentation3DInfo_Anatomical3D            = 2,
+        Segmentation3DInfo_Anatomical4DTMIP        = 3,
+        Segmentation3DInfo_SignalIntensity4DTMIP   = 4,
+        Segmentation3DInfo_IVSD                    = 5
     };
   } // inline namespace cmr
 } // namespace bk

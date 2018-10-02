@@ -40,7 +40,7 @@
 #include <bk/Mesh>
 #include <bk/Line>
 
-#include "Segmentation3DInfo.h"
+#include "ESegmentation3DInfo.h"
 #include "EVesselSemantic.h"
 #include "lib/bkCMR_export.h"
 
@@ -110,7 +110,7 @@ namespace bk
         [[nodiscard]] bool has_segmentation3D() const;
         [[nodiscard]] const segmentation3d_type& segmentation3D() const;
         [[nodiscard]] segmentation3d_type& segmentation3D();
-        [[nodiscard]] const std::pair<Segmentation3DInfo, unsigned int>& segmentation3D_info() const;
+        [[nodiscard]] const std::pair<Segmentation3DInfo_, unsigned int>& segmentation3D_info() const;
         [[nodiscard]] std::vector<unsigned int>& segmentation3D_inside_ids();
         [[nodiscard]] const std::vector<unsigned int>& segmentation3D_inside_ids() const;
         [[nodiscard]] std::vector<unsigned int>& segmentation3D_outside_ids();
