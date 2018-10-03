@@ -104,6 +104,11 @@ namespace bk
       [[nodiscard]] auto segmentation() const -> const segmentation_type&;
       /// @}
 
+      /// @{ -------------------------------------------------- GET IN OUT IMAGES
+      [[nodiscard]] auto inside() const -> const segmentation_type&;
+      [[nodiscard]] auto outside() const -> const segmentation_type&;
+      /// @}
+
       /// @{ -------------------------------------------------- SIGNALS
       [[nodiscard]] bk::Signal<>& signal_graph_cut_finished();
       [[nodiscard]] bk::Signal<>& signal_input_changed();

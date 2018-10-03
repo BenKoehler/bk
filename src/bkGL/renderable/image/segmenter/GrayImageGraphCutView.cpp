@@ -155,6 +155,14 @@ namespace bk
   auto GrayImageGraphCutView::segmentation() const -> const segmentation_type&
   { return _pdata->seg; }
 
+  /// @{ -------------------------------------------------- GET IN OUT IMAGES
+  auto GrayImageGraphCutView::inside() const -> const segmentation_type&
+  { return _pdata->in; }
+
+  auto GrayImageGraphCutView::outside() const -> const segmentation_type&
+  { return _pdata->out; }
+  /// @}
+
   bk::Signal<>& GrayImageGraphCutView::signal_graph_cut_finished()
   { return _pdata->s_gc_finished; }
 
@@ -267,7 +275,7 @@ namespace bk
           _pdata->show_inout_overlay = show;
 
           if (this->is_initialized())
-          {this->emit_signal_update_required();}
+          { this->emit_signal_update_required(); }
       }
   }
 
@@ -454,7 +462,7 @@ namespace bk
               #pragma omp single nowait
               {
                   #ifdef BK_EMIT_PROGRESS
-                  bk::Progress& prog_input = bk_progress.emplace_task(5, ___("Setting graph cut input"));
+                  bk::Progress& prog_input = bk_progress.emplace_task(2, ___("Setting graph cut input"));
                   #endif
 
                   _pdata->gc->clear_source_nodes();
@@ -485,19 +493,27 @@ namespace bk
                   prog_input.set_finished();
                   #endif
 
-                  //_pdata->gc->reset();
-                  //_pdata->gc->update_inside_outside();
                   _pdata->gc->run();
 
                   #ifdef BK_EMIT_PROGRESS
-                  bk::Progress& prog_postpro = bk_progress.emplace_task(6, ___("Post-processing graph cut result"));
+                  bk::Progress& prog_postpro = bk_progress.emplace_task(5, ___("Post-processing graph cut result"));
                   #endif
 
-                  //_gc->write_segmentation(_seg);
+                  /*
+                   * - write segmentation
+                   * - enforce that regions drawn as inside/outside are 1/0 in segmentation
+                   */
                   for (GLuint i = 0; i < static_cast<GLuint>(_pdata->seg.num_values()); ++i)
                   {
-                      const auto gid = bk::list_to_grid_id(_pdata->in.size(), i);
-                      _pdata->seg[i] = _pdata->gc->is_in_segmentation(gid[0], gid[1], gid[2]) ? 1 : 0;
+                      if (_pdata->in[i] != 0)
+                      { _pdata->seg[i] = 1; }
+                      else if (_pdata->out[i] != 0)
+                      { _pdata->seg[i] = 0; }
+                      else
+                      {
+                          const auto gid = bk::list_to_grid_id(_pdata->in.size(), i);
+                          _pdata->seg[i] = _pdata->gc->is_in_segmentation(gid[0], gid[1], gid[2]) ? 1 : 0;
+                      }
                   }
 
                   #ifdef BK_EMIT_PROGRESS
@@ -515,21 +531,6 @@ namespace bk
                   #endif
 
                   _pdata->seg = bk::ConnectedComponentAnalysisKeepLargestRegionImageFilter::apply(_pdata->seg);
-
-                  #ifdef BK_EMIT_PROGRESS
-                  prog_postpro.increment(2);
-                  #endif
-
-                  /*
-                   * enforce that regions drawn as inside/outside are 1/0 in segmentation
-                   */
-                  for (GLuint i = 0; i < static_cast<GLuint>(_pdata->seg.num_values()); ++i)
-                  {
-                      if (_pdata->in[i] != 0)
-                      { _pdata->seg[i] = 1; }
-                      else if (_pdata->out[i] != 0)
-                      { _pdata->seg[i] = 0; }
-                  }
 
                   #ifdef BK_EMIT_PROGRESS
                   prog_postpro.set_finished();
@@ -659,7 +660,7 @@ namespace bk
       }
 
       if (interaction_mode_is_graph_cut())
-      {  process_onscreen_drawing(_mouse().x(), _mouse().y(), true /*mouse was released*/); }
+      { process_onscreen_drawing(_mouse().x(), _mouse().y(), true /*mouse was released*/); }
 
       return !interaction_mode_is_graph_cut();
   }
