@@ -38,6 +38,7 @@
 #include <functional>
 #include <mutex>
 #include <string>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -49,7 +50,8 @@ namespace bk
       //===== DEFINITIONS
       //====================================================================================================
       using self_type = Signal<Args...>;
-      using slot_map_type = std::vector<std::pair<unsigned int, std::function<void(Args...)>>>;
+      //using slot_map_type = std::vector<std::pair<unsigned int /*slot_id*/, std::function<void(Args...)> /*execute_function*/>>;
+      using slot_map_type = std::vector<std::tuple<unsigned int /*slot_id*/, bool /*once*/, std::function<void(Args...)> /*execute_function*/>>;
 
       //====================================================================================================
       //===== MEMBERS
@@ -107,7 +109,7 @@ namespace bk
       [[maybe_unused]] unsigned int connect_member(F&& f, A&& ... a)
       {
           std::unique_lock<std::mutex> lock(_map_mutex);
-          _slots.emplace_back(++_current_id, std::bind(std::forward<F>(f), std::forward<A>(a)...));
+          _slots.emplace_back(++_current_id, false, std::bind(std::forward<F>(f), std::forward<A>(a)...));
           return _current_id;
       }
 
@@ -115,7 +117,7 @@ namespace bk
       [[maybe_unused]] unsigned int connect(const std::function<void(Args...)>& slot)
       {
           std::unique_lock<std::mutex> lock(_map_mutex);
-          _slots.emplace_back(++_current_id, slot);
+          _slots.emplace_back(++_current_id, false, slot);
           return _current_id;
       }
 
@@ -123,8 +125,33 @@ namespace bk
       [[maybe_unused]] unsigned int connect_front(const std::function<void(Args...)>& slot)
       {
           std::unique_lock<std::mutex> lock(_map_mutex);
-          _slots.emplace(_slots.begin(), ++_current_id, slot);
+          _slots.emplace(_slots.begin(), false, ++_current_id, slot);
           return _current_id;
+      }
+
+      //! connects a member function of a given object to this Signal
+      template<typename F, typename... A>
+      [[maybe_unused]] unsigned int connect_member_once(F&& f, A&& ... a)
+      {
+          unsigned int id = connect_member(std::forward<F>(f), std::forward<A>(a)...);
+          std::get<1>(_slots.back()) = true;
+          return id;
+      }
+
+      //! connects a std::function to the signal. The returned value can be used to disconnect the function again
+      [[maybe_unused]] unsigned int connect_once(const std::function<void(Args...)>& slot)
+      {
+          unsigned int id = connect(slot);
+          std::get<1>(_slots.back()) = true;
+          return id;
+      }
+
+      //! connects a std::function to the signal. The returned value can be used to disconnect the function again.
+      [[maybe_unused]] unsigned int connect_front_once(const std::function<void(Args...)>& slot)
+      {
+          unsigned int id = connect_front(slot);
+          std::get<1>(_slots.front()) = true;
+          return id;
       }
       /// @}
 
@@ -134,9 +161,9 @@ namespace bk
       {
           std::unique_lock<std::mutex> lock(_map_mutex);
 
-          _slots.erase(std::remove_if(_slots.begin(), _slots.end(), [&](const std::pair<unsigned int, std::function<void(Args...)>>& x) -> bool
+          _slots.erase(std::remove_if(_slots.begin(), _slots.end(), [&](const typename slot_map_type::value_type& x) -> bool
           {
-              return x.first == id;
+              return std::get<0>(x) == id;
           }), _slots.end());
       }
 
@@ -163,7 +190,11 @@ namespace bk
           {
               std::unique_lock<std::mutex> lock(_map_mutex);
               for (auto it = _slots.begin(); it != _slots.end(); ++it)
-              { it->second(p...); }
+              { std::get<2>(*it)(p...); }
+
+              // remove one time executions
+              _slots.erase(std::remove_if(_slots.begin(), _slots.end(), [](const typename slot_map_type::value_type& x)
+              { return std::get<1>(x); }), _slots.end());
           }
       }
       /// @}
