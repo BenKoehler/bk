@@ -104,6 +104,9 @@ namespace bk
       /// @{ -------------------------------------------------- START/END POINTS
       [[nodiscard]] GLint start_point_id() const;
       [[nodiscard]] const std::vector<GLint>& end_point_ids() const;
+
+      [[nodiscard]] bool has_start_point_id() const;
+      [[nodiscard]] bool has_end_point_ids() const;
       /// @}
 
       /// @{ -------------------------------------------------- IS INITIALIZED

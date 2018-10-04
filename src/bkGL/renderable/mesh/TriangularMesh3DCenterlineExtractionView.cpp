@@ -204,6 +204,12 @@ namespace bk
 
   const std::vector<GLint>& TriangularMesh3DCenterlineExtractionView::end_point_ids() const
   { return _pdata->end_point_ids; }
+
+  bool TriangularMesh3DCenterlineExtractionView::has_start_point_id() const
+  { return _pdata->start_point_id != -1; }
+
+  bool TriangularMesh3DCenterlineExtractionView::has_end_point_ids() const
+  { return !_pdata->end_point_ids.empty(); }
   /// @}
 
   /// @{ -------------------------------------------------- IS INITIALIZED
@@ -530,7 +536,7 @@ namespace bk
           else
           { _pdata->shader_phong_ghosted.init_from_sources(SL::mesh::picking::vert_phong(), SL::mesh::phong::frag_ghosted_oit()); }
       }
-      
+
       _pdata->shader_picking_ids.init_from_sources(SL::mesh::picking::vert(), SL::mesh::picking::frag());
       _pdata->shader_selection_sphere.init_from_sources(SL::mesh::picking::vert_current_selection(), SL::mesh::picking::frag_current_selection(), SL::mesh::picking::geom_current_selection());
   }
@@ -559,7 +565,7 @@ namespace bk
       _pdata->ubo_selection_sphere.init_from_registered_values_size();
       _pdata->ubo_selection_sphere.release();
   }
-  
+
   void TriangularMesh3DCenterlineExtractionView::init_fbo_picking()
   {
       _pdata->fbo_picking.clear();
@@ -628,8 +634,10 @@ namespace bk
   }
 
   void TriangularMesh3DCenterlineExtractionView::on_oit_enabled(bool /*b*/)
-  {  if (_pdata->mode == details::MeshRenderMode_FrontFaceCullingWithGhostedView)
-      { init_shader(); } }
+  {
+      if (_pdata->mode == details::MeshRenderMode_FrontFaceCullingWithGhostedView)
+      { init_shader(); }
+  }
 
   void TriangularMesh3DCenterlineExtractionView::on_animation_enabled(bool /*b*/)
   { /* do nothing */ }
