@@ -29,9 +29,12 @@
 
 namespace bk::details
 {
-  enum class MeshRenderMode : int
+  enum MeshRenderMode_ : int
   {
-      Solid = 0, FrontFaceCullingWithGhostedView = 1, WireFrame = 2, Silhouette = 3
+      MeshRenderMode_Solid = 0, //
+      MeshRenderMode_FrontFaceCullingWithGhostedView = 1, //
+      MeshRenderMode_WireFrame = 2, //
+      MeshRenderMode_Silhouette = 3 //
   };
 } // namespace bk::details
 
