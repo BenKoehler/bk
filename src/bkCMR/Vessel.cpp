@@ -26,6 +26,8 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <fstream>
+#include <vector>
 
 #include <bkCMR/rotation_angle_2d.h>
 #include <bk/BitVector>
@@ -63,15 +65,17 @@ namespace bk
         VesselSemantic_ semantic;
         mesh_type mesh;
         //pathlineset_type                            pathlines;
-        //unsigned int                                centerline_seed_id;
-        //std::vector<unsigned int>                   centerline_target_ids;
-        //centerlineset_type                          centerlines;
+        unsigned int centerline_seed_id;
+        std::vector<unsigned int> centerline_target_ids;
+        std::vector<Line3D> centerlines;
         //std::vector<measuring_plane_type> measuring_planes;
         //std::vector<FlowJet_CMR> flowjets;
         //FlowJetSet_CMR flowjets;
 
         Impl()
-            : semantic(VesselSemantic_None)
+            : name(""),
+              semantic(VesselSemantic_None),
+              centerline_seed_id(0)
         { /* do nothing */ }
 
         Impl(const Impl&) = default;
@@ -175,23 +179,26 @@ namespace bk
     //unsigned int Vessel::num_pathlines() const
     //{ return _pdata->pathlines.size(); }
     //
-    //auto Vessel::centerlines() const -> const centerlineset_type&
-    //{ return _pdata->centerlines; }
-    //
-    //auto Vessel::centerlines() -> centerlineset_type&
-    //{ return _pdata->centerlines; }
-    //
-    //unsigned int Vessel::num_centerlines() const
-    //{ return _pdata->centerlines.size(); }
-    //
-    //unsigned int Vessel::centerline_seed_id() const
-    //{ return _pdata->centerline_seed_id; }
-    //
-    //const std::vector<unsigned int>& Vessel::centerline_target_ids() const
-    //{ return _pdata->centerline_target_ids; }
-    //
-    //bool Vessel::has_centerline_ids() const
-    //{ return !_pdata->centerline_target_ids.empty(); }
+    const std::vector<Line3D>& Vessel::centerlines() const
+    { return _pdata->centerlines; }
+
+    std::vector<Line3D>& Vessel::centerlines()
+    { return _pdata->centerlines; }
+
+    unsigned int Vessel::num_centerlines() const
+    { return _pdata->centerlines.size(); }
+
+    bool Vessel::has_centerline_ids() const
+    { return !_pdata->centerline_target_ids.empty(); }
+
+    unsigned int Vessel::centerline_seed_id() const
+    { return _pdata->centerline_seed_id; }
+
+    const std::vector<unsigned int>& Vessel::centerline_target_ids() const
+    { return _pdata->centerline_target_ids; }
+
+    bool Vessel::has_centerlines() const
+    { return !_pdata->centerlines.empty(); }
 
     //auto Vessel::measuring_planes() -> std::vector<measuring_plane_type>&
     //{ return _pdata->measuring_planes; }
@@ -267,14 +274,12 @@ namespace bk
     }
 
     void Vessel::clear_centerlines()
-    {
-        //_pdata->centerlines.clear();
-        // todo 
-    }
+    { _pdata->centerlines.clear(); }
 
     void Vessel::clear_centerline_ids()
     {
-        // todo
+        _pdata->centerline_seed_id = 0;
+        _pdata->centerline_target_ids.clear();
     }
 
     void Vessel::clear_measuring_planes()
@@ -364,33 +369,30 @@ namespace bk
         _pdata->seg3info.second = 0;
     }
 
-    //void Vessel::set_centerline_seed_id(unsigned int seedid)
-    //{ _pdata->centerline_seed_id = seedid; }
+    void Vessel::set_centerline_seed_id(unsigned int seedid)
+    { _pdata->centerline_seed_id = seedid; }
 
-    //void Vessel::set_centerline_target_ids(std::vector<unsigned int> targetids)
-    //{ _pdata->centerline_target_ids = targetids; }
+    void Vessel::set_centerline_target_ids(std::vector<unsigned int> targetids)
+    { _pdata->centerline_target_ids = targetids; }
 
-    //void Vessel::add_centerline_target_id(unsigned int targetid)
-    //{
-    //    _pdata->centerline_target_ids.push_back(targetid);
-    //
-    //    #if defined(__GNUC__) && defined(_OPENMP)
-    //    __gnu_parallel
-    //    #else
-    //    std
-    //    #endif
-    //    ::sort(_pdata->centerline_target_ids.begin(), _pdata->centerline_target_ids.end());
-    //    _pdata->centerline_target_ids.erase(std::unique(_pdata->centerline_target_ids.begin(), _pdata->centerline_target_ids.end()), _pdata->centerline_target_ids.end());
-    //}
+    void Vessel::add_centerline_target_id(unsigned int targetid)
+    {
+        _pdata->centerline_target_ids.push_back(targetid);
 
-    //void Vessel::clear_centerline_ids()
-    //{
-    //    _pdata->centerline_seed_id = 0;
-    //    _pdata->centerline_target_ids.clear();
-    //}
+        std::sort(_pdata->centerline_target_ids.begin(), _pdata->centerline_target_ids.end());
+        _pdata->centerline_target_ids.erase(std::unique(_pdata->centerline_target_ids.begin(), _pdata->centerline_target_ids.end()), _pdata->centerline_target_ids.end());
+    }
+
+    void Vessel::add_centerline(const Line3D& cl)
+    { _pdata->centerlines.push_back(cl); }
+
+    void Vessel::add_centerline(Line3D&& cl)
+    { _pdata->centerlines.emplace_back(std::move(cl)); }
+
+    void Vessel::add_centerlines(std::vector<Line3D>::iterator first, std::vector<Line3D>::iterator last)
+    { _pdata->centerlines.insert(_pdata->centerlines.end(), first, last); }
 
     Vessel& Vessel::operator=(const Vessel&) = default;
-
     Vessel& Vessel::operator=(Vessel&&) noexcept = default;
 
     //====================================================================================================
@@ -566,37 +568,37 @@ namespace bk
     //    std::cout << "Calculated Advanced Attributes (" << numLines << " lines; " << numPointsTotal << " points) in " << clock.time_in_sec() << " seconds" << std::endl;
     //}
 
-    //std::pair<int /*centerlineId*/, bk::KDPointInfo<bk::Vec3d>> Vessel::closest_centerline_and_point_id(const bk::Vec3d& pt)
-    //{
-    //    for (unsigned int centerlineId = 0; centerlineId < centerlines().num_lines(); ++centerlineId)
-    //    {
-    //        auto cl = centerlines().line(centerlineId);
-    //
-    //        #pragma omp critical
-    //        {
-    //            if (!cl->geometry().has_kdtree())
-    //            { cl->geometry().construct_kd_tree(); }
-    //        };
-    //    } // for centerlineId
-    //
-    //    int                        closestCenterlineId = -1;
-    //    bk::KDPointInfo<bk::Vec3d> closest;
-    //    closest.distance_to_query = std::numeric_limits<double>::max();
-    //
-    //    for (unsigned int clid = 0; clid < centerlines().num_lines(); ++clid)
-    //    {
-    //        auto& cl = *centerlines().line(clid);
-    //        bk::KDPointInfo<bk::Vec3d> cp = cl.geometry().closest_point(pt);
-    //
-    //        if (cp.distance_to_query < closest.distance_to_query)
-    //        {
-    //            closest             = std::move(cp);
-    //            closestCenterlineId = clid;
-    //        }
-    //    } // for clid
-    //
-    //    return std::make_pair(closestCenterlineId, std::move(closest));
-    //}
+    std::pair<int /*centerlineId*/, bk::KDPointInfo<bk::Vec3d>> Vessel::closest_centerline_and_point_id(const bk::Vec3d& pt)
+    {
+        for (unsigned int centerlineId = 0; centerlineId < num_centerlines(); ++centerlineId)
+        {
+            Line3D& cl = _pdata->centerlines[centerlineId];
+
+            #pragma omp critical
+            {
+                if (!cl.geometry().has_kdtree())
+                { cl.geometry().construct_kd_tree(); }
+            };
+        } // for centerlineId
+
+        int closestCenterlineId = -1;
+        bk::KDPointInfo<bk::Vec3d> closest;
+        closest.distance_to_query = std::numeric_limits<double>::max();
+
+        for (unsigned int clid = 0; clid < num_centerlines(); ++clid)
+        {
+            Line3D& cl = _pdata->centerlines[clid];
+            bk::KDPointInfo<bk::Vec3d> cp = cl.geometry().closest_point(pt);
+
+            if (cp.distance_to_query < closest.distance_to_query)
+            {
+                closest = std::move(cp);
+                closestCenterlineId = clid;
+            }
+        } // for clid
+
+        return std::make_pair(closestCenterlineId, std::move(closest));
+    }
 
     //====================================================================================================
     //===== I/O
@@ -841,313 +843,308 @@ namespace bk
         return true;
     }
 
-    //bool Vessel::save_centerline_ids(std::string_view filepath) const
-    //{
-    //    #ifdef BK_EMIT_PROGRESS
-    //    Progress& prog           = bk_progress.emplace_task(0, 3, ___("Saving centerline end points"));
-    //    #endif
-    //
-    //    //------------------------------------------------------------------------------------------------------
-    //    // check filename
-    //    //------------------------------------------------------------------------------------------------------
-    //    std::string       fname(filepath);
-    //    const std::string suffix = ".clids";
-    //    if (fname.empty())
-    //    { fname = "centerlineIDs" + suffix; }
-    //    else if (!string_utils::ends_with(fname, suffix))
-    //    { fname.append(suffix); }
-    //
-    //    //------------------------------------------------------------------------------------------------------
-    //    // create file
-    //    //------------------------------------------------------------------------------------------------------
-    //    std::ofstream file(fname, std::ios_base::out | std::ios_base::binary);
-    //    if (!file.good())
-    //    {
-    //        #ifdef BK_EMIT_PROGRESS
-    //        prog.set_finished();
-    //        #endif
-    //        return false;
-    //    }
-    //
-    //    #ifdef BK_EMIT_PROGRESS
-    //    prog.increment(1);
-    //    #endif
-    //
-    //    // temp
-    //    std::uint32_t ui32temp = 0;
-    //
-    //    // seed id
-    //    ui32temp = static_cast<std::uint32_t>(_pdata->centerline_seed_id);
-    //    file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
-    //
-    //    #ifdef BK_EMIT_PROGRESS
-    //    prog.increment(1);
-    //    #endif
-    //
-    //    // num target ids
-    //    ui32temp = _pdata->centerline_target_ids.size();
-    //    file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
-    //
-    //    // target ids
-    //    for (unsigned int i = 0; i < _pdata->centerline_target_ids.size(); ++i)
-    //    {
-    //        ui32temp = static_cast<std::uint32_t>(_pdata->centerline_target_ids[i]);
-    //        file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
-    //    }
-    //
-    //    file.close();
-    //
-    //    #ifdef BK_EMIT_PROGRESS
-    //    //prog.increment(1);
-    //    prog.set_finished();
-    //    #endif
-    //
-    //    return true;
-    //}
-    //
-    //bool Vessel::load_centerline_ids(std::string_view filepath)
-    //{
-    //    #ifdef BK_EMIT_PROGRESS
-    //    Progress& prog = bk_progress.emplace_task(0, 3, ___("Loading centerline end points"));
-    //    #endif
-    //
-    //    _pdata->centerline_target_ids.clear();
-    //    _pdata->centerline_seed_id = 0;
-    //
-    //    //------------------------------------------------------------------------------------------------------
-    //    // check file ending
-    //    //------------------------------------------------------------------------------------------------------
-    //    if (!string_utils::ends_with(filepath, ".clids"))
-    //    {
-    //        #ifdef BK_EMIT_PROGRESS
-    //        prog.set_finished();
-    //        #endif
-    //        return false;
-    //    }
-    //
-    //    //------------------------------------------------------------------------------------------------------
-    //    // create file
-    //    //------------------------------------------------------------------------------------------------------
-    //    std::ifstream file(filepath, std::ios_base::in | std::ios_base::binary);
-    //    if (!file.good())
-    //    {
-    //        #ifdef BK_EMIT_PROGRESS
-    //        prog.set_finished();
-    //        #endif
-    //        return false;
-    //    }
-    //
-    //    #ifdef BK_EMIT_PROGRESS
-    //    prog.increment(1);
-    //    #endif
-    //
-    //    // temp
-    //    std::uint32_t ui32temp = 0;
-    //
-    //    // seed id
-    //    file.read(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
-    //    _pdata->centerline_seed_id = ui32temp;
-    //
-    //    #ifdef BK_EMIT_PROGRESS
-    //    prog.increment(1);
-    //    #endif
-    //
-    //    // num target ids
-    //    std::uint32_t numTargetIds = 0;
-    //    file.read(reinterpret_cast<char*>(&numTargetIds), sizeof(std::uint32_t));
-    //    _pdata->centerline_target_ids.resize(numTargetIds);
-    //
-    //    // target ids
-    //    for (unsigned int i = 0; i < numTargetIds; ++i)
-    //    {
-    //        file.read(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
-    //        _pdata->centerline_target_ids[i] = ui32temp;
-    //    }
-    //
-    //    file.close();
-    //
-    //    #ifdef BK_EMIT_PROGRESS
-    //    //prog.increment(1);
-    //    prog.set_finished();
-    //    #endif
-    //
-    //    return true;
-    //}
-    //
-    //bool Vessel::save_centerlines(std::string_view filepath) const
-    //{
-    //    #ifdef BK_EMIT_PROGRESS
-    //    Progress& prog           = bk_progress.emplace_task(0, 3, ___("Saving centerlines"));
-    //    #endif
-    //
-    //    //------------------------------------------------------------------------------------------------------
-    //    // check filename
-    //    //------------------------------------------------------------------------------------------------------
-    //    std::string       fname(filepath);
-    //    const std::string suffix = ".cl";
-    //    if (fname.empty())
-    //    { fname = "centerlines" + suffix; }
-    //    else if (!string_utils::ends_with(fname, suffix))
-    //    { fname.append(suffix); }
-    //
-    //    //------------------------------------------------------------------------------------------------------
-    //    // create file
-    //    //------------------------------------------------------------------------------------------------------
-    //    std::ofstream file(fname, std::ios_base::out | std::ios_base::binary);
-    //    if (!file.good())
-    //    {
-    //        #ifdef BK_EMIT_PROGRESS
-    //        prog.set_finished();
-    //        #endif
-    //        return false;
-    //    }
-    //
-    //    #ifdef BK_EMIT_PROGRESS
-    //    prog.increment(1);
-    //    #endif
-    //
-    //    // temp
-    //    std::uint32_t ui32temp = 0;
-    //    double        dtemp    = 0;
-    //
-    //    // num centerlines
-    //    ui32temp = static_cast<std::uint32_t>(centerlines().num_lines());
-    //    file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
-    //
-    //    // centerline
-    //    for (unsigned int i = 0; i < centerlines().num_lines(); ++i)
-    //    {
-    //        const auto& l = *centerlines().line(i);
-    //
-    //        // num points of centerline
-    //        ui32temp = static_cast<std::uint32_t>(l.geometry().num_points());
-    //        file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
-    //
-    //        for (unsigned int p = 0; p < l.geometry().num_points(); ++p)
-    //        {
-    //            const auto& pt = l.geometry().point(p);
-    //
-    //            // 3d point coordinates
-    //            for (unsigned int k = 0; k < 3; ++k)
-    //            {
-    //                dtemp = pt[k];
-    //                file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //            }
-    //
-    //            // MaximumInscribedSphereRadius
-    //            auto misr = l.point_attributes().get_MaximumInscribedSphereRadius_value(p);
-    //            dtemp = misr != nullptr ? *misr : 0;
-    //            file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //        }
-    //    }
-    //
-    //    file.close();
-    //
-    //    #ifdef BK_EMIT_PROGRESS
-    //    //prog.increment(1);
-    //    prog.set_finished();
-    //    #endif
-    //
-    //    return true;
-    //}
-    //
-    //bool Vessel::load_centerlines(std::string_view filepath)
-    //{
-    //    #ifdef BK_EMIT_PROGRESS
-    //    Progress& prog = bk_progress.emplace_task(0, 3, ___("Loading centerlines"));
-    //    #endif
-    //
-    //    //------------------------------------------------------------------------------------------------------
-    //    // check file ending
-    //    //------------------------------------------------------------------------------------------------------
-    //    const std::string suffix = ".cl";
-    //    if (!string_utils::ends_with(filepath, suffix))
-    //    {
-    //        #ifdef BK_EMIT_PROGRESS
-    //        prog.set_finished();
-    //        #endif
-    //        return false;
-    //    }
-    //
-    //    //------------------------------------------------------------------------------------------------------
-    //    // open file
-    //    //------------------------------------------------------------------------------------------------------
-    //    std::ifstream file(filepath, std::ios_base::in | std::ios_base::binary);
-    //    if (!file.good())
-    //    {
-    //        #ifdef BK_EMIT_PROGRESS
-    //        prog.set_finished();
-    //        #endif
-    //        return false;
-    //    }
-    //
-    //    #ifdef BK_EMIT_PROGRESS
-    //    prog.increment(1);
-    //    #endif
-    //
-    //    // num centerlines
-    //    std::uint32_t numCenterlines = 0;
-    //    file.read(reinterpret_cast<char*>(&numCenterlines), sizeof(std::uint32_t));
-    //
-    //    centerlines().lines().resize(numCenterlines);
-    //
-    //    std::vector<std::future<void>> fut;
-    //    fut.reserve(numCenterlines);
-    //
-    //    // centerline
-    //    for (unsigned int i = 0; i < numCenterlines; ++i)
-    //    {
-    //        auto& l = *centerlines().line(i);
-    //
-    //        // num points of centerline
-    //        std::uint32_t numPoints = 0;
-    //        file.read(reinterpret_cast<char*>(&numPoints), sizeof(std::uint32_t));
-    //
-    //        l.geometry().reserve(numPoints);
-    //
-    //        for (unsigned int p = 0; p < numPoints; ++p)
-    //        {
-    //            // 3d point coordinates
-    //            double dtemp0 = 0;
-    //            double dtemp1 = 0;
-    //            double dtemp2 = 0;
-    //
-    //            file.read(reinterpret_cast<char*>(&dtemp0), sizeof(double));
-    //            file.read(reinterpret_cast<char*>(&dtemp1), sizeof(double));
-    //            file.read(reinterpret_cast<char*>(&dtemp2), sizeof(double));
-    //
-    //            l.geometry().emplace_back(dtemp0, dtemp1, dtemp2);
-    //
-    //            // MaximumInscribedSphereRadius
-    //            double misr = 0;
-    //            file.read(reinterpret_cast<char*>(&misr), sizeof(double));
-    //            l.point_attributes().set_MaximumInscribedSphereRadius_value(p, misr);
-    //        }
-    //
-    //        fut.push_back(bk_threadpool.enqueue([=]()
-    //                                            {
-    //                                                //constexpr const unsigned int binomial_smooth_iterations = 25; // todo options
-    //                                                //constexpr const unsigned int binomial_smooth_kernel_size = 5; // todo options
-    //                                                //centerlines().line(i)->calc_consistent_local_coordinate_systems(binomial_smooth_iterations, binomial_smooth_kernel_size);
-    //
-    //                                                centerlines().line(i)->geometry().construct_kd_tree();
-    //                                                centerlines().line(i)->calc_consistent_local_coordinate_systems();
-    //                                            }));
-    //    }
-    //
-    //    for (auto& f : fut)
-    //    { f.get(); }
-    //
-    //    file.close();
-    //
-    //    #ifdef BK_EMIT_PROGRESS
-    //    //prog.increment(1);
-    //    prog.set_finished();
-    //    #endif
-    //
-    //    return true;
-    //}
-    //
+    bool Vessel::save_centerline_ids(std::string_view filepath) const
+    {
+        #ifdef BK_EMIT_PROGRESS
+        Progress& prog = bk_progress.emplace_task(3, ___("Saving centerline end points"));
+        #endif
+
+        //------------------------------------------------------------------------------------------------------
+        // check filename
+        //------------------------------------------------------------------------------------------------------
+        std::string fname(filepath);
+        const std::string suffix = ".clids";
+        if (fname.empty())
+        { fname = "centerlineIDs" + suffix; }
+        else if (!string_utils::ends_with(fname, suffix))
+        { fname.append(suffix); }
+
+        //------------------------------------------------------------------------------------------------------
+        // create file
+        //------------------------------------------------------------------------------------------------------
+        std::ofstream file(fname, std::ios_base::out | std::ios_base::binary);
+        if (!file.good())
+        {
+            #ifdef BK_EMIT_PROGRESS
+            prog.set_finished();
+            #endif
+            return false;
+        }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
+
+        // temp
+        std::uint32_t ui32temp = 0;
+
+        // seed id
+        ui32temp = static_cast<std::uint32_t>(_pdata->centerline_seed_id);
+        file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
+
+        // num target ids
+        ui32temp = _pdata->centerline_target_ids.size();
+        file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
+
+        // target ids
+        for (unsigned int i = 0; i < _pdata->centerline_target_ids.size(); ++i)
+        {
+            ui32temp = static_cast<std::uint32_t>(_pdata->centerline_target_ids[i]);
+            file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
+        }
+
+        file.close();
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        return true;
+    }
+
+    bool Vessel::load_centerline_ids(std::string_view filepath)
+    {
+        #ifdef BK_EMIT_PROGRESS
+        Progress& prog = bk_progress.emplace_task(3, ___("Loading centerline end points"));
+        #endif
+
+        _pdata->centerline_target_ids.clear();
+        _pdata->centerline_seed_id = 0;
+
+        //------------------------------------------------------------------------------------------------------
+        // check file ending
+        //------------------------------------------------------------------------------------------------------
+        if (!string_utils::ends_with(filepath, ".clids"))
+        {
+            #ifdef BK_EMIT_PROGRESS
+            prog.set_finished();
+            #endif
+            return false;
+        }
+
+        //------------------------------------------------------------------------------------------------------
+        // create file
+        //------------------------------------------------------------------------------------------------------
+        std::ifstream file(filepath.data(), std::ios_base::in | std::ios_base::binary);
+        if (!file.good())
+        {
+            #ifdef BK_EMIT_PROGRESS
+            prog.set_finished();
+            #endif
+            return false;
+        }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
+
+        // temp
+        std::uint32_t ui32temp = 0;
+
+        // seed id
+        file.read(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
+        _pdata->centerline_seed_id = ui32temp;
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
+
+        // num target ids
+        std::uint32_t numTargetIds = 0;
+        file.read(reinterpret_cast<char*>(&numTargetIds), sizeof(std::uint32_t));
+        _pdata->centerline_target_ids.resize(numTargetIds);
+
+        // target ids
+        for (unsigned int i = 0; i < numTargetIds; ++i)
+        {
+            file.read(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
+            _pdata->centerline_target_ids[i] = ui32temp;
+        }
+
+        file.close();
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        return true;
+    }
+
+    bool Vessel::save_centerlines(std::string_view filepath) const
+    {
+        #ifdef BK_EMIT_PROGRESS
+        Progress& prog = bk_progress.emplace_task(3, ___("Saving centerlines"));
+        #endif
+
+        //------------------------------------------------------------------------------------------------------
+        // check filename
+        //------------------------------------------------------------------------------------------------------
+        std::string fname(filepath);
+        const std::string suffix = ".cl";
+        if (fname.empty())
+        { fname = "centerlines" + suffix; }
+        else if (!string_utils::ends_with(fname, suffix))
+        { fname.append(suffix); }
+
+        //------------------------------------------------------------------------------------------------------
+        // create file
+        //------------------------------------------------------------------------------------------------------
+        std::ofstream file(fname, std::ios_base::out | std::ios_base::binary);
+        if (!file.good())
+        {
+            #ifdef BK_EMIT_PROGRESS
+            prog.set_finished();
+            #endif
+            return false;
+        }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
+
+        // temp
+        std::uint32_t ui32temp = 0;
+        double dtemp = 0;
+
+        // num centerlines
+        ui32temp = static_cast<std::uint32_t>(num_centerlines());
+        file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
+
+        // centerline
+        for (unsigned int i = 0; i < num_centerlines(); ++i)
+        {
+            const Line3D& l = _pdata->centerlines[i];
+
+            // num points of centerline
+            ui32temp = static_cast<std::uint32_t>(l.geometry().num_points());
+            file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
+
+            const bool hasRadius = l.point_attribute_map().has_attribute(attribute_info::radius());
+
+            for (unsigned int p = 0; p < l.geometry().num_points(); ++p)
+            {
+                const auto& pt = l.geometry().point(p);
+
+                // 3d point coordinates
+                for (unsigned int k = 0; k < 3; ++k)
+                {
+                    dtemp = pt[k];
+                    file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
+                }
+
+                // radius
+                dtemp = 0;
+                if (hasRadius)
+                { dtemp = l.template point_attribute_value<attribute_info::radius()>(p); }
+
+                file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
+            }
+        }
+
+        file.close();
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        return true;
+    }
+
+    bool Vessel::load_centerlines(std::string_view filepath)
+    {
+        #ifdef BK_EMIT_PROGRESS
+        Progress& prog = bk_progress.emplace_task(3, ___("Loading centerlines"));
+        #endif
+
+        //------------------------------------------------------------------------------------------------------
+        // check file ending
+        //------------------------------------------------------------------------------------------------------
+        const std::string suffix = ".cl";
+        if (!string_utils::ends_with(filepath, suffix))
+        {
+            #ifdef BK_EMIT_PROGRESS
+            prog.set_finished();
+            #endif
+            return false;
+        }
+
+        //------------------------------------------------------------------------------------------------------
+        // open file
+        //------------------------------------------------------------------------------------------------------
+        std::ifstream file(filepath.data(), std::ios_base::in | std::ios_base::binary);
+        if (!file.good())
+        {
+            #ifdef BK_EMIT_PROGRESS
+            prog.set_finished();
+            #endif
+            return false;
+        }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
+
+        // num centerlines
+        std::uint32_t numCenterlines = 0;
+        file.read(reinterpret_cast<char*>(&numCenterlines), sizeof(std::uint32_t));
+
+        _pdata->centerlines.resize(numCenterlines);
+
+        std::vector<std::future<void>> fut;
+        fut.reserve(numCenterlines);
+
+        // centerline
+        for (unsigned int i = 0; i < numCenterlines; ++i)
+        {
+            Line3D& l = _pdata->centerlines[i];
+
+            // num points of centerline
+            std::uint32_t numPoints = 0;
+            file.read(reinterpret_cast<char*>(&numPoints), sizeof(std::uint32_t));
+
+            l.geometry().reserve(numPoints);
+            std::vector<double>& rad = l.template add_point_attribute_vector<attribute_info::radius()>();
+
+            for (unsigned int p = 0; p < numPoints; ++p)
+            {
+                // 3d point coordinates
+                double dtemp0 = 0;
+                double dtemp1 = 0;
+                double dtemp2 = 0;
+
+                file.read(reinterpret_cast<char*>(&dtemp0), sizeof(double));
+                file.read(reinterpret_cast<char*>(&dtemp1), sizeof(double));
+                file.read(reinterpret_cast<char*>(&dtemp2), sizeof(double));
+
+                l.geometry().emplace_back(dtemp0, dtemp1, dtemp2);
+
+                // radius
+                file.read(reinterpret_cast<char*>(&rad[p]), sizeof(double));
+            }
+
+            fut.push_back(bk_threadpool.enqueue([&]()
+                                                {
+                                                    _pdata->centerlines[i].geometry().construct_kd_tree();
+                                                    _pdata->centerlines[i].calc_consistent_local_coordinate_systems();
+                                                }));
+        }
+
+        for (auto& f : fut)
+        { f.get(); }
+
+        file.close();
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        return true;
+    }
+
     //bool Vessel::save_measuringplanes(std::string_view filepath) const
     //{
     //    #ifdef BK_EMIT_PROGRESS

@@ -185,7 +185,7 @@ namespace bk
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> lpc() const;
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> lpc(bool load_flow_img_if_necessary);
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> ivsd() const;
-        [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> ivsd(bool load_flow_img_if_necessary);
+        [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> ivsd(bool load_flow_img_if_necessary, DatasetFilter_ flags = DatasetFilter_FlowDirCorrection);
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> tmip_magnitude_3dt() const;
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> tmip_signal_intensity_3dt() const;
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> tmip_anatomical_3dt(unsigned int dcmImgId) const;
@@ -193,6 +193,9 @@ namespace bk
         [[nodiscard]] std::unique_ptr<DicomImage<double, 4>> pressure_map(PressureMapImageFilter pmf) const;
         [[nodiscard]] std::unique_ptr<DicomImage<double, 4>> pressure_map() const;
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> vessel_segmentation_in_flow_field_3dt_size(const Vessel& v) const;
+
+        [[maybe_unused]] bool extract_centerlines(Vessel* v, unsigned int upscale = 3, int distance_penalty_exponent = 5, unsigned int smooth_iterations = 500, unsigned int smooth_kernel_size = 3, double smooth_relaxation = 0.1);
+        [[maybe_unused]] bool extract_centerlines(unsigned int upscale = 3, int distance_penalty_exponent = 5, unsigned int smooth_iterations = 500, unsigned int smooth_kernel_size = 3, double smooth_relaxation = 0.1);
 
         // todo: 2dt centerline cuts
 

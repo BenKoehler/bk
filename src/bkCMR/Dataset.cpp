@@ -28,7 +28,9 @@
 #include <future>
 #include <utility>
 
+#include <bk/Clock>
 #include <bkCMR/Dataset.h>
+#include <bkCMR/CenterlineExtractor.h>
 #include <bkCMR/FlowDirCorrection.h>
 #include <bkCMR/FlowImage2DT.h>
 #include <bkCMR/FlowImage3DT.h>
@@ -243,16 +245,24 @@ namespace bk
 
     bool Dataset::vessel_has_centerline_ids(const Vessel* v) const
     {
-        // todo
+        if (v == nullptr)
+        {
+            std::cerr << "Dataset::vessel_has_centerline_ids - Vessel (v) is nullptr" << std::endl;
+            return false;
+        }
 
-        return false;
+        return v->has_centerline_ids();
     }
 
     bool Dataset::vessel_has_centerlines(const Vessel* v) const
     {
-        // todo
+        if (v == nullptr)
+        {
+            std::cerr << "Dataset::vessel_has_centerline_ids - Vessel (v) is nullptr" << std::endl;
+            return false;
+        }
 
-        return false;
+        return v->has_centerlines();
     }
 
     bool Dataset::vessels_have_centerline_ids() const
@@ -733,13 +743,13 @@ namespace bk
         return IVSDImageFilter::apply(_pdata->flow_image_3dt);
     }
 
-    std::unique_ptr<DicomImage<double, 3>> Dataset::ivsd(bool load_flow_img_if_necessary)
+    std::unique_ptr<DicomImage<double, 3>> Dataset::ivsd(bool load_flow_img_if_necessary, DatasetFilter_ flags)
     {
         if (has_local_image_copy(filepath_ivsd()))
         { return load_local_image_copy(filepath_ivsd()); }
 
         if (load_flow_img_if_necessary && !is_flow_image_3dt_loaded())
-        { load_flow_image_3dt(); }
+        { load_flow_image_3dt(flags); }
 
         return ivsd();
     }
@@ -927,6 +937,69 @@ namespace bk
     {
         assert(is_flow_image_3dt_loaded() && "3dt flow image must be loaded!");
         return VesselSegmentationInFlowFieldSizeImageFilter::apply(_pdata->flow_image_3dt, v);
+    }
+
+    bool Dataset::extract_centerlines(Vessel* v, unsigned int upscale, int distance_penalty_exponent, unsigned int smooth_iterations, unsigned int smooth_kernel_size, double smooth_relaxation)
+    {
+        if (v == nullptr)
+        {
+            std::cerr << "Dataset::extract_centerlines - Vessel (v) is nullptr!" << std::endl;
+            return false;
+        }
+
+        CenterlineExtractor centerlineExtractor;
+        centerlineExtractor.set_image_upscale(upscale);
+        centerlineExtractor.set_distance_penalty_exponent(distance_penalty_exponent);
+        centerlineExtractor.set_num_smooth_iterations(smooth_iterations);
+        centerlineExtractor.set_smooth_kernel_size(smooth_kernel_size);
+        centerlineExtractor.set_smooth_relaxation(smooth_relaxation);
+
+        auto[centerlines, success] = centerlineExtractor.extract_centerlines(v->mesh(), v->segmentation3D(), v->centerline_seed_id(), v->centerline_target_ids());
+
+        v->clear_centerlines();
+        v->add_centerlines(centerlines.begin(), centerlines.end());
+
+        return success;
+    }
+
+    bool Dataset::extract_centerlines(unsigned int upscale, int distance_penalty_exponent, unsigned int smooth_iterations, unsigned int smooth_kernel_size, double smooth_relaxation)
+    {
+        unsigned int numCenterlinesTotal = 0;
+        const unsigned int numVessels = num_vessels();
+
+        #ifdef BK_EMIT_PROGRESS
+        for (auto& v: _pdata->vessels)
+        { numCenterlinesTotal += v.centerline_target_ids().size(); }
+
+        Progress& prog = bk_progress.emplace_task(numCenterlinesTotal, ___("Extracting centerlines of all vessels"));
+        #endif
+
+        Clock clock;
+        clock.start();
+
+        bool overallSuccess = true;
+
+        for (auto& v: _pdata->vessels)
+        {
+            const bool success = extract_centerlines(&v, upscale, distance_penalty_exponent, smooth_iterations, smooth_kernel_size, smooth_relaxation);
+            overallSuccess = success && overallSuccess;
+
+            #ifndef BK_EMIT_PROGRESS
+            numCenterlinesTotal += v.centerlines().num_lines();
+            #else
+            prog.increment(1);
+            #endif
+        }
+
+        clock.stop();
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        std::cout << "Extracted " << numCenterlinesTotal << " centerlines in " << numVessels << " vessels " << clock.time_in_sec() << " s (" << clock.time_in_milli_sec() << " ms)" << std::endl;
+
+        return overallSuccess;
     }
 
     //====================================================================================================

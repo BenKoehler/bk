@@ -68,8 +68,6 @@ namespace bk
         using mesh_type = bk::TriangularMesh3D;
         using pathline_type = bk::Line3D;
         //using pathlineset_type = std::vector<pathline_type>;
-        //using centerline_type = bk::Line3D; // todo branching centerline
-        //using centerlineset_type = std::vector<centerline_type>;
         //using   measuring_plane_type = MeasuringPlane_CMR;
         //using        flowjetset_type = FlowJetSet_CMR;
 
@@ -78,7 +76,6 @@ namespace bk
         //====================================================================================================
       private:
         class Impl;
-
         bk::cpimpl<Impl> _pdata;
 
         //====================================================================================================
@@ -125,13 +122,15 @@ namespace bk
         //[[nodiscard]] const pathlineset_type& pathlines () const;
         //[[nodiscard]] pathlineset_type& pathlines ();
 
-        //[[nodiscard]] unsigned int num_centerlines () const;
-        //[[nodiscard]] const centerlineset_type& centerlines () const;
-        //[[nodiscard]] centerlineset_type& centerlines ();
+        [[nodiscard]] unsigned int num_centerlines () const;
+        [[nodiscard]] const std::vector<Line3D>& centerlines () const;
+        [[nodiscard]] std::vector<Line3D>& centerlines ();
 
-        //[[nodiscard]] bool has_centerline_ids () const;
-        //[[nodiscard]] unsigned int centerline_seed_id () const;
-        //[[nodiscard]] const std::vector<unsigned int>& centerline_tarids () const;
+        [[nodiscard]] bool has_centerline_ids () const;
+        [[nodiscard]] unsigned int centerline_seed_id () const;
+        [[nodiscard]] const std::vector<unsigned int>& centerline_target_ids () const;
+
+        [[nodiscard]] bool has_centerlines () const;
 
         //[[nodiscard]] auto measuring_planes() -> std::vector<measuring_plane_type>&;
         //[[nodiscard]] auto measuring_planes() const -> const std::vector<measuring_plane_type>&;
@@ -147,7 +146,7 @@ namespace bk
         //[[nodiscard]] FlowJet* flowjet(unsigned int i);
         //[[nodiscard]] const FlowJet* flowjet(unsigned int i) const;
 
-        //[[nodiscard]] std::pair<int, bk::KDPointInfo<bk::Vec3d>> closest_centerline_and_point_id (const bk::Vec3d& pt);
+        [[nodiscard]] std::pair<int, bk::KDPointInfo<bk::Vec3d>> closest_centerline_and_point_id (const bk::Vec3d& pt);
 
         //====================================================================================================
         //===== SETTER
@@ -183,6 +182,10 @@ namespace bk
         void set_centerline_target_ids(std::vector<unsigned int> targetids);
         void add_centerline_target_id(unsigned int targetid);
 
+        void add_centerline(const Line3D& cl);
+        void add_centerline(Line3D&& cl);
+        void add_centerlines(std::vector<Line3D>::iterator first, std::vector<Line3D>::iterator last);
+
         //====================================================================================================
         //===== FUNCTIONS
         //====================================================================================================
@@ -195,10 +198,10 @@ namespace bk
         [[maybe_unused]] bool load_mesh(std::string_view filepath);
         [[maybe_unused]] bool save_segmentation3D(std::string_view filepath) const;
         [[maybe_unused]] bool load_segmentation3D(std::string_view filepath);
-        //[[maybe_unused]] bool save_centerline_ids(std::string_view filepath) const;
-        //[[maybe_unused]] bool load_centerline_ids(std::string_view filepath);
-        //[[maybe_unused]] bool save_centerlines(std::string_view filepath) const;
-        //[[maybe_unused]] bool load_centerlines(std::string_view filepath);
+        [[maybe_unused]] bool save_centerline_ids(std::string_view filepath) const;
+        [[maybe_unused]] bool load_centerline_ids(std::string_view filepath);
+        [[maybe_unused]] bool save_centerlines(std::string_view filepath) const;
+        [[maybe_unused]] bool load_centerlines(std::string_view filepath);
         //[[maybe_unused]] bool save_measuringplanes(std::string_view filepath) const;
         //[[maybe_unused]] bool load_measuringplanes(std::string_view filepath);
         //[[maybe_unused]] bool save_flowjets(std::string_view filepath) const;

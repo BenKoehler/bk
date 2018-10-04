@@ -178,6 +178,7 @@ endif ()
 # add library bkCMR
 # ----------
 set(SOURCE_FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/CenterlineExtractor.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/Dataset.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/Vessel.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowDirCorrection.cpp
