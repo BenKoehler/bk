@@ -47,8 +47,6 @@ namespace bk
       using self_type = TriangularMesh3DCenterlineExtractionView;
       using base_type = details::AbstractSceneRenderable;
     public:
-      using value_type = GLfloat;
-      using size_type = GLuint;
       using color_type = ColorRGBA;
 
       //====================================================================================================
@@ -70,8 +68,8 @@ namespace bk
       #else
       TriangularMesh3DCenterlineExtractionView(bk::qt_gl_functions* gl);
       #endif
-      TriangularMesh3DCenterlineExtractionView(const self_type& other) = delete;
-      TriangularMesh3DCenterlineExtractionView(self_type&& other) noexcept;
+      TriangularMesh3DCenterlineExtractionView(const self_type&) = delete;
+      TriangularMesh3DCenterlineExtractionView(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -87,16 +85,16 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- GET SHININESS
-      [[nodiscard]] auto shininess() const -> value_type;
+      [[nodiscard]] GLfloat shininess() const;
       /// @}
 
       /// @{ -------------------------------------------------- GET GHOSTED VIEW PARAMS
-      [[nodiscard]] auto ghosted_view_cutoff() const -> value_type;
-      [[nodiscard]] auto ghosted_view_falloff() const -> value_type;
+      [[nodiscard]] GLfloat ghosted_view_cutoff() const;
+      [[nodiscard]] GLfloat ghosted_view_falloff() const;
       /// @}
 
       /// @{ -------------------------------------------------- GET CENTER
-      [[nodiscard]] virtual auto center() const -> Vec3<value_type> override;
+      [[nodiscard]] virtual Vec3<GLfloat> center() const override;
       /// @}
 
       /// @{ -------------------------------------------------- INDEX AT SCREEN POS
@@ -121,12 +119,16 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- SET SHININESS
-      void set_shininess(value_type shininess);
+      void set_shininess(GLfloat shininess);
       /// @}
 
       /// @{ -------------------------------------------------- SET GHOSTED VIEW PARAMS
-      void set_ghosted_view_falloff(value_type falloff);
-      void set_ghosted_view_cutoff(value_type cutoff);
+      void set_ghosted_view_falloff(GLfloat falloff);
+      void set_ghosted_view_cutoff(GLfloat cutoff);
+      /// @}
+
+      /// @{ -------------------------------------------------- SET COLOR
+      void set_color(GLfloat r, GLfloat g, GLfloat b);
       /// @}
 
       /// @{ -------------------------------------------------- SET START/END POINTS
@@ -142,8 +144,8 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- OPERATOR =
-      [[maybe_unused]] auto operator=(const self_type& other) -> self_type& = delete;
-      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
+      [[maybe_unused]] auto operator=(const self_type&) -> self_type& = delete;
+      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
       //====================================================================================================
@@ -161,12 +163,12 @@ namespace bk
       /// @{ -------------------------------------------------- INIT
     private:
       void init_mesh(const TriangularMesh3D& mesh);
-      void init_selection_sphere(value_type r, GLint nTheta, GLint nPhi);
+      void init_selection_sphere(GLfloat r, GLint nTheta, GLint nPhi);
       void init_shader();
-      void init_ubo_selection_sphere();
+      void init_ubo();
       void init_fbo_picking();
     public:
-      void init(const TriangularMesh3D& mesh, GLint w, GLint h, value_type selection_sphere_radius = 3, GLint selection_sphere_theta = 20, GLint selection_sphere_phi = 20);
+      void init(const TriangularMesh3D& mesh, /*GLint w, GLint h,*/ GLfloat selection_sphere_radius = 3, GLint selection_sphere_theta = 20, GLint selection_sphere_phi = 20);
       /// @}
 
       /// @{ -------------------------------------------------- EVENTS

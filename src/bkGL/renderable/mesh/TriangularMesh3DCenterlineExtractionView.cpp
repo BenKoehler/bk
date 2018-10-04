@@ -31,9 +31,9 @@
 #include <bkTools/color/ColorRGBA.h>
 #include <bkMath/constants/pi.h>
 
-#include <bkGL/renderable/mesh/TriangularMesh3DView.h>
 #include <bkGL/renderable/mesh/EMeshRenderMode.h>
 #include <bkGL/buffer/IBO.h>
+#include <bkGL/UBOPhong.h>
 #include <bkGL/buffer/VBO.h>
 #include <bkGL/UBOPhong.h>
 #include <bkGL/UBOSelectionSphere.h>
@@ -42,30 +42,43 @@
 #include <bkGL/shader/Shader.h>
 #include <bkGL/shader/ShaderLibrary.h>
 #include <bkGL/texture/Texture2D.h>
+#include <bkGL/renderable/mesh/EMeshRenderMode.h>
 
 namespace bk
 {
+
   struct TriangularMesh3DCenterlineExtractionView::Impl
   {
-      TriangularMesh3DView meshView;
+      VBO vbo_mesh;
+      IBO ibo_mesh;
+      VAO vao_mesh;
+      details::UBOPhong ubo_mesh;
       VBO vbo_selection_sphere;
       IBO ibo_selection_sphere;
       VAO vao_selection_sphere;
       details::UBOSelectionSphere ubo_selection_sphere;
+      Shader shader_phong;
+      Shader shader_phong_ghosted;
       Shader shader_picking_ids;
       Shader shader_selection_sphere;
       FBO fbo_picking;
       GLsizei sizeInd_selection_sphere;
-      Vec3<value_type> center;
+      GLsizei sizeInd_mesh;
+      Vec3<GLfloat> center;
       GLint screen_w;
       GLint screen_h;
       GLint mouse_x;
       GLint mouse_y;
       GLint ssaa_factor;
       GLint selected_point_id;
-      std::vector<Vec3<value_type>> mesh_vertices;
+      std::vector<Vec3<GLfloat>> mesh_vertices;
       GLint start_point_id;
       std::vector<GLint> end_point_ids;
+      details::MeshRenderMode_ mode;
+      GLfloat shininess;
+      GLfloat ghost_falloff;
+      GLfloat ghost_cutoff;
+      color_type color;
 
           #ifndef BK_LIB_QT_AVAILABLE
 
@@ -74,24 +87,35 @@ namespace bk
           #else
 
       explicit Impl(bk::qt_gl_functions* gl)
-          : meshView(gl),
+          : vbo_mesh(gl),
+            ibo_mesh(gl),
+            vao_mesh(gl),
+            ubo_mesh(gl),
             vbo_selection_sphere(gl),
             ibo_selection_sphere(gl),
             vao_selection_sphere(gl),
             ubo_selection_sphere(gl),
+            shader_phong(gl),
+            shader_phong_ghosted(gl),
             shader_picking_ids(gl),
             shader_selection_sphere(gl),
             fbo_picking(gl),
           #endif
           sizeInd_selection_sphere(0),
-          center(MatrixFactory::Zero_Vec_3D<value_type>()),
+          sizeInd_mesh(0),
+          center(MatrixFactory::Zero_Vec_3D<GLfloat>()),
           screen_w(0),
           screen_h(0),
           mouse_x(0),
           mouse_y(0),
           ssaa_factor(1),
           selected_point_id(-1),
-          start_point_id(-1)
+          start_point_id(-1),
+          mode(details::MeshRenderMode_Solid),
+          shininess(30),
+          ghost_falloff(3.5),
+          ghost_cutoff(0.85),
+          color(0.5, 0.5, 0.5, 1)
       { /* do nothing */ }
   };
 
@@ -114,7 +138,12 @@ namespace bk
       _pdata->ibo_selection_sphere.set_usage_STATIC_DRAW();
       _pdata->vao_selection_sphere.add_default_attribute_position_3xfloat();
 
-      _pdata->meshView.forward_signals(this);
+      _pdata->vbo_mesh.set_usage_STATIC_DRAW();
+      _pdata->ibo_mesh.set_usage_STATIC_DRAW();
+      _pdata->vao_mesh.add_default_attribute_position_3xfloat();
+      _pdata->vao_mesh.add_default_attribute_normal_3xfloat();
+      _pdata->vao_mesh.add_default_attribute_scalar_1xfloat("id");
+      _pdata->ubo_mesh.set_usage_STATIC_DRAW();
   }
 
   TriangularMesh3DCenterlineExtractionView::TriangularMesh3DCenterlineExtractionView(self_type&&) noexcept = default;
@@ -129,27 +158,27 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- GET MODE
   bool TriangularMesh3DCenterlineExtractionView::mode_is_solid_default() const
-  { return _pdata->meshView.mode_is_solid_default(); }
+  { return _pdata->mode == details::MeshRenderMode_Solid; }
 
   bool TriangularMesh3DCenterlineExtractionView::mode_is_front_face_culling_with_ghosted_view() const
-  { return _pdata->meshView.mode_is_front_face_culling_with_ghosted_view(); }
+  { return _pdata->mode == details::MeshRenderMode_FrontFaceCullingWithGhostedView; }
   /// @}
 
   /// @{ -------------------------------------------------- GET SHININESS
-  auto TriangularMesh3DCenterlineExtractionView::shininess() const -> value_type
-  { return _pdata->meshView.shininess(); }
+  GLfloat TriangularMesh3DCenterlineExtractionView::shininess() const
+  { return _pdata->shininess; }
   /// @}
 
   /// @{ -------------------------------------------------- GET GHOSTED VIEW PARAMS
-  auto TriangularMesh3DCenterlineExtractionView::ghosted_view_cutoff() const -> value_type
-  { return _pdata->meshView.ghosted_view_cutoff(); }
+  GLfloat TriangularMesh3DCenterlineExtractionView::ghosted_view_cutoff() const
+  { return _pdata->ghost_falloff; }
 
-  auto TriangularMesh3DCenterlineExtractionView::ghosted_view_falloff() const -> value_type
-  { return _pdata->meshView.ghosted_view_falloff(); }
+  GLfloat TriangularMesh3DCenterlineExtractionView::ghosted_view_falloff() const
+  { return _pdata->ghost_cutoff; }
   /// @}
 
   /// @{ -------------------------------------------------- GET CENTER
-  auto TriangularMesh3DCenterlineExtractionView::center() const -> Vec3<value_type>
+  Vec3<GLfloat> TriangularMesh3DCenterlineExtractionView::center() const
   { return _pdata->center; }
   /// @}
 
@@ -158,7 +187,7 @@ namespace bk
   {
       _pdata->fbo_picking.bind();
 
-      value_type data[3] = {-1, -1, -1};
+      GLfloat data[3] = {-1, -1, -1};
 
       BK_QT_GL glReadBuffer(GL_COLOR_ATTACHMENT0);
       BK_QT_GL glReadPixels(x * _pdata->ssaa_factor, _pdata->screen_h - y * _pdata->ssaa_factor, 1, 1, GL_RGB, GL_FLOAT, data);
@@ -179,7 +208,7 @@ namespace bk
 
   /// @{ -------------------------------------------------- IS INITIALIZED
   bool TriangularMesh3DCenterlineExtractionView::is_initialized() const
-  { return _pdata->meshView.is_initialized() && _pdata->vbo_selection_sphere.is_initialized() && _pdata->ibo_selection_sphere.is_initialized() && _pdata->ubo_selection_sphere.is_initialized(); }
+  { return _pdata->vao_mesh.is_initialized() && _pdata->vao_selection_sphere.is_initialized(); }
   /// @}
 
   //====================================================================================================
@@ -190,7 +219,7 @@ namespace bk
   {
       if (!mode_is_solid_default())
       {
-          _pdata->meshView.set_mode_solid_default();
+          _pdata->mode = details::MeshRenderMode_Solid;
 
           if (this->is_initialized())
           {
@@ -204,7 +233,7 @@ namespace bk
   {
       if (!mode_is_front_face_culling_with_ghosted_view())
       {
-          _pdata->meshView.set_mode_front_face_culling_with_ghosted_view();
+          _pdata->mode = details::MeshRenderMode_FrontFaceCullingWithGhostedView;
 
           if (this->is_initialized())
           {
@@ -216,16 +245,59 @@ namespace bk
   /// @}
 
   /// @{ -------------------------------------------------- SET SHININESS
-  void TriangularMesh3DCenterlineExtractionView::set_shininess(value_type shininess)
-  { _pdata->meshView.set_shininess(shininess); }
+  void TriangularMesh3DCenterlineExtractionView::set_shininess(GLfloat shininess)
+  {
+      _pdata->shininess = shininess;
+      if (this->is_initialized())
+      {
+          _pdata->ubo_mesh.set_shininess(_pdata->shininess);
+          _pdata->ubo_mesh.release();
+          this->emit_signal_update_required();
+      }
+  }
   /// @}
 
   /// @{ -------------------------------------------------- SET GHOSTED VIEW PARAMS
-  void TriangularMesh3DCenterlineExtractionView::set_ghosted_view_falloff(value_type falloff)
-  { _pdata->meshView.set_ghosted_view_falloff(falloff); }
+  void TriangularMesh3DCenterlineExtractionView::set_ghosted_view_falloff(GLfloat falloff)
+  {
+      _pdata->ghost_falloff = falloff;
+      if (this->is_initialized())
+      {
+          _pdata->ubo_mesh.set_ghostFalloff(_pdata->ghost_falloff);
+          _pdata->ubo_mesh.release();
+          this->emit_signal_update_required();
+      }
+  }
 
-  void TriangularMesh3DCenterlineExtractionView::set_ghosted_view_cutoff(value_type cutoff)
-  { _pdata->meshView.set_ghosted_view_falloff(cutoff); }
+  void TriangularMesh3DCenterlineExtractionView::set_ghosted_view_cutoff(GLfloat cutoff)
+  {
+      _pdata->ghost_cutoff = cutoff;
+      if (this->is_initialized())
+      {
+          _pdata->ubo_mesh.set_ghostCutoff(_pdata->ghost_cutoff);
+          _pdata->ubo_mesh.release();
+          this->emit_signal_update_required();
+      }
+  }
+  /// @}
+
+  /// @{ -------------------------------------------------- SET COLOR
+  void TriangularMesh3DCenterlineExtractionView::set_color(GLfloat r, GLfloat g, GLfloat b)
+  {
+      _pdata->color[0] = r;
+      _pdata->color[1] = g;
+      _pdata->color[2] = b;
+      _pdata->color[3] = 1;
+
+      if (this->is_initialized())
+      {
+          _pdata->ubo_mesh.set_meshcol_r(_pdata->color[0]);
+          _pdata->ubo_mesh.set_meshcol_g(_pdata->color[1]);
+          _pdata->ubo_mesh.set_meshcol_b(_pdata->color[2]);
+          _pdata->ubo_mesh.release();
+          this->emit_signal_update_required();
+      }
+  }
   /// @}
 
   /// @{ -------------------------------------------------- SET START/END POINTS
@@ -283,12 +355,20 @@ namespace bk
   /// @{ -------------------------------------------------- CLEAR
   void TriangularMesh3DCenterlineExtractionView::clear_shader()
   {
+      _pdata->shader_phong.clear();
+      _pdata->shader_phong_ghosted.clear();
       _pdata->shader_picking_ids.clear();
       _pdata->shader_selection_sphere.clear();
   }
 
   void TriangularMesh3DCenterlineExtractionView::clear_buffers()
   {
+      _pdata->vbo_mesh.clear();
+      _pdata->ibo_mesh.clear();
+      _pdata->vao_mesh.clear();
+      _pdata->ubo_mesh.clear();
+      _pdata->sizeInd_mesh = 0;
+
       _pdata->vbo_selection_sphere.clear();
       _pdata->ibo_selection_sphere.clear();
       _pdata->vao_selection_sphere.clear();
@@ -307,8 +387,6 @@ namespace bk
 
   void TriangularMesh3DCenterlineExtractionView::clear()
   {
-      _pdata->meshView.clear();
-
       clear_shader();
       clear_buffers();
       clear_start_and_end_points();
@@ -321,23 +399,81 @@ namespace bk
   /// @{ -------------------------------------------------- INIT
   void TriangularMesh3DCenterlineExtractionView::init_mesh(const TriangularMesh3D& mesh)
   {
-      _pdata->meshView.init(mesh);
-      _pdata->meshView.set_color(0.5, 0.5, 0.5, 1);
+      const unsigned int num_points = mesh.geometry().num_points();
+      const unsigned int num_triangles = mesh.topology().num_cells();
 
-      const unsigned int nPoints = mesh.geometry().num_points();
-      _pdata->mesh_vertices.resize(nPoints);
+      if (num_points == 0 || num_triangles == 0)
+      { return; }
 
-      #pragma omp parallel for
-      for (unsigned int i = 0; i < nPoints; ++i)
-      { _pdata->mesh_vertices[i] = mesh.geometry().point(i); }
+      std::vector<GLfloat> vertices_normals_ids(7 * num_points); //vx vy vz nx ny nz id
+      std::vector<GLuint> indices(3 * num_triangles);
+
+      #pragma omp parallel sections
+      {
+          #pragma omp section
+          {
+              this->_pdata->center.set_zero();
+              _pdata->mesh_vertices.resize(num_points);
+
+              #pragma omp parallel for
+              for (unsigned int i = 0; i < num_points; ++i)
+              {
+                  const auto pt = mesh.geometry().point(i);
+                  vertices_normals_ids[7 * i + 0] = pt[0];
+                  vertices_normals_ids[7 * i + 1] = pt[1];
+                  vertices_normals_ids[7 * i + 2] = pt[2];
+
+                  #pragma omp critical
+                  this->_pdata->center += pt;
+
+                  _pdata->mesh_vertices[i] = pt;
+
+                  if (mesh.has_normals())
+                  {
+                      const auto nrml = mesh.normal_of_point(i);
+                      vertices_normals_ids[7 * i + 3] = nrml[0];
+                      vertices_normals_ids[7 * i + 4] = nrml[1];
+                      vertices_normals_ids[7 * i + 5] = nrml[2];
+                  }
+                  else
+                  {
+                      vertices_normals_ids[7 * i + 3] = 0;
+                      vertices_normals_ids[7 * i + 4] = 0;
+                      vertices_normals_ids[7 * i + 5] = 1;
+                  }
+
+                  vertices_normals_ids[7 * i + 6] = i;
+              }
+              this->_pdata->center /= num_points;
+          }
+
+          #pragma omp section
+          {
+              #pragma omp parallel for
+              for (unsigned int i = 0; i < num_triangles; ++i)
+              {
+                  const auto& tri = mesh.topology().cell(i);
+                  indices[3 * i + 0] = tri[0];
+                  indices[3 * i + 1] = tri[1];
+                  indices[3 * i + 2] = tri[2];
+              }
+              _pdata->sizeInd_mesh = 3 * num_triangles;
+          }
+      };
+
+      _pdata->vbo_mesh.init(vertices_normals_ids);
+      _pdata->ibo_mesh.init(indices);
+      _pdata->vao_mesh.init(_pdata->vbo_mesh, _pdata->ibo_mesh);
+
+      this->emit_signal_scene_changed();
   }
 
-  void TriangularMesh3DCenterlineExtractionView::init_selection_sphere(value_type r, GLint nTheta, GLint nPhi)
+  void TriangularMesh3DCenterlineExtractionView::init_selection_sphere(GLfloat r, GLint nTheta, GLint nPhi)
   {
-      const value_type dtheta = pi<value_type> / (nTheta - 1);
-      const value_type dphi = 2 * pi<value_type> / (nPhi - 1);
+      const GLfloat dtheta = pi<GLfloat> / (nTheta - 1);
+      const GLfloat dphi = 2 * pi<GLfloat> / (nPhi - 1);
 
-      std::vector<value_type> vertices(nTheta * nPhi * 3);
+      std::vector<GLfloat> vertices(nTheta * nPhi * 3);
 
       #pragma omp parallel for
       for (unsigned int t = 0; t < static_cast<unsigned int>(nTheta); ++t)
@@ -345,16 +481,16 @@ namespace bk
           for (unsigned int p = 0; p < static_cast<unsigned int>(nPhi); ++p)
           {
               const unsigned int off = t * nPhi * 3 + p * 3;
-              const value_type theta = t * dtheta;
-              const value_type phi = p * dphi;
-              const value_type sintheta = std::sin(theta);
+              const GLfloat theta = t * dtheta;
+              const GLfloat phi = p * dphi;
+              const GLfloat sintheta = std::sin(theta);
               vertices[off + 0] = r * sintheta * std::cos(phi);
               vertices[off + 1] = r * sintheta * std::sin(phi);
               vertices[off + 2] = r * std::cos(theta);
           }
       }
 
-      std::vector<size_type> indices;
+      std::vector<GLuint> indices;
       indices.reserve((nTheta - 1) * nPhi + (nTheta - 1));
 
       for (unsigned int t = 0; t < static_cast<unsigned int>(nTheta - 1); ++t)
@@ -367,7 +503,7 @@ namespace bk
               indices.push_back(off + nPhi);
           }
 
-          indices.push_back(std::numeric_limits<size_type>::max());
+          indices.push_back(std::numeric_limits<GLuint>::max());
       }
 
       _pdata->sizeInd_selection_sphere = indices.size();
@@ -383,17 +519,47 @@ namespace bk
 
       using SL = details::ShaderLibrary;
 
+      if (mode_is_solid_default())
+      { _pdata->shader_phong.init_from_sources(SL::mesh::picking::vert_phong(), SL::mesh::phong::frag()); }
+      else // if (mode_is_front_face_culling_with_ghosted_view())
+      {
+          _pdata->shader_phong.init_from_sources(SL::mesh::picking::vert_phong(), SL::mesh::phong::frag());
+
+          if (!this->oit_is_available())
+          { _pdata->shader_phong_ghosted.init_from_sources(SL::mesh::picking::vert_phong(), SL::mesh::phong::frag_ghosted()); }
+          else
+          { _pdata->shader_phong_ghosted.init_from_sources(SL::mesh::picking::vert_phong(), SL::mesh::phong::frag_ghosted_oit()); }
+      }
+      
       _pdata->shader_picking_ids.init_from_sources(SL::mesh::picking::vert(), SL::mesh::picking::frag());
       _pdata->shader_selection_sphere.init_from_sources(SL::mesh::picking::vert_current_selection(), SL::mesh::picking::frag_current_selection(), SL::mesh::picking::geom_current_selection());
   }
 
-  void TriangularMesh3DCenterlineExtractionView::init_ubo_selection_sphere()
+  void TriangularMesh3DCenterlineExtractionView::init_ubo()
   {
+      _pdata->ubo_mesh.clear();
+      _pdata->ubo_mesh.init_from_registered_values_size();
+      _pdata->ubo_mesh.set_meshcol_r(_pdata->color[0]);
+      _pdata->ubo_mesh.set_meshcol_g(_pdata->color[1]);
+      _pdata->ubo_mesh.set_meshcol_b(_pdata->color[2]);
+      _pdata->ubo_mesh.set_lightcol_r(0.5);
+      _pdata->ubo_mesh.set_lightcol_g(0.5);
+      _pdata->ubo_mesh.set_lightcol_b(0.5);
+      _pdata->ubo_mesh.set_shininess(_pdata->shininess);
+      _pdata->ubo_mesh.set_ghostFalloff(_pdata->ghost_falloff);
+      _pdata->ubo_mesh.set_ghostCutoff(_pdata->ghost_cutoff);
+      _pdata->ubo_mesh.set_silhouette_width(0.0f);
+      _pdata->ubo_mesh.set_color_enabled(0);
+      _pdata->ubo_mesh.set_num_colors(0);
+      _pdata->ubo_mesh.set_min_attribute_value(0.0f);
+      _pdata->ubo_mesh.set_max_attribute_value(0.0f);
+      _pdata->ubo_mesh.release();
+
       _pdata->ubo_selection_sphere.clear();
       _pdata->ubo_selection_sphere.init_from_registered_values_size();
       _pdata->ubo_selection_sphere.release();
   }
-
+  
   void TriangularMesh3DCenterlineExtractionView::init_fbo_picking()
   {
       _pdata->fbo_picking.clear();
@@ -436,15 +602,15 @@ namespace bk
       _pdata->fbo_picking.init();
   }
 
-  void TriangularMesh3DCenterlineExtractionView::init(const TriangularMesh3D& mesh, GLint w, GLint h, value_type selection_sphere_radius, GLint selection_sphere_theta, GLint selection_sphere_phi)
+  void TriangularMesh3DCenterlineExtractionView::init(const TriangularMesh3D& mesh, /*GLint w, GLint h,*/ GLfloat selection_sphere_radius, GLint selection_sphere_theta, GLint selection_sphere_phi)
   {
-      _pdata->screen_w = w;
-      _pdata->screen_h = h;
+      //_pdata->screen_w = w;
+      //_pdata->screen_h = h;
 
       init_mesh(mesh);
       init_selection_sphere(selection_sphere_radius, selection_sphere_theta, selection_sphere_phi);
       init_shader();
-      init_ubo_selection_sphere();
+      init_ubo();
       init_fbo_picking();
       this->emit_signal_scene_changed();
       this->emit_signal_update_required();
@@ -461,17 +627,18 @@ namespace bk
       this->emit_signal_update_required();
   }
 
-  void TriangularMesh3DCenterlineExtractionView::on_oit_enabled(bool b)
-  { _pdata->meshView.on_oit_enabled(b); }
+  void TriangularMesh3DCenterlineExtractionView::on_oit_enabled(bool /*b*/)
+  {  if (_pdata->mode == details::MeshRenderMode_FrontFaceCullingWithGhostedView)
+      { init_shader(); } }
 
-  void TriangularMesh3DCenterlineExtractionView::on_animation_enabled(bool b)
-  { _pdata->meshView.on_animation_enabled(b); }
+  void TriangularMesh3DCenterlineExtractionView::on_animation_enabled(bool /*b*/)
+  { /* do nothing */ }
 
-  void TriangularMesh3DCenterlineExtractionView::on_modelview_changed(bool b)
-  { _pdata->meshView.on_modelview_changed(b); }
+  void TriangularMesh3DCenterlineExtractionView::on_modelview_changed(bool /*b*/)
+  { /* do nothing */ }
 
-  void TriangularMesh3DCenterlineExtractionView::on_visible_changed(bool b)
-  { _pdata->meshView.on_visible_changed(b); }
+  void TriangularMesh3DCenterlineExtractionView::on_visible_changed(bool /*b*/)
+  { /* do nothing */ }
 
   void TriangularMesh3DCenterlineExtractionView::on_mouse_pos_changed(GLint x, GLint y)
   {
@@ -494,10 +661,17 @@ namespace bk
   void TriangularMesh3DCenterlineExtractionView::on_mouse_button_released(MouseButton_ /*btn*/)
   { /* do nothing */ }
 
-  void TriangularMesh3DCenterlineExtractionView::on_key_pressed(Key_ /*k*/){ /* do nothing */ }
-  void TriangularMesh3DCenterlineExtractionView::on_key_released(Key_ /*k*/){ /* do nothing */ }
-  void TriangularMesh3DCenterlineExtractionView::on_mouse_wheel_up(){ /* do nothing */ }
-  void TriangularMesh3DCenterlineExtractionView::on_mouse_wheel_down(){ /* do nothing */ }
+  void TriangularMesh3DCenterlineExtractionView::on_key_pressed(Key_ /*k*/)
+  { /* do nothing */ }
+
+  void TriangularMesh3DCenterlineExtractionView::on_key_released(Key_ /*k*/)
+  { /* do nothing */ }
+
+  void TriangularMesh3DCenterlineExtractionView::on_mouse_wheel_up()
+  { /* do nothing */ }
+
+  void TriangularMesh3DCenterlineExtractionView::on_mouse_wheel_down()
+  { /* do nothing */ }
 
   void TriangularMesh3DCenterlineExtractionView::on_ssaa_factor_changed(GLint ssaa_factor)
   { _pdata->ssaa_factor = ssaa_factor; }
@@ -508,23 +682,54 @@ namespace bk
   {
       // ubo 0 must be global ubo with modelview/projection matrices
 
-      _pdata->meshView.draw_opaque();
+      _pdata->ubo_mesh.bind_to_default_base();
+
+      /*
+       * draw mesh (opaque)
+       */
+      if (_pdata->mode == details::MeshRenderMode_FrontFaceCullingWithGhostedView)
+      {
+          // first pass: back side
+          BK_QT_GL glPushAttrib(GL_POLYGON_BIT);
+
+          BK_QT_GL glEnable(GL_CULL_FACE);
+          BK_QT_GL glFrontFace(GL_CCW);
+          BK_QT_GL glCullFace(GL_FRONT);
+
+          _pdata->vao_mesh.bind();
+          _pdata->shader_phong.bind();
+          BK_QT_GL glDrawElements(GL_TRIANGLES, _pdata->sizeInd_mesh, GL_UNSIGNED_INT, nullptr);
+          _pdata->shader_phong.release();
+          _pdata->vao_mesh.release();
+
+          BK_QT_GL glPopAttrib();
+      }
+      else
+      {
+          BK_QT_GL glDepthFunc(GL_LEQUAL);
+
+          _pdata->vao_mesh.bind();
+          _pdata->shader_phong.bind();
+          BK_QT_GL glDrawElements(GL_TRIANGLES, _pdata->sizeInd_mesh, GL_UNSIGNED_INT, nullptr);
+          _pdata->shader_phong.release();
+          _pdata->vao_mesh.release();
+
+          BK_QT_GL glDepthFunc(GL_LESS);
+      }
 
       /*
        * draw picking ids
        */
-      _pdata->meshView.ubo().bind_to_default_base();
-
       _pdata->fbo_picking.bind();
       BK_QT_GL glClearColor(-1, -1, -1, 0);
       BK_QT_GL glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       BK_QT_GL glClearColor(0, 0, 0, 0);
 
-      _pdata->meshView.vao().bind();
+      _pdata->vao_mesh.bind();
       _pdata->shader_picking_ids.bind();
-      BK_QT_GL glDrawElements(GL_TRIANGLES, _pdata->meshView.sizeInd(), GL_UNSIGNED_INT, nullptr);
+      BK_QT_GL glDrawElements(GL_TRIANGLES, _pdata->sizeInd_mesh, GL_UNSIGNED_INT, nullptr);
       _pdata->shader_picking_ids.release();
-      _pdata->meshView.vao().release();
+      _pdata->vao_mesh.release();
 
       _pdata->fbo_picking.release();
 
@@ -537,7 +742,7 @@ namespace bk
           _pdata->ubo_selection_sphere.bind_to_default_base();
 
           BK_QT_GL glEnable(GL_PRIMITIVE_RESTART);
-          BK_QT_GL glPrimitiveRestartIndex(std::numeric_limits<size_type>::max());
+          BK_QT_GL glPrimitiveRestartIndex(std::numeric_limits<GLuint>::max());
 
           _pdata->vao_selection_sphere.bind();
           _pdata->shader_selection_sphere.bind();
@@ -559,11 +764,14 @@ namespace bk
           BK_QT_GL glDrawElements(GL_TRIANGLE_STRIP, _pdata->sizeInd_selection_sphere, GL_UNSIGNED_INT, nullptr);
       }
 
+      /*
+       * draw start point
+       */
       if (_pdata->start_point_id >= 0 && _pdata->start_point_id < static_cast<int>(_pdata->mesh_vertices.size()))
       {
-          _pdata->ubo_selection_sphere.set_center_x(_pdata->mesh_vertices[_pdata->selected_point_id][0]);
-          _pdata->ubo_selection_sphere.set_center_y(_pdata->mesh_vertices[_pdata->selected_point_id][1]);
-          _pdata->ubo_selection_sphere.set_center_z(_pdata->mesh_vertices[_pdata->selected_point_id][2]);
+          _pdata->ubo_selection_sphere.set_center_x(_pdata->mesh_vertices[_pdata->start_point_id][0]);
+          _pdata->ubo_selection_sphere.set_center_y(_pdata->mesh_vertices[_pdata->start_point_id][1]);
+          _pdata->ubo_selection_sphere.set_center_z(_pdata->mesh_vertices[_pdata->start_point_id][2]);
           _pdata->ubo_selection_sphere.set_color_r(static_cast<GLfloat>(0));
           _pdata->ubo_selection_sphere.set_color_g(static_cast<GLfloat>(1));
           _pdata->ubo_selection_sphere.set_color_b(static_cast<GLfloat>(0)); // green
@@ -572,6 +780,9 @@ namespace bk
           BK_QT_GL glDrawElements(GL_TRIANGLE_STRIP, _pdata->sizeInd_selection_sphere, GL_UNSIGNED_INT, nullptr);
       }
 
+      /*
+       * draw end points
+       */
       for (auto id: _pdata->end_point_ids)
       {
           _pdata->ubo_selection_sphere.set_center_x(_pdata->mesh_vertices[id][0]);
@@ -595,11 +806,46 @@ namespace bk
           _pdata->vao_selection_sphere.release();
       }
 
-      _pdata->meshView.ubo().release_from_base();
+      _pdata->ubo_mesh.release_from_base();
   }
 
   void TriangularMesh3DCenterlineExtractionView::draw_transparent_impl()
-  { _pdata->meshView.draw_transparent(); }
+  {
+      if (this->is_initialized() && this->is_visible() && _pdata->mode == details::MeshRenderMode_FrontFaceCullingWithGhostedView)
+      {
+          // ubo 0 must be global ubo with modelview/projection matrices
+          _pdata->ubo_mesh.bind_to_default_base();
+
+          // second pass: front side
+          BK_QT_GL glPushAttrib(GL_POLYGON_BIT);
+
+          BK_QT_GL glEnable(GL_CULL_FACE);
+          BK_QT_GL glFrontFace(GL_CCW);
+          BK_QT_GL glCullFace(GL_BACK);
+
+          if (this->oit_is_available())
+          {
+              BK_QT_GL glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+              BK_QT_GL glDepthMask(GL_FALSE);
+          }
+
+          _pdata->vao_mesh.bind();
+          _pdata->shader_phong_ghosted.bind();
+          BK_QT_GL glDrawElements(GL_TRIANGLES, _pdata->sizeInd_mesh, GL_UNSIGNED_INT, nullptr);
+          _pdata->shader_phong_ghosted.release();
+          _pdata->vao_mesh.release();
+
+          if (this->oit_is_available())
+          {
+              BK_QT_GL glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+              BK_QT_GL glDepthMask(GL_TRUE);
+          }
+
+          BK_QT_GL glPopAttrib();
+
+          _pdata->ubo_mesh.release_from_base();
+      }
+  }
   /// @}
 } // namespace bk
 
