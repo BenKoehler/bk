@@ -115,28 +115,26 @@ namespace bk
                       for (unsigned int i = 0; i < dst.size(d); ++i)
                       {
                           gid[d] = i;
-                          _distance_map(dst, d + 1, dimId, stride, gid);
+                          _distance_map(dst, d + 1, dimId, stride, gid, first);
                       }
                   }
               }
-              else
-              {
-                  // low to high
-                  gid[d] = 1;
-                  unsigned int lid = bk::grid_to_list_id(dst.size(), gid, dst.num_dimensions());
+          }
+          else
+          {
+              // low to high
+              gid[dimId] = 1;
+              unsigned int lid = bk::grid_to_list_id(dst.size(), gid, dst.num_dimensions());
 
-                  for (unsigned int i = 1; i < dst.size(d); ++i, lid += stride)
-                  { dst[lid] = std::min(dst[lid - stride] + 1, dst[lid]); }
+              for (unsigned int i = 1; i < dst.size(dimId); ++i, lid += stride)
+              { dst[lid] = std::min(dst[lid - stride] + 1, dst[lid]); }
 
-                  // high to low
-                  gid[d] = dst.size(d) - 2;
-                  lid = bk::grid_to_list_id(dst.size(), gid, dst.num_dimensions());
+              // high to low
+              gid[dimId] = dst.size(dimId) - 2;
+              lid = bk::grid_to_list_id(dst.size(), gid, dst.num_dimensions());
 
-                  for (int i = static_cast<int>(dst.size(d)) - 2; i >= 0; --i, lid -= stride)
-                  { dst[lid] = std::min(dst[lid + stride] + 1, dst[lid]); }
-
-                  _distance_map(dst, d + 1, dimId, stride, gid);
-              }
+              for (int i = static_cast<int>(dst.size(dimId)) - 2; i >= 0; --i, lid -= stride)
+              { dst[lid] = std::min(dst[lid + stride] + 1, dst[lid]); }
           }
       }
 
