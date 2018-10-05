@@ -13,8 +13,10 @@
 #include <bkMath/functions/list_grid_id_conversion.h>
 
 #ifdef BK_EMIT_PROGRESS
+
     #include <bk/Localization>
     #include <bk/Progress>
+
 #endif
 
 namespace bk
@@ -108,7 +110,7 @@ namespace bk
         }
 
         #ifdef BK_EMIT_PROGRESS
-        Progress& prog = bk_progress.emplace_task(1 + target_meshVertexIds.size(), ___("Extracting centerline(s)"));
+        Progress& prog = bk_progress.emplace_task(5 + target_meshVertexIds.size(), ___("Extracting centerline(s)"));
         #endif
 
         bk::Clock clock;
@@ -122,8 +124,12 @@ namespace bk
         //------------------------------------------------------------------------------------------------------
         // create distance map
         const Vec3ui dmSize = size.mult_cwise(dmUpscale);
-        bk::DicomImage<double,3> dm;
+        bk::DicomImage<double, 3> dm;
         dm.set_size(dmSize);
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
 
         // create upscaled world matrix
         auto wmat = seg.geometry().transformation().world_matrix();
@@ -135,7 +141,15 @@ namespace bk
         double maxdst = dm.num_values();
         mesh.geometry().construct_kd_tree();
 
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
+
         maxdst = 0;
+
+        #ifdef BK_EMIT_PROGRESS
+        Progress& prog_dmap = bk_progress.emplace_task(dmSize[0]/4 + dmSize[0], ___("Intravascular distance map"));
+        #endif
 
         // calc distance map by finding closest point on surface mesh
         #pragma omp parallel for schedule(dynamic, 1) reduction(max:maxdst)
@@ -159,7 +173,16 @@ namespace bk
                     maxdst = std::max(maxdst, d);
                 }
             }
+
+            #ifdef BK_EMIT_PROGRESS
+            #pragma omp critical
+            { prog_dmap.increment(1); }
+            #endif
         }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
 
         // - normalize distance map
         // - apply exponential behavior
@@ -170,8 +193,16 @@ namespace bk
             dm[i] = std::pow(dm[i], _pdata->distance_penalty_exponent);
         }
 
+        #ifdef BK_EMIT_PROGRESS
+        prog_dmap.set_finished();
+        #endif
+
         const double maxdst_old = maxdst;
         maxdst = 1;
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
 
         //------------------------------------------------------------------------------------------------------
         //
@@ -199,6 +230,10 @@ namespace bk
 
         for (unsigned int tid = 0; tid < target_meshVertexIds.size(); ++tid)
         {
+            #ifdef BK_EMIT_PROGRESS
+            Progress& prog_cl = bk_progress.emplace_task(19, ___("Calculating centerline @0",  tid));
+            #endif
+
             auto cltarget_voxel = seg.geometry().transformation().to_object_coordinates(mesh.geometry().point(target_meshVertexIds[tid]));
 
             for (unsigned int i = 0; i < 3; ++i)
@@ -222,6 +257,10 @@ namespace bk
                 parent[i].set_constant(-1);
             }
 
+            #ifdef BK_EMIT_PROGRESS
+            prog_cl.increment(1);
+            #endif
+
             #pragma omp parallel for
             for (unsigned int x = 0; x < dmSize[0]; ++x)
             {
@@ -231,6 +270,10 @@ namespace bk
                     { visited[x][y][z] = false; }
                 }
             }
+
+            #ifdef BK_EMIT_PROGRESS
+            prog_cl.increment(1);
+            #endif
 
             const unsigned int lid_seed = grid_to_list_id(dmSize, clseed_voxel, 3);
             const unsigned int lid_target = grid_to_list_id(dmSize, cltarget_voxel, 3);
@@ -297,6 +340,10 @@ namespace bk
                     } // for dy
                 } // for dx
             } // while
+
+            #ifdef BK_EMIT_PROGRESS
+            prog_cl.increment(5);
+            #endif
 
             /*
              * was the target point not reached?
@@ -409,6 +456,10 @@ namespace bk
                 } // while
             }
 
+            #ifdef BK_EMIT_PROGRESS
+            prog_cl.increment(5);
+            #endif
+
             //------------------------------------------------------------------------------------------------------
             // trace parents back starting from target
             //------------------------------------------------------------------------------------------------------
@@ -425,6 +476,10 @@ namespace bk
 
             centerline.push_back(seg.geometry().transformation().to_world_coordinates(Vec3d(clseed_voxel).div_cwise(dmUpscale)));
 
+            #ifdef BK_EMIT_PROGRESS
+            prog_cl.increment(1);
+            #endif
+
             const unsigned int N = centerline.size();
 
             //------------------------------------------------------------------------------------------------------
@@ -432,6 +487,10 @@ namespace bk
             //------------------------------------------------------------------------------------------------------
             //bk::smooth_lambda_mu(centerline.begin(), centerline.end(), centerline.begin(), _pdata->num_smooth_iterations, _pdata->smooth_kernel_size, _pdata->smooth_relaxation, _pdata->smooth_relaxation, Vec3d::Zero());
             bk::smooth_lambda_mu(centerline.begin(), centerline.end(), _pdata->num_smooth_iterations, _pdata->smooth_kernel_size, _pdata->smooth_relaxation, _pdata->smooth_relaxation, MatrixFactory::Zero_Vec_3D<double>());
+
+            #ifdef BK_EMIT_PROGRESS
+            prog_cl.increment(2);
+            #endif
 
             //------------------------------------------------------------------------------------------------------
             // replace vessel centerline
@@ -449,13 +508,25 @@ namespace bk
             for (unsigned int i = 0; i < N; ++i)
             { vcl.geometry().point(i) = centerline[N - 1 - i]; }
 
+            #ifdef BK_EMIT_PROGRESS
+            prog_cl.increment(1);
+            #endif
+
             for (unsigned int i = 0; i < N; ++i)
             {
                 const double radius = (maxdst - std::pow(dm(dm.geometry().transformation().to_object_coordinates(centerline[N - 1 - i])), 1.0 / _pdata->distance_penalty_exponent)) * maxdst_old;
                 rad[i] = radius;
             }
 
+            #ifdef BK_EMIT_PROGRESS
+            prog_cl.increment(1);
+            #endif
+
             vcl.calc_consistent_local_coordinate_systems();
+
+            #ifdef BK_EMIT_PROGRESS
+            prog_cl.set_finished();
+            #endif
 
             #ifdef BK_EMIT_PROGRESS
             prog.increment(1);
