@@ -571,13 +571,11 @@ namespace bk::gc_details
       /// @}
 
       /// @{ -------------------------------------------------- AUTOMATIC OUTSIDE IDS WITHIN NARROW BAND
-      void narrow_band_sink_ids(double band_width_percent)
+      void narrow_band_sink_ids(double band_width_percent, unsigned int min_width_pixel)
       {
-          constexpr int boundary_width = 3;
-
           id_type band_radius;
           for (int i = 0; i < TDims; ++i)
-          { band_radius[i] = std::max(boundary_width, static_cast<int>(std::round(static_cast<double>(_size[i]) * band_width_percent))); }
+          { band_radius[i] = std::max(static_cast<int>(min_width_pixel), static_cast<int>(std::round(static_cast<double>(_size[i]) * band_width_percent))); }
 
           #ifdef BK_EMIT_PROGRESS
           bk::Progress& prog = bk_progress.emplace_task(_connected_to_source.size() + 1 + _size[0], ___("Creating graph cut narrow band"));

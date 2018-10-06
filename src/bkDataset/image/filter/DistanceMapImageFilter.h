@@ -96,7 +96,7 @@ namespace bk
       template<typename TDistanceMap, typename TVec>
       void _distance_map(TDistanceMap& dst, unsigned int d, unsigned int dimId, unsigned int stride, TVec& gid, bool first = false) const
       {
-          if (d < dst.num_dimensions())
+          if (d < dst.num_dimensions()) // outer loops (other dimensions)
           {
               if (d != dimId)
               {
@@ -120,7 +120,7 @@ namespace bk
                   }
               }
           }
-          else
+          else // inner loop (target dimension)
           {
               // low to high
               gid[dimId] = 1;

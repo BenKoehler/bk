@@ -8,7 +8,6 @@
 #include <vector>
 
 #include <bk/CopyablePIMPL>
-#include <bkCMR/Vessel.h>
 #include <bk/Line>
 #include <bk/Image>
 #include <bk/Mesh>
@@ -63,7 +62,7 @@ namespace bk
         //====================================================================================================
         //===== FUNCTIONS
         //====================================================================================================
-        std::pair<std::vector<Line3D> /*centerlines*/, bool /*success*/> extract_centerlines(TriangularMesh3D& mesh, const Vessel::segmentation3d_type& seg, unsigned int seed_meshVertexId, const std::vector<unsigned int>& target_meshVertexIds) const;
+        std::pair<std::vector<Line3D> /*centerlines*/, bool /*success*/> extract_centerlines(TriangularMesh3D& mesh, const bk::DicomImage<double,3>& seg, unsigned int seed_meshVertexId, const std::vector<unsigned int>& target_meshVertexIds) const;
     }; // class CenterlineExtractor
   } // inline namespace cmr
 } // namespace bk

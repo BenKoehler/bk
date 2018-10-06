@@ -608,11 +608,8 @@ namespace bk
       _pdata->fbo_picking.init();
   }
 
-  void TriangularMesh3DCenterlineExtractionView::init(const TriangularMesh3D& mesh, /*GLint w, GLint h,*/ GLfloat selection_sphere_radius, GLint selection_sphere_theta, GLint selection_sphere_phi)
+  void TriangularMesh3DCenterlineExtractionView::init(const TriangularMesh3D& mesh, GLfloat selection_sphere_radius, GLint selection_sphere_theta, GLint selection_sphere_phi)
   {
-      //_pdata->screen_w = w;
-      //_pdata->screen_h = h;
-
       init_mesh(mesh);
       init_selection_sphere(selection_sphere_radius, selection_sphere_theta, selection_sphere_phi);
       init_shader();

@@ -77,6 +77,8 @@ namespace bk::attribute_info
 
   BK_DEFINE_ATTRIBUTE_HASH(angle, double)
 
+  BK_DEFINE_ATTRIBUTE_HASH(radius, double)
+
   BK_DEFINE_ATTRIBUTE_HASH(temp0_double, double)
 
   BK_DEFINE_ATTRIBUTE_HASH(temp1_double, double)

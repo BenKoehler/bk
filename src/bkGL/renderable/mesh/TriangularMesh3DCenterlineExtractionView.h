@@ -158,8 +158,8 @@ namespace bk
     private:
       void clear_shader();
       void clear_buffers();
-      void clear_start_and_end_points();
     public:
+      void clear_start_and_end_points();
       void clear();
       /// @}
 
@@ -171,7 +171,7 @@ namespace bk
       void init_ubo();
       void init_fbo_picking();
     public:
-      void init(const TriangularMesh3D& mesh, /*GLint w, GLint h,*/ GLfloat selection_sphere_radius = 3, GLint selection_sphere_theta = 20, GLint selection_sphere_phi = 20);
+      void init(const TriangularMesh3D& mesh, GLfloat selection_sphere_radius = 3, GLint selection_sphere_theta = 20, GLint selection_sphere_phi = 20);
       /// @}
 
       /// @{ -------------------------------------------------- EVENTS

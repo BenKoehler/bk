@@ -206,6 +206,7 @@ namespace bk::details
           struct picking
           {
               [[nodiscard]] static std::string vert();
+              [[nodiscard]] static std::string vert_phong();
               [[nodiscard]] static std::string frag();
               [[nodiscard]] static std::string vert_current_selection();
               [[nodiscard]] static std::string geom_current_selection();

@@ -56,7 +56,7 @@ namespace bk
     //class FlowJet_CMR;
     //class LineSet3;
     //class MeasuringPlane_CMR;
-  // -------------------- forward declaration END
+    // -------------------- forward declaration END
 
     class BKCMR_EXPORT Vessel
     {
@@ -76,6 +76,7 @@ namespace bk
         //====================================================================================================
       private:
         class Impl;
+
         bk::cpimpl<Impl> _pdata;
 
         //====================================================================================================
@@ -105,8 +106,9 @@ namespace bk
         [[nodiscard]] bool is_semantic_right_heart() const;
 
         [[nodiscard]] bool has_segmentation3D() const;
-        [[nodiscard]] const segmentation3d_type& segmentation3D() const;
-        [[nodiscard]] segmentation3d_type& segmentation3D();
+        [[nodiscard]] segmentation3d_type& segmentation3D()&;
+        [[nodiscard]] const segmentation3d_type& segmentation3D() const&;
+        [[nodiscard]] segmentation3d_type&& segmentation3D()&&;
         [[nodiscard]] const std::pair<Segmentation3DInfo_, unsigned int>& segmentation3D_info() const;
         [[nodiscard]] std::vector<unsigned int>& segmentation3D_inside_ids();
         [[nodiscard]] const std::vector<unsigned int>& segmentation3D_inside_ids() const;
@@ -114,23 +116,25 @@ namespace bk
         [[nodiscard]] const std::vector<unsigned int>& segmentation3D_outside_ids() const;
 
         [[nodiscard]] bool has_mesh() const;
-        [[nodiscard]] mesh_type& mesh();
-        [[nodiscard]] const mesh_type& mesh() const;
+        [[nodiscard]] mesh_type& mesh()&;
+        [[nodiscard]] const mesh_type& mesh() const&;
+        [[nodiscard]] mesh_type&& mesh()&&;
 
         //[[nodiscard]] bool has_pathlines () const;
         //[[nodiscard]] unsigned int num_pathlines () const;
         //[[nodiscard]] const pathlineset_type& pathlines () const;
         //[[nodiscard]] pathlineset_type& pathlines ();
 
-        [[nodiscard]] unsigned int num_centerlines () const;
-        [[nodiscard]] const std::vector<Line3D>& centerlines () const;
-        [[nodiscard]] std::vector<Line3D>& centerlines ();
+        [[nodiscard]] unsigned int num_centerlines() const;
+        [[nodiscard]] std::vector<Line3D>& centerlines()&;
+        [[nodiscard]] const std::vector<Line3D>& centerlines() const&;
+        [[nodiscard]] std::vector<Line3D>&& centerlines()&&;
 
-        [[nodiscard]] bool has_centerline_ids () const;
-        [[nodiscard]] unsigned int centerline_seed_id () const;
-        [[nodiscard]] const std::vector<unsigned int>& centerline_target_ids () const;
+        [[nodiscard]] bool has_centerline_ids() const;
+        [[nodiscard]] unsigned int centerline_seed_id() const;
+        [[nodiscard]] const std::vector<unsigned int>& centerline_target_ids() const;
 
-        [[nodiscard]] bool has_centerlines () const;
+        [[nodiscard]] bool has_centerlines() const;
 
         //[[nodiscard]] auto measuring_planes() -> std::vector<measuring_plane_type>&;
         //[[nodiscard]] auto measuring_planes() const -> const std::vector<measuring_plane_type>&;
@@ -146,7 +150,7 @@ namespace bk
         //[[nodiscard]] FlowJet* flowjet(unsigned int i);
         //[[nodiscard]] const FlowJet* flowjet(unsigned int i) const;
 
-        [[nodiscard]] std::pair<int, bk::KDPointInfo<bk::Vec3d>> closest_centerline_and_point_id (const bk::Vec3d& pt);
+        [[nodiscard]] std::pair<int, bk::KDPointInfo<bk::Vec3d>> closest_centerline_and_point_id(const bk::Vec3d& pt);
 
         //====================================================================================================
         //===== SETTER
@@ -170,7 +174,7 @@ namespace bk
 
         void set_semantic(VesselSemantic_ sem);
         void add_semantic(VesselSemantic_ sem);
-        
+
         void set_seg3d_was_performed_on_magnitude_TMIP();
         void set_seg3d_was_performed_on_LPC();
         void set_seg3d_was_performed_on_IVSD();

@@ -152,7 +152,7 @@ namespace bk
       auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
-      void set_inside_outside_from_graph_cut();
+      void set_inside_outside_from_graph_cut(bool resetSegmentation = true);
       template<typename Img3_>
       void set_segmentation(const Img3_& seg);
 
@@ -196,7 +196,7 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- UPDATE SEGMENTATION (RUN GC)
-      void update_gc(double narrow_band_width_percent = 1);
+      void update_gc(double narrow_band_width_percent = 1, unsigned int narrow_band_min_pixel_width = 5);
       /// @}
 
       /// @{ -------------------------------------------------- UPDATE SSBO GC

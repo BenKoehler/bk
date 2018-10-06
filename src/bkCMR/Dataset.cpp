@@ -75,13 +75,6 @@ namespace bk
     };
 
     //====================================================================================================
-    //===== DEFINITIONS
-    //====================================================================================================
-    const std::string Dataset::dcmbytes = "dcmbytes";
-
-    const std::string Dataset::vessel_dir = "vessels/";
-
-    //====================================================================================================
     //===== CONSTRUCTORS & DESTRUCTOR
     //====================================================================================================
     Dataset::Dataset() = default;
@@ -201,7 +194,7 @@ namespace bk
     Vessel* Dataset::vessel(unsigned int i)
     { return i < num_vessels() ? &_pdata->vessels[i] : nullptr; }
 
-    Vessel* Dataset::vessel(const std::string& name, bool case_sensitive)
+    Vessel* Dataset::vessel(std::string_view name, bool case_sensitive)
     {
         for (Vessel& v: _pdata->vessels)
         {
@@ -215,7 +208,7 @@ namespace bk
     const Vessel* Dataset::vessel(unsigned int i) const
     { return i < num_vessels() ? &_pdata->vessels[i] : nullptr; }
 
-    const Vessel* Dataset::vessel(const std::string& name, bool case_sensitive) const
+    const Vessel* Dataset::vessel(std::string_view name, bool case_sensitive) const
     {
         for (const Vessel& v: _pdata->vessels)
         {
@@ -954,7 +947,8 @@ namespace bk
         centerlineExtractor.set_smooth_kernel_size(smooth_kernel_size);
         centerlineExtractor.set_smooth_relaxation(smooth_relaxation);
 
-        auto[centerlines, success] = centerlineExtractor.extract_centerlines(v->mesh(), v->segmentation3D(), v->centerline_seed_id(), v->centerline_target_ids());
+        const auto seg = this->vessel_segmentation_in_flow_field_3dt_size(*v);
+        auto[centerlines, success] = centerlineExtractor.extract_centerlines(v->mesh(), *seg, v->centerline_seed_id(), v->centerline_target_ids());
 
         v->clear_centerlines();
         v->add_centerlines(centerlines.begin(), centerlines.end());
@@ -1120,6 +1114,12 @@ namespace bk
     std::string Dataset::filepath_phase_unwrapping_3dt() const
     { return _pdata->project_path + "phase_wraps_3dt.pu"; }
 
+    std::string Dataset::dirpath_vessels() const
+    { return dirpath_vessels_without_slash_ending() + "/"; }
+    
+    std::string Dataset::dirpath_vessels_without_slash_ending() const
+    { return project_path() + vessel_dir; }
+    
     std::string Dataset::dirpath_vessel(const Vessel* v) const
     { return dirpath_vessel_without_slash_ending(v) + "/"; }
 
@@ -1131,14 +1131,55 @@ namespace bk
         if (v == nullptr)
         {
             std::cerr << "Dataset::dirpath_vessel - vessel is nullptr" << std::endl;
-            return project_path() + "vessels/";
+            return project_path() + vessel_dir;
         }
 
-        return project_path() + "vessels/" + v->name();
+        return project_path() + vessel_dir + v->name();
     }
 
     std::string Dataset::dirpath_vessel_without_slash_ending(std::string_view name) const
-    { return project_path() + "vessels/" + name.data(); }
+    { return project_path() + vessel_dir + name.data(); }
+
+    std::string Dataset::filepath_segmentation3D_of_vessel(const Vessel* v) const
+    { return filepath_segmentation3D_of_vessel(v->name()); }
+
+    std::string Dataset::filepath_segmentation3D_of_vessel(std::string_view name) const
+    { return dirpath_vessel(name) + name.data() + ".seg3"; }
+
+    std::string Dataset::filepath_mesh_of_vessel(const Vessel* v) const
+    { return filepath_mesh_of_vessel(v->name()); }
+
+    std::string Dataset::filepath_mesh_of_vessel(std::string_view name) const
+    { return dirpath_vessel(name) + name.data() + ".mesh"; }
+
+    std::string Dataset::filepath_centerline_ids_of_vessel(const Vessel* v) const
+    { return filepath_centerline_ids_of_vessel(v->name()); }
+
+    std::string Dataset::filepath_centerline_ids_of_vessel(std::string_view name) const
+    { return dirpath_vessel(name) + name.data() + ".clids"; }
+
+    std::string Dataset::filepath_centerlines_of_vessel(const Vessel* v) const
+    { return filepath_centerlines_of_vessel(v->name()); }
+
+    std::string Dataset::filepath_centerlines_of_vessel(std::string_view name) const
+    { return dirpath_vessel(name) + name.data() + ".cl"; }
+
+    std::string Dataset::filepath_flowjet_of_vessel(const Vessel* v) const
+    { return filepath_flowjet_of_vessel(v->name()); }
+
+    std::string Dataset::filepath_flowjet_of_vessel(std::string_view name) const
+    { return dirpath_vessel(name) + name.data() + ".fj"; }
+
+    bool Dataset::delete_file_if_exists(std::string_view path) const
+    {
+        if (std::filesystem::exists(path))
+        {
+            std::filesystem::remove(path);
+            return true;
+        }
+
+        return false;
+    }
 
     bool Dataset::save_local_dcmbyte_image_copies() const
     {
@@ -1312,11 +1353,17 @@ namespace bk
     bool Dataset::save_pressure_map() const
     { return save_pressure_map(PressureMapImageFilter()); }
 
+    bool Dataset::delete_file_pressure_map_of_vessel(const Vessel* v) const
+    { return v == nullptr ? false : delete_file_if_exists(filepath_pressure_map_of_vessel(*v)); }
+
     bool Dataset::save_flow_dir_correction()
     { return _pdata->flow_dir_correction.save(filepath_flow_dir_correction()); }
 
     bool Dataset::load_flow_dir_correction()
     { return _pdata->flow_dir_correction.load(filepath_flow_dir_correction()); }
+
+    bool Dataset::delete_file_flow_dir_correction()
+    { return delete_file_if_exists(filepath_flow_dir_correction()); }
 
     bool Dataset::save_phase_unwrapping_2dt()
     {
@@ -1375,11 +1422,17 @@ namespace bk
         return success;
     }
 
+    bool Dataset::delete_file_phase_unwrapping_2dt()
+    { return delete_file_if_exists(filepath_phase_unwrapping_2dt()); }
+
     bool Dataset::save_phase_unwrapping_3dt()
     { return _pdata->phase_unwrapping_3dt.save(filepath_phase_unwrapping_3dt()); }
 
     bool Dataset::load_phase_unwrapping_3dt()
     { return _pdata->phase_unwrapping_3dt.load(filepath_phase_unwrapping_3dt()); }
+
+    bool Dataset::delete_file_phase_unwrapping_3dt()
+    { return delete_file_if_exists(filepath_phase_unwrapping_3dt()); }
 
     bool Dataset::save_ivsd()
     {
@@ -1450,6 +1503,48 @@ namespace bk
 
         return true;
     }
+
+    bool Dataset::save_mesh_of_vessel(const Vessel* v) const
+    { return v == nullptr ? false : save_mesh_of_vessel(v->mesh(), v->name()); }
+
+    bool Dataset::save_mesh_of_vessel(std::string_view name) const
+    { return save_mesh_of_vessel(vessel(name)); }
+
+    bool Dataset::save_mesh_of_vessel(const Vessel::mesh_type& mesh, const Vessel* v) const
+    { return v == nullptr ? false : save_mesh_of_vessel(mesh, v->name()); }
+
+    bool Dataset::save_mesh_of_vessel(const Vessel::mesh_type& mesh, std::string_view name) const
+    { return mesh.save(filepath_mesh_of_vessel(name)); }
+
+    bool Dataset::delete_file_segmentation3D_of_vessel(const Vessel* v) const
+    { return v == nullptr ? false : delete_file_segmentation3D_of_vessel(v->name()); }
+
+    bool Dataset::delete_file_segmentation3D_of_vessel(std::string_view name) const
+    { return delete_file_if_exists(filepath_segmentation3D_of_vessel(name)); }
+
+    bool Dataset::delete_file_mesh_of_vessel(const Vessel* v) const
+    { return v == nullptr ? false : delete_file_mesh_of_vessel(v->name()); }
+
+    bool Dataset::delete_file_mesh_of_vessel(std::string_view name) const
+    { return delete_file_if_exists(filepath_mesh_of_vessel(name)); }
+
+    bool Dataset::delete_file_flowjet_of_vessel(const Vessel* v) const
+    { return v == nullptr ? false : delete_file_flowjet_of_vessel(v->name()); }
+
+    bool Dataset::delete_file_flowjet_of_vessel(std::string_view name) const
+    { return delete_file_if_exists(filepath_flowjet_of_vessel(name)); }
+
+    bool Dataset::delete_file_centerlines_of_vessel(const Vessel* v) const
+    { return v == nullptr ? false : delete_file_centerlines_of_vessel(v->name()); }
+
+    bool Dataset::delete_file_centerlines_of_vessel(std::string_view name) const
+    { return delete_file_if_exists(filepath_centerlines_of_vessel(name)); }
+
+    bool Dataset::delete_file_centerline_ids_of_vessel(const Vessel* v) const
+    { return v == nullptr ? false : delete_file_centerline_ids_of_vessel(v->name()); }
+
+    bool Dataset::delete_file_centerline_ids_of_vessel(std::string_view name) const
+    { return delete_file_if_exists(filepath_centerline_ids_of_vessel(name)); }
   } // inline namespace cmr
 } // namespace bk
 

@@ -140,11 +140,14 @@ namespace bk
     bool Vessel::has_segmentation3D() const
     { return _pdata->seg3.num_values() > 1; }
 
-    auto Vessel::segmentation3D() const -> const segmentation3d_type&
+    auto Vessel::segmentation3D()& -> segmentation3d_type&
     { return _pdata->seg3; }
 
-    auto Vessel::segmentation3D() -> segmentation3d_type&
+    auto Vessel::segmentation3D() const& -> const segmentation3d_type&
     { return _pdata->seg3; }
+
+    auto Vessel::segmentation3D()&& -> segmentation3d_type&&
+    { return std::move(_pdata->seg3); }
 
     const std::pair<Segmentation3DInfo_, unsigned int>& Vessel::segmentation3D_info() const
     { return _pdata->seg3info; }
@@ -164,11 +167,14 @@ namespace bk
     bool Vessel::has_mesh() const
     { return _pdata->mesh.geometry().num_points() > 1 && _pdata->mesh.topology().num_cells() > 1; }
 
-    auto Vessel::mesh() const -> const mesh_type&
+    auto Vessel::mesh()& -> mesh_type&
     { return _pdata->mesh; }
 
-    auto Vessel::mesh() -> mesh_type&
+    auto Vessel::mesh() const& -> const mesh_type&
     { return _pdata->mesh; }
+
+    auto Vessel::mesh()&& -> mesh_type&&
+    { return std::move(_pdata->mesh); }
 
     //auto Vessel::pathlines() const -> const pathlineset_type&
     //{ return _pdata->pathlines; }
@@ -178,12 +184,15 @@ namespace bk
     //
     //unsigned int Vessel::num_pathlines() const
     //{ return _pdata->pathlines.size(); }
-    //
-    const std::vector<Line3D>& Vessel::centerlines() const
+
+    std::vector<Line3D>& Vessel::centerlines()&
     { return _pdata->centerlines; }
 
-    std::vector<Line3D>& Vessel::centerlines()
+    const std::vector<Line3D>& Vessel::centerlines() const&
     { return _pdata->centerlines; }
+
+    std::vector<Line3D>&& Vessel::centerlines()&&
+    { return std::move(_pdata->centerlines); }
 
     unsigned int Vessel::num_centerlines() const
     { return _pdata->centerlines.size(); }
@@ -774,6 +783,7 @@ namespace bk
         for (unsigned int i = 0; i < 16; ++i)
         { w[i] = wmat[i]; }
         _pdata->seg3.geometry().transformation().set_world_matrix(w);
+        _pdata->seg3.geometry().transformation().set_dicom_image_type_3d();
 
         // segmentation bits
         BitVectorX segbits;
@@ -1108,6 +1118,7 @@ namespace bk
 
             l.geometry().reserve(numPoints);
             std::vector<double>& rad = l.template add_point_attribute_vector<attribute_info::radius()>();
+            rad.resize(numPoints, 0);
 
             for (unsigned int p = 0; p < numPoints; ++p)
             {
@@ -1126,7 +1137,7 @@ namespace bk
                 file.read(reinterpret_cast<char*>(&rad[p]), sizeof(double));
             }
 
-            fut.push_back(bk_threadpool.enqueue([&]()
+            fut.push_back(bk_threadpool.enqueue([&,i]()
                                                 {
                                                     _pdata->centerlines[i].geometry().construct_kd_tree();
                                                     _pdata->centerlines[i].calc_consistent_local_coordinate_systems();

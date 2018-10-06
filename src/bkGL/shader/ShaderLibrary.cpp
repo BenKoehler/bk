@@ -937,6 +937,7 @@ namespace bk::details
 
       s << comment_tag_fragment_shader("PHONG GHOSTED OIT");
       s << version();
+      s << oit_definition_max_fragments();
 
       s << comment_region_input();
       s << "layout(location = 0) in vec3 position_frag;\n";
@@ -1260,6 +1261,33 @@ namespace bk::details
       s << function_main_begin();
       s << "   position_frag = position_in;\n";
       s << "   vertID_frag = vertID_in;\n";
+      s << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_in, 1);\n";
+      s << function_main_end();
+
+      return s.str();
+  }
+
+  std::string ShaderLibrary::mesh::picking::vert_phong()
+  {
+      std::stringstream s;
+
+      s << comment_tag_vertex_shader("PICKING (PHONG)");
+      s << version();
+
+      s << comment_region_input();
+      s << "layout(location = 0) in vec3 position_in;\n";
+      s << "layout(location = 1) in vec3 normal_in;\n";
+      s << "layout(location = 2) in float vertID_in; //unused\n";
+      s << ubo_definition_global();
+
+      s << comment_region_output();
+      s << "layout(location = 0) out vec3 position_frag;\n";
+      s << "layout(location = 1) out vec3 normal_frag;\n";
+
+      s << comment_region_functions();
+      s << function_main_begin();
+      s << "   position_frag = position_in;\n";
+      s << "   normal_frag = normal_in;\n";
       s << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_in, 1);\n";
       s << function_main_end();
 

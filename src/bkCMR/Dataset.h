@@ -36,6 +36,7 @@
 #include <bk/Image>
 #include <bk/Matrix>
 #include <bkCMR/lib/bkCMR_export.h>
+#include "Vessel.h"
 
 namespace bk
 {
@@ -61,12 +62,12 @@ namespace bk
 
     enum DatasetFilter_ : unsigned int
     {
-        DatasetFilter_PhaseUnwrapping   = 1 << 0, //
-        DatasetFilter_VelocityOffset    = 1 << 1, //
+        DatasetFilter_PhaseUnwrapping = 1 << 0, //
+        DatasetFilter_VelocityOffset = 1 << 1, //
         DatasetFilter_FlowDirCorrection = 1 << 2, //
         //
-        DatasetFilter_None              = 0, //
-        DatasetFilter_All               = DatasetFilter_PhaseUnwrapping | DatasetFilter_VelocityOffset | DatasetFilter_FlowDirCorrection, //
+            DatasetFilter_None = 0, //
+        DatasetFilter_All = DatasetFilter_PhaseUnwrapping | DatasetFilter_VelocityOffset | DatasetFilter_FlowDirCorrection, //
     };
 
     class BKCMR_EXPORT Dataset
@@ -75,8 +76,8 @@ namespace bk
         //===== DEFINITIONS
         //====================================================================================================
       public:
-        static const std::string dcmbytes;
-        static const std::string vessel_dir;
+        inline static const std::string dcmbytes = "dcmbytes";
+        inline static const std::string vessel_dir = "vessels/";
 
         //====================================================================================================
         //===== MEMBERS
@@ -118,9 +119,9 @@ namespace bk
 
         [[nodiscard]] unsigned int num_vessels() const;
         [[nodiscard]] Vessel* vessel(unsigned int i);
-        [[nodiscard]] Vessel* vessel(const std::string& name, bool case_sensitive = true);
+        [[nodiscard]] Vessel* vessel(std::string_view name, bool case_sensitive = true);
         [[nodiscard]] const Vessel* vessel(unsigned int i) const;
-        [[nodiscard]] const Vessel* vessel(const std::string& name, bool case_sensitive = true) const;
+        [[nodiscard]] const Vessel* vessel(std::string_view name, bool case_sensitive = true) const;
         [[nodiscard]] bool has_vessel(std::string_view name, bool case_sensitive = true) const;
 
         [[nodiscard]] bool vessel_has_centerline_ids(const Vessel* v) const;
@@ -218,15 +219,29 @@ namespace bk
         //====================================================================================================
         //===== I/O
         //====================================================================================================
-      private:
         [[nodiscard]] std::string filepath_importer() const;
         [[nodiscard]] std::string filepath_flow_dir_correction() const;
         [[nodiscard]] std::string filepath_phase_unwrapping_2dt() const;
         [[nodiscard]] std::string filepath_phase_unwrapping_3dt() const;
+        [[nodiscard]] std::string dirpath_vessels() const;
+        [[nodiscard]] std::string dirpath_vessels_without_slash_ending() const;
         [[nodiscard]] std::string dirpath_vessel(const Vessel* v) const;
         [[nodiscard]] std::string dirpath_vessel(std::string_view name) const;
         [[nodiscard]] std::string dirpath_vessel_without_slash_ending(const Vessel* v) const;
         [[nodiscard]] std::string dirpath_vessel_without_slash_ending(std::string_view name) const;
+        [[nodiscard]] std::string filepath_segmentation3D_of_vessel(const Vessel* v) const;
+        [[nodiscard]] std::string filepath_segmentation3D_of_vessel(std::string_view name) const;
+        [[nodiscard]] std::string filepath_mesh_of_vessel(const Vessel* v) const;
+        [[nodiscard]] std::string filepath_mesh_of_vessel(std::string_view name) const;
+        [[nodiscard]] std::string filepath_centerline_ids_of_vessel(const Vessel* v) const;
+        [[nodiscard]] std::string filepath_centerline_ids_of_vessel(std::string_view name) const;
+        [[nodiscard]] std::string filepath_centerlines_of_vessel(const Vessel* v) const;
+        [[nodiscard]] std::string filepath_centerlines_of_vessel(std::string_view name) const;
+        [[nodiscard]] std::string filepath_flowjet_of_vessel(const Vessel* v) const;
+        [[nodiscard]] std::string filepath_flowjet_of_vessel(std::string_view name) const;
+
+      private:
+        [[maybe_unused]] bool delete_file_if_exists(std::string_view path) const;
       public:
 
         [[maybe_unused]] bool save_local_dcmbyte_image_copies() const;
@@ -237,21 +252,41 @@ namespace bk
 
         [[maybe_unused]] bool save_pressure_map(PressureMapImageFilter pmf) const;
         [[maybe_unused]] bool save_pressure_map() const;
+        [[maybe_unused]] bool delete_file_pressure_map_of_vessel(const Vessel* v) const;
 
         [[maybe_unused]] bool save_flow_dir_correction();
         [[maybe_unused]] bool load_flow_dir_correction();
+        [[maybe_unused]] bool delete_file_flow_dir_correction();
 
         [[maybe_unused]] bool save_phase_unwrapping_2dt();
         [[maybe_unused]] bool load_phase_unwrapping_2dt();
+        [[maybe_unused]] bool delete_file_phase_unwrapping_2dt();
 
         [[maybe_unused]] bool save_phase_unwrapping_3dt();
         [[maybe_unused]] bool load_phase_unwrapping_3dt();
+        [[maybe_unused]] bool delete_file_phase_unwrapping_3dt();
 
         [[maybe_unused]] bool save_ivsd();
         [[maybe_unused]] bool save_magnitude_tmip_3dt();
         [[maybe_unused]] bool save_anatomical_tmip_3dt(unsigned int imgId);
 
         [[maybe_unused]] bool save_vessel(const Vessel* v) const;
+
+        [[maybe_unused]] bool save_mesh_of_vessel(const Vessel* v) const;
+        [[maybe_unused]] bool save_mesh_of_vessel(std::string_view name) const;
+        [[maybe_unused]] bool save_mesh_of_vessel(const Vessel::mesh_type& mesh, const Vessel* v) const;
+        [[maybe_unused]] bool save_mesh_of_vessel(const Vessel::mesh_type& mesh, std::string_view name) const;
+        
+        [[maybe_unused]] bool delete_file_segmentation3D_of_vessel(const Vessel* v) const;
+        [[maybe_unused]] bool delete_file_segmentation3D_of_vessel(std::string_view name) const;
+        [[maybe_unused]] bool delete_file_mesh_of_vessel(const Vessel* v) const;
+        [[maybe_unused]] bool delete_file_mesh_of_vessel(std::string_view name) const;
+        [[maybe_unused]] bool delete_file_flowjet_of_vessel(const Vessel* v) const;
+        [[maybe_unused]] bool delete_file_flowjet_of_vessel(std::string_view name) const;
+        [[maybe_unused]] bool delete_file_centerlines_of_vessel(const Vessel* v) const;
+        [[maybe_unused]] bool delete_file_centerlines_of_vessel(std::string_view name) const;
+        [[maybe_unused]] bool delete_file_centerline_ids_of_vessel(const Vessel* v) const;
+        [[maybe_unused]] bool delete_file_centerline_ids_of_vessel(std::string_view name) const;
     }; // class Dataset
   } // inline namespace cmr
 } // namespace bk

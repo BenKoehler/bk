@@ -71,7 +71,7 @@ namespace bk
       ColorRGBA color;
       ColorScaleType colorscale_type;
       Vec3<value_type> center;
-      details::MeshRenderMode mode;
+      details::MeshRenderMode_ mode;
 
           #ifndef BK_LIB_QT_AVAILABLE
 
@@ -100,7 +100,7 @@ namespace bk
           color(ColorRGBA::Green()),
           colorscale_type(ColorScaleType::Rainbow),
           center(MatrixFactory::Zero_Vec_3D<value_type>()),
-          mode(details::MeshRenderMode::Solid)
+          mode(details::MeshRenderMode_Solid)
       { /* do nothing */ }
   };
 
@@ -141,16 +141,16 @@ namespace bk
   //====================================================================================================
   /// @{ -------------------------------------------------- GET MODE
   bool TriangularMesh3DView::mode_is_solid_default() const
-  { return _pdata->mode == details::MeshRenderMode::Solid; }
+  { return _pdata->mode == details::MeshRenderMode_Solid; }
 
   bool TriangularMesh3DView::mode_is_wireframe() const
-  { return _pdata->mode == details::MeshRenderMode::WireFrame; }
+  { return _pdata->mode == details::MeshRenderMode_WireFrame; }
 
   bool TriangularMesh3DView::mode_is_front_face_culling_with_ghosted_view() const
-  { return _pdata->mode == details::MeshRenderMode::FrontFaceCullingWithGhostedView; }
+  { return _pdata->mode == details::MeshRenderMode_FrontFaceCullingWithGhostedView; }
 
   bool TriangularMesh3DView::mode_is_silhouette() const
-  { return _pdata->mode == details::MeshRenderMode::Silhouette; }
+  { return _pdata->mode == details::MeshRenderMode_Silhouette; }
   /// @}
 
   /// @{ -------------------------------------------------- GET SHININESS
@@ -215,9 +215,9 @@ namespace bk
   /// @{ -------------------------------------------------- SET RENDER MODE
   void TriangularMesh3DView::set_mode_solid_default()
   {
-      if (_pdata->mode != details::MeshRenderMode::Solid)
+      if (_pdata->mode != details::MeshRenderMode_Solid)
       {
-          _pdata->mode = details::MeshRenderMode::Solid;
+          _pdata->mode = details::MeshRenderMode_Solid;
 
           if (this->is_initialized())
           {
@@ -229,9 +229,9 @@ namespace bk
 
   void TriangularMesh3DView::set_mode_wireframe()
   {
-      if (_pdata->mode != details::MeshRenderMode::WireFrame)
+      if (_pdata->mode != details::MeshRenderMode_WireFrame)
       {
-          _pdata->mode = details::MeshRenderMode::WireFrame;
+          _pdata->mode = details::MeshRenderMode_WireFrame;
 
           if (this->is_initialized())
           {
@@ -243,9 +243,9 @@ namespace bk
 
   void TriangularMesh3DView::set_mode_front_face_culling_with_ghosted_view()
   {
-      if (_pdata->mode != details::MeshRenderMode::FrontFaceCullingWithGhostedView)
+      if (_pdata->mode != details::MeshRenderMode_FrontFaceCullingWithGhostedView)
       {
-          _pdata->mode = details::MeshRenderMode::FrontFaceCullingWithGhostedView;
+          _pdata->mode = details::MeshRenderMode_FrontFaceCullingWithGhostedView;
 
           if (this->is_initialized())
           {
@@ -257,9 +257,9 @@ namespace bk
 
   void TriangularMesh3DView::set_mode_silhouette()
   {
-      if (_pdata->mode != details::MeshRenderMode::Silhouette)
+      if (_pdata->mode != details::MeshRenderMode_Silhouette)
       {
-          _pdata->mode = details::MeshRenderMode::Silhouette;
+          _pdata->mode = details::MeshRenderMode_Silhouette;
 
           if (this->is_initialized())
           {
@@ -594,7 +594,7 @@ namespace bk
 
       switch (_pdata->mode)
       {
-          case details::MeshRenderMode::Solid:
+          case details::MeshRenderMode_Solid:
           {
               if (!_pdata->color_enabled)
               { _pdata->shader.init_from_sources(SL::mesh::phong::vert(), SL::mesh::phong::frag()); }
@@ -603,7 +603,7 @@ namespace bk
 
               break;
           }
-          case details::MeshRenderMode::WireFrame:
+          case details::MeshRenderMode_WireFrame:
           {
               if (!_pdata->color_enabled)
               { _pdata->shader.init_from_sources(SL::mesh::wireframe::vert(), SL::mesh::wireframe::frag(), SL::mesh::wireframe::geom()); }
@@ -612,7 +612,7 @@ namespace bk
 
               break;
           }
-          case details::MeshRenderMode::FrontFaceCullingWithGhostedView:
+          case details::MeshRenderMode_FrontFaceCullingWithGhostedView:
           {
               if (!_pdata->color_enabled)
               { _pdata->shader.init_from_sources(SL::mesh::phong::vert(), SL::mesh::phong::frag()); }
@@ -636,7 +636,7 @@ namespace bk
 
               break;
           }
-          case details::MeshRenderMode::Silhouette:
+          case details::MeshRenderMode_Silhouette:
           {
               if (!_pdata->color_enabled)
               { _pdata->shader.init_from_sources(SL::mesh::silhouette::vert(), SL::mesh::silhouette::frag()); }
@@ -775,7 +775,7 @@ namespace bk
 
   void TriangularMesh3DView::on_oit_enabled(bool b)
   {
-      if (_pdata->mode == details::MeshRenderMode::FrontFaceCullingWithGhostedView)
+      if (_pdata->mode == details::MeshRenderMode_FrontFaceCullingWithGhostedView)
       { init_shader(); }
 
       _pdata->colorbarview.on_oit_enabled(b);
@@ -819,7 +819,7 @@ namespace bk
           if (_pdata->color_enabled)
           { _pdata->ssbo_colorbar.bind_to_base(7); }
 
-          if (_pdata->mode == details::MeshRenderMode::FrontFaceCullingWithGhostedView)
+          if (_pdata->mode == details::MeshRenderMode_FrontFaceCullingWithGhostedView)
           {
               // first pass: back side
               BK_QT_GL glPushAttrib(GL_POLYGON_BIT);
@@ -864,7 +864,7 @@ namespace bk
 
   void TriangularMesh3DView::draw_transparent_impl()
   {
-      if (this->is_initialized() && this->is_visible() && _pdata->mode == details::MeshRenderMode::FrontFaceCullingWithGhostedView)
+      if (this->is_initialized() && this->is_visible() && _pdata->mode == details::MeshRenderMode_FrontFaceCullingWithGhostedView)
       {
           // ubo 0 must be global ubo with modelview/projection matrices
           _pdata->ubo.bind_to_default_base();
@@ -872,7 +872,7 @@ namespace bk
           if (_pdata->color_enabled)
           { _pdata->ssbo_colorbar.bind_to_base(7); }
 
-          // first pass: back side
+          // second pass: front side
           BK_QT_GL glPushAttrib(GL_POLYGON_BIT);
 
           BK_QT_GL glEnable(GL_CULL_FACE);

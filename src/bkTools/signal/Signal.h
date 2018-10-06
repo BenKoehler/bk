@@ -189,12 +189,21 @@ namespace bk
           if (!_mute)
           {
               std::unique_lock<std::mutex> lock(_map_mutex);
+
+              bool hasOneTimeSlots = false;
+
               for (auto it = _slots.begin(); it != _slots.end(); ++it)
-              { std::get<2>(*it)(p...); }
+              {
+                  std::get<2>(*it)(p...);
+                  hasOneTimeSlots |= std::get<1>(*it);
+              }
 
               // remove one time executions
-              _slots.erase(std::remove_if(_slots.begin(), _slots.end(), [](const typename slot_map_type::value_type& x)
-              { return std::get<1>(x); }), _slots.end());
+              if (hasOneTimeSlots)
+              {
+                  _slots.erase(std::remove_if(_slots.begin(), _slots.end(), [](const typename slot_map_type::value_type& x)
+                  { return std::get<1>(x); }), _slots.end());
+              }
           }
       }
       /// @}

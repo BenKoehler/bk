@@ -99,7 +99,7 @@ namespace bk
     //====================================================================================================
     //===== FUNCTIONS
     //====================================================================================================
-    std::pair<std::vector<Line3D> /*centerlines*/, bool /*success*/> CenterlineExtractor::extract_centerlines(TriangularMesh3D& mesh, const Vessel::segmentation3d_type& seg, unsigned int seed_meshVertexId, const std::vector<unsigned int>& target_meshVertexIds) const
+    std::pair<std::vector<Line3D> /*centerlines*/, bool /*success*/> CenterlineExtractor::extract_centerlines(TriangularMesh3D& mesh, const bk::DicomImage<double,3>& seg, unsigned int seed_meshVertexId, const std::vector<unsigned int>& target_meshVertexIds) const
     {
         std::vector<Line<3>> result_centerlines;
 
@@ -137,24 +137,28 @@ namespace bk
         wmat.col_ref(1) /= dmUpscale[1];
         wmat.col_ref(2) /= dmUpscale[2];
         dm.geometry().transformation().set_world_matrix(wmat);
+        dm.geometry().transformation().set_dicom_image_type_3d();
 
-        double maxdst = dm.num_values();
+        //double maxdst = dm.num_values();
+        double maxdst = 0;
         mesh.geometry().construct_kd_tree();
 
         #ifdef BK_EMIT_PROGRESS
         prog.increment(1);
         #endif
 
-        maxdst = 0;
+        //maxdst = 0;
 
         #ifdef BK_EMIT_PROGRESS
-        Progress& prog_dmap = bk_progress.emplace_task(dmSize[0]/4 + dmSize[0], ___("Intravascular distance map"));
+        Progress& prog_dmap = bk_progress.emplace_task(dm.num_values() + dmSize[0], ___("Intravascular distance map"));
         #endif
 
         // calc distance map by finding closest point on surface mesh
         #pragma omp parallel for schedule(dynamic, 1) reduction(max:maxdst)
         for (unsigned int x = 0; x < dmSize[0]; ++x)
         {
+            double tempMaxdst = 0;
+
             for (unsigned int y = 0; y < dmSize[1]; ++y)
             {
                 for (unsigned int z = 0; z < dmSize[2]; ++z)
@@ -170,12 +174,14 @@ namespace bk
                     dm(x, y, z) = d;
 
                     // determine global max for later normalization
-                    maxdst = std::max(maxdst, d);
+                    tempMaxdst = std::max(tempMaxdst, d);
                 }
             }
 
+            maxdst = std::max(maxdst, tempMaxdst);
+
             #ifdef BK_EMIT_PROGRESS
-            #pragma omp critical
+            #pragma omp critical(prog_dmap)
             { prog_dmap.increment(1); }
             #endif
         }
@@ -191,6 +197,11 @@ namespace bk
         {
             dm[i] = (maxdst - dm[i]) / maxdst;
             dm[i] = std::pow(dm[i], _pdata->distance_penalty_exponent);
+
+            #ifdef BK_EMIT_PROGRESS
+            #pragma omp critical(prog_dmap)
+            { prog_dmap.increment(1); }
+            #endif
         }
 
         #ifdef BK_EMIT_PROGRESS
@@ -231,7 +242,7 @@ namespace bk
         for (unsigned int tid = 0; tid < target_meshVertexIds.size(); ++tid)
         {
             #ifdef BK_EMIT_PROGRESS
-            Progress& prog_cl = bk_progress.emplace_task(19, ___("Calculating centerline @0",  tid));
+            Progress& prog_cl = bk_progress.emplace_task(19, ___("Calculating centerline @0 of @1",  tid+1, target_meshVertexIds.size()));
             #endif
 
             auto cltarget_voxel = seg.geometry().transformation().to_object_coordinates(mesh.geometry().point(target_meshVertexIds[tid]));

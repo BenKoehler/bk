@@ -226,7 +226,7 @@ namespace bk
 
   auto GrayImageGraphCutView::operator=(self_type&& other) noexcept -> self_type& = default;
 
-  void GrayImageGraphCutView::set_inside_outside_from_graph_cut()
+  void GrayImageGraphCutView::set_inside_outside_from_graph_cut(bool resetSegmentation)
   {
       #pragma omp parallel sections
       {
@@ -248,8 +248,11 @@ namespace bk
           }
           #pragma omp section
           {
-              for (auto& x: _pdata->seg)
-              { x = 0; }
+              if (resetSegmentation)
+              {
+                  for (auto& x: _pdata->seg)
+                  { x = 0; }
+              }
           }
       }
 
@@ -450,7 +453,7 @@ namespace bk
   void GrayImageGraphCutView::clear_ssbo_gc()
   { _pdata->ssbo_gc.clear(); }
 
-  void GrayImageGraphCutView::update_gc(double narrow_band_width_percent)
+  void GrayImageGraphCutView::update_gc(double narrow_band_width_percent, unsigned int narrow_band_min_pixel_width)
   {
       if (!_pdata->gc_is_running && _pdata->gc != nullptr)
       {
@@ -487,7 +490,7 @@ namespace bk
                   }
 
                   if (narrow_band_width_percent < 1)
-                  { _pdata->gc->narrow_band_sink_ids(narrow_band_width_percent); }
+                  { _pdata->gc->narrow_band_sink_ids(narrow_band_width_percent, narrow_band_min_pixel_width); }
 
                   #ifdef BK_EMIT_PROGRESS
                   prog_input.set_finished();
@@ -497,27 +500,6 @@ namespace bk
 
                   #ifdef BK_EMIT_PROGRESS
                   bk::Progress& prog_postpro = bk_progress.emplace_task(5, ___("Post-processing graph cut result"));
-                  #endif
-
-                  /*
-                   * - write segmentation
-                   * - enforce that regions drawn as inside/outside are 1/0 in segmentation
-                   */
-                  for (GLuint i = 0; i < static_cast<GLuint>(_pdata->seg.num_values()); ++i)
-                  {
-                      if (_pdata->in[i] != 0)
-                      { _pdata->seg[i] = 1; }
-                      else if (_pdata->out[i] != 0)
-                      { _pdata->seg[i] = 0; }
-                      else
-                      {
-                          const auto gid = bk::list_to_grid_id(_pdata->in.size(), i);
-                          _pdata->seg[i] = _pdata->gc->is_in_segmentation(gid[0], gid[1], gid[2]) ? 1 : 0;
-                      }
-                  }
-
-                  #ifdef BK_EMIT_PROGRESS
-                  prog_postpro.increment(1);
                   #endif
 
                   /*
@@ -531,6 +513,27 @@ namespace bk
                   #endif
 
                   _pdata->seg = bk::ConnectedComponentAnalysisKeepLargestRegionImageFilter::apply(_pdata->seg);
+
+                  #ifdef BK_EMIT_PROGRESS
+                  prog_postpro.increment(1);
+                  #endif
+
+                  /*
+                  * - write segmentation
+                  * - enforce that regions drawn as inside/outside are 1/0 in segmentation
+                  */
+                  for (GLuint i = 0; i < static_cast<GLuint>(_pdata->seg.num_values()); ++i)
+                  {
+                      if (_pdata->in[i] != 0)
+                      { _pdata->seg[i] = 1; }
+                      else if (_pdata->out[i] != 0)
+                      { _pdata->seg[i] = 0; }
+                      else
+                      {
+                          const auto gid = bk::list_to_grid_id(_pdata->in.size(), i);
+                          _pdata->seg[i] = _pdata->gc->is_in_segmentation(gid[0], gid[1], gid[2]) ? 1 : 0;
+                      }
+                  }
 
                   #ifdef BK_EMIT_PROGRESS
                   prog_postpro.set_finished();
