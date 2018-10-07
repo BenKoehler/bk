@@ -42,7 +42,6 @@ private:\
 inline static T x;\
 public:\
     inline static bk::Signal<T> signal_##x##_changed;\
-    [[nodiscard]] static bk::Signal<T>& get_signal_##x() {return signal_##x##_changed;}\
     [[nodiscard]] T get_##x() const {return x;}\
     void set_##x(T _##x) {if (x != _##x){x = _##x; signal_##x##_changed.emit_signal(x);}}
 
