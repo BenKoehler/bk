@@ -142,7 +142,7 @@ namespace bk
       BK_QT_GL glPrimitiveRestartIndex(std::numeric_limits<GLuint>::max());
 
       _vao().bind();
-      _ssbo_intensity().bind_to_base(1);
+      _ssbo_intensity().bind_to_base(2);
 
       _shader().bind();
       BK_QT_GL glDrawElements(GL_TRIANGLE_STRIP, _sizeInd(), GL_UNSIGNED_INT, nullptr);
