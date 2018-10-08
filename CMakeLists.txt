@@ -315,30 +315,30 @@ set(SOURCE_FILES # BUFFER
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/dvr/DVRImageView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/dvr/DVRImage3DView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/dvr/DVRImage4DView.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/segmenter/GrayImageGraphCutView.cpp # TODO
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/texture/Texture2DView.cpp # TODO
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/AbstractGraySliceView.cpp # TODO
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/AbstractRGBSliceView.cpp # TODO
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/AbstractSliceView.cpp # TODO
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/GrayDICOMSliceView.cpp # TODO
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/GrayImageLiveThresholdSliceView.cpp # TODO
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/GrayImagePlusSegmentationSliceView.cpp # TODO
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/GrayImageSliceView.cpp # TODO
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/RGBDICOMFlowImageSliceView.cpp # TODO
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/RGBDICOMSliceView.cpp # TODO
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/RGBImageSliceView.cpp # TODO
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/segmenter/GrayImageGraphCutView.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/texture/Texture2DView.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/AbstractGraySliceView.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/AbstractRGBSliceView.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/AbstractSliceView.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/GrayDICOMSliceView.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/GrayImageLiveThresholdSliceView.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/GrayImagePlusSegmentationSliceView.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/GrayImageSliceView.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/RGBDICOMFlowImageSliceView.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/RGBDICOMSliceView.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/RGBImageSliceView.cpp 
         #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/imageplane/ImagePlanePreviewView.cpp # TODO
         #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/imageplane/ImagePlaneView.cpp # TODO
 
-        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/AreaPlotView.cpp # TODO
-        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/MultiLinePlotView.cpp # TODO
-        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotAbstractDataVectorView.cpp # TODO
-        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotAxis.cpp # TODO
-        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotBase.cpp # TODO
-        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotDataVector.cpp # TODO
-        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotLine.cpp # TODO
-        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotMarker.cpp # TODO
-        #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/SingleLinePlotView.cpp # TODO
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/AreaPlotView.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/MultiLinePlotView.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotAbstractDataVectorView.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotAxis.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotBase.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotDataVector.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotLine.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotMarker.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/SingleLinePlotView.cpp 
 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/line/LineView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/mesh/TriangularMesh3DView.cpp
@@ -371,6 +371,9 @@ set(SOURCE_FILES # BUFFER
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOGlobal.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOLine.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOPhong.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOAreaPlot.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOPlot.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOPlotLine.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOSelectionSphere.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOSliceView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOText.cpp

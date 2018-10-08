@@ -80,6 +80,7 @@ namespace bk::details
       [[nodiscard]] static std::string function_grid_to_list_id();
       [[nodiscard]] static std::string function_camera_position();
       [[nodiscard]] static std::string function_linearize_depth();
+      [[nodiscard]] static std::string function_plot_data_to_screen();
       /// @}
 
       /// @{ -------------------------------------------------- UBO
@@ -88,6 +89,9 @@ namespace bk::details
       [[nodiscard]] static std::string ubo_definition_dvr();
       [[nodiscard]] static std::string ubo_definition_global();
       [[nodiscard]] static std::string ubo_definition_line();
+      [[nodiscard]] static std::string ubo_definition_area_plot();
+      [[nodiscard]] static std::string ubo_definition_plot();
+      [[nodiscard]] static std::string ubo_definition_plot_line();
       [[nodiscard]] static std::string ubo_definition_phong();
       [[nodiscard]] static std::string ubo_definition_selection_sphere();
       [[nodiscard]] static std::string ubo_definition_sliceview();
@@ -352,6 +356,44 @@ namespace bk::details
           };
 
       }; // struct segmentation
+
+      //====================================================================================================
+      //===== PLOT
+      //====================================================================================================
+      struct plot
+      {
+          struct area
+          {
+              [[nodiscard]] static std::string vert();
+              [[nodiscard]] static std::string frag();
+          };
+
+          struct line
+          {
+              [[nodiscard]] static std::string vert();
+              [[nodiscard]] static std::string frag();
+          };
+
+          struct stdev
+          {
+              [[nodiscard]] static std::string vert();
+              [[nodiscard]] static std::string frag();
+          };
+
+          struct axis
+          {
+              [[nodiscard]] static std::string vert();
+              [[nodiscard]] static std::string geom();
+              [[nodiscard]] static std::string frag();
+          };
+
+          struct ticks
+          {
+              [[nodiscard]] static std::string vert();
+              [[nodiscard]] static std::string geom();
+              [[nodiscard]] static std::string frag();
+          };
+      };
   }; // class ShaderLibrary
 } // namespace bk::details
 

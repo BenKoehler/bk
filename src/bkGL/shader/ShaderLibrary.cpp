@@ -34,6 +34,9 @@
 #include <bkGL/UBODVR.h>
 #include <bkGL/UBOGlobal.h>
 #include <bkGL/UBOLine.h>
+#include <bkGL/UBOAreaPlot.h>
+#include <bkGL/UBOPlot.h>
+#include <bkGL/UBOPlotLine.h>
 #include <bkGL/UBOPhong.h>
 #include <bkGL/UBOSelectionSphere.h>
 #include <bkGL/UBOSliceView.h>
@@ -158,7 +161,7 @@ namespace bk::details
   std::string ShaderLibrary::function_linearize_depth()
   {
       const std::string znear = UBOGlobal::name_cam_znear();
-      const std::string zfar  = UBOGlobal::name_cam_zfar();
+      const std::string zfar = UBOGlobal::name_cam_zfar();
 
       std::stringstream s;
 
@@ -167,6 +170,28 @@ namespace bk::details
 
       s << "float linearize_depth()\n";
       s << "{ return linearize_depth(gl_FragCoord.z); }\n\n";
+
+      return s.str();
+  }
+
+  std::string ShaderLibrary::function_plot_data_to_screen()
+  {
+      const std::string hb = UBOPlot::name_border_width_horizontal_in_percent();
+      const std::string vb = UBOPlot::name_border_width_vertical_in_percent();
+      const std::string xmin = UBOPlot::name_xmin();
+      const std::string xmax = UBOPlot::name_xmax();
+      const std::string ymin = UBOPlot::name_ymin();
+      const std::string ymax = UBOPlot::name_ymax();
+
+      std::stringstream s;
+
+      s << "vec2 plot_data_to_screen(vec2 xy)\n";
+      s << "{\n";
+      s << "   return vec2(\n";
+      s << "      (-1 + " << hb << ") + (2 - " << hb << " - " << hb << "/4) * (xy[0] - " << xmin << ") / (" << xmax << " - " << xmin << "),\n";
+      s << "      (-1 + " << vb << ") + (2 - " << vb << " - " << vb << "/4) * (xy[1] - " << ymin << ") / (" << ymax << " - " << ymin << ")\n";
+      s << "   );\n";
+      s << "}\n\n";
 
       return s.str();
   }
@@ -215,6 +240,33 @@ namespace bk::details
   std::string ShaderLibrary::ubo_definition_line()
   {
       return ubo_definition(bk::details::UBOLine(
+      #ifdef BK_LIB_QT_AVAILABLE
+          nullptr
+      #endif
+      ));
+  }
+
+  std::string ShaderLibrary::ubo_definition_area_plot()
+  {
+      return ubo_definition(bk::details::UBOAreaPlot(
+      #ifdef BK_LIB_QT_AVAILABLE
+          nullptr
+      #endif
+      ));
+  }
+
+  std::string ShaderLibrary::ubo_definition_plot()
+  {
+      return ubo_definition(bk::details::UBOPlot(
+      #ifdef BK_LIB_QT_AVAILABLE
+          nullptr
+      #endif
+      ));
+  }
+
+  std::string ShaderLibrary::ubo_definition_plot_line()
+  {
+      return ubo_definition(bk::details::UBOPlotLine(
       #ifdef BK_LIB_QT_AVAILABLE
           nullptr
       #endif
@@ -3268,4 +3320,135 @@ namespace bk::details
 
   std::string ShaderLibrary::segmentation::live_threshold::frag()
   { return contour::frag(); }
+
+  //====================================================================================================
+  //===== PLOT
+  //====================================================================================================
+  std::string ShaderLibrary::plot::area::vert()
+  {
+      // todo
+  }
+
+  std::string ShaderLibrary::plot::area::frag()
+  {
+      // todo
+  }
+
+  std::string ShaderLibrary::plot::line::vert()
+  {
+      // todo
+  }
+
+  std::string ShaderLibrary::plot::line::frag()
+  {
+      // todo
+  }
+
+  std::string ShaderLibrary::plot::stdev::vert()
+  {
+      // todo
+  }
+
+  std::string ShaderLibrary::plot::stdev::frag()
+  {
+      // todo
+  }
+
+  std::string ShaderLibrary::plot::axis::vert()
+  {
+      std::stringstream s;
+
+      s << comment_tag_vertex_shader("PLOT AXIS");
+      s << version();
+
+      s << comment_region_input();
+      s << "layout(location = 0) in vec2 position_in;\n";
+
+      s << comment_region_output();
+      s << "layout(location = 0) out vec2 position_geom;\n";
+
+      s << comment_region_functions();
+      s << function_main_begin();
+      s << "   position_geom = position_in;\n";
+      s << function_main_end();
+
+      return s.str();
+  }
+
+  std::string ShaderLibrary::plot::axis::geom()
+  {
+      std::stringstream s;
+
+      s << comment_tag_geometry_shader("PLOT AXIS");
+      s << version();
+
+      s << comment_region_input();
+      s << "layout(location = 0) in vec2 position_geom[2];\n";
+      s << ubo_definition_global();
+      s << ubo_definition_plot();
+      s << ubo_definition_plot_line();
+      s << geom_layout_in_lines();
+
+      s << comment_region_output();
+      s << geom_layout_out_triangle_strip(4);
+
+      s << comment_region_functions();
+      s << function_plot_data_to_screen();
+      s << function_main_begin();
+
+      s << "   const vec2 tangent = normalize(plot_data_to_screen(position_geom[1]) - plot_data_to_screen(position_geom[0]));\n";
+      s << "   const vec2 ortho = vec2(-tangent.y, tangent.x);\n\n";
+
+      s << "   const float l = float(" << details::UBOGlobal::name_ssaa_factor() << ") / sqrt(" << details::UBOGlobal::name_window_width() << "*" << details::UBOGlobal::name_window_height() << " + "
+        << details::UBOGlobal::name_window_width() << "*" << details::UBOGlobal::name_window_height() << ");\n\n";
+
+      s << "   gl_Position = vec4(plot_data_to_screen(position_geom[0]) + l*" << details::UBOPlotLine::name_line_width() << "*ortho, 0, 1);\n";
+      s << "   EmitVertex();\n\n";
+
+      s << "   gl_Position = vec4(plot_data_to_screen(position_geom[1]) + l*" << details::UBOPlotLine::name_line_width() << "*ortho, 0, 1);\n";
+      s << "   EmitVertex();\n\n";
+
+      s << "   gl_Position = vec4(plot_data_to_screen(position_geom[0]) - l*" << details::UBOPlotLine::name_line_width() << "*ortho, 0, 1);\n";
+      s << "   EmitVertex();\n\n";
+
+      s << "   gl_Position = vec4(plot_data_to_screen(position_geom[1]) - l*" << details::UBOPlotLine::name_line_width() << "*ortho, 0, 1);\n";
+      s << "   EmitVertex();\n";
+
+      s << function_main_end();
+
+      return s.str();
+  }
+
+  std::string ShaderLibrary::plot::axis::frag()
+  {
+      std::stringstream s;
+
+      s << comment_tag_fragment_shader("PLOT AXIS");
+      s << version();
+
+      s << comment_region_input();
+      s << ubo_definition_plot();
+      s << ubo_definition_plot_line();
+
+      s << comment_region_output();
+      s << "layout(location = 0) out vec4 color_out;\n";
+
+      s << comment_region_functions();
+      s << function_plot_data_to_screen();
+      s << function_main_begin();
+      s << "   color_out = vec4(" << details::UBOPlotLine::name_color_r() << ", " << details::UBOPlotLine::name_color_g() << ", " << details::UBOPlotLine::name_color_b() << ", " << details::UBOPlotLine::name_color_a()
+        << ");\n";
+      s << function_main_end();
+
+      return s.str();
+  }
+
+  std::string ShaderLibrary::plot::ticks::vert()
+  { return ShaderLibrary::plot::axis::vert();}
+
+  std::string ShaderLibrary::plot::ticks::geom()
+  { return ShaderLibrary::plot::axis::geom();}
+
+  std::string ShaderLibrary::plot::ticks::frag()
+  { return ShaderLibrary::plot::axis::frag();}
 } // namespace bk::details
