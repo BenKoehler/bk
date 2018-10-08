@@ -104,6 +104,7 @@ namespace bk
 
         [[nodiscard]] DicomDirImporter_CMR& importer();
         [[nodiscard]] const DicomDirImporter_CMR& importer() const;
+        [[nodiscard]] bool is_importer_loaded() const;
 
         [[nodiscard]] bool has_magnitude_images() const;
         [[nodiscard]] bool has_signal_intensity_image() const;
@@ -159,7 +160,6 @@ namespace bk
         //====================================================================================================
         //===== IMAGES
         //====================================================================================================
-      private:
         [[nodiscard]] std::string filepath_flow_image(unsigned int v) const;
         [[nodiscard]] std::string filepath_tmip_magnitude_3dt() const;
         [[nodiscard]] std::string filepath_lpc() const;
@@ -168,7 +168,9 @@ namespace bk
         [[nodiscard]] std::string filepath_tmip_anatomical_3dt(unsigned int imgId) const;
         [[nodiscard]] std::vector<std::string> filepaths_of_local_image_copies() const;
         [[nodiscard]] std::string filepath_pressure_map_of_vessel(const Vessel& v) const;
+        [[nodiscard]] std::string filepath_static_tissue_threshold() const;
 
+      private:
         [[nodiscard]] bool has_local_image_copy(std::string_view filepath) const;
         [[nodiscard]] bool has_local_image_copy_dcmbytes(unsigned int imgId) const;
 
@@ -197,6 +199,9 @@ namespace bk
 
         [[maybe_unused]] bool extract_centerlines(Vessel* v, unsigned int upscale = 3, int distance_penalty_exponent = 5, unsigned int smooth_iterations = 500, unsigned int smooth_kernel_size = 3, double smooth_relaxation = 0.1);
         [[maybe_unused]] bool extract_centerlines(unsigned int upscale = 3, int distance_penalty_exponent = 5, unsigned int smooth_iterations = 500, unsigned int smooth_kernel_size = 3, double smooth_relaxation = 0.1);
+
+        [[nodiscard]] bool has_static_tissue_threshold() const;
+        [[nodiscard]] double static_tissue_threshold() const;
 
         // todo: 2dt centerline cuts
 
@@ -270,13 +275,15 @@ namespace bk
         [[maybe_unused]] bool save_magnitude_tmip_3dt();
         [[maybe_unused]] bool save_anatomical_tmip_3dt(unsigned int imgId);
 
+        [[maybe_unused]] bool save_static_tissue_threshold(double t) const;
+
         [[maybe_unused]] bool save_vessel(const Vessel* v) const;
 
         [[maybe_unused]] bool save_mesh_of_vessel(const Vessel* v) const;
         [[maybe_unused]] bool save_mesh_of_vessel(std::string_view name) const;
         [[maybe_unused]] bool save_mesh_of_vessel(const Vessel::mesh_type& mesh, const Vessel* v) const;
         [[maybe_unused]] bool save_mesh_of_vessel(const Vessel::mesh_type& mesh, std::string_view name) const;
-        
+
         [[maybe_unused]] bool delete_file_segmentation3D_of_vessel(const Vessel* v) const;
         [[maybe_unused]] bool delete_file_segmentation3D_of_vessel(std::string_view name) const;
         [[maybe_unused]] bool delete_file_mesh_of_vessel(const Vessel* v) const;

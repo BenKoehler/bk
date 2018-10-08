@@ -99,6 +99,9 @@ namespace bk
     const DicomDirImporter_CMR& Dataset::importer() const
     { return _pdata->importer; }
 
+    bool Dataset::is_importer_loaded() const
+    { return _pdata->importer.is_import_successful(); }
+
     bool Dataset::has_magnitude_images() const
     { return !_pdata->importer.class_3dt_magnitude_images().empty(); }
 
@@ -412,6 +415,9 @@ namespace bk
 
     std::string Dataset::filepath_pressure_map_of_vessel(const Vessel& v) const
     { return _pdata->project_path + vessel_dir + v.name() + "/" + v.name() + ".pm"; }
+
+    std::string Dataset::filepath_static_tissue_threshold() const
+    { return _pdata->project_path + "stati"; }
 
     bool Dataset::has_local_image_copy(std::string_view filepath) const
     { return std::filesystem::exists(filepath.data()); }
@@ -996,6 +1002,27 @@ namespace bk
         return overallSuccess;
     }
 
+    bool Dataset::has_static_tissue_threshold() const
+    { return std::filesystem::exists(filepath_static_tissue_threshold()); }
+
+    double Dataset::static_tissue_threshold() const
+    {
+        double sc = 0;
+
+        if (!has_static_tissue_threshold())
+        {
+            std::cerr << "Dataset::static_tissue_threshold - stati file not found" << std::endl;
+            return sc;
+        }
+
+        std::ifstream file(filepath_static_tissue_threshold(), std::ios_base::in | std::ios_base::binary);
+        if (file.good())
+        { file.read(reinterpret_cast<char*>(&sc), sizeof(double)); }
+        file.close();
+
+        return sc;
+    }
+
     //====================================================================================================
     //===== FILTERS
     //====================================================================================================
@@ -1116,10 +1143,10 @@ namespace bk
 
     std::string Dataset::dirpath_vessels() const
     { return dirpath_vessels_without_slash_ending() + "/"; }
-    
+
     std::string Dataset::dirpath_vessels_without_slash_ending() const
     { return project_path() + vessel_dir; }
-    
+
     std::string Dataset::dirpath_vessel(const Vessel* v) const
     { return dirpath_vessel_without_slash_ending(v) + "/"; }
 
@@ -1450,6 +1477,15 @@ namespace bk
     {
         auto img = tmip_anatomical_3dt(imgId);
         return save_local_image_copy(filepath_tmip_anatomical_3dt(imgId), *img);
+    }
+
+    bool Dataset::save_static_tissue_threshold(double t) const
+    {
+        std::ofstream file(filepath_static_tissue_threshold(), std::ios_base::out | std::ios_base::binary);
+        file.write(reinterpret_cast<char*>(&t), sizeof(double));
+        file.close();
+
+        return true;
     }
 
     bool Dataset::save_vessel(const Vessel* v) const
