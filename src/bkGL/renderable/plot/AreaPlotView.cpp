@@ -503,11 +503,14 @@ namespace bk
 
   void AreaPlotView::set_area_alpha(GLfloat a)
   {
-      _pdata->fillcolor_above[3] = std::max(std::min(a, static_cast<GLfloat>(1)), static_cast<GLfloat>(0));
+      const GLfloat a_ = std::clamp(a, static_cast<GLfloat>(0), static_cast<GLfloat>(1));
+      _pdata->fillcolor_above[3] = a_;
+      _pdata->fillcolor_below[3] = a_;
 
       if (this->is_initialized())
       {
           _pdata->ubo.set_areaColorAbove_a(_pdata->fillcolor_above[3]);
+          _pdata->ubo.set_areaColorBelow_a(_pdata->fillcolor_below[3]);
           _pdata->ubo.release();
 
           this->emit_signal_update_required();
@@ -572,11 +575,11 @@ namespace bk
   void AreaPlotView::init_shader()
   {
       using SL = details::ShaderLibrary::plot;
-      _pdata->shader_area.init_from_sources(SL::area::vert(),SL::area::frag());
-      _pdata->shader_line.init_from_sources(SL::line::vert(),SL::line::frag(true),SL::line::geom(true));
-      _pdata->shader_stdev.init_from_sources(SL::stdev::vert(),SL::stdev::frag(),SL::stdev::geom());
-      _pdata->shader_axis.init_from_sources(SL::axis::vert(),SL::axis::frag(true),SL::axis::geom(true));
-      _pdata->shader_ticks.init_from_sources(SL::ticks::vert(),SL::ticks::frag(true),SL::ticks::geom(true));
+      _pdata->shader_area.init_from_sources(SL::area::vert(), SL::area::frag());
+      _pdata->shader_line.init_from_sources(SL::line::vert(), SL::line::frag(true), SL::line::geom(true));
+      _pdata->shader_stdev.init_from_sources(SL::stdev::vert(), SL::stdev::frag(), SL::stdev::geom());
+      _pdata->shader_axis.init_from_sources(SL::axis::vert(), SL::axis::frag(true), SL::axis::geom(true));
+      _pdata->shader_ticks.init_from_sources(SL::ticks::vert(), SL::ticks::frag(true), SL::ticks::geom(true));
   }
 
   void AreaPlotView::init_vbo_vao()
@@ -928,9 +931,11 @@ namespace bk
       BK_QT_GL glPushAttrib(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
       BK_QT_GL glDisable(GL_DEPTH_TEST);
       BK_QT_GL glEnable(GL_BLEND);
+
       BK_QT_GL glMatrixMode(GL_MODELVIEW);
       BK_QT_GL glPushMatrix();
       BK_QT_GL glLoadIdentity();
+
       BK_QT_GL glMatrixMode(GL_PROJECTION);
       BK_QT_GL glPushMatrix();
       BK_QT_GL glLoadIdentity();

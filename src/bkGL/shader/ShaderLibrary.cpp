@@ -3380,15 +3380,14 @@ namespace bk::details
       s << "layout(location = 0) out vec4 color_out;\n";
 
       s << comment_region_functions();
-      s << function_plot_data_to_screen();
       s << function_main_begin();
 
       s << "   if (above_frag <= 0)\n";
-      s << "   { color_out = vec4(" << details::UBOAreaPlot::bytes_areaColorBelow_r() << ", " << details::UBOAreaPlot::bytes_areaColorBelow_g() << ", "
-        << details::UBOAreaPlot::bytes_areaColorBelow_b() << ", " << details::UBOAreaPlot::bytes_areaColorBelow_a() << "); }\n";
+      s << "   { color_out = vec4(" << details::UBOAreaPlot::name_areaColorBelow_r() << ", " << details::UBOAreaPlot::name_areaColorBelow_g() << ", "
+        << details::UBOAreaPlot::name_areaColorBelow_b() << ", " << details::UBOAreaPlot::name_areaColorBelow_a() << "); }\n";
       s << "   else\n";
-      s << "   { color_out = vec4(" << details::UBOAreaPlot::bytes_areaColorAbove_r() << ", " << details::UBOAreaPlot::bytes_areaColorAbove_g() << ", "
-        << details::UBOAreaPlot::bytes_areaColorAbove_b() << ", " << details::UBOAreaPlot::bytes_areaColorAbove_a() << "); }\n";
+      s << "   { color_out = vec4(" << details::UBOAreaPlot::name_areaColorAbove_r() << ", " << details::UBOAreaPlot::name_areaColorAbove_g() << ", "
+        << details::UBOAreaPlot::name_areaColorAbove_b() << ", " << details::UBOAreaPlot::name_areaColorAbove_a() << "); }\n";
 
       s << function_main_end();
 
@@ -3409,7 +3408,6 @@ namespace bk::details
       s << "layout(location = 0) out vec2 position_geom;\n";
 
       s << comment_region_functions();
-      s << function_plot_data_to_screen();
       s << function_main_begin();
       s << "   position_geom = position_in;\n";
       s << function_main_end();
@@ -3426,8 +3424,7 @@ namespace bk::details
 
       std::stringstream s;
 
-      s << comment_tag_geometry_shader("PLOT LINE (use_area_ubo:");
-      s << (use_area_ubo ? "yes" : "no") << ")";
+      s << comment_tag_geometry_shader("PLOT LINE (use_area_ubo:" + std::string(use_area_ubo ? "yes" : "no") + ")");
       s << version();
 
       s << comment_region_input();
@@ -3443,7 +3440,7 @@ namespace bk::details
       s << geom_layout_in_lines_adjacency();
 
       s << comment_region_output();
-      geom_layout_out_triangle_strip(4);
+      s << geom_layout_out_triangle_strip(4);
 
       s << comment_region_functions();
       s << function_plot_data_to_screen();
@@ -3485,8 +3482,7 @@ namespace bk::details
 
       std::stringstream s;
 
-      s << comment_tag_fragment_shader("PLOT LINE (use_area_ubo:");
-      s << (use_area_ubo ? "yes" : "no") << ")";
+      s << comment_tag_fragment_shader("PLOT LINE (use_area_ubo:" + std::string(use_area_ubo ? "yes" : "no") + ")");
       s << version();
 
       s << comment_region_input();

@@ -559,7 +559,7 @@ namespace bk
           /*
            * first pass: render cuboid front faces with position colors
            */
-          _pdata->ubo.bind_to_base(1);
+          _pdata->ubo.bind_to_default_base();
 
           _pdata->fbo.bind();
           BK_QT_GL glClear(GL_COLOR_BUFFER_BIT);
