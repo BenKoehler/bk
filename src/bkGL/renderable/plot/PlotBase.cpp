@@ -105,8 +105,7 @@ namespace bk
 
   PlotBase::PlotBase(PlotBase&&) noexcept = default;
 
-  PlotBase::~PlotBase()
-  { /*do nothing*/ }
+  PlotBase::~PlotBase() = default;
 
   //====================================================================================================
   //===== GETTER
@@ -128,7 +127,7 @@ namespace bk
       GLfloat xmin = std::numeric_limits<GLfloat>::max();
 
       for (auto& o: _pdata->plotobjects)
-      { xmin = std::min(xmin, o->get_x_min()); }
+      { xmin = std::min(xmin, o->x_min()); }
 
       return xmin;
   }
@@ -138,7 +137,7 @@ namespace bk
       GLfloat xmax = -std::numeric_limits<GLfloat>::max();
 
       for (auto& o: _pdata->plotobjects)
-      { xmax = std::max(xmax, o->get_x_max()); }
+      { xmax = std::max(xmax, o->x_max()); }
 
       return xmax;
   }
@@ -148,7 +147,7 @@ namespace bk
       GLfloat ymin = std::numeric_limits<GLfloat>::max();
 
       for (auto& o: _pdata->plotobjects)
-      { ymin = std::min(ymin, o->get_y_min()); }
+      { ymin = std::min(ymin, o->y_min()); }
 
       return ymin;
   }
@@ -158,7 +157,7 @@ namespace bk
       GLfloat ymax = -std::numeric_limits<GLfloat>::max();
 
       for (auto& o: _pdata->plotobjects)
-      { ymax = std::max(ymax, o->get_y_max()); }
+      { ymax = std::max(ymax, o->y_max()); }
 
       return ymax;
   }

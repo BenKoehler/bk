@@ -39,11 +39,6 @@ namespace bk::details
       using base_type = details::AbstractRenderable;
 
       //====================================================================================================
-      //===== MEMBERS
-      //====================================================================================================
-    private:
-
-      //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR
       //====================================================================================================
     public:
@@ -64,10 +59,10 @@ namespace bk::details
       //====================================================================================================
       //===== GETTER
       //====================================================================================================
-      [[nodiscard]] virtual GLfloat get_x_min() const = 0;
-      [[nodiscard]] virtual GLfloat get_x_max() const = 0;
-      [[nodiscard]] virtual GLfloat get_y_min() const = 0;
-      [[nodiscard]] virtual GLfloat get_y_max() const = 0;
+      [[nodiscard]] virtual GLfloat x_min() const = 0;
+      [[nodiscard]] virtual GLfloat x_max() const = 0;
+      [[nodiscard]] virtual GLfloat y_min() const = 0;
+      [[nodiscard]] virtual GLfloat y_max() const = 0;
 
       //====================================================================================================
       //===== SETTER

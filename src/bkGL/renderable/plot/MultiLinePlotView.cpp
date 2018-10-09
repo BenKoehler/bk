@@ -56,8 +56,7 @@ namespace bk
 
   MultiLinePlotView::MultiLinePlotView(MultiLinePlotView&&) noexcept = default;
 
-  MultiLinePlotView::~MultiLinePlotView()
-  { /*do nothing*/ }
+  MultiLinePlotView::~MultiLinePlotView() = default;
 
   //====================================================================================================
   //===== GETTER

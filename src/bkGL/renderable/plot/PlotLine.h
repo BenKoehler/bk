@@ -29,7 +29,9 @@
 
 #include <memory>
 
-#include "PlotAbstractDataVectorView.h"
+#include <bk/CopyablePIMPL>
+
+#include <bkGL/renderable/plot/PlotAbstractDataVectorView.h>
 
 namespace bk
 {
@@ -46,13 +48,7 @@ namespace bk
       //====================================================================================================
       //===== DEFINITIONS
       //====================================================================================================
-      using self_type = PlotLine;
       using base_type = details::PlotAbstractDataVectorView;
-
-    public:
-      using color_type = ColorRGBA;
-      using value_type = GLfloat;
-      using data_vector_type = PlotDataVector;
 
       //====================================================================================================
       //===== MEMBERS
@@ -60,7 +56,7 @@ namespace bk
     private:
       class Impl;
 
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR 
@@ -68,13 +64,12 @@ namespace bk
     public:
       /// @{ -------------------------------------------------- CONSTRUCTORS
       #ifndef BK_LIB_QT_AVAILABLE
-
       PlotLine();
       #else
       explicit PlotLine(qt_gl_functions* gl);
       #endif
-      PlotLine(const self_type& other) = delete;
-      PlotLine(self_type&& other);
+      PlotLine(const PlotLine&) = delete;
+      PlotLine(PlotLine&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DESTRUCTOR
@@ -84,26 +79,31 @@ namespace bk
       //====================================================================================================
       //===== GETTER 
       //====================================================================================================
-      [[nodiscard]] auto get_color() const -> const color_type&;
-      [[nodiscard]] auto get_line_width() const -> value_type;
-      [[nodiscard]] auto get_data_vector() const -> const data_vector_type&;
-      [[nodiscard]] auto get_data_vector() -> data_vector_type&;
-      virtual auto get_x_min() const -> value_type override;
-      virtual auto get_x_max() const -> value_type override;
-      virtual auto get_y_min() const -> value_type override;
-      virtual auto get_y_max() const -> value_type override;
+      [[nodiscard]] const ColorRGBA& color() const;
+      [[nodiscard]] GLfloat line_width() const;
+      [[nodiscard]] const PlotDataVector& data_vector() const;
+      [[nodiscard]] PlotDataVector& data_vector();
+      [[nodiscard]] virtual GLfloat x_min() const override;
+      [[nodiscard]] virtual GLfloat x_max() const override;
+      [[nodiscard]] virtual GLfloat y_min() const override;
+      [[nodiscard]] virtual GLfloat y_max() const override;
+
+      /// @{ -------------------------------------------------- IS INITIALIZED
+      [[nodiscard]] virtual bool is_initialized() const override;
+      /// @}
 
       //====================================================================================================
       //===== SETTER
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
-      [[maybe_unused]] auto operator=(const self_type& other) -> self_type& = delete;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] auto operator=(const PlotLine&) -> PlotLine& = delete;
+      [[maybe_unused]] auto operator=(PlotLine&&) noexcept -> PlotLine&;
       /// @}
 
-      void set_color(const color_type& col);
-      void set_color(value_type r, value_type g, value_type b, value_type a);
-      void set_line_width(value_type w);
+      void set_color(const ColorRGBA& col);
+      void set_color(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
+      void set_line_width(GLfloat w);
+
       //====================================================================================================
       //===== GL
       //====================================================================================================
@@ -113,7 +113,7 @@ namespace bk
       [[maybe_unused]] bool init_vbo_vao();
       [[maybe_unused]] bool init_ubo();
     public:
-      virtual bool init() override;
+      [[maybe_unused]] virtual bool init() override;
       /// @}
 
       /// @{ -------------------------------------------------- CLEAR

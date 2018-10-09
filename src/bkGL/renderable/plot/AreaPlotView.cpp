@@ -214,9 +214,7 @@ namespace bk
   }
 
   AreaPlotView::AreaPlotView(AreaPlotView&&) noexcept = default;
-
-  AreaPlotView::~AreaPlotView()
-  { /* do nothing */ }
+  AreaPlotView::~AreaPlotView() = default;
 
   //====================================================================================================
   //===== GETTER
@@ -574,19 +572,11 @@ namespace bk
   void AreaPlotView::init_shader()
   {
       using SL = details::ShaderLibrary::plot;
-
-      // todo
-      //_pdata->shader_area.init_from_sources(SL::area::vert(),SL::area::frag());
-      //_pdata->shader_line.init_from_sources(SL::line::vert(),SL::line::frag(),SL::line::geom());
-      //_pdata->shader_stdev.init_from_sources(SL::stdev::vert(),SL::stdev::frag(),SL::stdev::geom());
-      //_pdata->shader_axis.init_from_sources("shader/plot/axis.vert", "shader/plot/axis.frag", "shader/plot/axis.geom");
-      //_pdata->shader_ticks.init_from_sources("shader/plot/ticks.vert", "shader/plot/ticks.frag", "shader/plot/ticks.geom");
-      
-      _pdata->shader_area.init("shader/plot/area_plot.vert", "shader/plot/area_plot.frag");
-      _pdata->shader_line.init("shader/plot/plotline.vert", "shader/plot/plotline.frag", "shader/plot/plotline.geom");
-      _pdata->shader_stdev.init("shader/plot/stdev.vert", "shader/plot/stdev.frag", "shader/plot/stdev.geom");
-      _pdata->shader_axis.init("shader/plot/axis.vert", "shader/plot/axis.frag", "shader/plot/axis.geom");
-      _pdata->shader_ticks.init("shader/plot/ticks.vert", "shader/plot/ticks.frag", "shader/plot/ticks.geom");
+      _pdata->shader_area.init_from_sources(SL::area::vert(),SL::area::frag());
+      _pdata->shader_line.init_from_sources(SL::line::vert(),SL::line::frag(true),SL::line::geom(true));
+      _pdata->shader_stdev.init_from_sources(SL::stdev::vert(),SL::stdev::frag(),SL::stdev::geom());
+      _pdata->shader_axis.init_from_sources(SL::axis::vert(),SL::axis::frag(true),SL::axis::geom(true));
+      _pdata->shader_ticks.init_from_sources(SL::ticks::vert(),SL::ticks::frag(true),SL::ticks::geom(true));
   }
 
   void AreaPlotView::init_vbo_vao()

@@ -26,12 +26,13 @@
 
 #include <algorithm>
 
-#include "tools/color/ColorRGBA.h"
-#include "gl/buffer/IBO.h"
-#include "gl/buffer/UBO.h"
-#include "gl/buffer/VBO.h"
-#include "gl/vao/VAO.h"
-#include "gl/Shader.h"
+#include <bkTools/color/ColorRGBA.h>
+#include <bkGL/buffer/IBO.h>
+#include <bkGL/UBOPlotLine.h>
+#include <bkGL/buffer/VBO.h>
+#include <bkGL/vao/VAO.h>
+#include <bkGL/shader/Shader.h>
+#include <bkGL/shader/ShaderLibrary.h>
 
 namespace bk
 {
@@ -42,16 +43,16 @@ namespace bk
   {
       VAO vao;
       VBO vbo;
-      UBO ubo;
+      details::UBOPlotLine ubo;
       Shader shader;
-      value_type dataValue;
-      value_type xmin;
-      value_type xmax;
-      value_type ymin;
-      value_type ymax;
-      color_type color;
-      value_type lineWidth;
-      details::PlotMarkerOrientation orientation;
+      GLfloat dataValue;
+      GLfloat xmin;
+      GLfloat xmax;
+      GLfloat ymin;
+      GLfloat ymax;
+      ColorRGBA color;
+      GLfloat lineWidth;
+      PlotMarkerOrientation_ orientation;
 
           #ifndef BK_LIB_QT_AVAILABLE
 
@@ -65,21 +66,21 @@ namespace bk
             ubo(gl),
             shader(gl),
           #endif
-            dataValue(0),
-            xmin(0),
-            xmax(0),
-            ymin(0),
-            ymax(0),
-            color(0, 0, 0, 1),
-            lineWidth(2),
-            orientation(details::PlotMarkerOrientation::Vertical)
+          dataValue(0),
+          xmin(0),
+          xmax(0),
+          ymin(0),
+          ymax(0),
+          color(0, 0, 0, 1),
+          lineWidth(2),
+          orientation(PlotMarkerOrientation_Vertical)
       { /* do nothing */ }
 
       Impl(const Impl&) = delete;
-      Impl(Impl&&) = default;
+      Impl(Impl&&) noexcept = default;
       ~Impl() = default;
       Impl& operator=(const Impl&) = delete;
-      Impl& operator=(Impl&&) = default;
+      Impl& operator=(Impl&&) noexcept = default;
   };
 
   //====================================================================================================
@@ -87,84 +88,79 @@ namespace bk
   //====================================================================================================
 
   #ifndef BK_LIB_QT_AVAILABLE
+
   PlotMarker::PlotMarker()
-      : base_type(),
-      _pdata(std::make_unique<Impl>())
+      : base_type()
   #else
 
   PlotMarker::PlotMarker(qt_gl_functions* gl)
       : base_type(gl),
-        _pdata(std::make_unique<Impl>(gl))
+        _pdata(gl)
   #endif
   {
       _pdata->vbo.set_usage_STATIC_DRAW();
       _pdata->vao.add_default_attribute_position_2xfloat();
-
-      _pdata->ubo.set_usage_STATIC_DRAW();
-      _pdata->ubo.register_value_of_size("lineWidth", sizeof(value_type));
-      _pdata->ubo.register_value_of_size("colorr", sizeof(value_type));
-      _pdata->ubo.register_value_of_size("colorg", sizeof(value_type));
-      _pdata->ubo.register_value_of_size("colorb", sizeof(value_type));
-      _pdata->ubo.register_value_of_size("colora", sizeof(value_type));
   }
 
-  PlotMarker::PlotMarker(self_type&&) = default;
+  PlotMarker::PlotMarker(PlotMarker&&) noexcept = default;
 
-  PlotMarker::~PlotMarker()
-  { /* do nothing */ }
+  PlotMarker::~PlotMarker() = default;
 
   //====================================================================================================
   //===== GETTER 
   //====================================================================================================
-  auto PlotMarker::get_color() const -> const color_type&
+  const ColorRGBA& PlotMarker::color() const
   { return _pdata->color; }
 
-  auto PlotMarker::get_line_width() const -> value_type
+  GLfloat PlotMarker::line_width() const
   { return _pdata->lineWidth; }
 
-  auto PlotMarker::get_data_value() const -> value_type
+  GLfloat PlotMarker::data_value() const
   { return _pdata->dataValue; }
 
-  const details::PlotMarkerOrientation& PlotMarker::get_orientation() const
+  const PlotMarkerOrientation_& PlotMarker::orientation() const
   { return _pdata->orientation; }
 
   bool PlotMarker::orientation_is_horizontal() const
-  { return _pdata->orientation == details::PlotMarkerOrientation::Horizontal; }
+  { return _pdata->orientation == PlotMarkerOrientation_Horizontal; }
 
   bool PlotMarker::orientation_is_vertical() const
-  { return _pdata->orientation == details::PlotMarkerOrientation::Vertical; }
+  { return _pdata->orientation == PlotMarkerOrientation_Vertical; }
+
+  bool PlotMarker::is_initialized() const
+  { return _pdata->vao.is_initialized(); }
 
   //====================================================================================================
   //===== SETTER
   //====================================================================================================
-  auto PlotMarker::operator=(self_type&& other) -> self_type& = default;
+  PlotMarker& PlotMarker::operator=(PlotMarker&&) noexcept = default;
 
-  void PlotMarker::set_color(const color_type& col)
+  void PlotMarker::set_color(const ColorRGBA& col)
   { set_color(col[0], col[1], col[2], col[3]); }
 
-  void PlotMarker::set_color(value_type r, value_type g, value_type b, value_type a)
+  void PlotMarker::set_color(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
   { _pdata->color.set(r, g, b, a); }
 
-  void PlotMarker::set_line_width(value_type w)
+  void PlotMarker::set_line_width(GLfloat w)
   {
-      _pdata->lineWidth = std::max(w, static_cast<value_type>(0));
+      _pdata->lineWidth = std::max(w, static_cast<GLfloat>(0));
 
       if (this->is_initialized())
       {
-          _pdata->ubo.write_registered_value("lineWidth", &_pdata->lineWidth);
+          _pdata->ubo.set_line_width(_pdata->lineWidth);
           _pdata->ubo.release();
 
           this->emit_signal_update_required();
       }
   }
 
-  void PlotMarker::set_data_value(value_type x)
+  void PlotMarker::set_data_value(GLfloat x)
   {
       _pdata->dataValue = x;
 
       if (this->is_initialized())
       {
-          value_type* buf = _pdata->vbo.map_write_only<value_type>();
+          GLfloat* buf = _pdata->vbo.map_write_only<GLfloat>();
           if (buf != nullptr)
           {
               //const unsigned int ids[2] = (orientation_is_horizontal()) ? {1,3} : {0,2};
@@ -191,19 +187,19 @@ namespace bk
       }
   }
 
-  void PlotMarker::set_x_min(value_type xmin)
+  void PlotMarker::set_x_min(GLfloat xmin)
   { _pdata->xmin = xmin; }
 
-  void PlotMarker::set_x_max(value_type xmax)
+  void PlotMarker::set_x_max(GLfloat xmax)
   { _pdata->xmax = xmax; }
 
-  void PlotMarker::set_y_min(value_type ymin)
+  void PlotMarker::set_y_min(GLfloat ymin)
   { _pdata->ymin = ymin; }
 
-  void PlotMarker::set_y_max(value_type ymax)
+  void PlotMarker::set_y_max(GLfloat ymax)
   { _pdata->ymax = ymax; }
 
-  void PlotMarker::set_orientation(details::PlotMarkerOrientation orientation)
+  void PlotMarker::set_orientation(PlotMarkerOrientation_ orientation)
   {
       _pdata->orientation = orientation;
 
@@ -215,21 +211,24 @@ namespace bk
   }
 
   void PlotMarker::set_orientation_horizontal()
-  { set_orientation(details::PlotMarkerOrientation::Horizontal); }
+  { set_orientation(PlotMarkerOrientation_Horizontal); }
 
   void PlotMarker::set_orientation_vertical()
-  { set_orientation(details::PlotMarkerOrientation::Vertical); }
+  { set_orientation(PlotMarkerOrientation_Vertical); }
 
   //====================================================================================================
   //===== GL
   //====================================================================================================
   bool PlotMarker::init_shader()
-  { return _pdata->shader.init("shader/plot-new/plotmarker.vert", "shader/plot-new/plotmarker.frag", "shader/plot-new/plotmarker.geom"); }
+  {
+      using SL = details::ShaderLibrary::plot::marker;
+      return _pdata->shader.init_from_sources(SL::vert(), SL::frag(), SL::geom());
+  }
 
   bool PlotMarker::init_vbo_vao()
   {
       // axis
-      std::vector<value_type> vert;
+      std::vector<GLfloat> vert;
       vert.reserve(4);
 
       if (orientation_is_horizontal())
@@ -260,15 +259,11 @@ namespace bk
       if (!_pdata->ubo.init_from_registered_values_size())
       { return false; }
 
-      _pdata->ubo.write_registered_value("lineWidth", &_pdata->lineWidth);
-      value_type ftemp = _pdata->color[0];
-      _pdata->ubo.write_registered_value("colorr", &ftemp);
-      ftemp = _pdata->color[1];
-      _pdata->ubo.write_registered_value("colorg", &ftemp);
-      ftemp = _pdata->color[2];
-      _pdata->ubo.write_registered_value("colorb", &ftemp);
-      ftemp = _pdata->color[3];
-      _pdata->ubo.write_registered_value("colora", &ftemp);
+      _pdata->ubo.set_line_width(_pdata->lineWidth);
+      _pdata->ubo.set_color_r(_pdata->color[0]);
+      _pdata->ubo.set_color_g(_pdata->color[1]);
+      _pdata->ubo.set_color_b(_pdata->color[2]);
+      _pdata->ubo.set_color_a(_pdata->color[3]);
       _pdata->ubo.release();
 
       return true;
@@ -282,10 +277,7 @@ namespace bk
           return false;
       }
       else
-      {
-          this->set_initialized(true);
-          return true;
-      }
+      { return true; }
   }
 
   void PlotMarker::clear_shader()
@@ -305,8 +297,6 @@ namespace bk
       clear_shader();
       clear_vbo_vao();
       clear_ubo();
-
-      this->set_initialized(false);
   }
 
   void PlotMarker::on_resize(GLint /*w*/, GLint /*h*/)
@@ -324,9 +314,33 @@ namespace bk
   void PlotMarker::on_visible_changed(bool /*b*/)
   { /* do nothing */ }
 
+  void PlotMarker::on_mouse_pos_changed(GLint /*x*/, GLint /*y*/)
+  { /* do nothing */ }
+
+  void PlotMarker::on_mouse_button_pressed(MouseButton_ /*btn*/)
+  { /* do nothing */ }
+
+  void PlotMarker::on_mouse_button_released(MouseButton_ /*btn*/)
+  { /* do nothing */ }
+
+  void PlotMarker::on_key_pressed(Key_ /*k*/)
+  { /* do nothing */ }
+
+  void PlotMarker::on_key_released(Key_ /*k*/)
+  { /* do nothing */ }
+
+  void PlotMarker::on_mouse_wheel_up()
+  { /* do nothing */ }
+
+  void PlotMarker::on_mouse_wheel_down()
+  { /* do nothing */ }
+
+  void PlotMarker::on_ssaa_factor_changed(GLint /*ssaa_factor*/)
+  { /* do nothing */ }
+
   void PlotMarker::draw_impl()
   {
-      _pdata->ubo.bind_to_base(2);
+      _pdata->ubo.bind_to_default_base();
 
       BK_QT_GL glPushAttrib(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
       BK_QT_GL glDisable(GL_DEPTH_TEST);

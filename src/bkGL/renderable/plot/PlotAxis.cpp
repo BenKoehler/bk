@@ -123,8 +123,7 @@ namespace bk
 
   PlotAxis::PlotAxis(PlotAxis&&) noexcept = default;
 
-  PlotAxis::~PlotAxis()
-  { /* do nothing */ }
+  PlotAxis::~PlotAxis() = default;
 
   //====================================================================================================
   //===== GETTER 
@@ -237,8 +236,8 @@ namespace bk
   {
       using SL = details::ShaderLibrary::plot;
 
-      bool success = _pdata->shader.init_from_sources(SL::axis::vert(), SL::axis::frag(), SL::axis::geom());
-      success = _pdata->shader_ticks.init_from_sources(SL::ticks::vert(), SL::ticks::frag(), SL::ticks::geom()) && success;
+      bool success = _pdata->shader.init_from_sources(SL::axis::vert(), SL::axis::frag(false), SL::axis::geom(false));
+      success = _pdata->shader_ticks.init_from_sources(SL::ticks::vert(), SL::ticks::frag(false), SL::ticks::geom(false)) && success;
 
       return success;
   }

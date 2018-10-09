@@ -27,7 +27,8 @@
 #ifndef BK_PLOTMARKER_H
 #define BK_PLOTMARKER_H
 
-#include "gl/renderable/Renderable.h"
+#include <bk/CopyablePIMPL>
+#include <bkGL/renderable/AbstractRenderable.h>
 
 namespace bk
 {
@@ -35,34 +36,25 @@ namespace bk
   class ColorRGBA;
   // -------------------- forward declaration END
 
-  namespace details
+  enum PlotMarkerOrientation_ : unsigned int
   {
-    enum class PlotMarkerOrientation : unsigned int
-    {
-        Horizontal = 0, Vertical = 1
-    };
-  } // namespace details
+      PlotMarkerOrientation_Horizontal = 0,//
+      PlotMarkerOrientation_Vertical = 1//
+  };
 
-  class BKGL_EXPORT PlotMarker: public details::Renderable
+  class BKGL_EXPORT PlotMarker : public details::AbstractRenderable
   {
       //====================================================================================================
       //===== DEFINITIONS
       //====================================================================================================
-      using self_type = PlotMarker;
-      using base_type = details::Renderable;
-
-    public:
-      using color_type = ColorRGBA;
-      using value_type = GLfloat;
-      using size_type = GLuint;
+      using base_type = details::AbstractRenderable;
 
       //====================================================================================================
       //===== MEMBERS
       //====================================================================================================
-    private:
       class Impl;
 
-      std::unique_ptr <Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR
@@ -74,8 +66,8 @@ namespace bk
       #else
       explicit PlotMarker(qt_gl_functions* gl);
       #endif
-      PlotMarker(const self_type& other);
-      PlotMarker(self_type&& other);
+      PlotMarker(const PlotMarker&);
+      PlotMarker(PlotMarker&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
@@ -85,31 +77,35 @@ namespace bk
       //====================================================================================================
       //===== GETTER
       //====================================================================================================
-      [[nodiscard]] auto get_color() const -> const color_type&;
-      [[nodiscard]] auto get_line_width() const -> value_type;
-      [[nodiscard]] auto get_data_value() const -> value_type;
-      [[nodiscard]] const details::PlotMarkerOrientation& get_orientation() const;
+      [[nodiscard]] const ColorRGBA& color() const;
+      [[nodiscard]] GLfloat line_width() const;
+      [[nodiscard]] GLfloat data_value() const;
+      [[nodiscard]] const PlotMarkerOrientation_& orientation() const;
       [[nodiscard]] bool orientation_is_horizontal() const;
       [[nodiscard]] bool orientation_is_vertical() const;
+
+      /// @{ -------------------------------------------------- IS INITIALIZED
+      [[nodiscard]] virtual bool is_initialized() const override;
+      /// @}
 
       //====================================================================================================
       //===== SETTER
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
-      auto operator=(const self_type& other) -> self_type&;
-      auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] PlotMarker& operator=(const PlotMarker&);
+      [[maybe_unused]] PlotMarker& operator=(PlotMarker&&) noexcept;
       /// @}
 
-      void set_color(const color_type& col);
-      void set_color(value_type r, value_type g, value_type b, value_type a);
-      void set_line_width(value_type w);
-      void set_data_value(value_type x);
-      void set_x_min(value_type xmin);
-      void set_x_max(value_type xmax);
-      void set_y_min(value_type ymin);
-      void set_y_max(value_type ymax);
+      void set_color(const ColorRGBA& col);
+      void set_color(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
+      void set_line_width(GLfloat w);
+      void set_data_value(GLfloat x);
+      void set_x_min(GLfloat xmin);
+      void set_x_max(GLfloat xmax);
+      void set_y_min(GLfloat ymin);
+      void set_y_max(GLfloat ymax);
     private:
-      void set_orientation(details::PlotMarkerOrientation orientation);
+      void set_orientation(PlotMarkerOrientation_ orientation);
     public:
       void set_orientation_horizontal();
       void set_orientation_vertical();
@@ -139,12 +135,19 @@ namespace bk
       virtual void on_resize(GLint w, GLint h) override;
       virtual void on_oit_enabled(bool b) override;
       virtual void on_animation_enabled(bool b) override;
-      virtual void on_modelview_changed(bool b) override;
+      virtual void on_modelview_changed(bool) override;
       virtual void on_visible_changed(bool b) override;
+      virtual void on_mouse_pos_changed(GLint x, GLint y) override;
+      virtual void on_mouse_button_pressed(MouseButton_ btn) override;
+      virtual void on_mouse_button_released(MouseButton_ btn) override;
+      virtual void on_key_pressed(Key_ k) override;
+      virtual void on_key_released(Key_ k) override;
+      virtual void on_mouse_wheel_up() override;
+      virtual void on_mouse_wheel_down() override;
+      virtual void on_ssaa_factor_changed(GLint ssaa_factor) override;
       /// @}
 
       virtual void draw_impl() override;
-
   }; // class PlotMarker
 } // namespace bk
 

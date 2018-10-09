@@ -44,8 +44,7 @@ namespace bk::details
 
   PlotAbstractDataVectorView::PlotAbstractDataVectorView(PlotAbstractDataVectorView&&) noexcept = default;
 
-  PlotAbstractDataVectorView::~PlotAbstractDataVectorView()
-  { /*do nothing*/ }
+  PlotAbstractDataVectorView::~PlotAbstractDataVectorView() = default;
 
   //====================================================================================================
   //===== SETTER

@@ -315,7 +315,8 @@ namespace bk::details
   {
       std::stringstream s;
       s << "// atomic pixel counter\n";
-      s << "layout(binding = " << OrderIndependentTransparency::buffer_base_atomic_counter() << ", offset = 0) uniform atomic_uint " << OrderIndependentTransparency::buffer_name_atomic_counter() << ";\n\n";
+      s << "layout(binding = " << OrderIndependentTransparency::buffer_base_atomic_counter() << ", offset = 0) uniform atomic_uint " << OrderIndependentTransparency::buffer_name_atomic_counter()
+        << ";\n\n";
       return s.str();
   }
 
@@ -793,7 +794,8 @@ namespace bk::details
       if (assignSpecular)
       {
           s << "   // specular\n";
-          s << "   const vec3 light_color = vec3(" << bk::details::UBOPhong::name_lightcol_r() << ", " << bk::details::UBOPhong::name_lightcol_g() << ", " << bk::details::UBOPhong::name_lightcol_b() << ");\n";
+          s << "   const vec3 light_color = vec3(" << bk::details::UBOPhong::name_lightcol_r() << ", " << bk::details::UBOPhong::name_lightcol_g() << ", " << bk::details::UBOPhong::name_lightcol_b()
+            << ");\n";
           s << "   color_out.rgb += light_color * pow(clamp(abs(dot(R, E)), 0.0, 1.0), " << bk::details::UBOPhong::name_shininess() << ");\n";
       }
 
@@ -1452,7 +1454,8 @@ namespace bk::details
       s << "   const vec3 N = normalize(normal_frag);\n";
       s << "   const vec3 R = normalize(reflect(L, N)); // for specular\n\n";
 
-      s << "   vec3 color = vec3(" << bk::details::UBOSelectionSphere::name_color_r() << ", " << bk::details::UBOSelectionSphere::name_color_g() << ", " << bk::details::UBOSelectionSphere::name_color_b() << ");\n";
+      s << "   vec3 color = vec3(" << bk::details::UBOSelectionSphere::name_color_r() << ", " << bk::details::UBOSelectionSphere::name_color_g() << ", "
+        << bk::details::UBOSelectionSphere::name_color_b() << ");\n";
 
       s << "   // alpha\n";
       s << "   color_out.a = 1;\n\n";
@@ -1465,7 +1468,8 @@ namespace bk::details
       s << "   color_out.rgb += abs(NdotL) * (NdotL >= 0 ? 1.0f : 0.75f) * color;\n\n";
 
       s << "   // specular\n";
-      s << "   const vec3 light_color = vec3(" << bk::details::UBOPhong::name_lightcol_r() << ", " << bk::details::UBOPhong::name_lightcol_g() << ", " << bk::details::UBOPhong::name_lightcol_b() << ");\n";
+      s << "   const vec3 light_color = vec3(" << bk::details::UBOPhong::name_lightcol_r() << ", " << bk::details::UBOPhong::name_lightcol_g() << ", " << bk::details::UBOPhong::name_lightcol_b()
+        << ");\n";
       s << "   color_out.rgb += light_color * pow(clamp(abs(dot(R, E)), 0.0, 1.0), " << bk::details::UBOPhong::name_shininess() << ");\n";
       s << function_main_end();
 
@@ -1627,8 +1631,8 @@ namespace bk::details
           s << "   const float dt0 = abs(position_geom[1][3] - " << bk::details::UBOGlobal::name_animation_current_time() << ");\n";
           s << "   const float dt1 = abs(position_geom[2][3] - " << bk::details::UBOGlobal::name_animation_current_time() << ");\n\n";
 
-          s << "   if (" << bk::details::UBOGlobal::name_animation_enabled() << " == 0 || dt0 < " << bk::details::UBOLine::name_trail_length_in_ms() << " || dt1 < " << bk::details::UBOLine::name_trail_length_in_ms()
-            << ")\n";
+          s << "   if (" << bk::details::UBOGlobal::name_animation_enabled() << " == 0 || dt0 < " << bk::details::UBOLine::name_trail_length_in_ms() << " || dt1 < "
+            << bk::details::UBOLine::name_trail_length_in_ms() << ")\n";
           s << "   {\n";
       }
 
@@ -1808,8 +1812,8 @@ namespace bk::details
           s << "      { color_out.rgb = ColorBar[" << bk::details::UBOLine::name_num_colors() << "-1]; }\n";
           s << "      else\n";
           s << "      {\n";
-          s << "          const float temp = (" << bk::details::UBOLine::name_num_colors() << " - 1) * (attrib_frag - " << bk::details::UBOLine::name_min_value() << ") / (" << bk::details::UBOLine::name_max_value()
-            << " - " << bk::details::UBOLine::name_min_value() << ");\n\n";
+          s << "          const float temp = (" << bk::details::UBOLine::name_num_colors() << " - 1) * (attrib_frag - " << bk::details::UBOLine::name_min_value() << ") / ("
+            << bk::details::UBOLine::name_max_value() << " - " << bk::details::UBOLine::name_min_value() << ");\n\n";
 
           s << "          if (" << bk::details::UBOLine::name_scale_attrib_to_colorbar() << " != 0)\n";
           s << "          {\n";
@@ -1862,7 +1866,8 @@ namespace bk::details
       s << "      const vec3 ISLNormal = normalize(cross(normalize(cross(T, L)), T));\n";
       s << "      const vec3 R = normalize(reflect(-L, ISLNormal));\n\n";
 
-      s << "      const vec3 lightColor = vec3(" << bk::details::UBOLine::name_lightcol_r() << ", " << bk::details::UBOLine::name_lightcol_g() << ", " << bk::details::UBOLine::name_lightcol_b() << ");\n\n";
+      s << "      const vec3 lightColor = vec3(" << bk::details::UBOLine::name_lightcol_r() << ", " << bk::details::UBOLine::name_lightcol_g() << ", " << bk::details::UBOLine::name_lightcol_b()
+        << ");\n\n";
 
       s << "      color_out.rgb *= clamp(abs(dot(ISLNormal, L)), 0.0, 1.0); //diffuse\n";
       s << "      color_out.rgb += clamp(pow(abs(dot(R, L)), " << bk::details::UBOLine::name_shininess() << "), 0.0, 1.0) * lightColor; // specular\n";
@@ -1955,8 +1960,8 @@ namespace bk::details
           s << "      { color_out.rgb = ColorBar[" << bk::details::UBOLine::name_num_colors() << "-1]; }\n";
           s << "      else\n";
           s << "      {\n";
-          s << "          const float temp = (" << bk::details::UBOLine::name_num_colors() << " - 1) * (attrib_frag - " << bk::details::UBOLine::name_min_value() << ") / (" << bk::details::UBOLine::name_max_value()
-            << " - " << bk::details::UBOLine::name_min_value() << ");\n\n";
+          s << "          const float temp = (" << bk::details::UBOLine::name_num_colors() << " - 1) * (attrib_frag - " << bk::details::UBOLine::name_min_value() << ") / ("
+            << bk::details::UBOLine::name_max_value() << " - " << bk::details::UBOLine::name_min_value() << ");\n\n";
 
           s << "          if (" << bk::details::UBOLine::name_scale_attrib_to_colorbar() << " != 0)\n";
           s << "          {\n";
@@ -2006,7 +2011,8 @@ namespace bk::details
       s << "      const vec3 ISLNormal = normalize(cross(normalize(cross(T, L)), T));\n";
       s << "      const vec3 R = normalize(reflect(-L, ISLNormal));\n\n";
 
-      s << "      const vec3 lightColor = vec3(" << bk::details::UBOLine::name_lightcol_r() << ", " << bk::details::UBOLine::name_lightcol_g() << ", " << bk::details::UBOLine::name_lightcol_b() << ");\n\n";
+      s << "      const vec3 lightColor = vec3(" << bk::details::UBOLine::name_lightcol_r() << ", " << bk::details::UBOLine::name_lightcol_g() << ", " << bk::details::UBOLine::name_lightcol_b()
+        << ");\n\n";
 
       s << "      color_out.rgb *= clamp(abs(dot(ISLNormal, L)), 0.0, 1.0); //diffuse\n";
       s << "      color_out.rgb += clamp(pow(abs(dot(R, L)), " << bk::details::UBOLine::name_shininess() << "), 0.0, 1.0) * lightColor; // specular\n";
@@ -2236,7 +2242,8 @@ namespace bk::details
 
       s << "        const float k_diffuse = clamp(abs(dot(ISLNormal, L)), 0.0, 1.0);\n\n";
 
-      s << "        const vec3 lightColor = vec3(" << bk::details::UBOLine::name_lightcol_r() << ", " << bk::details::UBOLine::name_lightcol_g() << ", " << bk::details::UBOLine::name_lightcol_b() << ");\n";
+      s << "        const vec3 lightColor = vec3(" << bk::details::UBOLine::name_lightcol_r() << ", " << bk::details::UBOLine::name_lightcol_g() << ", " << bk::details::UBOLine::name_lightcol_b()
+        << ");\n";
       s << "        const float k_specular = clamp(pow(abs(dot(R, L)), " << bk::details::UBOLine::name_shininess() << "), 0.0, 1.0);\n\n";
 
       s << "        if (lineao_anisotropic != 0)\n";
@@ -2338,8 +2345,8 @@ namespace bk::details
           s << "   const float dt0 = abs(position_geom[1][3] - " << bk::details::UBOGlobal::name_animation_current_time() << ");\n";
           s << "   const float dt1 = abs(position_geom[2][3] - " << bk::details::UBOGlobal::name_animation_current_time() << ");\n\n";
 
-          s << "   if (" << bk::details::UBOGlobal::name_animation_enabled() << " == 0 || dt0 < " << bk::details::UBOLine::name_trail_length_in_ms() << " || dt1 < " << bk::details::UBOLine::name_trail_length_in_ms()
-            << ")\n";
+          s << "   if (" << bk::details::UBOGlobal::name_animation_enabled() << " == 0 || dt0 < " << bk::details::UBOLine::name_trail_length_in_ms() << " || dt1 < "
+            << bk::details::UBOLine::name_trail_length_in_ms() << ")\n";
           s << "   {\n";
       }
 
@@ -2393,7 +2400,8 @@ namespace bk::details
       s << indent << "   angle_frag = angle0;\n";
       if (colorEnabled)
       { s << indent << "   attrib_frag = attrib_geom[1];\n"; }
-      s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_geom[1].xyz + " << w0fac << bk::details::UBOLine::name_line_width() << "*ortho[0], 1);\n";
+      s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_geom[1].xyz + " << w0fac << bk::details::UBOLine::name_line_width()
+        << "*ortho[0], 1);\n";
       s << indent << "   EmitVertex();\n\n";
 
       s << indent << "   position_frag = position_geom[2];\n";
@@ -2402,7 +2410,8 @@ namespace bk::details
       s << indent << "   angle_frag = angle1;\n";
       if (colorEnabled)
       { s << indent << "   attrib_frag = attrib_geom[2];\n"; }
-      s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_geom[2].xyz + " << w1fac << bk::details::UBOLine::name_line_width() << "*ortho[1], 1);\n";
+      s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_geom[2].xyz + " << w1fac << bk::details::UBOLine::name_line_width()
+        << "*ortho[1], 1);\n";
       s << indent << "   EmitVertex();\n\n";
 
       s << indent << "   halo_percent_frag = 1;\n";
@@ -2412,7 +2421,8 @@ namespace bk::details
       s << indent << "   angle_frag = angle0;\n";
       if (colorEnabled)
       { s << indent << "   attrib_frag = attrib_geom[1];\n"; }
-      s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_geom[1].xyz - " << w0fac << bk::details::UBOLine::name_line_width() << "*ortho[0], 1);\n";
+      s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_geom[1].xyz - " << w0fac << bk::details::UBOLine::name_line_width()
+        << "*ortho[0], 1);\n";
       s << indent << "   EmitVertex();\n\n";
 
       s << indent << "   position_frag = position_geom[2];\n";
@@ -2421,7 +2431,8 @@ namespace bk::details
       s << indent << "   angle_frag = angle1;\n";
       if (colorEnabled)
       { s << indent << "   attrib_frag = attrib_geom[2];\n"; }
-      s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_geom[2].xyz - " << w1fac << bk::details::UBOLine::name_line_width() << "*ortho[1], 1);\n";
+      s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_geom[2].xyz - " << w1fac << bk::details::UBOLine::name_line_width()
+        << "*ortho[1], 1);\n";
       s << indent << "   EmitVertex();\n";
       if (linesHaveTime && animationEnabled)
       { s << "   }\n"; }
@@ -2510,8 +2521,8 @@ namespace bk::details
           s << "       { color_map.rgb = ColorBar[" << bk::details::UBOLine::name_num_colors() << "-1]; }\n";
           s << "       else\n";
           s << "       {\n";
-          s << "           const float temp = (" << bk::details::UBOLine::name_num_colors() << " - 1) * (attrib_frag - " << bk::details::UBOLine::name_min_value() << ") / (" << bk::details::UBOLine::name_max_value()
-            << " - " << bk::details::UBOLine::name_min_value() << ");\n\n";
+          s << "           const float temp = (" << bk::details::UBOLine::name_num_colors() << " - 1) * (attrib_frag - " << bk::details::UBOLine::name_min_value() << ") / ("
+            << bk::details::UBOLine::name_max_value() << " - " << bk::details::UBOLine::name_min_value() << ");\n\n";
 
           s << "           if (" << bk::details::UBOLine::name_scale_attrib_to_colorbar() << " != 0)\n";
           s << "           {\n";
@@ -2773,8 +2784,8 @@ namespace bk::details
       s << comment_region_functions();
       s << function_main_begin();
 
-      s << "   color_out = vec4(" << bk::details::UBOText::name_color_background_r() << ", " << bk::details::UBOText::name_color_background_g() << ", " << bk::details::UBOText::name_color_background_b() << ", "
-        << bk::details::UBOText::name_color_background_a() << ");\n";
+      s << "   color_out = vec4(" << bk::details::UBOText::name_color_background_r() << ", " << bk::details::UBOText::name_color_background_g() << ", "
+        << bk::details::UBOText::name_color_background_b() << ", " << bk::details::UBOText::name_color_background_a() << ");\n";
       s << discard_zero_alpha();
 
       s << function_main_end();
@@ -2925,7 +2936,8 @@ namespace bk::details
 
       s << "vec3 tf_color(const float d)\n";
       s << "{\n";
-      s << "    const float w = clamp((d - " << bk::details::UBODVR::name_tf_center() << " + " << bk::details::UBODVR::name_tf_width() << ") / (2*" << bk::details::UBODVR::name_tf_width() << "), 0, 1);\n";
+      s << "    const float w = clamp((d - " << bk::details::UBODVR::name_tf_center() << " + " << bk::details::UBODVR::name_tf_width() << ") / (2*" << bk::details::UBODVR::name_tf_width()
+        << "), 0, 1);\n";
       s << "    return mix(vec3(0), vec3(1), w);\n";
       s << "}\n\n";
 
@@ -2933,8 +2945,8 @@ namespace bk::details
       s << "{ return clamp((d - " << bk::details::UBODVR::name_tf_center() << " + " << bk::details::UBODVR::name_tf_width() << ") / (2*" << bk::details::UBODVR::name_tf_width() << "), 0, 1); }\n\n";
 
       s << function_main_begin();
-      s << "   const vec3 entry = texture(entry_tex, vec2(float(gl_FragCoord.x)/float(" << bk::details::UBOGlobal::name_window_width() << "), float(gl_FragCoord.y)/float(" << bk::details::UBOGlobal::name_window_height()
-        << "))).rgb;\n";
+      s << "   const vec3 entry = texture(entry_tex, vec2(float(gl_FragCoord.x)/float(" << bk::details::UBOGlobal::name_window_width() << "), float(gl_FragCoord.y)/float("
+        << bk::details::UBOGlobal::name_window_height() << "))).rgb;\n";
       s << "   const vec3 ray_increment = (exit_frag - entry) / (" << bk::details::UBODVR::name_num_ray_samples() << "-1);\n\n";
 
       s << "   color_out.rgb = vec3(0);\n";
@@ -2943,8 +2955,8 @@ namespace bk::details
 
       if (fourDimensional)
       {
-          s << "   const float wimg = (" << bk::details::UBOGlobal::name_animation_current_time() << " / " << bk::details::UBODVR::name_temporal_resolution() << ") - " << bk::details::UBODVR::name_current_t0()
-            << ";\n\n";
+          s << "   const float wimg = (" << bk::details::UBOGlobal::name_animation_current_time() << " / " << bk::details::UBODVR::name_temporal_resolution() << ") - "
+            << bk::details::UBODVR::name_current_t0() << ";\n\n";
       }
 
       s << "   for (int i = 0; i < " << bk::details::UBODVR::name_num_ray_samples() << " && color_out.a < 0.98f; ++i)\n";
@@ -2956,7 +2968,8 @@ namespace bk::details
       else
       { s << "      const float imgval = mix(texture(image_tex0, samplePos).r, texture(image_tex1, samplePos).r, wimg);\n"; }
 
-      s << "       const float w = clamp((imgval - " << bk::details::UBODVR::name_tf_center() << " + " << bk::details::UBODVR::name_tf_width() << ") / (2*" << bk::details::UBODVR::name_tf_width() << "), 0, 1);\n\n";
+      s << "       const float w = clamp((imgval - " << bk::details::UBODVR::name_tf_center() << " + " << bk::details::UBODVR::name_tf_width() << ") / (2*" << bk::details::UBODVR::name_tf_width()
+        << "), 0, 1);\n\n";
 
       s << "       color_out.rgb += mix(vec3(0), vec3(1), w) * w * (1 - color_out.a);\n";
       s << "       color_out.a += w * (1 - color_out.a);\n";
@@ -3001,7 +3014,8 @@ namespace bk::details
 
       s << "vec3 tf_color(const float d)\n";
       s << "{\n";
-      s << "    const float w = clamp((d - " << bk::details::UBODVR::name_tf_center() << " + " << bk::details::UBODVR::name_tf_width() << ") / (2*" << bk::details::UBODVR::name_tf_width() << "), 0, 1);\n";
+      s << "    const float w = clamp((d - " << bk::details::UBODVR::name_tf_center() << " + " << bk::details::UBODVR::name_tf_width() << ") / (2*" << bk::details::UBODVR::name_tf_width()
+        << "), 0, 1);\n";
       s << "    return mix(vec3(0), vec3(1), w);\n";
       s << "}\n\n";
 
@@ -3009,8 +3023,8 @@ namespace bk::details
       s << "{ return clamp((d - " << bk::details::UBODVR::name_tf_center() << " + " << bk::details::UBODVR::name_tf_width() << ") / (2*" << bk::details::UBODVR::name_tf_width() << "), 0, 1); }\n\n";
 
       s << function_main_begin();
-      s << "   const vec3 entry = texture(entry_tex, vec2(float(gl_FragCoord.x)/float(" << bk::details::UBOGlobal::name_window_width() << "), float(gl_FragCoord.y)/float(" << bk::details::UBOGlobal::name_window_height()
-        << "))).rgb;\n";
+      s << "   const vec3 entry = texture(entry_tex, vec2(float(gl_FragCoord.x)/float(" << bk::details::UBOGlobal::name_window_width() << "), float(gl_FragCoord.y)/float("
+        << bk::details::UBOGlobal::name_window_height() << "))).rgb;\n";
       s << "   const vec3 ray_increment = (exit_frag - entry) / (" << bk::details::UBODVR::name_num_ray_samples() << "-1);\n\n";
 
       s << "   vec3 samplePos = entry;\n";
@@ -3018,8 +3032,8 @@ namespace bk::details
 
       if (fourDimensional)
       {
-          s << "   const float wimg = (" << bk::details::UBOGlobal::name_animation_current_time() << " / " << bk::details::UBODVR::name_temporal_resolution() << ") - " << bk::details::UBODVR::name_current_t0()
-            << ";\n\n";
+          s << "   const float wimg = (" << bk::details::UBOGlobal::name_animation_current_time() << " / " << bk::details::UBODVR::name_temporal_resolution() << ") - "
+            << bk::details::UBODVR::name_current_t0() << ";\n\n";
       }
 
       s << "   for (int i = 0; i < " << bk::details::UBODVR::name_num_ray_samples() << " && color_out.a < 0.98f; ++i)\n";
@@ -3034,8 +3048,8 @@ namespace bk::details
       s << "      dataVal = " << (useMinimum ? "min" : "max") << "(dataVal, imgval);\n";
       s << "   }\n\n";
 
-      s << "   color_out.rgb = mix(vec3(0), vec3(1), clamp((dataVal - " << bk::details::UBODVR::name_tf_center() << " + " << bk::details::UBODVR::name_tf_width() << ") / (2*" << bk::details::UBODVR::name_tf_width()
-        << "), 0, 1));\n";
+      s << "   color_out.rgb = mix(vec3(0), vec3(1), clamp((dataVal - " << bk::details::UBODVR::name_tf_center() << " + " << bk::details::UBODVR::name_tf_width() << ") / (2*"
+        << bk::details::UBODVR::name_tf_width() << "), 0, 1));\n";
       s << "   color_out.a = 1;\n";
       s << function_main_end();
 
@@ -3053,7 +3067,8 @@ namespace bk::details
 
       s << "   const float voxelscale_ratio = " << bk::details::UBOSliceView::name_voxel_scale0() << " / " << bk::details::UBOSliceView::name_voxel_scale1() << ";\n";
       s << "   const float xratio = min(1, voxelscale_ratio*qqi_ratio*float(" << bk::details::UBOSliceView::name_xyzt_max0() << ")/float(" << bk::details::UBOSliceView::name_xyzt_max1() << "));\n";
-      s << "   const float yratio = min(1, float(" << bk::details::UBOSliceView::name_xyzt_max1() << ")/(voxelscale_ratio*qqi_ratio*float(" << bk::details::UBOSliceView::name_xyzt_max0() << ")));\n\n";
+      s << "   const float yratio = min(1, float(" << bk::details::UBOSliceView::name_xyzt_max1() << ")/(voxelscale_ratio*qqi_ratio*float(" << bk::details::UBOSliceView::name_xyzt_max0()
+        << ")));\n\n";
 
       s << "   gl_Position.x = xratio*2*position_in.x/float(" << bk::details::UBOSliceView::name_xyzt_max0() << "-1) - xratio;\n";
       s << "   gl_Position.y = yratio*2*position_in.y/float(" << bk::details::UBOSliceView::name_xyzt_max1() << "-1) - yratio;\n";
@@ -3084,8 +3099,8 @@ namespace bk::details
       s << function_main_begin();
       s << details::default_glposition_vert();
       s << "   const uint id = uint(position_in.y*(" << bk::details::UBOSliceView::name_xyzt_max0() << "+1) + position_in.x);\n";
-      s << "   const float w = clamp((intensity[id] - " << bk::details::UBOSliceView::name_tf_center() << " + " << bk::details::UBOSliceView::name_tf_width() << ") / (2*" << bk::details::UBOSliceView::name_tf_width()
-        << "), 0, 1);\n";
+      s << "   const float w = clamp((intensity[id] - " << bk::details::UBOSliceView::name_tf_center() << " + " << bk::details::UBOSliceView::name_tf_width() << ") / (2*"
+        << bk::details::UBOSliceView::name_tf_width() << "), 0, 1);\n";
       s << "   color_frag = mix(vec3(0,0,0), vec3(1,1,1), w);\n";
       s << function_main_end();
 
@@ -3326,39 +3341,65 @@ namespace bk::details
   //====================================================================================================
   std::string ShaderLibrary::plot::area::vert()
   {
-      // todo
+      std::stringstream s;
+
+      s << comment_tag_vertex_shader("AREA PLOT");
+      s << version();
+
+      s << comment_region_input();
+      s << "layout(location = 0) in vec2 position_in;\n";
+      s << "layout(location = 1) in float dy;\n";
+      s << ubo_definition_global();
+      s << ubo_definition_area_plot();
+
+      s << comment_region_output();
+      s << "layout(location = 0) out flat int above_frag;\n";
+
+      s << comment_region_functions();
+      s << function_plot_data_to_screen();
+      s << function_main_begin();
+      s << "   above_frag = dy >= 0 ? 1 : 0;\n";
+      s << "   gl_Position = vec4(plot_data_to_screen(position_in), 0, 1);\n";
+      s << function_main_end();
+
+      return s.str();
   }
 
   std::string ShaderLibrary::plot::area::frag()
   {
-      // todo
+      std::stringstream s;
+
+      s << comment_tag_fragment_shader("AREA PLOT");
+      s << version();
+
+      s << comment_region_input();
+      s << "layout(location = 0) in flat int above_frag;\n";
+      s << ubo_definition_area_plot();
+
+      s << comment_region_output();
+      s << "layout(location = 0) out vec4 color_out;\n";
+
+      s << comment_region_functions();
+      s << function_plot_data_to_screen();
+      s << function_main_begin();
+
+      s << "   if (above_frag <= 0)\n";
+      s << "   { color_out = vec4(" << details::UBOAreaPlot::bytes_areaColorBelow_r() << ", " << details::UBOAreaPlot::bytes_areaColorBelow_g() << ", "
+        << details::UBOAreaPlot::bytes_areaColorBelow_b() << ", " << details::UBOAreaPlot::bytes_areaColorBelow_a() << "); }\n";
+      s << "   else\n";
+      s << "   { color_out = vec4(" << details::UBOAreaPlot::bytes_areaColorAbove_r() << ", " << details::UBOAreaPlot::bytes_areaColorAbove_g() << ", "
+        << details::UBOAreaPlot::bytes_areaColorAbove_b() << ", " << details::UBOAreaPlot::bytes_areaColorAbove_a() << "); }\n";
+
+      s << function_main_end();
+
+      return s.str();
   }
 
   std::string ShaderLibrary::plot::line::vert()
   {
-      // todo
-  }
-
-  std::string ShaderLibrary::plot::line::frag()
-  {
-      // todo
-  }
-
-  std::string ShaderLibrary::plot::stdev::vert()
-  {
-      // todo
-  }
-
-  std::string ShaderLibrary::plot::stdev::frag()
-  {
-      // todo
-  }
-
-  std::string ShaderLibrary::plot::axis::vert()
-  {
       std::stringstream s;
 
-      s << comment_tag_vertex_shader("PLOT AXIS");
+      s << comment_tag_vertex_shader("PLOT LINE");
       s << version();
 
       s << comment_region_input();
@@ -3368,6 +3409,7 @@ namespace bk::details
       s << "layout(location = 0) out vec2 position_geom;\n";
 
       s << comment_region_functions();
+      s << function_plot_data_to_screen();
       s << function_main_begin();
       s << "   position_geom = position_in;\n";
       s << function_main_end();
@@ -3375,80 +3417,184 @@ namespace bk::details
       return s.str();
   }
 
-  std::string ShaderLibrary::plot::axis::geom()
+  std::string ShaderLibrary::plot::line::geom(bool use_area_ubo)
   {
+      const std::string ww = details::UBOGlobal::name_window_width();
+      const std::string wh = details::UBOGlobal::name_window_height();
+      const std::string ssaa = details::UBOGlobal::name_ssaa_factor();
+      const std::string linew = use_area_ubo ? details::UBOAreaPlot::name_line_width() : details::UBOPlotLine::name_line_width();
+
       std::stringstream s;
 
-      s << comment_tag_geometry_shader("PLOT AXIS");
+      s << comment_tag_geometry_shader("PLOT LINE (use_area_ubo:");
+      s << (use_area_ubo ? "yes" : "no") << ")";
       s << version();
 
       s << comment_region_input();
-      s << "layout(location = 0) in vec2 position_geom[2];\n";
+      s << "layout(location = 0) in vec2 position_geom[4];\n";
       s << ubo_definition_global();
-      s << ubo_definition_plot();
-      s << ubo_definition_plot_line();
-      s << geom_layout_in_lines();
+      if (use_area_ubo)
+      { s << ubo_definition_area_plot(); }
+      else
+      {
+          s << ubo_definition_plot();
+          s << ubo_definition_plot_line();
+      }
+      s << geom_layout_in_lines_adjacency();
 
       s << comment_region_output();
-      s << geom_layout_out_triangle_strip(4);
+      geom_layout_out_triangle_strip(4);
 
       s << comment_region_functions();
       s << function_plot_data_to_screen();
       s << function_main_begin();
+      s << "   const vec2 tangent[2] = {\n";
+      s << "       normalize(plot_data_to_screen(position_geom[2]) - plot_data_to_screen(position_geom[0])),\n";
+      s << "       normalize(plot_data_to_screen(position_geom[3]) - plot_data_to_screen(position_geom[1]))\n";
+      s << "   };\n";
 
-      s << "   const vec2 tangent = normalize(plot_data_to_screen(position_geom[1]) - plot_data_to_screen(position_geom[0]));\n";
-      s << "   const vec2 ortho = vec2(-tangent.y, tangent.x);\n\n";
+      s << "   const vec2 ortho[2] = {\n";
+      s << "       vec2(-tangent[0].y, tangent[0].x),\n";
+      s << "       vec2(-tangent[1].y, tangent[1].x)\n";
+      s << "   };\n";
 
-      s << "   const float l = float(" << details::UBOGlobal::name_ssaa_factor() << ") / sqrt(" << details::UBOGlobal::name_window_width() << "*" << details::UBOGlobal::name_window_height() << " + "
-        << details::UBOGlobal::name_window_width() << "*" << details::UBOGlobal::name_window_height() << ");\n\n";
+      s << "   const float l = float(" << ssaa << ") / sqrt(" << ww << "*" << ww << " + " << wh << "*" << wh << ");\n\n";
 
-      s << "   gl_Position = vec4(plot_data_to_screen(position_geom[0]) + l*" << details::UBOPlotLine::name_line_width() << "*ortho, 0, 1);\n";
+      s << "   gl_Position = vec4(plot_data_to_screen(position_geom[1]) + l*" << linew << "*ortho[0], 0, 1);\n";
       s << "   EmitVertex();\n\n";
 
-      s << "   gl_Position = vec4(plot_data_to_screen(position_geom[1]) + l*" << details::UBOPlotLine::name_line_width() << "*ortho, 0, 1);\n";
+      s << "   gl_Position = vec4(plot_data_to_screen(position_geom[2]) + l*" << linew << "*ortho[1], 0, 1);\n";
       s << "   EmitVertex();\n\n";
 
-      s << "   gl_Position = vec4(plot_data_to_screen(position_geom[0]) - l*" << details::UBOPlotLine::name_line_width() << "*ortho, 0, 1);\n";
+      s << "   gl_Position = vec4(plot_data_to_screen(position_geom[1]) - l*" << linew << "*ortho[0], 0, 1);\n";
       s << "   EmitVertex();\n\n";
 
-      s << "   gl_Position = vec4(plot_data_to_screen(position_geom[1]) - l*" << details::UBOPlotLine::name_line_width() << "*ortho, 0, 1);\n";
+      s << "   gl_Position = vec4(plot_data_to_screen(position_geom[2]) - l*" << linew << "*ortho[1], 0, 1);\n";
       s << "   EmitVertex();\n";
-
       s << function_main_end();
 
       return s.str();
   }
 
-  std::string ShaderLibrary::plot::axis::frag()
+  std::string ShaderLibrary::plot::line::frag(bool use_area_ubo)
   {
+      const std::string cr = use_area_ubo ? details::UBOAreaPlot::name_linecolorr() : details::UBOPlotLine::name_color_r();
+      const std::string cg = use_area_ubo ? details::UBOAreaPlot::name_linecolorg() : details::UBOPlotLine::name_color_g();
+      const std::string cb = use_area_ubo ? details::UBOAreaPlot::name_linecolorb() : details::UBOPlotLine::name_color_b();
+      const std::string ca = use_area_ubo ? details::UBOAreaPlot::name_linecolora() : details::UBOPlotLine::name_color_a();
+
       std::stringstream s;
 
-      s << comment_tag_fragment_shader("PLOT AXIS");
+      s << comment_tag_fragment_shader("PLOT LINE (use_area_ubo:");
+      s << (use_area_ubo ? "yes" : "no") << ")";
       s << version();
 
       s << comment_region_input();
-      s << ubo_definition_plot();
-      s << ubo_definition_plot_line();
+      s << (use_area_ubo ? ubo_definition_area_plot() : ubo_definition_plot_line());
 
       s << comment_region_output();
       s << "layout(location = 0) out vec4 color_out;\n";
 
       s << comment_region_functions();
-      s << function_plot_data_to_screen();
       s << function_main_begin();
-      s << "   color_out = vec4(" << details::UBOPlotLine::name_color_r() << ", " << details::UBOPlotLine::name_color_g() << ", " << details::UBOPlotLine::name_color_b() << ", " << details::UBOPlotLine::name_color_a()
-        << ");\n";
+      s << "   color_out = vec4(" << cr << ", " << cg << ", " << cb << ", " << ca << ");\n";
       s << function_main_end();
 
       return s.str();
   }
 
+  std::string ShaderLibrary::plot::stdev::vert()
+  { return line::vert(); }
+
+  std::string ShaderLibrary::plot::stdev::geom()
+  { return line::geom(true); }
+
+  std::string ShaderLibrary::plot::stdev::frag()
+  {
+      const std::string cr = details::UBOAreaPlot::name_stdevcolorr();
+      const std::string cg = details::UBOAreaPlot::name_stdevcolorg();
+      const std::string cb = details::UBOAreaPlot::name_stdevcolorb();
+      const std::string ca = details::UBOAreaPlot::name_stdevcolora();
+
+      std::stringstream s;
+
+      s << comment_tag_fragment_shader("PLOT STDEV");
+      s << version();
+
+      s << comment_region_input();
+      s << ubo_definition_area_plot();
+
+      s << comment_region_output();
+      s << "layout(location = 0) out vec4 color_out;\n";
+
+      s << comment_region_functions();
+      s << function_main_begin();
+      s << "   color_out = vec4(" << cr << ", " << cg << ", " << cb << ", " << ca << ");\n";
+      s << function_main_end();
+
+      return s.str();
+  }
+
+  std::string ShaderLibrary::plot::axis::vert()
+  {return line::vert();}
+
+  std::string ShaderLibrary::plot::axis::geom(bool use_area_ubo)
+  {return line::geom(use_area_ubo); }
+
+  std::string ShaderLibrary::plot::axis::frag(bool use_area_ubo)
+  {
+      if (!use_area_ubo)
+      {return line::frag(use_area_ubo);}
+
+      std::stringstream s;
+
+      s << comment_tag_fragment_shader("PLOT AXIS (use_area_ubo:yes)");
+      s << version();
+
+      s << comment_region_output();
+      s << "layout(location = 0) out vec4 color_out;\n";
+
+      s << comment_region_functions();
+      s << function_main_begin();
+      s << "   color_out = vec4(0,0,0,1);\n";
+      s << function_main_end();
+
+      return s.str();
+  }
+
+  std::string ShaderLibrary::plot::marker::vert()
+  { return line::vert(); }
+
+  std::string ShaderLibrary::plot::marker::geom()
+  { return line::geom(false); }
+
+  std::string ShaderLibrary::plot::marker::frag()
+  { return line::frag(false); }
+
   std::string ShaderLibrary::plot::ticks::vert()
-  { return ShaderLibrary::plot::axis::vert();}
+  { return line::vert(); }
 
-  std::string ShaderLibrary::plot::ticks::geom()
-  { return ShaderLibrary::plot::axis::geom();}
+  std::string ShaderLibrary::plot::ticks::geom(bool use_area_ubo)
+  { return line::geom(use_area_ubo); }
 
-  std::string ShaderLibrary::plot::ticks::frag()
-  { return ShaderLibrary::plot::axis::frag();}
+  std::string ShaderLibrary::plot::ticks::frag(bool use_area_ubo)
+  {
+      if (!use_area_ubo)
+      {return line::frag(use_area_ubo);}
+
+      std::stringstream s;
+
+      s << comment_tag_fragment_shader("PLOT AXIS TICKS (use_area_ubo:yes)");
+      s << version();
+
+      s << comment_region_output();
+      s << "layout(location = 0) out vec4 color_out;\n";
+
+      s << comment_region_functions();
+      s << function_main_begin();
+      s << "   color_out = vec4(1,1,1,0.5);\n";
+      s << function_main_end();
+
+      return s.str();
+  }
 } // namespace bk::details

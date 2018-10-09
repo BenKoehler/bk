@@ -371,16 +371,25 @@ namespace bk::details
           struct line
           {
               [[nodiscard]] static std::string vert();
-              [[nodiscard]] static std::string frag();
+              [[nodiscard]] static std::string geom(bool use_area_ubo);
+              [[nodiscard]] static std::string frag(bool use_area_ubo);
           };
 
           struct stdev
           {
               [[nodiscard]] static std::string vert();
+              [[nodiscard]] static std::string geom();
               [[nodiscard]] static std::string frag();
           };
 
           struct axis
+          {
+              [[nodiscard]] static std::string vert();
+              [[nodiscard]] static std::string geom(bool use_area_ubo);
+              [[nodiscard]] static std::string frag(bool use_area_ubo);
+          };
+
+          struct marker
           {
               [[nodiscard]] static std::string vert();
               [[nodiscard]] static std::string geom();
@@ -390,8 +399,8 @@ namespace bk::details
           struct ticks
           {
               [[nodiscard]] static std::string vert();
-              [[nodiscard]] static std::string geom();
-              [[nodiscard]] static std::string frag();
+              [[nodiscard]] static std::string geom(bool use_area_ubo);
+              [[nodiscard]] static std::string frag(bool use_area_ubo);
           };
       };
   }; // class ShaderLibrary

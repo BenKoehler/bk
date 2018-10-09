@@ -29,7 +29,8 @@
 
 #include <memory>
 
-#include "PlotBase.h"
+#include <bk/CopyablePIMPL>
+#include <bkGL/renderable/plot/PlotBase.h>
 
 namespace bk
 {
@@ -42,19 +43,14 @@ namespace bk
       //====================================================================================================
       //===== DEFINITIONS
       //====================================================================================================
-      using self_type = SingleLinePlotView;
       using base_type = PlotBase;
-
-    public:
-      using value_type = GLfloat;
 
       //====================================================================================================
       //===== MEMBERS
       //====================================================================================================
-    private:
       class Impl;
 
-      std::unique_ptr<Impl> _pdata;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR 
@@ -66,8 +62,8 @@ namespace bk
       #else
       explicit SingleLinePlotView(qt_gl_functions* gl);
       #endif
-      SingleLinePlotView(const self_type& other) = delete;
-      SingleLinePlotView(self_type&& other);
+      SingleLinePlotView(const SingleLinePlotView&) = delete;
+      SingleLinePlotView(SingleLinePlotView&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DESTRUCTOR
@@ -77,21 +73,21 @@ namespace bk
       //====================================================================================================
       //===== GETTER 
       //====================================================================================================
-      [[nodiscard]] std::shared_ptr<PlotLine>& get_line();
-      [[nodiscard]] const std::shared_ptr<PlotLine>& get_line() const;
+      [[nodiscard]] std::shared_ptr<PlotLine>& line();
+      [[nodiscard]] const std::shared_ptr<PlotLine>& line() const;
+
       //====================================================================================================
       //===== SETTER
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
-      [[maybe_unused]] auto operator=(const self_type& other) -> self_type& = delete;
-      [[maybe_unused]] auto operator=(self_type&& other) -> self_type&;
+      [[maybe_unused]] SingleLinePlotView& operator=(const SingleLinePlotView&) = delete;
+      [[maybe_unused]] SingleLinePlotView& operator=(SingleLinePlotView&&) noexcept;
       /// @}
 
       //====================================================================================================
       //===== GL
       //====================================================================================================
       [[maybe_unused]] bool init();
-      void clear();
   }; // class SingleLinePlotView
 } // namespace bk
 

@@ -103,8 +103,8 @@ namespace bk
       //===== SETTER
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
-      AreaPlotView& operator=(const AreaPlotView&) = delete;
-      AreaPlotView& operator=(AreaPlotView&&) noexcept;
+      [[maybe_unused]] AreaPlotView& operator=(const AreaPlotView&) = delete;
+      [[maybe_unused]] AreaPlotView& operator=(AreaPlotView&&) noexcept;
       /// @}
 
       void set_xlabel(const std::string& xlab);

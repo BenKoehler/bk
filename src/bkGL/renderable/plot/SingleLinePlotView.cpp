@@ -38,7 +38,7 @@ namespace bk
           #ifndef BK_LIB_QT_AVAILABLE
 
       Impl()
-          :
+          : line(std::make_shared<PlotLine>())
           #else
 
       explicit Impl(qt_gl_functions* gl)
@@ -47,66 +47,56 @@ namespace bk
       { /* do nothing */ }
 
       Impl(const Impl&) = delete;
-      Impl(Impl&&) = default;
+      Impl(Impl&&) noexcept = default;
       ~Impl() = default;
       Impl& operator=(const Impl&) = delete;
-      Impl& operator=(Impl&&) = default;
+      Impl& operator=(Impl&&) noexcept = default;
   };
 
   //====================================================================================================
   //===== CONSTRUCTORS & DESTRUCTOR
   //====================================================================================================
   #ifndef BK_LIB_QT_AVAILABLE
+
   SingleLinePlotView::SingleLinePlotView()
-    : base_type(),
-      _pdata(std::make_unique<Impl>())
+      : base_type()
   #else
 
   SingleLinePlotView::SingleLinePlotView(qt_gl_functions* gl)
       : base_type(gl),
-        _pdata(std::make_unique<Impl>(gl))
+        _pdata(gl)
   #endif
   { this->add_datavectorview(_pdata->line); }
 
-  SingleLinePlotView::SingleLinePlotView(self_type&&) = default;
+  SingleLinePlotView::SingleLinePlotView(SingleLinePlotView&&) noexcept = default;
 
-  SingleLinePlotView::~SingleLinePlotView()
-  { /*do nothing*/ }
+  SingleLinePlotView::~SingleLinePlotView() = default;
 
   //====================================================================================================
   //===== GETTER
   //====================================================================================================
-  std::shared_ptr<PlotLine>& SingleLinePlotView::get_line()
+  std::shared_ptr<PlotLine>& SingleLinePlotView::line()
   { return _pdata->line; }
 
-  const std::shared_ptr<PlotLine>& SingleLinePlotView::get_line() const
+  const std::shared_ptr<PlotLine>& SingleLinePlotView::line() const
   { return _pdata->line; }
 
   //====================================================================================================
   //===== SETTER
   //====================================================================================================
-  auto SingleLinePlotView::operator=(self_type&& other) -> self_type& = default;
+  SingleLinePlotView& SingleLinePlotView::operator=(SingleLinePlotView&&) noexcept = default;
 
   //====================================================================================================
   //===== GL
   //====================================================================================================
   bool SingleLinePlotView::init()
   {
-      //clear();
-
       const bool success = base_type::init();
-      this->set_initialized(success);
 
       if (!success)
       { clear(); }
 
       return success;
-  }
-
-  void SingleLinePlotView::clear()
-  {
-      base_type::clear();
-      this->set_initialized(false);
   }
 } // namespace bk
 

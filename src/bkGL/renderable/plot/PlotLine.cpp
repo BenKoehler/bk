@@ -22,17 +22,18 @@
  * SOFTWARE.
  */
 
-#include "PlotLine.h"
+#include <bkGL/renderable/plot/PlotLine.h>
 
 #include <algorithm>
 #include <limits>
 
-#include "PlotDataVector.h"
-#include "tools/color/ColorRGBA.h"
-#include "gl/buffer/VBO.h"
-#include "gl/buffer/UBO.h"
-#include "gl/vao/VAO.h"
-#include "gl/Shader.h"
+#include <bkGL/renderable/plot/PlotDataVector.h>
+#include <bkTools/color/ColorRGBA.h>
+#include <bkGL/buffer/VBO.h>
+#include <bkGL/UBOPlotLine.h>
+#include <bkGL/vao/VAO.h>
+#include <bkGL/shader/Shader.h>
+#include <bkGL/shader/ShaderLibrary.h>
 
 namespace bk
 {
@@ -43,11 +44,11 @@ namespace bk
   {
       VAO vao;
       VBO vbo;
-      UBO ubo;
+      details::UBOPlotLine ubo;
       Shader shader;
       PlotDataVector data;
-      color_type color;
-      value_type lineWidth;
+      ColorRGBA color;
+      GLfloat lineWidth;
       GLsizei primitiveCount;
 
           #ifndef BK_LIB_QT_AVAILABLE
@@ -62,107 +63,100 @@ namespace bk
             ubo(gl),
             shader(gl),
           #endif
-          //color(0.25, 0.5, 1, 1),
-            color(1, 0.5, 0, 1),
-            lineWidth(3),
-            primitiveCount(0)
+          color(1, 0.5, 0, 1),
+          lineWidth(3),
+          primitiveCount(0)
       { /* do nothing */ }
 
       Impl(const Impl&) = delete;
-      Impl(Impl&&) = default;
+      Impl(Impl&&) noexcept = default;
       ~Impl() = default;
       Impl& operator=(const Impl&) = delete;
-      Impl& operator=(Impl&&) = default;
+      Impl& operator=(Impl&&) noexcept = default;
   };
 
   //====================================================================================================
   //===== CONSTRUCTORS & DESTRUCTOR 
   //====================================================================================================
-
   #ifndef BK_LIB_QT_AVAILABLE
+
   PlotLine::PlotLine()
-      : base_type(),
-      _pdata(std::make_unique<Impl>())
+      : base_type()
   #else
 
   PlotLine::PlotLine(qt_gl_functions* gl)
       : base_type(gl),
-        _pdata(std::make_unique<Impl>(gl))
+        _pdata(gl)
   #endif
   {
       _pdata->vbo.set_usage_STATIC_DRAW();
       _pdata->vao.add_default_attribute_position_2xfloat();
-
-      _pdata->ubo.set_usage_STATIC_DRAW();
-      _pdata->ubo.register_value_of_size("lineWidth", sizeof(value_type));
-      _pdata->ubo.register_value_of_size("colorr", sizeof(value_type));
-      _pdata->ubo.register_value_of_size("colorg", sizeof(value_type));
-      _pdata->ubo.register_value_of_size("colorb", sizeof(value_type));
-      _pdata->ubo.register_value_of_size("colora", sizeof(value_type));
   }
 
-  PlotLine::PlotLine(self_type&&) = default;
+  PlotLine::PlotLine(PlotLine&&) noexcept = default;
 
-  PlotLine::~PlotLine()
-  { /* do nothing */ }
+  PlotLine::~PlotLine() = default;
 
   //====================================================================================================
   //===== GETTER 
   //====================================================================================================
-  auto PlotLine::get_color() const -> const color_type&
+  const ColorRGBA& PlotLine::color() const
   { return _pdata->color; }
 
-  auto PlotLine::get_line_width() const -> value_type
+  GLfloat PlotLine::line_width() const
   { return _pdata->lineWidth; }
 
-  auto PlotLine::get_data_vector() const -> const data_vector_type&
+  const PlotDataVector& PlotLine::data_vector() const
   { return _pdata->data; }
 
-  auto PlotLine::get_data_vector() -> data_vector_type&
+  PlotDataVector& PlotLine::data_vector()
   { return _pdata->data; }
 
-  auto PlotLine::get_x_min() const -> value_type
+  GLfloat PlotLine::x_min() const
   {
-      const auto& v = get_data_vector().get_x_value_vector();
-      return v.empty() ? std::numeric_limits<value_type>::max() : *std::min_element(v.begin(), v.end());
+      const auto& v = data_vector().x_value_vector();
+      return v.empty() ? std::numeric_limits<GLfloat>::max() : *std::min_element(v.begin(), v.end());
   }
 
-  auto PlotLine::get_x_max() const -> value_type
+  GLfloat PlotLine::x_max() const
   {
-      const auto& v = get_data_vector().get_x_value_vector();
-      return v.empty() ? -std::numeric_limits<value_type>::max() : *std::max_element(get_data_vector().get_x_value_vector().begin(), get_data_vector().get_x_value_vector().end());
+      const auto& v = data_vector().x_value_vector();
+      return v.empty() ? -std::numeric_limits<GLfloat>::max() : *std::max_element(data_vector().x_value_vector().begin(), data_vector().x_value_vector().end());
   }
 
-  auto PlotLine::get_y_min() const -> value_type
+  GLfloat PlotLine::y_min() const
   {
-      const auto& v = get_data_vector().get_y_value_vector();
-      return v.empty() ? std::numeric_limits<value_type>::max() : *std::min_element(get_data_vector().get_y_value_vector().begin(), get_data_vector().get_y_value_vector().end());
+      const auto& v = data_vector().y_value_vector();
+      return v.empty() ? std::numeric_limits<GLfloat>::max() : *std::min_element(data_vector().y_value_vector().begin(), data_vector().y_value_vector().end());
   }
 
-  auto PlotLine::get_y_max() const -> value_type
+  GLfloat PlotLine::y_max() const
   {
-      const auto& v = get_data_vector().get_y_value_vector();
-      return v.empty() ? -std::numeric_limits<value_type>::max() : *std::max_element(get_data_vector().get_y_value_vector().begin(), get_data_vector().get_y_value_vector().end());
+      const auto& v = data_vector().y_value_vector();
+      return v.empty() ? -std::numeric_limits<GLfloat>::max() : *std::max_element(data_vector().y_value_vector().begin(), data_vector().y_value_vector().end());
   }
+
+  bool PlotLine::is_initialized() const
+  { return _pdata->vao.is_initialized(); }
 
   //====================================================================================================
   //===== SETTER
   //====================================================================================================
-  auto PlotLine::operator=(self_type&& other) -> self_type& = default;
+  PlotLine& PlotLine::operator=(PlotLine&&) noexcept = default;
 
-  void PlotLine::set_color(const color_type& col)
+  void PlotLine::set_color(const ColorRGBA& col)
   { set_color(col[0], col[1], col[2], col[3]); }
 
-  void PlotLine::set_color(value_type r, value_type g, value_type b, value_type a)
+  void PlotLine::set_color(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
   { _pdata->color.set(r, g, b, a); }
 
-  void PlotLine::set_line_width(value_type w)
+  void PlotLine::set_line_width(GLfloat w)
   {
-      _pdata->lineWidth = std::max(w, static_cast<value_type>(0));
+      _pdata->lineWidth = std::max(w, static_cast<GLfloat>(0));
 
       if (this->is_initialized())
       {
-          _pdata->ubo.write_registered_value("lineWidth", &_pdata->lineWidth);
+          _pdata->ubo.set_line_width(_pdata->lineWidth);
           _pdata->ubo.release();
       }
   }
@@ -173,23 +167,25 @@ namespace bk
   bool PlotLine::init_shader()
   {
       clear_shader();
-      return _pdata->shader.init("shader/plot-new/plotline.vert", "shader/plot-new/plotline.frag", "shader/plot-new/plotline.geom");
+
+      using SL = details::ShaderLibrary::plot::line;
+      return _pdata->shader.init_from_sources(SL::vert(), SL::frag(false), SL::geom(false));
   }
 
   bool PlotLine::init_vbo_vao()
   {
       clear_vbo_vao();
 
-      const unsigned int N = _pdata->data.get_num_values();
+      const unsigned int N = _pdata->data.num_values();
 
       if (N == 0)
       { return false; }
 
       _pdata->primitiveCount = N + 2;
 
-      const std::vector<value_type>& x = _pdata->data.get_x_value_vector();
-      const std::vector<value_type>& y = _pdata->data.get_y_value_vector();
-      std::vector<value_type> vert;
+      const std::vector<GLfloat>& x = _pdata->data.x_value_vector();
+      const std::vector<GLfloat>& y = _pdata->data.y_value_vector();
+      std::vector<GLfloat> vert;
       vert.reserve(2 * _pdata->primitiveCount);
 
       // insert first point twice for line adjacency
@@ -219,15 +215,11 @@ namespace bk
       if (!_pdata->ubo.init_from_registered_values_size())
       { return false; }
 
-      _pdata->ubo.write_registered_value("lineWidth", &_pdata->lineWidth);
-      value_type ftemp = _pdata->color[0];
-      _pdata->ubo.write_registered_value("colorr", &ftemp);
-      ftemp = _pdata->color[1];
-      _pdata->ubo.write_registered_value("colorg", &ftemp);
-      ftemp = _pdata->color[2];
-      _pdata->ubo.write_registered_value("colorb", &ftemp);
-      ftemp = _pdata->color[3];
-      _pdata->ubo.write_registered_value("colora", &ftemp);
+      _pdata->ubo.set_line_width(_pdata->lineWidth);
+      _pdata->ubo.set_color_r(_pdata->color[0]);
+      _pdata->ubo.set_color_g(_pdata->color[1]);
+      _pdata->ubo.set_color_b(_pdata->color[2]);
+      _pdata->ubo.set_color_a(_pdata->color[3]);
       _pdata->ubo.release();
 
       return true;
@@ -238,7 +230,6 @@ namespace bk
       clear();
 
       const bool success = init_shader() && init_ubo() && init_vbo_vao();
-      this->set_initialized(success);
 
       if (!success)
       { clear(); }
@@ -263,13 +254,11 @@ namespace bk
       clear_shader();
       clear_vbo_vao();
       clear_ubo();
-
-      this->set_initialized(false);
   }
 
   void PlotLine::draw_impl()
   {
-      _pdata->ubo.bind_to_base(2);
+      _pdata->ubo.bind_to_default_base();
 
       BK_QT_GL glPushAttrib(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
       BK_QT_GL glDisable(GL_DEPTH_TEST);
