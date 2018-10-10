@@ -148,6 +148,8 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- GET CURRENT TEXT WIDTH IN PIXEL
+      // - absolute values are in pixels
+      // - relative values are in percent between [0,1]
       [[nodiscard]] GLfloat text_pixel_width_absolute() const;
       [[nodiscard]] GLfloat text_pixel_width_relative() const;
       [[nodiscard]] GLfloat text_pixel_width() const;
