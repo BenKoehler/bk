@@ -107,12 +107,12 @@ namespace bk::details
           const double sina = std::sin(angle_rad);
 
           // col 0
-          deriv->operator()(0, 0) = cosa;
-          deriv->operator()(1, 0) = sina;
+          deriv()->operator()(0, 0) = cosa;
+          deriv()->operator()(1, 0) = sina;
 
           // col 1
-          deriv->operator()(0, 1) = -sina;
-          deriv->operator()(1, 1) = cosa;
+          deriv()->operator()(0, 1) = -sina;
+          deriv()->operator()(1, 1) = cosa;
       }
 
       constexpr void set_rotation_matrix_2d_clockwise(double angle_rad)

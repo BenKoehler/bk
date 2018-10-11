@@ -118,19 +118,19 @@ namespace bk::details
           const double sina = std::sin(angle_rad);
 
           // col 0
-          deriv->operator()(0, 0) = cosa + axis_normalized[0] * axis_normalized[0] * (1.0 - cosa);
-          deriv->operator()(1, 0) = axis_normalized[1] * axis_normalized[0] * (1.0 - cosa) + axis_normalized[2] * sina;
-          deriv->operator()(2, 0) = axis_normalized[2] * axis_normalized[0] * (1.0 - cosa) - axis_normalized[1] * sina;
+          deriv()->operator()(0, 0) = cosa + axis_normalized[0] * axis_normalized[0] * (1.0 - cosa);
+          deriv()->operator()(1, 0) = axis_normalized[1] * axis_normalized[0] * (1.0 - cosa) + axis_normalized[2] * sina;
+          deriv()->operator()(2, 0) = axis_normalized[2] * axis_normalized[0] * (1.0 - cosa) - axis_normalized[1] * sina;
 
           // col 1
-          deriv->operator()(0, 1) = axis_normalized[0] * axis_normalized[1] * (1.0 - cosa) - axis_normalized[2] * sina;
-          deriv->operator()(1, 1) = cosa + axis_normalized[1] * axis_normalized[1] * (1.0 - cosa);
-          deriv->operator()(2, 1) = axis_normalized[2] * axis_normalized[1] * (1.0 - cosa) + axis_normalized[0] * sina;
+          deriv()->operator()(0, 1) = axis_normalized[0] * axis_normalized[1] * (1.0 - cosa) - axis_normalized[2] * sina;
+          deriv()->operator()(1, 1) = cosa + axis_normalized[1] * axis_normalized[1] * (1.0 - cosa);
+          deriv()->operator()(2, 1) = axis_normalized[2] * axis_normalized[1] * (1.0 - cosa) + axis_normalized[0] * sina;
 
           // col 2
-          deriv->operator()(0, 2) = axis_normalized[0] * axis_normalized[2] * (1.0 - cosa) + axis_normalized[1] * sina;
-          deriv->operator()(1, 2) = axis_normalized[1] * axis_normalized[2] * (1.0 - cosa) - axis_normalized[0] * sina;
-          deriv->operator()(2, 2) = cosa + axis_normalized[2] * axis_normalized[2] * (1.0 - cosa);
+          deriv()->operator()(0, 2) = axis_normalized[0] * axis_normalized[2] * (1.0 - cosa) + axis_normalized[1] * sina;
+          deriv()->operator()(1, 2) = axis_normalized[1] * axis_normalized[2] * (1.0 - cosa) - axis_normalized[0] * sina;
+          deriv()->operator()(2, 2) = cosa + axis_normalized[2] * axis_normalized[2] * (1.0 - cosa);
       }
       /// @}
 
@@ -145,10 +145,10 @@ namespace bk::details
           const double cosa = std::cos(angle_rad);
           const double sina = std::sin(angle_rad);
 
-          deriv->operator()(1, 1) = cosa;
-          deriv->operator()(2, 1) = sina;
-          deriv->operator()(1, 2) = -sina;
-          deriv->operator()(2, 2) = cosa;
+          deriv()->operator()(1, 1) = cosa;
+          deriv()->operator()(2, 1) = sina;
+          deriv()->operator()(1, 2) = -sina;
+          deriv()->operator()(2, 2) = cosa;
       }
 
       constexpr void set_rotation_matrix_3d_y(double angle_rad)
@@ -161,10 +161,10 @@ namespace bk::details
           const double cosa = std::cos(angle_rad);
           const double sina = std::sin(angle_rad);
 
-          deriv->operator()(0, 0) = cosa;
-          deriv->operator()(2, 0) = -sina;
-          deriv->operator()(0, 2) = sina;
-          deriv->operator()(2, 2) = cosa;
+          deriv()->operator()(0, 0) = cosa;
+          deriv()->operator()(2, 0) = -sina;
+          deriv()->operator()(0, 2) = sina;
+          deriv()->operator()(2, 2) = cosa;
       }
 
       constexpr void set_rotation_matrix_3d_z(double angle_rad)
@@ -177,10 +177,10 @@ namespace bk::details
           const double cosa = std::cos(angle_rad);
           const double sina = std::sin(angle_rad);
 
-          deriv->operator()(0, 0) = cosa;
-          deriv->operator()(1, 0) = sina;
-          deriv->operator()(0, 1) = -sina;
-          deriv->operator()(1, 1) = cosa;
+          deriv()->operator()(0, 0) = cosa;
+          deriv()->operator()(1, 0) = sina;
+          deriv()->operator()(0, 1) = -sina;
+          deriv()->operator()(1, 1) = cosa;
       }
       /// @}
   }; // class SquareMatrix3Functions
