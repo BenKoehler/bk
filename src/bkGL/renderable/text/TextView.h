@@ -167,6 +167,11 @@ namespace bk
     public:
       /// @}
 
+      /// @{ -------------------------------------------------- GET ORIENTATION
+      [[nodiscard]] bool orientation_is_horizontal() const;
+      [[nodiscard]] bool orientation_is_vertical() const;
+      /// @}
+
       /// @{ -------------------------------------------------- IS INITIALIZED
       [[nodiscard]] virtual bool is_initialized() const override;
       /// @}
@@ -214,6 +219,11 @@ namespace bk
       void set_scale(GLfloat sxy);
       /// @}
 
+      /// @{ -------------------------------------------------- SET ORIENTATION
+      void set_orientation_horizontal();
+      void set_orientation_vertical();
+      /// @}
+
       //====================================================================================================
       //===== FUNCTIONS
       //====================================================================================================
@@ -226,13 +236,13 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- INIT
-      [[maybe_unused]] static bool init_freetype(std::string_view path_to_font);
+      [[maybe_unused]] static bool init_freetype(std::string_view path_to_font = BK_GL_FONT_PATH );
     private:
       void init_shader();
       void init_buffers();
     public:
-      void init();
-      void init(std::string_view txt, std::string_view path_to_font = BK_GL_FONT_PATH );
+      [[maybe_unused]] bool init();
+      [[maybe_unused]] bool init(std::string_view txt, std::string_view path_to_font = BK_GL_FONT_PATH );
       /// @}
 
       /// @{ -------------------------------------------------- UPDATE POSITION

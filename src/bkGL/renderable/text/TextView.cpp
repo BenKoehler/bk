@@ -41,6 +41,17 @@
 namespace bk
 {
   //====================================================================================================
+  //===== ENUMS
+  //====================================================================================================
+  enum TextOrientation_ : unsigned int
+  {
+      TextOrientation_Horizontal = 0,//
+      TextOrientation_Vertical = 1,//
+  };
+
+  using TextOrientation = unsigned int;
+
+  //====================================================================================================
   //===== STRUCTS
   //====================================================================================================
   namespace details
@@ -92,6 +103,7 @@ namespace bk
       bk::Vec2<GLfloat> windowSize_initial;
       bk::Vec2<GLfloat> windowSize_current;
       bk::Vec2<GLfloat> scaleCorrectionWindowSize;
+      TextOrientation orientation;
 
           #ifndef BK_LIB_QT_AVAILABLE
 
@@ -110,13 +122,14 @@ namespace bk
           pos(0, 0),
           position_is_absolute(true),
           color_text(bk::ColorRGBA::White()),
-          //color_background(0, 0, 0, 0.75),
-          color_background(0, 0, 0, 1),
+          color_background(0, 0, 0, 0.75),
+          //color_background(0, 0, 0, 1),
           background_enabled(true),
           scale(1, 1),
           windowSize_initial(-1, -1),
           windowSize_current(-1, -1),
-          scaleCorrectionWindowSize(1, 1)
+          scaleCorrectionWindowSize(1, 1),
+          orientation(TextOrientation_Horizontal)
       { /* do nothing */ }
 
       Impl(const Impl&) = delete;
@@ -281,6 +294,14 @@ namespace bk
   { return position_mode_is_relative() ? text_max_off_y_relative() : text_max_off_y_absolute(); }
   /// @}
 
+  /// @{ -------------------------------------------------- GET ORIENTATION
+  bool TextView::orientation_is_horizontal() const
+  { return _pdata->orientation == TextOrientation_Horizontal; }
+
+  bool TextView::orientation_is_vertical() const
+  { return _pdata->orientation == TextOrientation_Vertical; }
+  /// @}
+
   /// @{ -------------------------------------------------- IS INITIALIZED
   bool TextView::is_initialized() const
   { return _pdata->shader_text.is_initialized() && _pdata->vao_text.is_initialized() && _pdata->ubo.is_initialized(); }
@@ -428,6 +449,24 @@ namespace bk
   { set_scale(sxy, sxy); }
   /// @}
 
+  /// @{ -------------------------------------------------- SET ORIENTATION
+  void TextView::set_orientation_horizontal()
+  {
+      _pdata->orientation = TextOrientation_Horizontal;
+
+      if (this->is_initialized())
+      { init(); }
+  }
+
+  void TextView::set_orientation_vertical()
+  {
+      _pdata->orientation = TextOrientation_Vertical;
+
+      if (this->is_initialized())
+      { init(); }
+  }
+  /// @}
+
   //====================================================================================================
   //===== FUNCTIONS
   //====================================================================================================
@@ -459,7 +498,7 @@ namespace bk
   bool TextView::init_freetype(std::string_view path_to_font)
   {
       if (TextView::ft_initialized)
-      { return false; }
+      { return true; }
 
       if (FT_Init_FreeType(&TextView::ft_lib))
       {
@@ -593,18 +632,20 @@ namespace bk
       _pdata->vao_background.init(_pdata->vbo_background);
   }
 
-  void TextView::init()
-  { init(BK_GL_FONT_PATH, _pdata->text); }
+  bool TextView::init()
+  { return init(_pdata->text, BK_GL_FONT_PATH); }
 
-  void TextView::init(std::string_view txt, std::string_view path_to_font)
+  bool TextView::init(std::string_view txt, std::string_view path_to_font)
   {
       clear();
 
       _pdata->text = txt;
-      TextView::init_freetype(path_to_font);
+      const bool success = TextView::init_freetype(path_to_font);
       init_shader();
       init_buffers();
       update_vbo_background();
+
+      return success;
   }
   /// @}
 
@@ -703,8 +744,10 @@ namespace bk
       _pdata->windowSize_current[0] = w;
       _pdata->windowSize_current[1] = h;
 
-      _pdata->scaleCorrectionWindowSize[0] = static_cast<GLfloat>(w) / _pdata->windowSize_initial[0];
-      _pdata->scaleCorrectionWindowSize[1] = static_cast<GLfloat>(h) / _pdata->windowSize_initial[1];
+      //_pdata->scaleCorrectionWindowSize[0] = static_cast<GLfloat>(w) / _pdata->windowSize_initial[0];
+      //_pdata->scaleCorrectionWindowSize[1] = static_cast<GLfloat>(h) / _pdata->windowSize_initial[1];
+      _pdata->scaleCorrectionWindowSize[0] = 1;
+      _pdata->scaleCorrectionWindowSize[1] = 1;
 
       update_vbo_background();
   }
@@ -730,10 +773,17 @@ namespace bk
   void TextView::on_mouse_button_released(MouseButton_ /*btn*/)
   { /* do nothing */ }
 
-  void TextView::on_key_pressed(Key_ /*k*/){ /* do nothing */ }
-  void TextView::on_key_released(Key_ /*k*/){ /* do nothing */ }
-  void TextView::on_mouse_wheel_up(){ /* do nothing */ }
-  void TextView::on_mouse_wheel_down(){ /* do nothing */ }
+  void TextView::on_key_pressed(Key_ /*k*/)
+  { /* do nothing */ }
+
+  void TextView::on_key_released(Key_ /*k*/)
+  { /* do nothing */ }
+
+  void TextView::on_mouse_wheel_up()
+  { /* do nothing */ }
+
+  void TextView::on_mouse_wheel_down()
+  { /* do nothing */ }
 
   void TextView::on_ssaa_factor_changed(GLint /*ssaa_factor*/)
   { /* do nothing */ }
@@ -744,21 +794,36 @@ namespace bk
   {
       _pdata->ubo.bind_to_default_base();
 
-      BK_QT_GL glMatrixMode(GL_MODELVIEW);
-      BK_QT_GL glPushMatrix();
-      BK_QT_GL glLoadIdentity();
+      BK_QT_GL glPushAttrib(GL_COLOR_BUFFER_BIT);
+      BK_QT_GL glEnable(GL_BLEND);
+      //BK_QT_GL glDisable(GL_BLEND);
+      //glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
+      //BK_QT_GL glBlendEquation(GL_FUNC_ADD);
+      //BK_QT_GL glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+      BK_QT_GL glDepthFunc(GL_ALWAYS);
 
       BK_QT_GL glMatrixMode(GL_PROJECTION);
       BK_QT_GL glPushMatrix();
       BK_QT_GL glLoadIdentity();
 
-      BK_QT_GL glDepthFunc(GL_ALWAYS);
+      BK_QT_GL glMatrixMode(GL_MODELVIEW);
+      BK_QT_GL glPushMatrix();
+      BK_QT_GL glLoadIdentity();
 
-      _pdata->shader_background.bind();
-      _pdata->vao_background.bind();
-      BK_QT_GL glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-      _pdata->vao_background.release();
-      _pdata->shader_background.release();
+      if (_pdata->rotation_deg != 0)
+      {
+          BK_QT_GL glRotatef(_pdata->rotation_deg, 0, 0, 1);
+      }
+
+      if (_pdata->background_enabled)
+      {
+          _pdata->shader_background.bind();
+          _pdata->vao_background.bind();
+          BK_QT_GL glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+          _pdata->vao_background.release();
+          _pdata->shader_background.release();
+      }
 
       _pdata->shader_text.bind();
       _pdata->vao_text.bind();
@@ -779,8 +844,10 @@ namespace bk
 
       BK_QT_GL glDepthFunc(GL_LESS);
 
+      BK_QT_GL glPopAttrib();
+
       BK_QT_GL glPopMatrix();
-      BK_QT_GL glMatrixMode(GL_MODELVIEW);
+      BK_QT_GL glMatrixMode(GL_PROJECTION);
       BK_QT_GL glPopMatrix();
 
       _pdata->ubo.release_from_base();
