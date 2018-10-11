@@ -24,69 +24,68 @@
 
 #pragma once
 
-#ifndef BKGL_UBOSLICEVIEW_H
-#define BKGL_UBOSLICEVIEW_H
+#ifndef BK_AREAPLOTDATAVECTOR_H
+#define BK_AREAPLOTDATAVECTOR_H
 
-#include <string>
+#include <vector>
 
-#include <bkGL/buffer/UBOSpecialization.h>
+#include <bk/CopyablePIMPL>
+#include <bkGL/gl_definitions.h>
 #include <bkGL/lib/bkGL_export.h>
 
-namespace bk::details
+namespace bk
 {
-  class BKGL_EXPORT UBOSliceView : public UBOSpecialization
+  class BKGL_EXPORT AreaPlotDataVector
   {
       //====================================================================================================
-      //===== DEFINITIONS
+      //===== MEMBERS
       //====================================================================================================
-      using self_type = UBOSliceView;
-      using base_type = UBOSpecialization;
+    private:
+      class Impl;
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
-      //===== CONSTRUCTORS & DESTRUCTOR
+      //===== CONSTRUCTORS & DESTRUCTOR 
       //====================================================================================================
     public:
-      /// @{ -------------------------------------------------- CTOR
-      #ifndef BK_LIB_QT_AVAILABLE
-      UBOSliceView();
-      #else
-      UBOSliceView(qt_gl_functions* gl);
-      #endif
-      UBOSliceView(const self_type&) = delete;
-      UBOSliceView(self_type&&) noexcept;
+      /// @{ -------------------------------------------------- CONSTRUCTORS
+      AreaPlotDataVector();
+      AreaPlotDataVector(const AreaPlotDataVector&);
+      AreaPlotDataVector(AreaPlotDataVector&&) noexcept;
       /// @}
 
-      /// @{ -------------------------------------------------- DTOR
-      ~UBOSliceView();
+      /// @{ -------------------------------------------------- DESTRUCTOR
+      ~AreaPlotDataVector();
       /// @}
+
+      //====================================================================================================
+      //===== GETTER 
+      //====================================================================================================
+    private:
+      [[nodiscard]] bool _is_valid_id(unsigned int i) const;
+    public:
+      [[nodiscard]] unsigned int num_values() const;
+      [[nodiscard]] const GLfloat* x_value(unsigned int i) const;
+      [[nodiscard]] const GLfloat* y0_value(unsigned int i) const;
+      [[nodiscard]] const GLfloat* y1_value(unsigned int i) const;
+      [[nodiscard]] const std::vector<GLfloat>& x_value_vector() const;
+      [[nodiscard]] const std::vector<GLfloat>& y0_value_vector() const;
+      [[nodiscard]] const std::vector<GLfloat>& y1_value_vector() const;
 
       //====================================================================================================
       //===== SETTER
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
-      [[maybe_unused]] auto operator=(const self_type&) -> self_type& = delete;
-      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
+      [[maybe_unused]] AreaPlotDataVector& operator=(const AreaPlotDataVector&);
+      [[maybe_unused]] AreaPlotDataVector& operator=(AreaPlotDataVector&&) noexcept;
       /// @}
 
-      using base_type::set_buffer_base;
-    private:
-      using base_type::set_buffer_name;
-    public:
+      void set_num_values(unsigned int N);
+      [[maybe_unused]] bool set_x_value(unsigned int i, GLfloat x);
+      [[maybe_unused]] bool set_y0_value(unsigned int i, GLfloat y0);
+      [[maybe_unused]] bool set_y1_value(unsigned int i, GLfloat y1);
+      [[maybe_unused]] bool set_value(unsigned int i, GLfloat x, GLfloat y0, GLfloat y1);
+  }; // class AreaPlotDataVector
+} // namespace bk
 
-      //====================================================================================================
-      //===== VALUES
-      //====================================================================================================
-      BK_UBO_SPECIALIZATION_DECLARE(xyzt_max0, GL_INT)
-      BK_UBO_SPECIALIZATION_DECLARE(xyzt_max1, GL_INT)
-      //BK_UBO_SPECIALIZATION_DECLARE(orientation, GL_INT) // todo
-      BK_UBO_SPECIALIZATION_DECLARE(window_width, GL_INT)
-      BK_UBO_SPECIALIZATION_DECLARE(window_height, GL_INT)
-      BK_UBO_SPECIALIZATION_DECLARE(voxel_scale0, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(voxel_scale1, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(tf_center, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(tf_width, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(threshold, GL_FLOAT)
-  }; // class UBOSliceView
-} // namespace bk::details
-
-#endif //BKGL_UBOSLICEVIEW_H
+#endif //BK_AREAPLOTDATAVECTOR_H

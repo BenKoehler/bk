@@ -89,8 +89,8 @@ namespace bk::details
       [[nodiscard]] static std::string ubo_definition_dvr();
       [[nodiscard]] static std::string ubo_definition_global();
       [[nodiscard]] static std::string ubo_definition_line();
-      [[nodiscard]] static std::string ubo_definition_area_plot();
       [[nodiscard]] static std::string ubo_definition_plot();
+      [[nodiscard]] static std::string ubo_definition_plot_area();
       [[nodiscard]] static std::string ubo_definition_plot_line();
       [[nodiscard]] static std::string ubo_definition_phong();
       [[nodiscard]] static std::string ubo_definition_selection_sphere();
@@ -371,22 +371,22 @@ namespace bk::details
           struct line
           {
               [[nodiscard]] static std::string vert();
-              [[nodiscard]] static std::string geom(bool use_area_ubo);
-              [[nodiscard]] static std::string frag(bool use_area_ubo);
+              [[nodiscard]] static std::string geom(bool lines_adjacency);
+              [[nodiscard]] static std::string frag();
           };
 
-          struct stdev
+          /*struct stdev
           {
               [[nodiscard]] static std::string vert();
               [[nodiscard]] static std::string geom();
               [[nodiscard]] static std::string frag();
-          };
+          };*/
 
           struct axis
           {
               [[nodiscard]] static std::string vert();
-              [[nodiscard]] static std::string geom(bool use_area_ubo);
-              [[nodiscard]] static std::string frag(bool use_area_ubo);
+              [[nodiscard]] static std::string geom();
+              [[nodiscard]] static std::string frag();
           };
 
           struct marker
@@ -399,8 +399,8 @@ namespace bk::details
           struct ticks
           {
               [[nodiscard]] static std::string vert();
-              [[nodiscard]] static std::string geom(bool use_area_ubo);
-              [[nodiscard]] static std::string frag(bool use_area_ubo);
+              [[nodiscard]] static std::string geom();
+              [[nodiscard]] static std::string frag();
           };
       };
   }; // class ShaderLibrary

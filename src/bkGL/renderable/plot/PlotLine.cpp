@@ -121,19 +121,19 @@ namespace bk
   GLfloat PlotLine::x_max() const
   {
       const auto& v = data_vector().x_value_vector();
-      return v.empty() ? -std::numeric_limits<GLfloat>::max() : *std::max_element(data_vector().x_value_vector().begin(), data_vector().x_value_vector().end());
+      return v.empty() ? -std::numeric_limits<GLfloat>::max() : *std::max_element(v.begin(), v.end());
   }
 
   GLfloat PlotLine::y_min() const
   {
       const auto& v = data_vector().y_value_vector();
-      return v.empty() ? std::numeric_limits<GLfloat>::max() : *std::min_element(data_vector().y_value_vector().begin(), data_vector().y_value_vector().end());
+      return v.empty() ? std::numeric_limits<GLfloat>::max() : *std::min_element(v.begin(), v.end());
   }
 
   GLfloat PlotLine::y_max() const
   {
       const auto& v = data_vector().y_value_vector();
-      return v.empty() ? -std::numeric_limits<GLfloat>::max() : *std::max_element(data_vector().y_value_vector().begin(), data_vector().y_value_vector().end());
+      return v.empty() ? -std::numeric_limits<GLfloat>::max() : *std::max_element(v.begin(), v.end());
   }
 
   bool PlotLine::is_initialized() const
@@ -169,7 +169,7 @@ namespace bk
       clear_shader();
 
       using SL = details::ShaderLibrary::plot::line;
-      return _pdata->shader.init_from_sources(SL::vert(), SL::frag(false), SL::geom(false));
+      return _pdata->shader.init_from_sources(SL::vert(), SL::frag(), SL::geom(true));
   }
 
   bool PlotLine::init_vbo_vao()
@@ -263,9 +263,11 @@ namespace bk
       BK_QT_GL glPushAttrib(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
       BK_QT_GL glDisable(GL_DEPTH_TEST);
       BK_QT_GL glEnable(GL_BLEND);
+
       BK_QT_GL glMatrixMode(GL_MODELVIEW);
       BK_QT_GL glPushMatrix();
       BK_QT_GL glLoadIdentity();
+
       BK_QT_GL glMatrixMode(GL_PROJECTION);
       BK_QT_GL glPushMatrix();
       BK_QT_GL glLoadIdentity();

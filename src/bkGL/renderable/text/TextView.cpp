@@ -329,8 +329,16 @@ namespace bk
   /// @{ -------------------------------------------------- SET POSITION
   void TextView::set_position(GLfloat x, GLfloat y)
   {
-      _pdata->pos[0] = x;
-      _pdata->pos[1] = y;
+      if (orientation_is_horizontal())
+      {
+          _pdata->pos[0] = x;
+          _pdata->pos[1] = y;
+      }
+      else
+      {
+          _pdata->pos[0] = y;
+          _pdata->pos[1] = x;
+      }
 
       update_vbo_background();
 
@@ -452,6 +460,9 @@ namespace bk
   /// @{ -------------------------------------------------- SET ORIENTATION
   void TextView::set_orientation_horizontal()
   {
+      if (orientation_is_vertical())
+      { std::swap(_pdata->pos[0], _pdata->pos[1]); }
+
       _pdata->orientation = TextOrientation_Horizontal;
 
       if (this->is_initialized())
@@ -460,6 +471,9 @@ namespace bk
 
   void TextView::set_orientation_vertical()
   {
+      if (orientation_is_horizontal())
+      { std::swap(_pdata->pos[0], _pdata->pos[1]); }
+
       _pdata->orientation = TextOrientation_Vertical;
 
       if (this->is_initialized())
@@ -605,17 +619,87 @@ namespace bk
             0 ------ 1
         */
       constexpr unsigned int N_text = 16;
-      constexpr GLfloat vertices_texCoords_interleaved_text[N_text] = {
-          /*vert0*/ -1, -1,
-          /*texCoord0*/ 0, 0,
-          /*vert1*/ 1, -1,
-          /*texCoord1*/ 0, 1,
-          /*vert2*/ -1, 1,
-          /*texCoord2*/ 1, 0,
-          /*vert3*/ 1, 1,
-          /*texCoord3*/ 1, 1};
 
-      _pdata->vbo_text.init(vertices_texCoords_interleaved_text, N_text * sizeof(GLfloat));
+      //constexpr GLfloat vertices_texCoords_interleaved_text[N_text] = {
+      //    /*vert0*/ -1, -1,
+      //    /*texCoord0*/ 0, 0,
+      //    /*vert1*/ 1, -1,
+      //    /*texCoord1*/ 0, 1,
+      //    /*vert2*/ -1, 1,
+      //    /*texCoord2*/ 1, 0,
+      //    /*vert3*/ 1, 1,
+      //    /*texCoord3*/ 1, 1};
+
+      //_pdata->vbo_text.init(vertices_texCoords_interleaved_text, N_text * sizeof(GLfloat));
+
+      if (orientation_is_horizontal())
+      {
+          constexpr GLfloat vertices_texCoords_interleaved_text[N_text] = {-1, -1, // vert0
+                                                                           0, 0, // texCoord0
+                                                                           1, -1, // vert1
+                                                                           0, 1, // texCoord1
+                                                                           -1, 1, // vert2
+                                                                           1, 0, // texCoord2
+                                                                           1, 1, // vert3
+                                                                           1, 1 // texCoord3
+          };
+
+          _pdata->vbo_text.init(vertices_texCoords_interleaved_text, N_text * sizeof(GLfloat));
+      }
+      else
+      {
+          //constexpr GLfloat vertices_texCoords_interleaved_text[N_text] = {-1, -1, // vert0
+          //                                                                 1, 0, // texCoord1
+          //                                                                 1, -1, // vert1
+          //                                                                 0, 0, // texCoord0
+          //                                                                 -1, 1, // vert2
+          //                                                                 1, 1, // texCoord3
+          //                                                                 1, 1, // vert3
+          //                                                                 0, 1, // texCoord1
+
+          //constexpr GLfloat vertices_texCoords_interleaved_text[N_text] = {-1, -1, // vert0
+          //                                                                 1, 0, // texCoord1
+          //                                                                 1, -1, // vert1
+          //                                                                 1, 1, // texCoord3
+          //                                                                 -1, 1, // vert2
+          //                                                                 0, 0, // texCoord0
+          //                                                                 1, 1, // vert3
+          //                                                                 0, 1, // texCoord1
+          //    };
+
+          //constexpr GLfloat vertices_texCoords_interleaved_text[N_text] = {-1, -1, // vert0
+          //                                                                 1, 1, // texCoord1
+          //                                                                 1, -1, // vert1
+          //                                                                 1, 0, // texCoord0
+          //                                                                 -1, 1, // vert2
+          //                                                                 0, 1, // texCoord3
+          //                                                                 1, 1, // vert3
+          //                                                                 1, 0, // texCoord1
+          //};
+
+          //constexpr GLfloat vertices_texCoords_interleaved_text[N_text] = {-1, -1, // vert0
+          //                                                                 0, 1, // texCoord0
+          //                                                                 1, -1, // vert1
+          //                                                                 0, 0, // texCoord1
+          //                                                                 -1, 1, // vert2
+          //                                                                 1, 1, // texCoord2
+          //                                                                 1, 1, // vert3
+          //                                                                 1, 0 // texCoord3
+          //};
+
+          constexpr GLfloat vertices_texCoords_interleaved_text[N_text] = {-1, -1, // vert0
+                                                                           0, 0, // texCoord0
+                                                                           1, -1, // vert1
+                                                                           0, 1, // texCoord1
+                                                                           -1, 1, // vert2
+                                                                           1, 0, // texCoord2
+                                                                           1, 1, // vert3
+                                                                           1, 1 // texCoord3
+          };
+
+          _pdata->vbo_text.init(vertices_texCoords_interleaved_text, N_text * sizeof(GLfloat));
+      }
+
       _pdata->vao_text.init(_pdata->vbo_text);
 
       /*
@@ -652,6 +736,8 @@ namespace bk
   /// @{ -------------------------------------------------- UPDATE POSITION
   GLfloat TextView::update_vbo_text(GLfloat x, GLfloat y, const details::FreeTypeCharacter& character)
   {
+      //if (orientation_is_horizontal())
+      //{
       if (!this->is_initialized())
       { return x; }
 
@@ -673,22 +759,53 @@ namespace bk
       if (data != nullptr)
       {
           const GLfloat xpos = x + bx * _pdata->scale[0] * _pdata->scaleCorrectionWindowSize[0];
-          //const GLfloat ypos = y - (sy - by) * _pdata->scale[1] * _pdata->scaleCorrectionWindowSize[1];
           const GLfloat ypos = y - (sy - by) * _pdata->scale[1] * _pdata->scaleCorrectionWindowSize[1] + offy;
+
           const GLfloat w = sx * _pdata->scale[0] * _pdata->scaleCorrectionWindowSize[0];
           const GLfloat h = sy * _pdata->scale[1] * _pdata->scaleCorrectionWindowSize[1];
 
-          data[0] = xpos;
-          data[1] = ypos + h;
+          if (orientation_is_horizontal())
+          {
+              data[0] = xpos;
+              data[1] = ypos + h;
 
-          data[4] = xpos;
-          data[5] = ypos;
+              data[4] = xpos;
+              data[5] = ypos;
 
-          data[8] = xpos + w;
-          data[9] = ypos + h;
+              data[8] = xpos + w;
+              data[9] = ypos + h;
 
-          data[12] = xpos + w;
-          data[13] = ypos;
+              data[12] = xpos + w;
+              data[13] = ypos;
+          }
+          else
+          {
+              //data[0] = ypos;
+              //data[1] = xpos;
+              //
+              //data[4] = ypos + h;
+              //data[5] = xpos;
+              //
+              //data[8] = ypos;
+              //data[9] = xpos + w;
+              //
+              //data[12] = ypos + h;
+              //data[13] = xpos + w;
+
+              const GLfloat corr = (sy - by) * _pdata->scale[1] * _pdata->scaleCorrectionWindowSize[1];
+
+              data[0] = ypos+corr;
+              data[1] = xpos;
+
+              data[4] = ypos + h;
+              data[5] = xpos;
+
+              data[8] = ypos+corr;
+              data[9] = xpos + w;
+
+              data[12] = ypos + h;
+              data[13] = xpos + w;
+          }
 
           _pdata->vbo_text.unmap_and_release();
       }
@@ -712,17 +829,34 @@ namespace bk
           const GLfloat y0 = _pdata->pos[1];
           const GLfloat y1 = y0 + text_pixel_height() + offy;
 
-          data[0] = x0;
-          data[1] = y1;
+          if (orientation_is_horizontal())
+          {
+              data[0] = x0;
+              data[1] = y1;
 
-          data[2] = x0;
-          data[3] = y0;
+              data[2] = x0;
+              data[3] = y0;
 
-          data[4] = x1;
-          data[5] = y1;
+              data[4] = x1;
+              data[5] = y1;
 
-          data[6] = x1;
-          data[7] = y0;
+              data[6] = x1;
+              data[7] = y0;
+          }
+          else
+          {
+              data[0] = y1;
+              data[1] = x0;
+
+              data[2] = y0;
+              data[3] = x0;
+
+              data[4] = y1;
+              data[5] = x1;
+
+              data[6] = y0;
+              data[7] = x1;
+          }
 
           _pdata->vbo_background.unmap_and_release();
       }
@@ -744,10 +878,10 @@ namespace bk
       _pdata->windowSize_current[0] = w;
       _pdata->windowSize_current[1] = h;
 
-      //_pdata->scaleCorrectionWindowSize[0] = static_cast<GLfloat>(w) / _pdata->windowSize_initial[0];
-      //_pdata->scaleCorrectionWindowSize[1] = static_cast<GLfloat>(h) / _pdata->windowSize_initial[1];
-      _pdata->scaleCorrectionWindowSize[0] = 1;
-      _pdata->scaleCorrectionWindowSize[1] = 1;
+      _pdata->scaleCorrectionWindowSize[0] = static_cast<GLfloat>(w) / _pdata->windowSize_initial[0];
+      _pdata->scaleCorrectionWindowSize[1] = static_cast<GLfloat>(h) / _pdata->windowSize_initial[1];
+      //_pdata->scaleCorrectionWindowSize[0] = 1;
+      //_pdata->scaleCorrectionWindowSize[1] = 1;
 
       update_vbo_background();
   }
@@ -796,11 +930,6 @@ namespace bk
 
       BK_QT_GL glPushAttrib(GL_COLOR_BUFFER_BIT);
       BK_QT_GL glEnable(GL_BLEND);
-      //BK_QT_GL glDisable(GL_BLEND);
-      //glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
-      //BK_QT_GL glBlendEquation(GL_FUNC_ADD);
-      //BK_QT_GL glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-
       BK_QT_GL glDepthFunc(GL_ALWAYS);
 
       BK_QT_GL glMatrixMode(GL_PROJECTION);
@@ -810,11 +939,6 @@ namespace bk
       BK_QT_GL glMatrixMode(GL_MODELVIEW);
       BK_QT_GL glPushMatrix();
       BK_QT_GL glLoadIdentity();
-
-      if (_pdata->rotation_deg != 0)
-      {
-          BK_QT_GL glRotatef(_pdata->rotation_deg, 0, 0, 1);
-      }
 
       if (_pdata->background_enabled)
       {

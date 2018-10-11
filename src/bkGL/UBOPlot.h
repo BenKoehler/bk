@@ -67,9 +67,9 @@ namespace bk::details
       [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
+      using base_type::set_buffer_base;
     private:
       using base_type::set_buffer_name;
-      using base_type::set_buffer_base;
     public:
 
       //====================================================================================================
@@ -79,8 +79,8 @@ namespace bk::details
       BK_UBO_SPECIALIZATION_DECLARE(xmax, GL_FLOAT)
       BK_UBO_SPECIALIZATION_DECLARE(ymin, GL_FLOAT)
       BK_UBO_SPECIALIZATION_DECLARE(ymax, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(border_width_horizontal_in_percent, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(border_width_vertical_in_percent, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_DECLARE(border_width_x_in_percent, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_DECLARE(border_width_y_in_percent, GL_FLOAT)
   }; // class UBOPlot
 } // namespace bk::details
 

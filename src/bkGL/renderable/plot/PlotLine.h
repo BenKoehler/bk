@@ -27,8 +27,6 @@
 #ifndef BK_PLOTLINE_H
 #define BK_PLOTLINE_H
 
-#include <memory>
-
 #include <bk/CopyablePIMPL>
 
 #include <bkGL/renderable/plot/PlotAbstractDataVectorView.h>

@@ -330,15 +330,17 @@ set(SOURCE_FILES # BUFFER
         #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/imageplane/ImagePlanePreviewView.cpp # TODO
         #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/imageplane/ImagePlaneView.cpp # TODO
 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/AreaPlotView.cpp 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/MultiLinePlotView.cpp 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotAbstractDataVectorView.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/MultiLinePlotView.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotAbstractDataVectorView.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotArea.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotAxis.cpp 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotBase.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotBase.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/AreaPlotDataVector.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotDataVector.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotLine.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotMarker.cpp 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/SingleLinePlotView.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/SingleLinePlotView.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/AreaPlotView.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/line/LineView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/mesh/TriangularMesh3DView.cpp
@@ -371,7 +373,7 @@ set(SOURCE_FILES # BUFFER
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOGlobal.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOLine.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOPhong.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOAreaPlot.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOPlotArea.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOPlot.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOPlotLine.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOSelectionSphere.cpp

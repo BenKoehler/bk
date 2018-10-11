@@ -25,6 +25,9 @@
 #include "PlotAxis.h"
 
 #include <algorithm>
+#include <iostream>
+#include <sstream>
+#include <vector>
 
 #include <bkTools/color/ColorRGBA.h>
 #include <bkGL/UBOPlotLine.h>
@@ -34,6 +37,7 @@
 #include <bkGL/vao/VAO.h>
 #include <bkGL/shader/Shader.h>
 #include <bkGL/shader/ShaderLibrary.h>
+#include <bkGL/renderable/text/TextView.h>
 
 namespace bk
 {
@@ -50,17 +54,25 @@ namespace bk
       IBO ibo_ticks;
       VAO vao_ticks;
       Shader shader_ticks;
+      TextView textview_label;
+      std::vector<TextView> textview_ticks;
       GLsizei sizeInd_ticks;
       GLfloat xmin;
       GLfloat xmax;
       GLfloat ymin;
       GLfloat ymax;
+      GLfloat border_width_x_in_percent;
+      GLfloat border_width_y_in_percent;
+      GLfloat w;
+      GLfloat h;
+      GLint ssaa;
       ColorRGBA color;
       GLfloat lineWidth;
       GLuint numTicks;
       std::string label;
-      details::PlotAxisOrientation_ orientation;
+      PlotAxisOrientation orientation;
       unsigned int tickPrecision;
+      bool draw_ticks_manually;
 
           #ifndef BK_LIB_QT_AVAILABLE
 
@@ -77,18 +89,25 @@ namespace bk
             ibo_ticks(gl),
             vao_ticks(gl),
             shader_ticks(gl),
+            textview_label(gl),
           #endif
           sizeInd_ticks(0),
           xmin(0),
           xmax(0),
           ymin(0),
           ymax(0),
-          color(0, 0, 0, 1),
+          border_width_x_in_percent(0),
+          border_width_y_in_percent(0),
+          w(0),
+          h(0),
+          ssaa(1),
+          color(0.5, 0.5, 0.5, 1),
           lineWidth(1),
           numTicks(3),
           label(""),
-          orientation(details::PlotAxisOrientation_Horizontal),
-          tickPrecision(1)
+          orientation(PlotAxisOrientation_Horizontal),
+          tickPrecision(1),
+          draw_ticks_manually(false)
       { /* do nothing */ }
 
       Impl(const Impl&) = delete;
@@ -119,6 +138,11 @@ namespace bk
       _pdata->vbo_ticks.set_usage_STATIC_DRAW();
       _pdata->ibo_ticks.set_usage_STATIC_DRAW();
       _pdata->vao_ticks.add_default_attribute_position_2xfloat();
+
+      _pdata->textview_label.set_position_mode_relative();
+      _pdata->textview_label.set_background_enabled(true);
+      _pdata->textview_label.set_color_background(0, 0, 0, 0.25);
+      this->forward_signals(&_pdata->textview_label);
   }
 
   PlotAxis::PlotAxis(PlotAxis&&) noexcept = default;
@@ -152,20 +176,29 @@ namespace bk
   const std::string& PlotAxis::label() const
   { return _pdata->label; }
 
-  const details::PlotAxisOrientation_& PlotAxis::orientation() const
+  PlotAxisOrientation PlotAxis::orientation() const
   { return _pdata->orientation; }
 
   bool PlotAxis::orientation_is_horizontal() const
-  { return _pdata->orientation == details::PlotAxisOrientation_Horizontal; }
+  { return _pdata->orientation == PlotAxisOrientation_Horizontal; }
 
   bool PlotAxis::orientation_is_vertical() const
-  { return _pdata->orientation == details::PlotAxisOrientation_Vertical; }
+  { return _pdata->orientation == PlotAxisOrientation_Vertical; }
 
   unsigned int PlotAxis::tick_precision() const
   { return _pdata->tickPrecision; }
 
+  TextView& PlotAxis::text_view_label()
+  { return _pdata->textview_label; }
+
+  const TextView& PlotAxis::text_view_label() const
+  { return _pdata->textview_label; }
+
   bool PlotAxis::is_initialized() const
   { return _pdata->vao.is_initialized() && _pdata->ubo.is_initialized(); }
+
+  bool PlotAxis::draw_ticks_manually() const
+  {return _pdata->draw_ticks_manually;}
 
   //====================================================================================================
   //===== SETTER
@@ -207,11 +240,40 @@ namespace bk
   { _pdata->numTicks = numTicks; }
 
   void PlotAxis::set_label(std::string_view label)
-  { _pdata->label = label; }
+  {
+      _pdata->label = label;
 
-  void PlotAxis::set_orientation(details::PlotAxisOrientation_ orientation)
+      if (this->is_initialized())
+      {
+          init_textview();
+          this->emit_signal_update_required();
+      }
+  }
+
+  void PlotAxis::set_border_width_x_in_percent(GLfloat p)
+  { _pdata->border_width_x_in_percent = p; }
+
+  void PlotAxis::set_border_width_y_in_percent(GLfloat p)
+  { _pdata->border_width_y_in_percent = p; }
+
+  void PlotAxis::set_orientation(PlotAxisOrientation orientation)
   {
       _pdata->orientation = orientation;
+
+      if (_pdata->orientation == PlotAxisOrientation_Horizontal)
+      {
+          _pdata->textview_label.set_orientation_horizontal();
+
+          for (auto& t: _pdata->textview_ticks)
+          { t.set_orientation_horizontal(); }
+      }
+      else // if (_pdata->orientation == PlotAxisOrientation_Vertical)
+      {
+          _pdata->textview_label.set_orientation_vertical();
+
+          for (auto& t: _pdata->textview_ticks)
+          { t.set_orientation_vertical(); }
+      }
 
       if (this->is_initialized())
       {
@@ -221,13 +283,24 @@ namespace bk
   }
 
   void PlotAxis::set_orientation_horizontal()
-  { set_orientation(details::PlotAxisOrientation_Horizontal); }
+  { set_orientation(PlotAxisOrientation_Horizontal); }
 
   void PlotAxis::set_orientation_vertical()
-  { set_orientation(details::PlotAxisOrientation_Vertical); }
+  { set_orientation(PlotAxisOrientation_Vertical); }
 
   void PlotAxis::set_tick_precision(unsigned int tickPrecision)
   { _pdata->tickPrecision = tickPrecision; }
+
+  void PlotAxis::set_draw_ticks_manually(bool b)
+  {
+      if (_pdata->draw_ticks_manually != b)
+      {
+          _pdata->draw_ticks_manually = b;
+
+          if (this->is_initialized())
+          { emit_signal_update_required(); }
+      }
+  }
 
   //====================================================================================================
   //===== GL
@@ -236,8 +309,9 @@ namespace bk
   {
       using SL = details::ShaderLibrary::plot;
 
-      bool success = _pdata->shader.init_from_sources(SL::axis::vert(), SL::axis::frag(false), SL::axis::geom(false));
-      success = _pdata->shader_ticks.init_from_sources(SL::ticks::vert(), SL::ticks::frag(false), SL::ticks::geom(false)) && success;
+      bool success = true;
+      success &= _pdata->shader.init_from_sources(SL::axis::vert(), SL::axis::frag(), SL::axis::geom());
+      success &= _pdata->shader_ticks.init_from_sources(SL::ticks::vert(), SL::ticks::frag(), SL::ticks::geom());
 
       return success;
   }
@@ -261,8 +335,8 @@ namespace bk
           /*
            * x ticks (vertical lines)
            */
-          const auto xTickValueDelta = (_pdata->xmax - _pdata->xmin) / (_pdata->numTicks + 1);
-          auto xval = _pdata->xmin;
+          const GLfloat xTickValueDelta = (_pdata->xmax - _pdata->xmin) / (_pdata->numTicks + 1);
+          GLfloat xval = _pdata->xmin;
           std::vector<GLfloat> vert_ticks_x;
           vert_ticks_x.reserve(2 * 2 * _pdata->numTicks);
 
@@ -303,8 +377,8 @@ namespace bk
           /*
            * y ticks (horizontal lines)
            */
-          const auto yTickValueDelta = (_pdata->ymax - _pdata->ymin) / (_pdata->numTicks + 1);
-          auto yval = _pdata->ymin;
+          const GLfloat yTickValueDelta = (_pdata->ymax - _pdata->ymin) / (_pdata->numTicks + 1);
+          GLfloat yval = _pdata->ymin;
           std::vector<GLfloat> vert_ticks_y;
           vert_ticks_y.reserve(2 * 2 * (_pdata->numTicks + 1));
 
@@ -344,7 +418,10 @@ namespace bk
   bool PlotAxis::init_ubo()
   {
       if (!_pdata->ubo.init_from_registered_values_size())
-      { return false; }
+      {
+          std::cerr << "PlotAxis::init_ubo - failed" << std::endl;
+          return false;
+      }
 
       _pdata->ubo.set_line_width(_pdata->lineWidth);
       _pdata->ubo.set_color_r(_pdata->color[0]);
@@ -356,15 +433,141 @@ namespace bk
       return true;
   }
 
+  bool PlotAxis::init_textview()
+  {
+      const bool success = _pdata->textview_label.init(_pdata->label);
+      constexpr GLfloat margin = 0.01f;
+      constexpr double scalescale = 0.75;
+
+      /*
+       * label
+       */
+      if (orientation_is_horizontal())
+      {
+          const GLfloat w = _pdata->textview_label.text_pixel_width_relative();
+          const GLfloat x = _pdata->border_width_x_in_percent + 0.5 * (1.0f - _pdata->border_width_x_in_percent - w);
+          const GLfloat y = margin;
+          _pdata->textview_label.set_position(x, y);
+          //_pdata->textview_label.set_position(1.0f - margin - w, _pdata->border_width_y_in_percent + margin); // bottom right, above axis
+      }
+      else // if (orientation_is_vertical())
+      {
+          const GLfloat w = _pdata->textview_label.text_pixel_width_relative();
+          const GLfloat x = margin;
+          const GLfloat y = _pdata->border_width_y_in_percent + 0.5 * (1.0f - _pdata->border_width_y_in_percent - w);
+          _pdata->textview_label.set_position(x, y);
+          //_pdata->textview_label.set_position(_pdata->border_width_x_in_percent + margin, 1.0f - h - margin); // top left; right next to axis
+      }
+
+      /*
+       * ticks
+       */
+      _pdata->textview_ticks.clear();
+
+      std::stringstream ss;
+      ss << std::fixed;
+      ss.precision(tick_precision());
+
+      const GLfloat range = orientation_is_horizontal() ? _pdata->xmax - _pdata->xmin : _pdata->ymax - _pdata->ymin;
+      const GLfloat deltaValue = range / (_pdata->numTicks + 1);
+      const GLfloat deltaRel = (1.0f - (orientation_is_horizontal() ? _pdata->border_width_x_in_percent : _pdata->border_width_y_in_percent)) / (_pdata->numTicks + 1);
+      GLfloat val = orientation_is_horizontal() ? _pdata->xmin : _pdata->ymin;
+      GLfloat rel = orientation_is_horizontal() ? _pdata->border_width_x_in_percent : _pdata->border_width_y_in_percent;
+
+      std::vector<GLfloat> values;
+      values.reserve(num_ticks() + 2);
+
+      std::vector<GLfloat> rels;
+      rels.reserve(num_ticks() + 2);
+
+      values.push_back(val);
+      rels.push_back(rel);
+      for (unsigned int i = 0; i < num_ticks() + 1; ++i)
+      {
+          val += deltaValue;
+          values.push_back(val);
+
+          rel += deltaRel;
+          rels.push_back(rel);
+      }
+
+      for (unsigned int i = 0; i < values.size(); ++i)
+      {
+          val = values[i];
+          rel = rels[i];
+
+          TextView tv
+          #ifdef BK_LIB_QT_AVAILABLE
+          (this->_gl)
+          #endif
+          ;
+
+          ss.str("");
+          ss << val;
+
+          if (_pdata->textview_label.position_mode_is_absolute())
+          { tv.set_position_mode_absolute(); }
+          else
+          { tv.set_position_mode_relative(); }
+
+          tv.on_resize(_pdata->w, _pdata->h);
+          tv.on_ssaa_factor_changed(_pdata->ssaa);
+          tv.set_scale(scalescale * _pdata->textview_label.scale_x(), scalescale * _pdata->textview_label.scale_y());
+          tv.set_color_background(_pdata->textview_label.color_background());
+          tv.set_color_text(_pdata->textview_label.color_text());
+          tv.set_background_enabled(_pdata->textview_label.background_is_enabled());
+          tv.set_text(ss.str());
+
+          const GLfloat w = tv.text_pixel_width_relative();
+          const GLfloat h = tv.text_pixel_height_relative();
+
+          if (orientation_is_horizontal())
+          {
+              if (i == 0)
+              { tv.set_position(rel, _pdata->border_width_y_in_percent - h - margin); }
+              else if (i != values.size() - 1)
+              { tv.set_position(rel - 0.5 * w, _pdata->border_width_y_in_percent - h - margin); }
+              else
+              { tv.set_position(1.0f - w, _pdata->border_width_y_in_percent - h - margin); }
+          }
+          else
+          {
+              if (i == 0)
+              { tv.set_position(_pdata->border_width_x_in_percent - w - margin, rel); }
+              else if (i != values.size() - 1)
+              { tv.set_position(_pdata->border_width_x_in_percent - w - margin, rel - 0.5 * h); }
+              else
+              { tv.set_position(_pdata->border_width_x_in_percent - w - margin, 1.0f - h); }
+          }
+
+          tv.init();
+
+          _pdata->textview_ticks.emplace_back(std::move(tv));
+      } // for x
+
+      return success;
+  }
+
   bool PlotAxis::init()
   {
-      if (!(init_shader() && init_ubo() && init_vbo_vao()))
-      {
-          clear();
-          return false;
-      }
-      else
-      { return true; }
+      bool success = true;
+
+      if (!(success &= init_shader()))
+      { std::cerr << "PlotAxis::init - shader failed" << std::endl; }
+
+      if (!(success &= init_ubo()))
+      { std::cerr << "PlotAxis::init - ubo failed" << std::endl; }
+
+      if (!(success &= init_vbo_vao()))
+      { std::cerr << "PlotAxis::init - vbo/vao failed" << std::endl; }
+
+      if (!(success &= init_textview()))
+      { std::cerr << "PlotAxis::init - textview_label failed" << std::endl; }
+
+      if (!success)
+      { clear(); }
+
+      return success;
   }
 
   void PlotAxis::clear_shader()
@@ -393,44 +596,164 @@ namespace bk
       clear_ubo();
   }
 
-  void PlotAxis::on_resize(GLint /*w*/, GLint /*h*/)
-  { /* do nothing */ }
+  void PlotAxis::on_resize(GLint w, GLint h)
+  {
+      _pdata->w = w;
+      _pdata->h = h;
 
-  void PlotAxis::on_oit_enabled(bool /*b*/)
-  { /* do nothing */ }
+      _pdata->textview_label.on_resize(w, h);
 
-  void PlotAxis::on_animation_enabled(bool /*b*/)
-  { /* do nothing */ }
+      for (TextView& t: _pdata->textview_ticks)
+      { t.on_resize(w, h); }
 
-  void PlotAxis::on_modelview_changed(bool /*b*/)
-  { /* do nothing */ }
+      if (this->is_initialized())
+      {
+          init_textview();
+          emit_signal_update_required();
+      }
+  }
 
-  void PlotAxis::on_visible_changed(bool /*b*/)
-  { /* do nothing */ }
+  void PlotAxis::on_oit_enabled(bool b)
+  {
+      _pdata->textview_label.on_oit_enabled(b);
 
-  void PlotAxis::on_mouse_pos_changed(GLint /*x*/, GLint /*y*/)
-  { /* do nothing */ }
+      for (TextView& t: _pdata->textview_ticks)
+      { t.on_oit_enabled(b); }
+  }
 
-  void PlotAxis::on_mouse_button_pressed(MouseButton_ /*btn*/)
-  { /* do nothing */ }
+  void PlotAxis::on_animation_enabled(bool b)
+  {
+      _pdata->textview_label.on_animation_enabled(b);
 
-  void PlotAxis::on_mouse_button_released(MouseButton_ /*btn*/)
-  { /* do nothing */ }
+      for (TextView& t: _pdata->textview_ticks)
+      { t.on_animation_enabled(b); }
+  }
 
-  void PlotAxis::on_key_pressed(Key_ /*k*/)
-  { /* do nothing */ }
+  void PlotAxis::on_modelview_changed(bool b)
+  {
+      _pdata->textview_label.on_modelview_changed(b);
 
-  void PlotAxis::on_key_released(Key_ /*k*/)
-  { /* do nothing */ }
+      for (TextView& t: _pdata->textview_ticks)
+      { t.on_modelview_changed(b); }
+  }
+
+  void PlotAxis::on_visible_changed(bool b)
+  {
+      _pdata->textview_label.on_visible_changed(b);
+
+      for (TextView& t: _pdata->textview_ticks)
+      { t.on_visible_changed(b); }
+  }
+
+  void PlotAxis::on_mouse_pos_changed(GLint x, GLint y)
+  {
+      _pdata->textview_label.on_mouse_pos_changed(x, y);
+
+      for (TextView& t: _pdata->textview_ticks)
+      { t.on_mouse_pos_changed(x, y); }
+  }
+
+  void PlotAxis::on_mouse_button_pressed(MouseButton_ btn)
+  {
+      _pdata->textview_label.on_mouse_button_pressed(btn);
+
+      for (TextView& t: _pdata->textview_ticks)
+      { t.on_mouse_button_pressed(btn); }
+  }
+
+  void PlotAxis::on_mouse_button_released(MouseButton_ btn)
+  {
+      _pdata->textview_label.on_mouse_button_released(btn);
+
+      for (TextView& t: _pdata->textview_ticks)
+      { t.on_mouse_button_released(btn); }
+  }
+
+  void PlotAxis::on_key_pressed(Key_ k)
+  {
+      _pdata->textview_label.on_key_pressed(k);
+
+      for (TextView& t: _pdata->textview_ticks)
+      { t.on_key_pressed(k); }
+  }
+
+  void PlotAxis::on_key_released(Key_ k)
+  {
+      _pdata->textview_label.on_key_released(k);
+
+      for (TextView& t: _pdata->textview_ticks)
+      { t.on_key_released(k); }
+  }
 
   void PlotAxis::on_mouse_wheel_up()
-  { /* do nothing */ }
+  {
+      _pdata->textview_label.on_mouse_wheel_up();
+
+      for (TextView& t: _pdata->textview_ticks)
+      { t.on_mouse_wheel_up(); }
+  }
 
   void PlotAxis::on_mouse_wheel_down()
-  { /* do nothing */ }
+  {
+      _pdata->textview_label.on_mouse_wheel_down();
 
-  void PlotAxis::on_ssaa_factor_changed(GLint /*ssaa_factor*/)
-  { /* do nothing */ }
+      for (TextView& t: _pdata->textview_ticks)
+      { t.on_mouse_wheel_down(); }
+  }
+
+  void PlotAxis::on_ssaa_factor_changed(GLint ssaa_factor)
+  {
+      _pdata->textview_label.on_ssaa_factor_changed(ssaa_factor);
+      _pdata->ssaa = ssaa_factor;
+
+      for (TextView& t: _pdata->textview_ticks)
+      { t.on_ssaa_factor_changed(ssaa_factor); }
+
+      if (this->is_initialized())
+      {
+          init_textview();
+          emit_signal_update_required();
+      }
+  }
+
+  void PlotAxis::draw_ticks()
+  {
+      _pdata->ubo.bind_to_default_base();
+
+      BK_QT_GL glPushAttrib(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+      BK_QT_GL glDisable(GL_DEPTH_TEST);
+      BK_QT_GL glEnable(GL_BLEND);
+
+      BK_QT_GL glMatrixMode(GL_MODELVIEW);
+      BK_QT_GL glPushMatrix();
+      BK_QT_GL glLoadIdentity();
+
+      BK_QT_GL glMatrixMode(GL_PROJECTION);
+      BK_QT_GL glPushMatrix();
+      BK_QT_GL glLoadIdentity();
+
+      /*
+       * ticks
+       */
+      BK_QT_GL glEnable(GL_PRIMITIVE_RESTART);
+      BK_QT_GL glPrimitiveRestartIndex(std::numeric_limits<GLuint>::max());
+
+      _pdata->shader_ticks.bind();
+      _pdata->vao_ticks.bind();
+      BK_QT_GL glDrawElements(GL_LINE_STRIP, _pdata->sizeInd_ticks, GL_UNSIGNED_INT, nullptr);
+      _pdata->vao_ticks.release();
+      _pdata->shader_ticks.release();
+
+      BK_QT_GL glDisable(GL_PRIMITIVE_RESTART);
+
+      BK_QT_GL glPopMatrix();
+      BK_QT_GL glMatrixMode(GL_MODELVIEW);
+      BK_QT_GL glPopMatrix();
+
+      BK_QT_GL glPopAttrib();
+
+      _pdata->ubo.release_from_base();
+  }
 
   void PlotAxis::draw_impl()
   {
@@ -439,9 +762,11 @@ namespace bk
       BK_QT_GL glPushAttrib(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
       BK_QT_GL glDisable(GL_DEPTH_TEST);
       BK_QT_GL glEnable(GL_BLEND);
+
       BK_QT_GL glMatrixMode(GL_MODELVIEW);
       BK_QT_GL glPushMatrix();
       BK_QT_GL glLoadIdentity();
+
       BK_QT_GL glMatrixMode(GL_PROJECTION);
       BK_QT_GL glPushMatrix();
       BK_QT_GL glLoadIdentity();
@@ -458,17 +783,19 @@ namespace bk
       /*
        * ticks
        */
-      BK_QT_GL glEnable(GL_PRIMITIVE_RESTART);
-      BK_QT_GL glPrimitiveRestartIndex(std::numeric_limits<GLuint>::max());
+      if (!_pdata->draw_ticks_manually)
+      {
+          BK_QT_GL glEnable(GL_PRIMITIVE_RESTART);
+          BK_QT_GL glPrimitiveRestartIndex(std::numeric_limits<GLuint>::max());
 
-      _pdata->shader_ticks.bind();
-      _pdata->vao_ticks.bind();
-      //BK_QT_GL glDrawElements(GL_LINE_STRIP, 3 * (_pdata->numTicks + 1), GL_UNSIGNED_INT, nullptr);
-      BK_QT_GL glDrawElements(GL_LINE_STRIP, _pdata->sizeInd_ticks, GL_UNSIGNED_INT, nullptr);
-      _pdata->vao_ticks.release();
-      _pdata->shader_ticks.release();
+          _pdata->shader_ticks.bind();
+          _pdata->vao_ticks.bind();
+          BK_QT_GL glDrawElements(GL_LINE_STRIP, _pdata->sizeInd_ticks, GL_UNSIGNED_INT, nullptr);
+          _pdata->vao_ticks.release();
+          _pdata->shader_ticks.release();
 
-      BK_QT_GL glDisable(GL_PRIMITIVE_RESTART);
+          BK_QT_GL glDisable(GL_PRIMITIVE_RESTART);
+      }
 
       BK_QT_GL glPopMatrix();
       BK_QT_GL glMatrixMode(GL_MODELVIEW);
@@ -477,6 +804,14 @@ namespace bk
       BK_QT_GL glPopAttrib();
 
       _pdata->ubo.release_from_base();
+
+      /*
+       * label
+       */
+      _pdata->textview_label.draw();
+
+      for (TextView& t: _pdata->textview_ticks)
+      { t.draw(); }
   }
 } // namespace bk
 

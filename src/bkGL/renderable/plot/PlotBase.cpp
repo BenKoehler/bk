@@ -25,6 +25,7 @@
 #include "PlotBase.h"
 
 #include <limits>
+#include <iostream>
 #include <vector>
 
 #include <bkGL/EKey.h>
@@ -51,8 +52,8 @@ namespace bk
       GLfloat xmax;
       GLfloat ymin;
       GLfloat ymax;
-      GLfloat border_width_horizontal_in_percent;
-      GLfloat border_width_vertical_in_percent;
+      GLfloat border_width_x_in_percent;
+      GLfloat border_width_y_in_percent;
 
           #ifndef BK_LIB_QT_AVAILABLE
 
@@ -69,8 +70,8 @@ namespace bk
           xmax(-std::numeric_limits<GLfloat>::max()),
           ymin(std::numeric_limits<GLfloat>::max()),
           ymax(-std::numeric_limits<GLfloat>::max()),
-          border_width_horizontal_in_percent(0.075),
-          border_width_vertical_in_percent(0.075)
+          border_width_x_in_percent(0.075),
+          border_width_y_in_percent(0.075)
       { /* do nothing */ }
 
       Impl(const Impl&) = delete;
@@ -96,6 +97,14 @@ namespace bk
   {
       _pdata->xaxis.set_orientation_horizontal();
       _pdata->yaxis.set_orientation_vertical();
+
+      _pdata->xaxis.set_border_width_x_in_percent(_pdata->border_width_x_in_percent);
+      _pdata->xaxis.set_border_width_y_in_percent(_pdata->border_width_y_in_percent);
+      _pdata->xaxis.set_draw_ticks_manually(true);
+
+      _pdata->yaxis.set_border_width_x_in_percent(_pdata->border_width_x_in_percent);
+      _pdata->yaxis.set_border_width_y_in_percent(_pdata->border_width_y_in_percent);
+      _pdata->yaxis.set_draw_ticks_manually(true);
 
       _pdata->xaxis.signal_update_required().connect([&]()
                                                      { this->emit_signal_update_required(); });
@@ -174,11 +183,11 @@ namespace bk
   GLfloat PlotBase::y_max() const
   { return _pdata->ymax != -std::numeric_limits<GLfloat>::max() ? _pdata->ymax : _y_max_from_data(); }
 
-  GLfloat PlotBase::border_width_horizontal_in_percent() const
-  { return _pdata->border_width_horizontal_in_percent; }
+  GLfloat PlotBase::border_width_x_in_percent() const
+  { return _pdata->border_width_x_in_percent; }
 
-  GLfloat PlotBase::border_width_vertical_in_percent() const
-  { return _pdata->border_width_vertical_in_percent; }
+  GLfloat PlotBase::border_width_y_in_percent() const
+  { return _pdata->border_width_y_in_percent; }
 
   unsigned int PlotBase::num_datavectorviews() const
   { return _pdata->plotobjects.size(); }
@@ -360,6 +369,7 @@ namespace bk
   {
       _pdata->xmin = xmin;
       xmin = x_min();
+
       _pdata->xaxis.set_x_min(xmin);
       _pdata->yaxis.set_x_min(xmin);
 
@@ -376,6 +386,7 @@ namespace bk
   {
       _pdata->xmax = xmax;
       xmax = x_max();
+
       _pdata->xaxis.set_x_max(xmax);
       _pdata->yaxis.set_x_max(xmax);
 
@@ -392,6 +403,7 @@ namespace bk
   {
       _pdata->ymin = ymin;
       ymin = y_min();
+
       _pdata->xaxis.set_y_min(ymin);
       _pdata->yaxis.set_y_min(ymin);
 
@@ -423,55 +435,44 @@ namespace bk
 
   void PlotBase::_reset_xy_minmax()
   {
-      _pdata->xmin = std::numeric_limits<GLfloat>::max();
-      _pdata->xmax = -std::numeric_limits<GLfloat>::max();
-      _pdata->ymin = std::numeric_limits<GLfloat>::max();
-      _pdata->ymax = -std::numeric_limits<GLfloat>::max();
+      set_x_min(std::numeric_limits<GLfloat>::max());
+      set_x_max(-std::numeric_limits<GLfloat>::max());
+      set_y_min(std::numeric_limits<GLfloat>::max());
+      set_y_max(-std::numeric_limits<GLfloat>::max());
   }
 
   void PlotBase::set_xy_minmax_from_data()
   {
-      _reset_xy_minmax();
+      set_x_min(_x_min_from_data());
+      set_x_max(_x_max_from_data());
+      set_y_min(_y_min_from_data());
+      set_y_max(_y_max_from_data());
+  }
+
+  void PlotBase::set_border_width_x_in_percent(GLfloat b)
+  {
+      _pdata->border_width_x_in_percent = b;
+      _pdata->xaxis.set_border_width_x_in_percent(_pdata->border_width_x_in_percent);
+      _pdata->yaxis.set_border_width_x_in_percent(_pdata->border_width_x_in_percent);
 
       if (this->is_initialized())
       {
-          GLfloat xmin = _x_min_from_data();
-          GLfloat xmax = _x_max_from_data();
-          GLfloat ymin = _y_min_from_data();
-          GLfloat ymax = _y_max_from_data();
-
-          _pdata->ubo.set_xmin(xmin);
-          _pdata->ubo.set_xmax(xmax);
-          _pdata->ubo.set_ymin(ymin);
-          _pdata->ubo.set_ymax(ymax);
+          _pdata->ubo.set_border_width_x_in_percent(_pdata->border_width_x_in_percent);
           _pdata->ubo.release();
 
           this->emit_signal_update_required();
       }
   }
 
-  void PlotBase::set_border_width_horizontal_in_percent(GLfloat b)
+  void PlotBase::set_border_width_y_in_percent(GLfloat b)
   {
-      _pdata->border_width_horizontal_in_percent = b;
+      _pdata->border_width_y_in_percent = b;
+      _pdata->xaxis.set_border_width_y_in_percent(_pdata->border_width_y_in_percent);
+      _pdata->yaxis.set_border_width_y_in_percent(_pdata->border_width_y_in_percent);
 
       if (this->is_initialized())
       {
-          //_pdata->ubo.set_border_width_horizontal_in_percent(_pdata->ymax); // todo
-          _pdata->ubo.set_border_width_horizontal_in_percent(_pdata->border_width_horizontal_in_percent);
-          _pdata->ubo.release();
-
-          this->emit_signal_update_required();
-      }
-  }
-
-  void PlotBase::set_border_width_vertical_in_percent(GLfloat b)
-  {
-      _pdata->border_width_vertical_in_percent = b;
-
-      if (this->is_initialized())
-      {
-          //_pdata->ubo.set_border_width_vertical_in_percent(_pdata->ymax); // todo
-          _pdata->ubo.set_border_width_vertical_in_percent(_pdata->border_width_vertical_in_percent);
+          _pdata->ubo.set_border_width_y_in_percent(_pdata->border_width_y_in_percent);
           _pdata->ubo.release();
 
           this->emit_signal_update_required();
@@ -491,8 +492,8 @@ namespace bk
           _pdata->ubo.set_xmax(x_max());
           _pdata->ubo.set_ymin(y_min());
           _pdata->ubo.set_ymax(y_max());
-          _pdata->ubo.set_border_width_horizontal_in_percent(_pdata->border_width_horizontal_in_percent);
-          _pdata->ubo.set_border_width_vertical_in_percent(_pdata->border_width_vertical_in_percent);
+          _pdata->ubo.set_border_width_x_in_percent(_pdata->border_width_x_in_percent);
+          _pdata->ubo.set_border_width_y_in_percent(_pdata->border_width_y_in_percent);
           _pdata->ubo.release();
 
           return true;
@@ -503,15 +504,34 @@ namespace bk
 
   bool PlotBase::init()
   {
+      bool success = init_ubo();
+      if (!success)
+      { std::cerr << "PlotBase::init - ubo failed" << std::endl; }
+
       _pdata->xaxis.set_x_min(x_min());
       _pdata->xaxis.set_x_max(x_max());
       _pdata->xaxis.set_y_min(y_min());
       _pdata->xaxis.set_y_max(y_max());
 
+      success &= _pdata->xaxis.init();
+      if (!success)
+      { std::cerr << "PlotBase::init - xaxis failed" << std::endl; }
+
       _pdata->yaxis.set_x_min(x_min());
       _pdata->yaxis.set_x_max(x_max());
       _pdata->yaxis.set_y_min(y_min());
       _pdata->yaxis.set_y_max(y_max());
+
+      success &= _pdata->yaxis.init();
+      if (!success)
+      { std::cerr << "PlotBase::init - yaxis failed" << std::endl; }
+
+      for (auto& o: _pdata->plotobjects)
+      {
+          success &= o->init();
+          if (!success)
+          { std::cerr << "PlotBase::init - plotobjects failed" << std::endl; }
+      }
 
       for (auto& m: _pdata->markers)
       {
@@ -519,15 +539,11 @@ namespace bk
           m->set_x_max(x_max());
           m->set_y_min(y_min());
           m->set_y_max(y_max());
+
+          success &= m->init();
+          if (!success)
+          { std::cerr << "PlotBase::init - markers failed" << std::endl; }
       }
-
-      bool success = init_ubo() && _pdata->xaxis.init() && _pdata->yaxis.init();
-
-      for (auto& o: _pdata->plotobjects)
-      { success = o->init() && success; }
-
-      for (auto& m: _pdata->markers)
-      { success = m->init() && success; }
 
       if (!success)
       { clear(); }
@@ -561,92 +577,173 @@ namespace bk
   {
       for (auto& o: _pdata->plotobjects)
       { o->on_resize(w, h); }
+
+      for (auto& o: _pdata->markers)
+      { o->on_resize(w, h); }
+
+      _pdata->xaxis.on_resize(w, h);
+      _pdata->yaxis.on_resize(w, h);
   }
 
   void PlotBase::on_oit_enabled(bool b)
   {
       for (auto& o: _pdata->plotobjects)
       { o->on_oit_enabled(b); }
+
+      for (auto& o: _pdata->markers)
+      { o->on_oit_enabled(b); }
+
+      _pdata->xaxis.on_oit_enabled(b);
+      _pdata->yaxis.on_oit_enabled(b);
   }
 
   void PlotBase::on_animation_enabled(bool b)
   {
       for (auto& o: _pdata->plotobjects)
       { o->on_animation_enabled(b); }
+
+      for (auto& o: _pdata->markers)
+      { o->on_animation_enabled(b); }
+
+      _pdata->xaxis.on_animation_enabled(b);
+      _pdata->yaxis.on_animation_enabled(b);
   }
 
   void PlotBase::on_modelview_changed(bool b)
   {
       for (auto& o: _pdata->plotobjects)
       { o->on_modelview_changed(b); }
+
+      for (auto& o: _pdata->markers)
+      { o->on_modelview_changed(b); }
+
+      _pdata->xaxis.on_modelview_changed(b);
+      _pdata->yaxis.on_modelview_changed(b);
   }
 
   void PlotBase::on_visible_changed(bool b)
   {
       for (auto& o: _pdata->plotobjects)
       { o->on_visible_changed(b); }
+
+      for (auto& o: _pdata->markers)
+      { o->on_visible_changed(b); }
+
+      _pdata->xaxis.on_visible_changed(b);
+      _pdata->yaxis.on_visible_changed(b);
   }
 
   void PlotBase::on_mouse_pos_changed(GLint x, GLint y)
   {
       for (auto& o: _pdata->plotobjects)
       { o->on_mouse_pos_changed(x, y); }
+
+      for (auto& o: _pdata->markers)
+      { o->on_mouse_pos_changed(x, y); }
+
+      _pdata->xaxis.on_mouse_pos_changed(x, y);
+      _pdata->yaxis.on_mouse_pos_changed(x, y);
   }
 
   void PlotBase::on_mouse_button_pressed(MouseButton_ btn)
   {
       for (auto& o: _pdata->plotobjects)
       { o->on_mouse_button_pressed(btn); }
+
+      for (auto& o: _pdata->markers)
+      { o->on_mouse_button_pressed(btn); }
+
+      _pdata->xaxis.on_mouse_button_pressed(btn);
+      _pdata->yaxis.on_mouse_button_pressed(btn);
   }
 
   void PlotBase::on_mouse_button_released(MouseButton_ btn)
   {
       for (auto& o: _pdata->plotobjects)
       { o->on_mouse_button_released(btn); }
+
+      for (auto& o: _pdata->markers)
+      { o->on_mouse_button_released(btn); }
+
+      _pdata->xaxis.on_mouse_button_released(btn);
+      _pdata->yaxis.on_mouse_button_released(btn);
   }
 
   void PlotBase::on_key_pressed(Key_ k)
   {
       for (auto& o: _pdata->plotobjects)
       { o->on_key_pressed(k); }
+
+      for (auto& o: _pdata->markers)
+      { o->on_key_pressed(k); }
+
+      _pdata->xaxis.on_key_pressed(k);
+      _pdata->yaxis.on_key_pressed(k);
   }
 
   void PlotBase::on_key_released(Key_ k)
   {
       for (auto& o: _pdata->plotobjects)
       { o->on_key_released(k); }
+
+      for (auto& o: _pdata->markers)
+      { o->on_key_released(k); }
+
+      _pdata->xaxis.on_key_released(k);
+      _pdata->yaxis.on_key_released(k);
   }
 
   void PlotBase::on_mouse_wheel_up()
   {
       for (auto& o: _pdata->plotobjects)
       { o->on_mouse_wheel_up(); }
+
+      for (auto& o: _pdata->markers)
+      { o->on_mouse_wheel_up(); }
+
+      _pdata->xaxis.on_mouse_wheel_up();
+      _pdata->yaxis.on_mouse_wheel_up();
   }
 
   void PlotBase::on_mouse_wheel_down()
   {
       for (auto& o: _pdata->plotobjects)
       { o->on_mouse_wheel_down(); }
+
+      for (auto& o: _pdata->markers)
+      { o->on_mouse_wheel_down(); }
+
+      _pdata->xaxis.on_mouse_wheel_down();
+      _pdata->yaxis.on_mouse_wheel_down();
   }
 
   void PlotBase::on_ssaa_factor_changed(GLint ssaa_factor)
   {
       for (auto& o: _pdata->plotobjects)
       { o->on_ssaa_factor_changed(ssaa_factor); }
+
+      for (auto& o: _pdata->markers)
+      { o->on_ssaa_factor_changed(ssaa_factor); }
+
+      _pdata->xaxis.on_ssaa_factor_changed(ssaa_factor);
+      _pdata->yaxis.on_ssaa_factor_changed(ssaa_factor);
   }
 
   void PlotBase::draw_impl()
   {
       _pdata->ubo.bind_to_default_base();
 
-      _pdata->xaxis.draw();
-      _pdata->yaxis.draw();
+      _pdata->xaxis.draw_ticks();
+      _pdata->yaxis.draw_ticks();
 
       for (auto& m: _pdata->markers)
       { m->draw(); }
 
       for (auto& o: _pdata->plotobjects)
       { o->draw(); }
+
+      _pdata->xaxis.draw();
+      _pdata->yaxis.draw();
 
       _pdata->ubo.release_from_base();
   }

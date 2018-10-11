@@ -24,41 +24,34 @@
 
 #pragma once
 
-#ifndef BK_PLOTAXIS_H
-#define BK_PLOTAXIS_H
-
-#include <memory>
-#include <string>
-#include <string_view>
+#ifndef BK_PLOTAREA_H
+#define BK_PLOTAREA_H
 
 #include <bk/CopyablePIMPL>
-#include <bkGL/renderable/AbstractRenderable.h>
+
+#include <bkGL/renderable/plot/PlotAbstractDataVectorView.h>
 
 namespace bk
 {
   // -------------------- forward declaration
   class ColorRGBA;
-  class TextView;
+
+  class AreaPlotDataVector;
+
+  template<typename...> class Signal;
   // -------------------- forward declaration END
 
-    enum PlotAxisOrientation_ : unsigned int
-    {
-        PlotAxisOrientation_Horizontal = 0,//
-        PlotAxisOrientation_Vertical = 1//
-    };
-
-    using PlotAxisOrientation = unsigned int;
-
-  class BKGL_EXPORT PlotAxis : public details::AbstractRenderable
+  class BKGL_EXPORT PlotArea : public details::PlotAbstractDataVectorView
   {
       //====================================================================================================
       //===== DEFINITIONS
       //====================================================================================================
-      using base_type = details::AbstractRenderable;
+      using base_type = details::PlotAbstractDataVectorView;
 
       //====================================================================================================
       //===== MEMBERS
       //====================================================================================================
+    private:
       class Impl;
       bk::cpimpl<Impl> _pdata;
 
@@ -68,37 +61,31 @@ namespace bk
     public:
       /// @{ -------------------------------------------------- CONSTRUCTORS
       #ifndef BK_LIB_QT_AVAILABLE
-
-      PlotAxis();
+      PlotArea();
       #else
-      explicit PlotAxis(qt_gl_functions* gl);
+      explicit PlotArea(qt_gl_functions* gl);
       #endif
-      PlotAxis(const PlotAxis& ) = delete;
-      PlotAxis(PlotAxis&& ) noexcept;
+      PlotArea(const PlotArea&) = delete;
+      PlotArea(PlotArea&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DESTRUCTOR
-      virtual ~PlotAxis();
+      virtual ~PlotArea();
       /// @}
 
       //====================================================================================================
       //===== GETTER 
       //====================================================================================================
-      [[nodiscard]] const ColorRGBA& color() const ;
-      [[nodiscard]] GLfloat line_width() const ;
-      [[nodiscard]] GLfloat x_min() const ;
-      [[nodiscard]] GLfloat x_max() const ;
-      [[nodiscard]] GLfloat y_min() const ;
-      [[nodiscard]] GLfloat y_max() const ;
-      [[nodiscard]] GLuint num_ticks() const ;
-      [[nodiscard]] const std::string& label() const;
-      [[nodiscard]] PlotAxisOrientation orientation() const;
-      [[nodiscard]] bool orientation_is_horizontal() const;
-      [[nodiscard]] bool orientation_is_vertical() const;
-      [[nodiscard]] unsigned int tick_precision() const;
-      [[nodiscard]] TextView& text_view_label();
-      [[nodiscard]] const TextView& text_view_label() const;
-      [[nodiscard]] bool draw_ticks_manually() const;
+      [[nodiscard]] const ColorRGBA& color_above() const;
+      [[nodiscard]] const ColorRGBA& color_below() const;
+      [[nodiscard]] const ColorRGBA& color_line() const;
+      [[nodiscard]] GLfloat line_width() const;
+      [[nodiscard]] const AreaPlotDataVector& data_vector() const;
+      [[nodiscard]] AreaPlotDataVector& data_vector();
+      [[nodiscard]] virtual GLfloat x_min() const override;
+      [[nodiscard]] virtual GLfloat x_max() const override;
+      [[nodiscard]] virtual GLfloat y_min() const override;
+      [[nodiscard]] virtual GLfloat y_max() const override;
 
       /// @{ -------------------------------------------------- IS INITIALIZED
       [[nodiscard]] virtual bool is_initialized() const override;
@@ -108,28 +95,18 @@ namespace bk
       //===== SETTER
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
-      [[maybe_unused]] PlotAxis& operator=(const PlotAxis& other) = delete;
-      [[maybe_unused]] PlotAxis& operator=(PlotAxis&& other) noexcept;
+      [[maybe_unused]] auto operator=(const PlotArea&) -> PlotArea& = delete;
+      [[maybe_unused]] auto operator=(PlotArea&&) noexcept -> PlotArea&;
       /// @}
 
-      void set_color(const ColorRGBA& col);
-      void set_color(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
+      void set_color_area_above(const ColorRGBA& col);
+      void set_color_area_above(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
+      void set_color_area_below(const ColorRGBA& col);
+      void set_color_area_below(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
+      void set_color_line(const ColorRGBA& col);
+      void set_color_line(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
+
       void set_line_width(GLfloat w);
-      void set_x_min(GLfloat xmin);
-      void set_x_max(GLfloat xmax);
-      void set_y_min(GLfloat ymin);
-      void set_y_max(GLfloat ymax);
-      void set_num_ticks(GLuint numTicks);
-      void set_label(std::string_view label);
-      void set_border_width_x_in_percent(GLfloat p);
-      void set_border_width_y_in_percent(GLfloat p);
-    private:
-      void set_orientation(PlotAxisOrientation orientation);
-    public:
-      void set_orientation_horizontal();
-      void set_orientation_vertical();
-      void set_tick_precision(unsigned int tickPrecision);
-      void set_draw_ticks_manually(bool b);
 
       //====================================================================================================
       //===== GL
@@ -139,9 +116,8 @@ namespace bk
       [[maybe_unused]] bool init_shader();
       [[maybe_unused]] bool init_vbo_vao();
       [[maybe_unused]] bool init_ubo();
-      [[maybe_unused]] bool init_textview();
     public:
-      [[maybe_unused]] bool init();
+      [[maybe_unused]] virtual bool init() override;
       /// @}
 
       /// @{ -------------------------------------------------- CLEAR
@@ -150,7 +126,7 @@ namespace bk
       void clear_vbo_vao();
       void clear_ubo();
     public:
-      void clear();
+      virtual void clear() override;
       /// @}
 
       /// @{ -------------------------------------------------- EVENTS
@@ -169,11 +145,8 @@ namespace bk
       virtual void on_ssaa_factor_changed(GLint ssaa_factor) override;
       /// @}
 
-      void draw_ticks();
       virtual void draw_impl() override;
-  }; // class PlotAxis
+  }; // class PlotArea
 } // namespace bk
 
-#endif //BK_PLOTAXIS_H
-
-
+#endif //BK_PLOTAREA_H

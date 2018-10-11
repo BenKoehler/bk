@@ -29,6 +29,7 @@
 
 #include <any>
 #include <cmath>
+#include <iostream>
 #include <memory>
 
 #include <bkAlgorithm/smooth.h>
@@ -118,7 +119,10 @@ namespace bk
 
           const unsigned int nPoints = this->geometry().num_points();
           if (nPoints == 0)
-          { return false; }
+          {
+              std::cerr << "Line3D::calc_consistent_local_coordinate_systems - empty line; abort!" << std::endl;
+              return false;
+          }
 
           // initialization: calculate lcs of first point
           point_lcs[0] = local_coordinate_system_at_point(0);

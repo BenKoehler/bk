@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include <bkGL/UBOPlot.h>
+#include <bkGL/UBOPlotArea.h>
 
 namespace bk::details
 {
@@ -31,44 +31,48 @@ namespace bk::details
   //====================================================================================================
   /// @{ -------------------------------------------------- CTOR
   #ifndef BK_LIB_QT_AVAILABLE
-  UBOPlot::UBOPlot()
-      : base_type("UBOPlot", 1)
+  UBOPlotArea::UBOPlotArea()
+      : base_type("UBOPlotArea", 2)
   #else
-  UBOPlot::UBOPlot(bk::qt_gl_functions* gl) 
-      : base_type(gl, "UBOPlot", 1)
+  UBOPlotArea::UBOPlotArea(bk::qt_gl_functions* gl) 
+      : base_type(gl, "UBOPlotArea", 2)
   #endif
   {
       this->set_usage_STATIC_DRAW();
 
-      BK_UBO_SPECIALIZATION_REGISTER(xmin, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_REGISTER(xmax, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_REGISTER(ymin, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_REGISTER(ymax, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_REGISTER(border_width_x_in_percent, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_REGISTER(border_width_y_in_percent, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_REGISTER(color_area_above_r, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_REGISTER(color_area_above_g, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_REGISTER(color_area_above_b, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_REGISTER(color_area_above_a, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_REGISTER(color_area_below_r, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_REGISTER(color_area_below_g, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_REGISTER(color_area_below_b, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_REGISTER(color_area_below_a, GL_FLOAT)
   }
 
-  UBOPlot::UBOPlot(self_type&&) noexcept = default;
+  UBOPlotArea::UBOPlotArea(self_type&&) noexcept = default;
   /// @}
 
   /// @{ -------------------------------------------------- DTOR
-  UBOPlot::~UBOPlot() = default;
+  UBOPlotArea::~UBOPlotArea() = default;
   /// @}
 
   //====================================================================================================
   //===== SETTER
   //====================================================================================================
   /// @{ -------------------------------------------------- OPERATOR =
-  auto UBOPlot::operator=(self_type&&) noexcept -> self_type& = default;
+  auto UBOPlotArea::operator=(self_type&&) noexcept -> self_type& = default;
   /// @}
 
   //====================================================================================================
   //===== VALUES
   //====================================================================================================
-  BK_UBO_SPECIALIZATION_DEFINE(UBOPlot, xmin, GL_FLOAT)
-  BK_UBO_SPECIALIZATION_DEFINE(UBOPlot, xmax, GL_FLOAT)
-  BK_UBO_SPECIALIZATION_DEFINE(UBOPlot, ymin, GL_FLOAT)
-  BK_UBO_SPECIALIZATION_DEFINE(UBOPlot, ymax, GL_FLOAT)
-  BK_UBO_SPECIALIZATION_DEFINE(UBOPlot, border_width_x_in_percent, GL_FLOAT)
-  BK_UBO_SPECIALIZATION_DEFINE(UBOPlot, border_width_y_in_percent, GL_FLOAT)
+  BK_UBO_SPECIALIZATION_DEFINE(UBOPlotArea, color_area_above_r, GL_FLOAT)
+  BK_UBO_SPECIALIZATION_DEFINE(UBOPlotArea, color_area_above_g, GL_FLOAT)
+  BK_UBO_SPECIALIZATION_DEFINE(UBOPlotArea, color_area_above_b, GL_FLOAT)
+  BK_UBO_SPECIALIZATION_DEFINE(UBOPlotArea, color_area_above_a, GL_FLOAT)
+  BK_UBO_SPECIALIZATION_DEFINE(UBOPlotArea, color_area_below_r, GL_FLOAT)
+  BK_UBO_SPECIALIZATION_DEFINE(UBOPlotArea, color_area_below_g, GL_FLOAT)
+  BK_UBO_SPECIALIZATION_DEFINE(UBOPlotArea, color_area_below_b, GL_FLOAT)
+  BK_UBO_SPECIALIZATION_DEFINE(UBOPlotArea, color_area_below_a, GL_FLOAT)
 } // namespace bk::details

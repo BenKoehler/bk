@@ -24,8 +24,8 @@
 
 #pragma once
 
-#ifndef BK_UBOAREAPLOT_H
-#define BK_UBOAREAPLOT_H
+#ifndef BK_UBOPLOTAREA_H
+#define BK_UBOPLOTAREA_H
 
 #include <bkGL/buffer/UBOSpecialization.h>
 #include <bkGL/lib/bkGL_export.h>
@@ -33,12 +33,12 @@
 
 namespace bk::details
 {
-  class BKGL_EXPORT UBOAreaPlot : public UBOSpecialization
+  class BKGL_EXPORT UBOPlotArea : public UBOSpecialization
   {
       //====================================================================================================
       //===== DEFINITIONS
       //====================================================================================================
-      using self_type = UBOAreaPlot;
+      using self_type = UBOPlotArea;
       using base_type = UBOSpecialization;
 
       //====================================================================================================
@@ -47,16 +47,16 @@ namespace bk::details
     public:
       /// @{ -------------------------------------------------- CTOR
       #ifndef BK_LIB_QT_AVAILABLE
-      UBOAreaPlot();
+      UBOPlotArea();
       #else
-      UBOAreaPlot(qt_gl_functions* gl);
+      UBOPlotArea(qt_gl_functions* gl);
       #endif
-      UBOAreaPlot(const self_type&) = delete;
-      UBOAreaPlot(self_type&&) noexcept;
+      UBOPlotArea(const self_type&) = delete;
+      UBOPlotArea(self_type&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
-      ~UBOAreaPlot();
+      ~UBOPlotArea();
       /// @}
 
       //====================================================================================================
@@ -67,38 +67,23 @@ namespace bk::details
       [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
+      using base_type::set_buffer_base;
     private:
       using base_type::set_buffer_name;
-      using base_type::set_buffer_base;
     public:
 
       //====================================================================================================
       //===== VALUES
       //====================================================================================================
-      BK_UBO_SPECIALIZATION_DECLARE(areaColorAbove_r, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(areaColorAbove_g, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(areaColorAbove_b, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(areaColorAbove_a, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(areaColorBelow_r, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(areaColorBelow_g, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(areaColorBelow_b, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(areaColorBelow_a, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(line_width, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(linecolorr, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(linecolorg, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(linecolorb, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(linecolora, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(stdevcolorr, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(stdevcolorg, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(stdevcolorb, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(stdevcolora, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(xmin, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(xmax, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(ymin, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(ymax, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(border_width_horizontal_in_percent, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(border_width_vertical_in_percent, GL_FLOAT)
-  }; // class UBOAreaPlot
+      BK_UBO_SPECIALIZATION_DECLARE(color_area_above_r, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_DECLARE(color_area_above_g, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_DECLARE(color_area_above_b, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_DECLARE(color_area_above_a, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_DECLARE(color_area_below_r, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_DECLARE(color_area_below_g, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_DECLARE(color_area_below_b, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_DECLARE(color_area_below_a, GL_FLOAT)
+  }; // class UBOPlotArea
 } // namespace bk::details
 
-#endif //BK_UBOAREAPLOT_H
+#endif //BK_UBOPLOTAREA_H

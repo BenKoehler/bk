@@ -32,10 +32,10 @@ namespace bk::details
   /// @{ -------------------------------------------------- CTOR
   #ifndef BK_LIB_QT_AVAILABLE
   UBOText::UBOText()
-      : base_type("UBOText", 1)
+      : base_type("UBOText", 3)
   #else
   UBOText::UBOText(bk::qt_gl_functions* gl) 
-      : base_type(gl, "UBOText", 1)
+      : base_type(gl, "UBOText", 3)
   #endif
   {
       this->set_usage_STATIC_DRAW();

@@ -27,7 +27,6 @@
 #ifndef BK_PLOTDATAVECTOR_H
 #define BK_PLOTDATAVECTOR_H
 
-#include <memory>
 #include <vector>
 
 #include <bk/CopyablePIMPL>
@@ -70,6 +69,7 @@ namespace bk
       [[nodiscard]] const GLfloat* y_value(unsigned int i) const;
       [[nodiscard]] const std::vector<GLfloat>& x_value_vector() const;
       [[nodiscard]] const std::vector<GLfloat>& y_value_vector() const;
+
       //====================================================================================================
       //===== SETTER
       //====================================================================================================

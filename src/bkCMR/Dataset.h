@@ -45,7 +45,6 @@ namespace bk
 
   inline namespace cmr
   {
-    // -------------------- forward declaration END
     class FlowDirCorrection;
 
     class FlowImage2DT;
@@ -59,16 +58,34 @@ namespace bk
     class PhaseUnwrapping2DT;
 
     class PhaseUnwrapping3DT;
+    // -------------------- forward declaration END
 
+    //====================================================================================================
+    //===== ENUMS
+    //====================================================================================================
     enum DatasetFilter_ : unsigned int
     {
+        DatasetFilter_None = 0, //
         DatasetFilter_PhaseUnwrapping = 1 << 0, //
         DatasetFilter_VelocityOffset = 1 << 1, //
         DatasetFilter_FlowDirCorrection = 1 << 2, //
-        //
-            DatasetFilter_None = 0, //
         DatasetFilter_All = DatasetFilter_PhaseUnwrapping | DatasetFilter_VelocityOffset | DatasetFilter_FlowDirCorrection, //
     };
+
+    using DatasetFilter = unsigned int;
+
+    enum VesselComponent_ : unsigned int
+    {
+        VesselComponent_None = 0, //
+        VesselComponent_Segmentation3D = 1 << 0, //
+        VesselComponent_Mesh = 1 << 1, //
+        VesselComponent_Centerlines = 1 << 2, //
+        VesselComponent_FlowJet = 1 << 3, //
+        VesselComponent_Pressure = 1 << 4, //
+        VesselComponent_All = VesselComponent_Segmentation3D | VesselComponent_Mesh | VesselComponent_Centerlines | VesselComponent_FlowJet | VesselComponent_Pressure, //
+    };
+
+    using VesselComponent = unsigned int;
 
     class BKCMR_EXPORT Dataset
     {
@@ -178,17 +195,17 @@ namespace bk
         [[nodiscard]] std::unique_ptr<DicomImage<double, -1>> load_local_image_copy_dcmbytes(unsigned int imgId) const;
       public:
 
-        [[maybe_unused]] bool load_flow_image_3dt(DatasetFilter_ flags = DatasetFilter_All);
+        [[maybe_unused]] bool load_flow_image_3dt(DatasetFilter flags = DatasetFilter_All);
 
-        [[nodiscard]] std::vector<std::unique_ptr<FlowImage2DT>> flow_images_2dt(DatasetFilter_ flags = DatasetFilter_All);
-        [[nodiscard]] std::unique_ptr<FlowImage2DT> flow_image_2dt(unsigned int dcm_id, DatasetFilter_ flags = DatasetFilter_All);
+        [[nodiscard]] std::vector<std::unique_ptr<FlowImage2DT>> flow_images_2dt(DatasetFilter flags = DatasetFilter_All);
+        [[nodiscard]] std::unique_ptr<FlowImage2DT> flow_image_2dt(unsigned int dcm_id, DatasetFilter flags = DatasetFilter_All);
 
         [[nodiscard]] int anatomical_2dt_image_id_of_flow_image_2dt(unsigned int flowimg_dcm_id, bool* success = nullptr);
 
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> lpc() const;
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> lpc(bool load_flow_img_if_necessary);
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> ivsd() const;
-        [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> ivsd(bool load_flow_img_if_necessary, DatasetFilter_ flags = DatasetFilter_FlowDirCorrection);
+        [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> ivsd(bool load_flow_img_if_necessary, DatasetFilter flags = DatasetFilter_FlowDirCorrection);
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> tmip_magnitude_3dt() const;
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> tmip_signal_intensity_3dt() const;
         [[nodiscard]] std::unique_ptr<DicomImage<double, 3>> tmip_anatomical_3dt(unsigned int dcmImgId) const;
@@ -220,6 +237,8 @@ namespace bk
         void clear();
         void delete_local_image_copies_if_incomplete() const;
         void delete_local_image_copies() const;
+
+        std::vector<double> mean_forward_velocity_in_vessel(Vessel* v, DatasetFilter filter = DatasetFilter_All);
 
         //====================================================================================================
         //===== I/O
@@ -277,7 +296,9 @@ namespace bk
 
         [[maybe_unused]] bool save_static_tissue_threshold(double t) const;
 
-        [[maybe_unused]] bool save_vessel(const Vessel* v) const;
+        [[maybe_unused]] bool save_vessel(const Vessel* v, VesselComponent comp = VesselComponent_All) const;
+        //! returns the number of successfully loaded vessels
+        [[maybe_unused]] unsigned int load_vessels(VesselComponent comp = VesselComponent_All);
 
         [[maybe_unused]] bool save_mesh_of_vessel(const Vessel* v) const;
         [[maybe_unused]] bool save_mesh_of_vessel(std::string_view name) const;

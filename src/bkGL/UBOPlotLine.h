@@ -67,9 +67,9 @@ namespace bk::details
       [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
+      using base_type::set_buffer_base;
     private:
       using base_type::set_buffer_name;
-      using base_type::set_buffer_base;
     public:
 
       //====================================================================================================

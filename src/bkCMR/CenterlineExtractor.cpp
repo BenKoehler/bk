@@ -519,6 +519,8 @@ namespace bk
             for (unsigned int i = 0; i < N; ++i)
             { vcl.geometry().point(i) = centerline[N - 1 - i]; }
 
+            //vcl.geometry().construct_kd_tree(); // not necessary here
+
             #ifdef BK_EMIT_PROGRESS
             prog_cl.increment(1);
             #endif

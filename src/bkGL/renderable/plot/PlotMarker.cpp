@@ -345,9 +345,11 @@ namespace bk
       BK_QT_GL glPushAttrib(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
       BK_QT_GL glDisable(GL_DEPTH_TEST);
       BK_QT_GL glEnable(GL_BLEND);
+
       BK_QT_GL glMatrixMode(GL_MODELVIEW);
       BK_QT_GL glPushMatrix();
       BK_QT_GL glLoadIdentity();
+
       BK_QT_GL glMatrixMode(GL_PROJECTION);
       BK_QT_GL glPushMatrix();
       BK_QT_GL glLoadIdentity();

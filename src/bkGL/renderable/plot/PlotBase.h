@@ -95,8 +95,8 @@ namespace bk
       [[nodiscard]] GLfloat y_min() const;
       [[nodiscard]] GLfloat y_max() const;
 
-      [[nodiscard]] GLfloat border_width_horizontal_in_percent() const;
-      [[nodiscard]] GLfloat border_width_vertical_in_percent() const;
+      [[nodiscard]] GLfloat border_width_x_in_percent() const;
+      [[nodiscard]] GLfloat border_width_y_in_percent() const;
       [[nodiscard]] unsigned int num_datavectorviews() const;
       [[nodiscard]] std::shared_ptr<details::PlotAbstractDataVectorView>& datavectorview(unsigned int i);
       [[nodiscard]] const std::shared_ptr<details::PlotAbstractDataVectorView>& datavectorview(unsigned int i) const;
@@ -150,8 +150,8 @@ namespace bk
 
       void set_xy_minmax_from_data();
 
-      void set_border_width_horizontal_in_percent(GLfloat b);
-      void set_border_width_vertical_in_percent(GLfloat b);
+      void set_border_width_x_in_percent(GLfloat b);
+      void set_border_width_y_in_percent(GLfloat b);
 
       //====================================================================================================
       //===== GL

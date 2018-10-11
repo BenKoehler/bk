@@ -512,7 +512,7 @@ namespace bk
         return _pdata->importer.read_image(imgId);
     }
 
-    bool Dataset::load_flow_image_3dt(DatasetFilter_ flags)
+    bool Dataset::load_flow_image_3dt(DatasetFilter flags)
     {
         const std::vector<unsigned int> flow_image_ids = _pdata->importer.class_3dt_flow_images();
 
@@ -644,6 +644,8 @@ namespace bk
             // todo
         }
 
+        _pdata->flow_image_3dt.calc_world_matrix_rotational_part();
+
         #ifdef BK_EMIT_PROGRESS
         prog.set_finished();
         #endif
@@ -651,7 +653,7 @@ namespace bk
         return true;
     }
 
-    std::vector<std::unique_ptr<FlowImage2DT>> Dataset::flow_images_2dt(DatasetFilter_ flags)
+    std::vector<std::unique_ptr<FlowImage2DT>> Dataset::flow_images_2dt(DatasetFilter flags)
     {
         const std::vector<unsigned int> imgIds = _pdata->importer.class_2dt_flow_images();
         std::vector<std::unique_ptr<FlowImage2DT>> images;
@@ -663,7 +665,7 @@ namespace bk
         return images;
     }
 
-    std::unique_ptr<FlowImage2DT> Dataset::flow_image_2dt(unsigned int dcm_id, DatasetFilter_ flags)
+    std::unique_ptr<FlowImage2DT> Dataset::flow_image_2dt(unsigned int dcm_id, DatasetFilter flags)
     {
         std::unique_ptr<DicomImage<double, -1>> img = has_local_image_copy_dcmbytes(dcm_id) ? load_local_image_copy_dcmbytes(dcm_id) : _pdata->importer.read_image(dcm_id);
 
@@ -742,7 +744,7 @@ namespace bk
         return IVSDImageFilter::apply(_pdata->flow_image_3dt);
     }
 
-    std::unique_ptr<DicomImage<double, 3>> Dataset::ivsd(bool load_flow_img_if_necessary, DatasetFilter_ flags)
+    std::unique_ptr<DicomImage<double, 3>> Dataset::ivsd(bool load_flow_img_if_necessary, DatasetFilter flags)
     {
         if (has_local_image_copy(filepath_ivsd()))
         { return load_local_image_copy(filepath_ivsd()); }
@@ -1126,6 +1128,77 @@ namespace bk
         #endif
     }
 
+    std::vector<double> Dataset::mean_forward_velocity_in_vessel(Vessel* v, DatasetFilter filter)
+    {
+        if (v == nullptr)
+        {
+            std::cerr << "Dataset::mean_forward_velocity_in_vessel - v is nullptr" << std::endl;
+            return {};
+        }
+
+        auto fut_cl = bk_threadpool.enqueue([&]()
+                                            {
+                                                #pragma omp parallel for
+                                                for (unsigned int i = 0; i < v->num_centerlines(); ++i)
+                                                { v->centerlines()[i].geometry().construct_kd_tree(); }
+                                            });
+
+        auto fut_f = bk_threadpool.enqueue([&]()
+                                           {
+                                               if (!is_flow_image_3dt_loaded())
+                                               { load_flow_image_3dt(filter); }
+                                           });
+
+        fut_cl.get();
+        fut_f.get();
+
+        FlowImage3DT* f = flow_image_3dt();
+        const auto fsize = f->geometry().size();
+        const std::unique_ptr<DicomImage<double, 3>> seg = vessel_segmentation_in_flow_field_3dt_size(*v);
+
+        const unsigned int T = fsize[3];
+        std::vector<double> avgVelo(T + 1, 0);
+        std::vector<unsigned int> cnt(T + 1, 0);
+
+        #pragma omp parallel for schedule(dynamic, 1)
+        for (unsigned int x = 0; x < fsize[0]; ++x)
+        {
+            for (unsigned int y = 0; y < fsize[1]; ++y)
+            {
+                for (unsigned int z = 0; z < fsize[2]; ++z)
+                {
+                    if ((*seg)(x, y, z) == 0)
+                    { continue; }
+
+                    const auto worldPos3D = f->geometry().transformation().to_world_coordinates(x, y, z, 0).sub_matrix<0, 2, 0, 0>();
+                    const auto[clid, cp] = v->closest_centerline_and_point_id(worldPos3D);
+                    const auto& cl = v->centerlines()[clid];
+                    const auto clTangent = cl.local_coordinate_system_at_point(cp.point_id).col(2);
+
+                    for (unsigned int t = 0; t < T; ++t)
+                    {
+                        const bk::Vec3d veloVec = f->flow_vector_world_rotated_at_grid_pos(x, y, z, t);
+                        const double forwardVelocity = veloVec.dot(clTangent);
+
+                        #pragma omp critical(mean_forward_velocity_in_vessel)
+                        {
+                            avgVelo[t] += forwardVelocity;
+                            ++cnt[t];
+                        }
+                    } // for t
+                } // for z
+            } // for y
+        } // for x
+
+        for (unsigned int t = 0; t < T; ++t)
+        { avgVelo[t] /= cnt[t]; }
+
+        // copy last from first time step since the dataset is cyclic
+        avgVelo.back() = avgVelo.front();
+
+        return avgVelo;
+    }
+
     //====================================================================================================
     //===== I/O
     //====================================================================================================
@@ -1488,7 +1561,7 @@ namespace bk
         return true;
     }
 
-    bool Dataset::save_vessel(const Vessel* v) const
+    bool Dataset::save_vessel(const Vessel* v, VesselComponent comp) const
     {
         if (v == nullptr)
         {
@@ -1505,39 +1578,142 @@ namespace bk
         bk::Progress& prog = bk_progress.emplace_task(5, ___("Saving vessel \"@0\"", v->name()));
         #endif
 
-        if (v->has_segmentation3D())
+        if (comp & VesselComponent_Segmentation3D && v->has_segmentation3D())
         { v->save_segmentation3D(path + v->name()); }
 
         #ifdef BK_EMIT_PROGRESS
         prog.increment(1);
         #endif
 
-        if (v->has_mesh())
+        if (comp & VesselComponent_Mesh && v->has_mesh())
         { v->save_mesh(path + v->name()); }
 
         #ifdef BK_EMIT_PROGRESS
         prog.increment(1);
         #endif
 
-        // todo: centerline
+        if (comp & VesselComponent_Centerlines)
+        {
+            if (v->has_centerlines())
+            { v->save_centerlines(path + v->name()); }
+
+            if (v->has_centerline_ids())
+            { v->save_centerline_ids(path + v->name()); }
+        }
 
         #ifdef BK_EMIT_PROGRESS
         prog.increment(1);
         #endif
 
-        // todo: flowjets
+        if (comp & VesselComponent_FlowJet)
+        {
+            // todo: flowjets
+        }
 
         #ifdef BK_EMIT_PROGRESS
         prog.increment(1);
         #endif
 
-        // (todo: pressure)
+        if (comp & VesselComponent_Pressure)
+        {
+            // (todo: pressure)    
+        }
 
         #ifdef BK_EMIT_PROGRESS
         prog.set_finished();
         #endif
 
         return true;
+    }
+
+    unsigned int Dataset::load_vessels(VesselComponent comp)
+    {
+        _pdata->vessels.clear();
+
+        unsigned int vesselCnt = 0;
+
+        std::vector<std::string> vesselNames;
+        for (auto& p: std::filesystem::directory_iterator(dirpath_vessels_without_slash_ending()))
+        {
+            if (p.is_directory())
+            { vesselNames.emplace_back(p.path().filename().string()); }
+        }
+
+        std::sort(vesselNames.begin(), vesselNames.end());
+
+        #ifdef BK_EMIT_PROGRESS
+        bk::Progress& prog_all = bk_progress.emplace_task(vesselNames.size(), ___("Loading vessels"));
+        #endif
+
+        for (unsigned int vid = 0; vid < vesselNames.size(); ++vid)
+        {
+            const std::string currentName = vesselNames[vid];
+
+            #ifdef BK_EMIT_PROGRESS
+            bk::Progress& prog_current = bk_progress.emplace_task(5, ___("Loading \"@0\"", currentName));
+            #endif
+
+            Vessel v;
+            v.set_name(vesselNames[vid]);
+
+            const std::string path = dirpath_vessel(currentName);
+            bool success = true;
+
+            if (comp & VesselComponent_Segmentation3D)
+            { success &= v.load_segmentation3D(filepath_segmentation3D_of_vessel(currentName)); }
+
+            #ifdef BK_EMIT_PROGRESS
+            prog_current.increment(1);
+            #endif
+
+            if (comp & VesselComponent_Mesh)
+            { success &= v.load_mesh(filepath_mesh_of_vessel(currentName)); }
+
+            #ifdef BK_EMIT_PROGRESS
+            prog_current.increment(1);
+            #endif
+
+            if (comp & VesselComponent_Centerlines)
+            {
+                success &= v.load_centerlines(filepath_centerlines_of_vessel(currentName));
+                success &= v.load_centerline_ids(filepath_centerline_ids_of_vessel(currentName));
+            }
+
+            #ifdef BK_EMIT_PROGRESS
+            prog_current.increment(1);
+            #endif
+
+            if (comp & VesselComponent_FlowJet)
+            {
+                // todo: flowjets
+            }
+
+            #ifdef BK_EMIT_PROGRESS
+            prog_current.increment(1);
+            #endif
+
+            if (comp & VesselComponent_Pressure)
+            {
+                // (todo: pressure)    
+            }
+
+            if (success)
+            {
+                add_vessel(std::move(v));
+                ++vesselCnt;
+            }
+
+            #ifdef BK_EMIT_PROGRESS
+            prog_current.set_finished();
+            prog_all.increment(1);
+            #endif
+        } // for vid
+
+        #ifdef BK_EMIT_PROGRESS
+        prog_all.set_finished();
+        #endif
+
+        return vesselCnt;
     }
 
     bool Dataset::save_mesh_of_vessel(const Vessel* v) const
