@@ -30,10 +30,12 @@
 
 #include <bk/Clock>
 #include <bkCMR/Dataset.h>
+#include <bkCMR/CardiacCycleDefinition.h>
 #include <bkCMR/CenterlineExtractor.h>
 #include <bkCMR/FlowDirCorrection.h>
 #include <bkCMR/FlowImage2DT.h>
 #include <bkCMR/FlowImage3DT.h>
+#include <bkCMR/FlowTimeShift.h>
 #include <bkCMR/IVSDImageFilter.h>
 #include <bkCMR/TMIPImageFilter.h>
 #include <bkCMR/LPCImageFilter.h>
@@ -67,6 +69,8 @@ namespace bk
         DicomDirImporter_CMR importer;
         FlowImage3DT flow_image_3dt;
         FlowDirCorrection flow_dir_correction;
+        FlowTimeShift flow_time_shift;
+        CardiacCycleDefinition cardiac_cycle_definition;
         std::vector<Vessel> vessels;
         PhaseUnwrapping3DT phase_unwrapping_3dt;
         std::map<unsigned int/*imgId*/, PhaseUnwrapping2DT> phase_unwrapping_2dt;
@@ -79,14 +83,12 @@ namespace bk
     //====================================================================================================
     Dataset::Dataset() = default;
     Dataset::Dataset(const Dataset&) = default;
-    Dataset::Dataset(Dataset&&) = default;
+    Dataset::Dataset(Dataset&&) noexcept = default;
     Dataset::~Dataset() = default;
 
     //====================================================================================================
     //===== GETTER
     //====================================================================================================
-
-
     const std::string& Dataset::project_path() const
     { return _pdata->project_path; }
 
@@ -191,6 +193,15 @@ namespace bk
     const FlowImage3DT* Dataset::flow_image_3dt() const
     { return &_pdata->flow_image_3dt; }
 
+    bool Dataset::has_flow_dir_correction() const
+    { return std::filesystem::exists(filepath_flow_dir_correction()); }
+
+    bool Dataset::has_flow_time_shift() const
+    { return std::filesystem::exists(filepath_flow_time_shift()); }
+
+    bool Dataset::has_cardiac_cycle_definition() const
+    { return std::filesystem::exists(filepath_cardiac_cycle_definition()); }
+
     unsigned int Dataset::num_vessels() const
     { return _pdata->vessels.size(); }
 
@@ -289,6 +300,18 @@ namespace bk
     const FlowDirCorrection& Dataset::flow_image_3dt_dir_correction() const
     { return _pdata->flow_dir_correction; }
 
+    FlowTimeShift& Dataset::flow_image_3dt_time_shift()
+    { return _pdata->flow_time_shift; }
+
+    const FlowTimeShift& Dataset::flow_image_3dt_time_shift() const
+    { return _pdata->flow_time_shift; }
+
+    CardiacCycleDefinition& Dataset::flow_image_3dt_cardiac_cycle_definition()
+    { return _pdata->cardiac_cycle_definition; }
+
+    const CardiacCycleDefinition& Dataset::flow_image_3dt_cardiac_cycle_definition() const
+    { return _pdata->cardiac_cycle_definition; }
+
     const PhaseUnwrapping3DT& Dataset::phase_unwrapping_3dt() const
     { return _pdata->phase_unwrapping_3dt; }
 
@@ -307,7 +330,7 @@ namespace bk
     //===== SETTER
     //====================================================================================================
     Dataset& Dataset::operator=(const Dataset&) = default;
-    Dataset& Dataset::operator=(Dataset&&) = default;
+    Dataset& Dataset::operator=(Dataset&&) noexcept = default;
 
     void Dataset::set_project_path(std::string_view path)
     {
@@ -643,6 +666,9 @@ namespace bk
             //correct_eddy_currents_3dt();
             // todo
         }
+
+        if (flags & DatasetFilter_TimeShift)
+        { _pdata->flow_time_shift.apply(_pdata->flow_image_3dt); }
 
         _pdata->flow_image_3dt.calc_world_matrix_rotational_part();
 
@@ -1208,6 +1234,12 @@ namespace bk
     std::string Dataset::filepath_flow_dir_correction() const
     { return _pdata->project_path + "dir.fdc"; }
 
+    std::string Dataset::filepath_flow_time_shift() const
+    { return _pdata->project_path + "fts"; }
+
+    std::string Dataset::filepath_cardiac_cycle_definition() const
+    { return _pdata->project_path + "ccd"; }
+
     std::string Dataset::filepath_phase_unwrapping_2dt() const
     { return _pdata->project_path + "phase_wraps_2dt.pu"; }
 
@@ -1464,6 +1496,24 @@ namespace bk
 
     bool Dataset::delete_file_flow_dir_correction()
     { return delete_file_if_exists(filepath_flow_dir_correction()); }
+
+    bool Dataset::save_flow_time_shift()
+    { return _pdata->flow_time_shift.save(filepath_flow_time_shift()); }
+
+    bool Dataset::load_flow_time_shift()
+    { return _pdata->flow_time_shift.load(filepath_flow_time_shift()); }
+
+    bool Dataset::delete_file_flow_time_shift()
+    { return delete_file_if_exists(filepath_flow_time_shift()); }
+
+    bool Dataset::save_cardiac_cycle_definition()
+    { return _pdata->cardiac_cycle_definition.save(filepath_cardiac_cycle_definition()); }
+
+    bool Dataset::load_cardiac_cycle_definition()
+    { return _pdata->cardiac_cycle_definition.load(filepath_cardiac_cycle_definition()); }
+
+    bool Dataset::delete_file_cardiac_cycle_definition()
+    { return delete_file_if_exists(filepath_cardiac_cycle_definition()); }
 
     bool Dataset::save_phase_unwrapping_2dt()
     {

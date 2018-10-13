@@ -163,13 +163,16 @@ namespace bk
           GLfloat* buf = _pdata->vbo.map_write_only<GLfloat>();
           if (buf != nullptr)
           {
-              //const unsigned int ids[2] = (orientation_is_horizontal()) ? {1,3} : {0,2};
-              const unsigned int ids[2] = {orientation_is_horizontal() ? 1U : 0U, orientation_is_horizontal() ? 0U : 2U};
+              //const unsigned int ids[2] = orientation_is_horizontal() ? {1U,3U} : {0U,2U};
 
-              for (unsigned int i: ids)
-              { buf[i] = _pdata->dataValue; }
+              //const unsigned int ids[2] = {//
+              //    orientation_is_horizontal() ? 1U : 0U,//
+              //    orientation_is_horizontal() ? 3U : 2U};
+              //
+              //for (unsigned int i: ids)
+              //{ buf[i] = _pdata->dataValue; }
 
-              /*if (orientation_is_horizontal())
+              if (orientation_is_horizontal())
               {
                   buf[1] = _pdata->dataValue;
                   buf[3] = _pdata->dataValue;
@@ -178,9 +181,9 @@ namespace bk
               {
                   buf[0] = _pdata->dataValue;
                   buf[2] = _pdata->dataValue;
-              }*/
+              }
 
-              _pdata->vbo.unmap();
+              _pdata->vbo.unmap_and_release();
           }
 
           this->emit_signal_update_required();

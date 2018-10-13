@@ -63,8 +63,8 @@ namespace bk
       GLfloat ymax;
       GLfloat border_width_x_in_percent;
       GLfloat border_width_y_in_percent;
-      GLfloat w;
-      GLfloat h;
+      GLfloat window_width;
+      GLfloat window_height;
       GLint ssaa;
       ColorRGBA color;
       GLfloat lineWidth;
@@ -98,8 +98,8 @@ namespace bk
           ymax(0),
           border_width_x_in_percent(0),
           border_width_y_in_percent(0),
-          w(0),
-          h(0),
+          window_width(0),
+          window_height(0),
           ssaa(1),
           color(0.5, 0.5, 0.5, 1),
           lineWidth(1),
@@ -176,6 +176,12 @@ namespace bk
   const std::string& PlotAxis::label() const
   { return _pdata->label; }
 
+  GLfloat PlotAxis::border_width_x_in_percent() const
+  { return _pdata->border_width_x_in_percent; }
+
+  GLfloat PlotAxis::border_width_y_in_percent() const
+  { return _pdata->border_width_y_in_percent; }
+
   PlotAxisOrientation PlotAxis::orientation() const
   { return _pdata->orientation; }
 
@@ -198,7 +204,7 @@ namespace bk
   { return _pdata->vao.is_initialized() && _pdata->ubo.is_initialized(); }
 
   bool PlotAxis::draw_ticks_manually() const
-  {return _pdata->draw_ticks_manually;}
+  { return _pdata->draw_ticks_manually; }
 
   //====================================================================================================
   //===== SETTER
@@ -452,8 +458,11 @@ namespace bk
       }
       else // if (orientation_is_vertical())
       {
-          const GLfloat w = _pdata->textview_label.text_pixel_width_relative();
-          const GLfloat x = margin;
+          const GLfloat fw = orientation_is_horizontal() ? 1 : _pdata->window_width / _pdata->window_height;
+
+          const GLfloat w = fw * _pdata->textview_label.text_pixel_width_relative();
+          const GLfloat h = _pdata->textview_label.text_pixel_height_relative();
+          const GLfloat x = h + margin;
           const GLfloat y = _pdata->border_width_y_in_percent + 0.5 * (1.0f - _pdata->border_width_y_in_percent - w);
           _pdata->textview_label.set_position(x, y);
           //_pdata->textview_label.set_position(_pdata->border_width_x_in_percent + margin, 1.0f - h - margin); // top left; right next to axis
@@ -510,7 +519,7 @@ namespace bk
           else
           { tv.set_position_mode_relative(); }
 
-          tv.on_resize(_pdata->w, _pdata->h);
+          tv.on_resize(_pdata->window_width, _pdata->window_height);
           tv.on_ssaa_factor_changed(_pdata->ssaa);
           tv.set_scale(scalescale * _pdata->textview_label.scale_x(), scalescale * _pdata->textview_label.scale_y());
           tv.set_color_background(_pdata->textview_label.color_background());
@@ -598,8 +607,8 @@ namespace bk
 
   void PlotAxis::on_resize(GLint w, GLint h)
   {
-      _pdata->w = w;
-      _pdata->h = h;
+      _pdata->window_width = w;
+      _pdata->window_height = h;
 
       _pdata->textview_label.on_resize(w, h);
 

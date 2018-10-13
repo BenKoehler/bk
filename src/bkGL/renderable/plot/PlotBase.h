@@ -78,6 +78,9 @@ namespace bk
       //====================================================================================================
       //===== GETTER 
       //====================================================================================================
+      [[nodiscard]] GLfloat window_width() const;
+      [[nodiscard]] GLfloat window_height() const;
+
       [[nodiscard]] PlotAxis& x_axis();
       [[nodiscard]] const PlotAxis& x_axis() const;
       [[nodiscard]] PlotAxis& y_axis();

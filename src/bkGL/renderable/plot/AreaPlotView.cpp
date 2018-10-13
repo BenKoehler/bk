@@ -22,8 +22,9 @@
  * SOFTWARE.
  */
 
-#include "AreaPlotView.h"
-#include "PlotArea.h"
+#include <bkGL/renderable/plot/AreaPlotView.h>
+#include <bkGL/renderable/plot/PlotArea.h>
+
 #include <bk/Signal>
 
 namespace bk

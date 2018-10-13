@@ -255,7 +255,6 @@ namespace bk::details
       ));
   }
 
-
   std::string ShaderLibrary::ubo_definition_line()
   {
       return ubo_definition(bk::details::UBOLine(
@@ -2759,7 +2758,6 @@ namespace bk::details
 
       s << comment_region_functions();
       s << function_main_begin();
-
       s << "   color_out = vec4(" << bk::details::UBOText::name_color_background_r() << ", " << bk::details::UBOText::name_color_background_g() << ", " << bk::details::UBOText::name_color_background_b() << ", " << bk::details::UBOText::name_color_background_a() << ");\n";
       s << discard_zero_alpha();
 
@@ -3395,8 +3393,8 @@ namespace bk::details
       s << "];\n";
 
       s << ubo_definition_global();
-          s << ubo_definition_plot();
-          s << ubo_definition_plot_line();
+      s << ubo_definition_plot();
+      s << ubo_definition_plot_line();
 
       if (lines_adjacency)
       { s << geom_layout_in_lines_adjacency(); }
@@ -3570,28 +3568,5 @@ namespace bk::details
   { return line::geom(false); }
 
   std::string ShaderLibrary::plot::ticks::frag()
-  {
-      const std::string cr = details::UBOPlotLine::name_color_r();
-      const std::string cg = details::UBOPlotLine::name_color_g();
-      const std::string cb = details::UBOPlotLine::name_color_b();
-      const std::string ca = details::UBOPlotLine::name_color_a();
-
-      std::stringstream s;
-
-      s << comment_tag_fragment_shader("PLOT AXIS TICKS");
-      s << version();
-
-      s << comment_region_input();
-      s << ubo_definition_plot_line();
-
-      s << comment_region_output();
-      s << "layout(location = 0) out vec4 color_out;\n";
-
-      s << comment_region_functions();
-      s << function_main_begin();
-      s << "   color_out = vec4(" << cr << ", " << cg << ", " << cb << ", " << ca << ");\n";
-      s << function_main_end();
-
-      return s.str();
-  }
+  { return plot::axis::frag(); }
 } // namespace bk::details

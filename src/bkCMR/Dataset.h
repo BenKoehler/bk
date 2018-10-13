@@ -45,7 +45,11 @@ namespace bk
 
   inline namespace cmr
   {
+    class CardiacCycleDefinition;
+    
     class FlowDirCorrection;
+
+    class FlowTimeShift;
 
     class FlowImage2DT;
 
@@ -69,7 +73,8 @@ namespace bk
         DatasetFilter_PhaseUnwrapping = 1 << 0, //
         DatasetFilter_VelocityOffset = 1 << 1, //
         DatasetFilter_FlowDirCorrection = 1 << 2, //
-        DatasetFilter_All = DatasetFilter_PhaseUnwrapping | DatasetFilter_VelocityOffset | DatasetFilter_FlowDirCorrection, //
+        DatasetFilter_TimeShift = 1 << 3, //
+        DatasetFilter_All = DatasetFilter_PhaseUnwrapping | DatasetFilter_VelocityOffset | DatasetFilter_FlowDirCorrection | DatasetFilter_TimeShift //
     };
 
     using DatasetFilter = unsigned int;
@@ -94,7 +99,8 @@ namespace bk
         //====================================================================================================
       public:
         inline static const std::string dcmbytes = "dcmbytes";
-        inline static const std::string vessel_dir = "vessels/";
+        inline static const std::string vessel_dir_no_slash = "vessels";
+        inline static const std::string vessel_dir = vessel_dir_no_slash+"/";
 
         //====================================================================================================
         //===== MEMBERS
@@ -110,7 +116,7 @@ namespace bk
       public:
         Dataset();
         Dataset(const Dataset&);
-        Dataset(Dataset&&);
+        Dataset(Dataset&&) noexcept;
         ~Dataset();
 
         //====================================================================================================
@@ -135,6 +141,10 @@ namespace bk
         [[nodiscard]] FlowImage3DT* flow_image_3dt();
         [[nodiscard]] const FlowImage3DT* flow_image_3dt() const;
 
+        [[nodiscard]] bool has_flow_dir_correction() const;
+        [[nodiscard]] bool has_flow_time_shift() const;
+        [[nodiscard]] bool has_cardiac_cycle_definition() const;
+
         [[nodiscard]] unsigned int num_vessels() const;
         [[nodiscard]] Vessel* vessel(unsigned int i);
         [[nodiscard]] Vessel* vessel(std::string_view name, bool case_sensitive = true);
@@ -156,6 +166,12 @@ namespace bk
         [[nodiscard]] FlowDirCorrection& flow_image_3dt_dir_correction();
         [[nodiscard]] const FlowDirCorrection& flow_image_3dt_dir_correction() const;
 
+        [[nodiscard]] FlowTimeShift& flow_image_3dt_time_shift();
+        [[nodiscard]] const FlowTimeShift& flow_image_3dt_time_shift() const;
+
+        [[nodiscard]] CardiacCycleDefinition& flow_image_3dt_cardiac_cycle_definition();
+        [[nodiscard]] const CardiacCycleDefinition& flow_image_3dt_cardiac_cycle_definition() const;
+
         [[nodiscard]] const PhaseUnwrapping3DT& phase_unwrapping_3dt() const;
 
         [[nodiscard]] const std::map<unsigned int, PhaseUnwrapping2DT>& phase_unwrapping_2dt() const;
@@ -165,7 +181,7 @@ namespace bk
         //===== SETTER
         //====================================================================================================
         [[maybe_unused]] Dataset& operator=(const Dataset&);
-        [[maybe_unused]] Dataset& operator=(Dataset&&);
+        [[maybe_unused]] Dataset& operator=(Dataset&&) noexcept;
 
         void set_project_path(std::string_view path);
 
@@ -245,6 +261,8 @@ namespace bk
         //====================================================================================================
         [[nodiscard]] std::string filepath_importer() const;
         [[nodiscard]] std::string filepath_flow_dir_correction() const;
+        [[nodiscard]] std::string filepath_flow_time_shift() const;
+        [[nodiscard]] std::string filepath_cardiac_cycle_definition() const;
         [[nodiscard]] std::string filepath_phase_unwrapping_2dt() const;
         [[nodiscard]] std::string filepath_phase_unwrapping_3dt() const;
         [[nodiscard]] std::string dirpath_vessels() const;
@@ -281,6 +299,14 @@ namespace bk
         [[maybe_unused]] bool save_flow_dir_correction();
         [[maybe_unused]] bool load_flow_dir_correction();
         [[maybe_unused]] bool delete_file_flow_dir_correction();
+
+        [[maybe_unused]] bool save_flow_time_shift();
+        [[maybe_unused]] bool load_flow_time_shift();
+        [[maybe_unused]] bool delete_file_flow_time_shift();
+
+        [[maybe_unused]] bool save_cardiac_cycle_definition();
+        [[maybe_unused]] bool load_cardiac_cycle_definition();
+        [[maybe_unused]] bool delete_file_cardiac_cycle_definition();
 
         [[maybe_unused]] bool save_phase_unwrapping_2dt();
         [[maybe_unused]] bool load_phase_unwrapping_2dt();

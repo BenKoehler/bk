@@ -24,8 +24,8 @@
 
 #pragma once
 
-#ifndef BK_FLOWDIRCORRECTION_H
-#define BK_FLOWDIRCORRECTION_H
+#ifndef BK_CARDIACCYCLEDEFINITION_H
+#define BK_CARDIACCYCLEDEFINITION_H
 
 #include <string_view>
 
@@ -41,7 +41,7 @@ namespace bk
     class FlowImage3DT;
     // -------------------- forward declaration END
 
-    class BKCMR_EXPORT FlowDirCorrection
+    class BKCMR_EXPORT CardiacCycleDefinition
     {
         //====================================================================================================
         //===== MEMBERS
@@ -53,37 +53,41 @@ namespace bk
         //===== CONSTRUCTORS & DESTRUCTOR
         //====================================================================================================
       public:
-        FlowDirCorrection();
-        FlowDirCorrection(const FlowDirCorrection&);
-        FlowDirCorrection(FlowDirCorrection&&) noexcept;
-        ~FlowDirCorrection();
+        CardiacCycleDefinition();
+        CardiacCycleDefinition(const CardiacCycleDefinition&);
+        CardiacCycleDefinition(CardiacCycleDefinition&&) noexcept;
+        ~CardiacCycleDefinition();
 
         //====================================================================================================
         //===== GETTER
         //====================================================================================================
         [[nodiscard]] bool is_initialized() const;
-
-        [[nodiscard]] int correction_x() const;
-        [[nodiscard]] int correction_y() const;
-        [[nodiscard]] int correction_z() const;
+        [[nodiscard]] unsigned int num_times() const;
+        [[nodiscard]] double temporal_resolution() const;
+        [[nodiscard]] unsigned int id_systole_begin_diastole_end() const;
+        [[nodiscard]] double ms_systole_begin_diastole_end() const;
+        [[nodiscard]] unsigned int id_systole_end_diastole_begin() const;
+        [[nodiscard]] double ms_systole_end_diastole_begin() const;
 
         //====================================================================================================
         //===== SETTER
         //====================================================================================================
-        [[maybe_unused]] FlowDirCorrection& operator=(const FlowDirCorrection&);
-        [[maybe_unused]] FlowDirCorrection& operator=(FlowDirCorrection&&) noexcept;
+        [[maybe_unused]] CardiacCycleDefinition& operator=(const CardiacCycleDefinition&);
+        [[maybe_unused]] CardiacCycleDefinition& operator=(CardiacCycleDefinition&&) noexcept;
 
-        void set(bool x_forward, bool y_forward, bool z_forward);
+        void set(unsigned int systole_begin, unsigned int systole_end, unsigned int numTimes, double temporalResolutionInMs);
+        void set(unsigned int systole_begin, unsigned int systole_end, FlowImage3DT& ff);
 
         //====================================================================================================
         //===== FUNCTIONS
         //====================================================================================================
-        void apply(FlowImage3DT& ff) const;
+        [[nodiscard]] unsigned int length_in_time_steps() const;
+        [[nodiscard]] double length_in_ms() const;
 
         [[maybe_unused]] bool save(std::string_view filepath) const;
         [[maybe_unused]] bool load(std::string_view filepath);
-    }; // class FlowDirCorrection
+    }; // class CardiacCycleDefinition
   } // inline namespace cmr
 } // namespace bk
 
-#endif //BK_FLOWDIRCORRECTION_H
+#endif //BK_CARDIACCYCLEDEFINITION_H

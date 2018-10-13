@@ -24,8 +24,8 @@
 
 #pragma once
 
-#ifndef BK_FLOWDIRCORRECTION_H
-#define BK_FLOWDIRCORRECTION_H
+#ifndef BK_FLOWTIMESHIFT_H
+#define BK_FLOWTIMESHIFT_H
 
 #include <string_view>
 
@@ -41,7 +41,7 @@ namespace bk
     class FlowImage3DT;
     // -------------------- forward declaration END
 
-    class BKCMR_EXPORT FlowDirCorrection
+    class BKCMR_EXPORT FlowTimeShift
     {
         //====================================================================================================
         //===== MEMBERS
@@ -53,27 +53,28 @@ namespace bk
         //===== CONSTRUCTORS & DESTRUCTOR
         //====================================================================================================
       public:
-        FlowDirCorrection();
-        FlowDirCorrection(const FlowDirCorrection&);
-        FlowDirCorrection(FlowDirCorrection&&) noexcept;
-        ~FlowDirCorrection();
+        FlowTimeShift();
+        FlowTimeShift(const FlowTimeShift&);
+        FlowTimeShift(FlowTimeShift&&) noexcept;
+        ~FlowTimeShift();
 
         //====================================================================================================
         //===== GETTER
         //====================================================================================================
         [[nodiscard]] bool is_initialized() const;
-
-        [[nodiscard]] int correction_x() const;
-        [[nodiscard]] int correction_y() const;
-        [[nodiscard]] int correction_z() const;
+        [[nodiscard]] unsigned int num_times() const;
+        [[nodiscard]] double temporal_resolution() const;
+        [[nodiscard]] unsigned int offset_id() const;
+        [[nodiscard]] double offset_in_ms() const;
 
         //====================================================================================================
         //===== SETTER
         //====================================================================================================
-        [[maybe_unused]] FlowDirCorrection& operator=(const FlowDirCorrection&);
-        [[maybe_unused]] FlowDirCorrection& operator=(FlowDirCorrection&&) noexcept;
+        [[maybe_unused]] FlowTimeShift& operator=(const FlowTimeShift&);
+        [[maybe_unused]] FlowTimeShift& operator=(FlowTimeShift&&) noexcept;
 
-        void set(bool x_forward, bool y_forward, bool z_forward);
+        void set_shift(int shift, unsigned int numTimes, double temporalResolutionInMs);
+        void set_shift(int shift, FlowImage3DT& ff);
 
         //====================================================================================================
         //===== FUNCTIONS
@@ -82,8 +83,8 @@ namespace bk
 
         [[maybe_unused]] bool save(std::string_view filepath) const;
         [[maybe_unused]] bool load(std::string_view filepath);
-    }; // class FlowDirCorrection
+    }; // class FlowTimeShift
   } // inline namespace cmr
 } // namespace bk
 
-#endif //BK_FLOWDIRCORRECTION_H
+#endif //BK_FLOWTIMESHIFT_H

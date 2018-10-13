@@ -24,6 +24,7 @@
 
 #include <bkCMR/FlowDirCorrection.h>
 
+#include <array>
 #include <cstdint>
 #include <fstream>
 #include <string>

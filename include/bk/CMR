@@ -24,6 +24,7 @@
 
 #include <bkCMR/Dataset.h>
 #include <bkCMR/FlowDirCorrection.h>
+#include <bkCMR/FlowTimeShift.h>
 #include <bkCMR/CenterlineExtractor.h>
 #include <bkCMR/Vessel.h>
 #include <bkCMR/EVesselSemantic.h>

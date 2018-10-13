@@ -178,6 +178,7 @@ endif ()
 # add library bkCMR
 # ----------
 set(SOURCE_FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/CardiacCycleDefinition.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/CenterlineExtractor.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/Dataset.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/Vessel.cpp
@@ -185,6 +186,7 @@ set(SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowImage2DT.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowImage3DT.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowJet.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowTimeShift.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/IVSDImageFilter.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/LPCImageFilter.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/TMIPImageFilter.cpp
@@ -341,6 +343,7 @@ set(SOURCE_FILES # BUFFER
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotMarker.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/SingleLinePlotView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/AreaPlotView.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/CardiacCycleDefinitionView.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/line/LineView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/mesh/TriangularMesh3DView.cpp

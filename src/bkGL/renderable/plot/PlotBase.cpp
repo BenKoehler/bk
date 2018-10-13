@@ -54,6 +54,8 @@ namespace bk
       GLfloat ymax;
       GLfloat border_width_x_in_percent;
       GLfloat border_width_y_in_percent;
+      GLfloat window_width;
+      GLfloat window_height;
 
           #ifndef BK_LIB_QT_AVAILABLE
 
@@ -71,7 +73,9 @@ namespace bk
           ymin(std::numeric_limits<GLfloat>::max()),
           ymax(-std::numeric_limits<GLfloat>::max()),
           border_width_x_in_percent(0.075),
-          border_width_y_in_percent(0.075)
+          border_width_y_in_percent(0.075),
+          window_width(0),
+          window_height(0)
       { /* do nothing */ }
 
       Impl(const Impl&) = delete;
@@ -119,6 +123,12 @@ namespace bk
   //====================================================================================================
   //===== GETTER
   //====================================================================================================
+  GLfloat PlotBase::window_width() const
+  { return _pdata->window_width; }
+
+  GLfloat PlotBase::window_height() const
+  { return _pdata->window_height; }
+
   PlotAxis& PlotBase::x_axis()
   { return _pdata->xaxis; }
 
@@ -575,6 +585,9 @@ namespace bk
 
   void PlotBase::on_resize(GLint w, GLint h)
   {
+      _pdata->window_width = w;
+      _pdata->window_height = h;
+
       for (auto& o: _pdata->plotobjects)
       { o->on_resize(w, h); }
 
@@ -736,14 +749,14 @@ namespace bk
       _pdata->xaxis.draw_ticks();
       _pdata->yaxis.draw_ticks();
 
-      for (auto& m: _pdata->markers)
-      { m->draw(); }
-
       for (auto& o: _pdata->plotobjects)
       { o->draw(); }
 
       _pdata->xaxis.draw();
       _pdata->yaxis.draw();
+
+      for (auto& m: _pdata->markers)
+      { m->draw(); }
 
       _pdata->ubo.release_from_base();
   }

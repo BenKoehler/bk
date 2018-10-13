@@ -38,16 +38,17 @@ namespace bk
 {
   // -------------------- forward declaration
   class ColorRGBA;
+
   class TextView;
   // -------------------- forward declaration END
 
-    enum PlotAxisOrientation_ : unsigned int
-    {
-        PlotAxisOrientation_Horizontal = 0,//
-        PlotAxisOrientation_Vertical = 1//
-    };
+  enum PlotAxisOrientation_ : unsigned int
+  {
+      PlotAxisOrientation_Horizontal = 0,//
+      PlotAxisOrientation_Vertical = 1//
+  };
 
-    using PlotAxisOrientation = unsigned int;
+  using PlotAxisOrientation = unsigned int;
 
   class BKGL_EXPORT PlotAxis : public details::AbstractRenderable
   {
@@ -60,6 +61,7 @@ namespace bk
       //===== MEMBERS
       //====================================================================================================
       class Impl;
+
       bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
@@ -73,8 +75,8 @@ namespace bk
       #else
       explicit PlotAxis(qt_gl_functions* gl);
       #endif
-      PlotAxis(const PlotAxis& ) = delete;
-      PlotAxis(PlotAxis&& ) noexcept;
+      PlotAxis(const PlotAxis&) = delete;
+      PlotAxis(PlotAxis&&) noexcept;
       /// @}
 
       /// @{ -------------------------------------------------- DESTRUCTOR
@@ -84,14 +86,16 @@ namespace bk
       //====================================================================================================
       //===== GETTER 
       //====================================================================================================
-      [[nodiscard]] const ColorRGBA& color() const ;
-      [[nodiscard]] GLfloat line_width() const ;
-      [[nodiscard]] GLfloat x_min() const ;
-      [[nodiscard]] GLfloat x_max() const ;
-      [[nodiscard]] GLfloat y_min() const ;
-      [[nodiscard]] GLfloat y_max() const ;
-      [[nodiscard]] GLuint num_ticks() const ;
+      [[nodiscard]] const ColorRGBA& color() const;
+      [[nodiscard]] GLfloat line_width() const;
+      [[nodiscard]] GLfloat x_min() const;
+      [[nodiscard]] GLfloat x_max() const;
+      [[nodiscard]] GLfloat y_min() const;
+      [[nodiscard]] GLfloat y_max() const;
+      [[nodiscard]] GLuint num_ticks() const;
       [[nodiscard]] const std::string& label() const;
+      [[nodiscard]] GLfloat border_width_x_in_percent() const;
+      [[nodiscard]] GLfloat border_width_y_in_percent() const;
       [[nodiscard]] PlotAxisOrientation orientation() const;
       [[nodiscard]] bool orientation_is_horizontal() const;
       [[nodiscard]] bool orientation_is_vertical() const;
