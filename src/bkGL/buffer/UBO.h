@@ -222,7 +222,7 @@ namespace bk
     { return gl_type_traits< TYPE >::size_in_bytes; }\
 \
     [[nodiscard]] static constexpr const char* typename_##NAME##_glsl () noexcept\
-    { return glenum_to_glsl_type_name( TYPE ) ;}\
+    { return bk::details::glenum_to_glsl_type_name( TYPE ) ;}\
 \
     void set_##NAME ( NAME##_value_type val);\
     void set_##NAME (const NAME##_value_type* val);

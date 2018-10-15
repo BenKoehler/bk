@@ -30,6 +30,8 @@
 #include <string>
 #include <string_view>
 
+#include <bkGL/lib/bkGL_export.h>
+
 // -------------------- forward declaration
 namespace bk
 {
@@ -46,7 +48,7 @@ namespace bk
 
 namespace bk::details
 {
-  struct ShaderLibrary
+  struct BKGL_EXPORT ShaderLibrary
   {
       /// @{ -------------------------------------------------- COMMENTS
       [[nodiscard]] static std::string comment_tag_shader(std::string_view type, std::string_view name);

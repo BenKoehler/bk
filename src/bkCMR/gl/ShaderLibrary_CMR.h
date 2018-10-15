@@ -22,18 +22,34 @@
  * SOFTWARE.
  */
 
-#include <bkCMR/Dataset.h>
-#include <bkCMR/FlowDirCorrection.h>
-#include <bkCMR/FlowTimeShift.h>
-#include <bkCMR/CenterlineExtractor.h>
-#include <bkCMR/Vessel.h>
-#include <bkCMR/EVesselSemantic.h>
-#include <bkCMR/FlowImage2DT.h>
-#include <bkCMR/FlowImage3DT.h>
-#include <bkCMR/FlowJet.h>
-#include <bkCMR/PhaseUnwrapping2DT.h>
-#include <bkCMR/PhaseUnwrapping3DT.h>
-#include <bkCMR/ESegmentation3DInfo.h>
+#pragma once
 
-#include <bkCMR/gl/CardiacCycleDefinitionView.h>
-#include <bkCMR/gl/MeasuringPlanePreviewView.h>
+#ifndef BK_SHADERLIBRARY_CMR_H
+#define BK_SHADERLIBRARY_CMR_H
+
+#include <bkGL/shader/ShaderLibrary.h>
+#include <bkCMR/lib/bkCMR_export.h>
+
+namespace bk
+{
+  inline namespace cmr
+  {
+    struct BKCMR_EXPORT ShaderLibrary_CMR : public bk::details::ShaderLibrary
+    {
+        /// @{ -------------------------------------------------- UBO
+        [[nodiscard]] static std::string ubo_definition_measuring_plane_preview();
+        /// @}
+
+        //====================================================================================================
+        //===== MEASURING PLANE PREVIEW
+        //====================================================================================================
+        struct measuring_plane_preview
+        {
+            [[nodiscard]] static std::string vert();
+            [[nodiscard]] static std::string frag();
+        };
+    }; // struct ShaderLibrary_CMR
+  } // inline namespace cmr
+} // namespace bk
+
+#endif //BK_SHADERLIBRARY_CMR_H

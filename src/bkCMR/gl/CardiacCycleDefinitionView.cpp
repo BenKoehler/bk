@@ -27,7 +27,7 @@
 #include <iostream>
 #include <limits>
 
-#include <bkGL/renderable/plot/CardiacCycleDefinitionView.h>
+#include <bkCMR/gl/CardiacCycleDefinitionView.h>
 #include <bkGL/renderable/plot/PlotMarker.h>
 #include <bkGL/renderable/plot/PlotAxis.h>
 #include <bkGL/renderable/text/TextView.h>
@@ -82,8 +82,8 @@ namespace bk
             current_data_value(0),
             mouse_left_is_pressed(false),
             mouse_right_is_pressed(false),
-            time_point_id_systole_begin(std::numeric_limits<unsigned int>::max()),
-            time_point_id_systole_end(std::numeric_limits<unsigned int>::max())
+            time_point_id_systole_begin(0),
+            time_point_id_systole_end(0)
       { /* do nothing */ }
 
       Impl(const Impl&) = delete;

@@ -31,6 +31,7 @@
 
 #include <bk/CopyablePIMPL>
 #include <bkGL/renderable/plot/AreaPlotView.h>
+#include <bkCMR/lib/bkCMR_export.h>
 
 namespace bk
 {
@@ -40,7 +41,7 @@ namespace bk
   template<typename...> class Signal;
   // -------------------- forward declaration END
 
-  class BKGL_EXPORT CardiacCycleDefinitionView : public AreaPlotView
+  class BKCMR_EXPORT CardiacCycleDefinitionView : public AreaPlotView
   {
       //====================================================================================================
       //===== DEFINITIONS

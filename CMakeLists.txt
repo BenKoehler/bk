@@ -196,6 +196,10 @@ set(SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/rotation_angle_2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/sampling/sampling_sphere_section.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/VesselSegmentationInFlowFieldSizeImageFilter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/CardiacCycleDefinitionView.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/MeasuringPlanePreviewView.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/ShaderLibrary_CMR.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/UBOMeasuringPlanePreview.cpp
         )
 
 add_library(bkCMR ${SOURCE_FILES})
@@ -343,7 +347,6 @@ set(SOURCE_FILES # BUFFER
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/PlotMarker.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/SingleLinePlotView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/AreaPlotView.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/plot/CardiacCycleDefinitionView.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/line/LineView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/mesh/TriangularMesh3DView.cpp
