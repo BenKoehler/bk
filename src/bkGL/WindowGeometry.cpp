@@ -104,6 +104,3 @@ namespace bk
   { return !operator==(other); }
   /// @}
 } // namespace bk
-
-
-

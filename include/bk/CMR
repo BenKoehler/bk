@@ -27,6 +27,7 @@
 #include <bkCMR/FlowTimeShift.h>
 #include <bkCMR/CenterlineExtractor.h>
 #include <bkCMR/Vessel.h>
+#include <bkCMR/ELandMarkSemantic.h>
 #include <bkCMR/EVesselSemantic.h>
 #include <bkCMR/FlowImage2DT.h>
 #include <bkCMR/FlowImage3DT.h>
@@ -37,4 +38,5 @@
 
 #include <bkCMR/gl/CardiacCycleDefinitionView.h>
 #include <bkCMR/gl/LandMarkSelectionView.h>
+#include <bkCMR/gl/PressureView.h>
 #include <bkCMR/gl/MeasuringPlanePreviewView.h>

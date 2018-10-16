@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <fstream>
+#include <iterator>
 #include <vector>
 
 #include <bkCMR/rotation_angle_2d.h>
@@ -62,12 +63,14 @@ namespace bk
         std::pair<Segmentation3DInfo_, unsigned int> seg3info;
         std::vector<unsigned int> seg3insideids;
         std::vector<unsigned int> seg3outsideids;
-        VesselSemantic_ semantic;
+        VesselSemantic semantic;
         mesh_type mesh;
-        //pathlineset_type                            pathlines;
+        //pathlineset_type pathlines;
         unsigned int centerline_seed_id;
         std::vector<unsigned int> centerline_target_ids;
         std::vector<Line3D> centerlines;
+        std::vector<LandMark> land_marks;
+
         //std::vector<measuring_plane_type> measuring_planes;
         //std::vector<FlowJet_CMR> flowjets;
         //FlowJetSet_CMR flowjets;
@@ -101,10 +104,10 @@ namespace bk
     const std::string& Vessel::name() const
     { return _pdata->name; }
 
-    VesselSemantic_ Vessel::semantic() const
+    VesselSemantic Vessel::semantic() const
     { return _pdata->semantic; }
 
-    bool Vessel::is_semantic(VesselSemantic_ sem) const
+    bool Vessel::is_semantic(VesselSemantic sem) const
     { return _pdata->semantic & sem; }
 
     bool Vessel::is_semantic_aorta() const
@@ -136,6 +139,32 @@ namespace bk
 
     bool Vessel::is_semantic_right_heart() const
     { return is_semantic_pulmonary_artery() || is_semantic_right_ventricle() || is_semantic_right_atrium() || is_semantic_vena_cava(); }
+
+    bool Vessel::has_land_marks() const
+    { return !_pdata->land_marks.empty(); }
+
+    bool Vessel::has_land_mark(LandMarkSemantic sem) const
+    {
+        return std::find_if(_pdata->land_marks.begin(), _pdata->land_marks.end(), [&](const LandMark& lm)
+        { return lm.semantic == sem; }) != _pdata->land_marks.end();
+    }
+
+    int Vessel::id_of_land_mark(LandMarkSemantic sem) const
+    {
+        const auto it = std::find_if(_pdata->land_marks.begin(), _pdata->land_marks.end(), [&](const LandMark& lm)
+        { return lm.semantic == sem; });
+
+        return it != _pdata->land_marks.end() ? std::abs(std::distance(_pdata->land_marks.begin(), it)) : -1;
+    }
+
+    unsigned int Vessel::num_land_marks() const
+    { return _pdata->land_marks.size(); }
+
+    const std::vector<LandMark>& Vessel::land_marks() const
+    { return _pdata->land_marks; }
+
+    const LandMark& Vessel::land_mark(unsigned int id) const
+    { return _pdata->land_marks[id]; }
 
     bool Vessel::has_segmentation3D() const
     { return _pdata->seg3.num_values() > 1; }
@@ -309,7 +338,7 @@ namespace bk
     void Vessel::set_name_from_semantic()
     { _pdata->name = Name_from_semantic(_pdata->semantic); }
 
-    std::string Vessel::Name_from_semantic(VesselSemantic_ s)
+    std::string Vessel::Name_from_semantic(VesselSemantic s)
     {
         std::string name = "";
 
@@ -336,11 +365,35 @@ namespace bk
         return name;
     }
 
-    void Vessel::set_semantic(VesselSemantic_ sem)
+    void Vessel::set_semantic(VesselSemantic sem)
     { _pdata->semantic = sem; }
 
-    void Vessel::add_semantic(VesselSemantic_ sem)
-    { _pdata->semantic = static_cast<VesselSemantic_>(static_cast<unsigned int>(_pdata->semantic) | static_cast<unsigned int>(sem)); }
+    void Vessel::add_semantic(VesselSemantic sem)
+    { _pdata->semantic = static_cast<VesselSemantic>(static_cast<unsigned int>(_pdata->semantic) | static_cast<unsigned int>(sem)); }
+
+    void Vessel::add_land_mark(LandMarkSemantic sem, unsigned int centerline_id, unsigned int point_id)
+    {
+        assert(centerline_id < num_centerlines());
+        assert(point_id < _pdata->centerlines[centerline_id].geometry().num_points());
+
+        auto it = std::find_if(_pdata->land_marks.begin(), _pdata->land_marks.end(), [&](const LandMark& l)
+        { return l.semantic == sem; });
+
+        if (it == _pdata->land_marks.end())
+        {
+            LandMark lm;
+            lm.semantic = sem;
+            lm.centerline_id = centerline_id;
+            lm.point_id = point_id;
+
+            _pdata->land_marks.emplace_back(std::move(lm));
+        }
+        else
+        {
+            it->point_id = point_id;
+            it->centerline_id = centerline_id;
+        }
+    }
 
     void Vessel::set_seg3d_was_performed_on_magnitude_TMIP()
     {
@@ -839,7 +892,7 @@ namespace bk
 
         // semantic
         file.read(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
-        _pdata->semantic = static_cast<VesselSemantic_>(ui32temp);
+        _pdata->semantic = static_cast<VesselSemantic>(ui32temp);
 
         fut_insideids.get();
         fut_outsideids.get();
@@ -1137,7 +1190,7 @@ namespace bk
                 file.read(reinterpret_cast<char*>(&rad[p]), sizeof(double));
             }
 
-            fut.push_back(bk_threadpool.enqueue([&,i]()
+            fut.push_back(bk_threadpool.enqueue([&, i]()
                                                 {
                                                     _pdata->centerlines[i].geometry().construct_kd_tree();
                                                     _pdata->centerlines[i].calc_consistent_local_coordinate_systems();
@@ -1146,6 +1199,128 @@ namespace bk
 
         for (auto& f : fut)
         { f.get(); }
+
+        file.close();
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        return true;
+    }
+
+    bool Vessel::save_land_marks(std::string_view filepath) const
+    {
+        #ifdef BK_EMIT_PROGRESS
+        Progress& prog = bk_progress.emplace_task(2, ___("Saving land marks"));
+        #endif
+
+        //------------------------------------------------------------------------------------------------------
+        // check filename
+        //------------------------------------------------------------------------------------------------------
+        std::string fname(filepath);
+        const std::string suffix = ".lm";
+        if (fname.empty())
+        { fname = "landmarks" + suffix; }
+        else if (!string_utils::ends_with(fname, suffix))
+        { fname.append(suffix); }
+
+        //------------------------------------------------------------------------------------------------------
+        // create file
+        //------------------------------------------------------------------------------------------------------
+        std::ofstream file(fname, std::ios_base::out | std::ios_base::binary);
+        if (!file.good())
+        {
+            #ifdef BK_EMIT_PROGRESS
+            prog.set_finished();
+            #endif
+            return false;
+        }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
+
+        // temp
+        std::uint32_t ui32temp = 0;
+
+        // num land marks
+        ui32temp = static_cast<std::uint32_t>(num_land_marks());
+        file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
+
+        // land marks
+        for (unsigned int i = 0; i < num_land_marks(); ++i)
+        {
+            const LandMark& l = _pdata->land_marks[i];
+
+            ui32temp = l.semantic;
+            file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
+
+            ui32temp = l.centerline_id;
+            file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
+
+            ui32temp = l.point_id;
+            file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
+        }
+
+        file.close();
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        return true;
+    }
+
+    bool Vessel::load_land_marks(std::string_view filepath)
+    {
+        #ifdef BK_EMIT_PROGRESS
+        Progress& prog = bk_progress.emplace_task(2, ___("Loading land marks"));
+        #endif
+
+        //------------------------------------------------------------------------------------------------------
+        // check file ending
+        //------------------------------------------------------------------------------------------------------
+        const std::string suffix = ".lm";
+        if (!string_utils::ends_with(filepath, suffix))
+        {
+            #ifdef BK_EMIT_PROGRESS
+            prog.set_finished();
+            #endif
+            return false;
+        }
+
+        //------------------------------------------------------------------------------------------------------
+        // open file
+        //------------------------------------------------------------------------------------------------------
+        std::ifstream file(filepath.data(), std::ios_base::in | std::ios_base::binary);
+        if (!file.good())
+        {
+            #ifdef BK_EMIT_PROGRESS
+            prog.set_finished();
+            #endif
+            return false;
+        }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
+
+        // num centerlines
+        std::uint32_t numLandMarks = 0;
+        file.read(reinterpret_cast<char*>(&numLandMarks), sizeof(std::uint32_t));
+
+        _pdata->land_marks.resize(numLandMarks);
+
+        // land mark
+        for (unsigned int i = 0; i < numLandMarks; ++i)
+        {
+            LandMark& l = _pdata->land_marks[i];
+
+            file.read(reinterpret_cast<char*>(&l.semantic), sizeof(std::uint32_t));
+            file.read(reinterpret_cast<char*>(&l.centerline_id), sizeof(std::uint32_t));
+            file.read(reinterpret_cast<char*>(&l.point_id), sizeof(std::uint32_t));
+        }
 
         file.close();
 

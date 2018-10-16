@@ -37,7 +37,9 @@ namespace bk
     struct BKCMR_EXPORT ShaderLibrary_CMR : public bk::details::ShaderLibrary
     {
         /// @{ -------------------------------------------------- UBO
+        [[nodiscard]] static std::string ubo_definition_flowjet_view();
         [[nodiscard]] static std::string ubo_definition_measuring_plane_preview();
+        [[nodiscard]] static std::string ubo_definition_pressure_view();
         /// @}
 
         //====================================================================================================
@@ -47,6 +49,38 @@ namespace bk
         {
             [[nodiscard]] static std::string vert();
             [[nodiscard]] static std::string frag();
+        };
+
+        //====================================================================================================
+        //===== PRESSURE PREVIEW
+        //====================================================================================================
+        struct pressure
+        {
+            // dvr minmaxip
+            [[nodiscard]] static std::string vert();
+            [[nodiscard]] static std::string frag();
+        };
+
+        //====================================================================================================
+        //===== FLOW JET
+        //====================================================================================================
+        struct flow_jet
+        {
+            struct area
+            {
+                [[nodiscard]] static std::string vert();
+                [[nodiscard]] static std::string geom();
+                [[nodiscard]] static std::string frag_opaque();
+                [[nodiscard]] static std::string frag_transparent();
+            };
+
+            struct jet
+            {
+                [[nodiscard]] static std::string vert();
+                [[nodiscard]] static std::string geom();
+                [[nodiscard]] static std::string frag_opaque();
+                [[nodiscard]] static std::string frag_transparent();
+            };
         };
     }; // struct ShaderLibrary_CMR
   } // inline namespace cmr

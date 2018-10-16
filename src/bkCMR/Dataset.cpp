@@ -1296,6 +1296,9 @@ namespace bk
     std::string Dataset::filepath_centerlines_of_vessel(std::string_view name) const
     { return dirpath_vessel(name) + name.data() + ".cl"; }
 
+    std::string Dataset::filepath_land_marks_of_vessel(const Vessel* v) const { return filepath_land_marks_of_vessel(v->name()); }
+    std::string Dataset::filepath_land_marks_of_vessel(std::string_view name) const { return dirpath_vessel(name) + name.data() + ".lm"; }
+
     std::string Dataset::filepath_flowjet_of_vessel(const Vessel* v) const
     { return filepath_flowjet_of_vessel(v->name()); }
 

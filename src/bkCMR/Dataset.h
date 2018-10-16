@@ -87,7 +87,8 @@ namespace bk
         VesselComponent_Centerlines = 1 << 2, //
         VesselComponent_FlowJet = 1 << 3, //
         VesselComponent_Pressure = 1 << 4, //
-        VesselComponent_All = VesselComponent_Segmentation3D | VesselComponent_Mesh | VesselComponent_Centerlines | VesselComponent_FlowJet | VesselComponent_Pressure, //
+        VesselComponent_LandMark = 1 << 5, //
+        VesselComponent_All = VesselComponent_Segmentation3D | VesselComponent_Mesh | VesselComponent_Centerlines | VesselComponent_FlowJet | VesselComponent_Pressure | VesselComponent_LandMark, //
     };
 
     using VesselComponent = unsigned int;
@@ -279,6 +280,8 @@ namespace bk
         [[nodiscard]] std::string filepath_centerline_ids_of_vessel(std::string_view name) const;
         [[nodiscard]] std::string filepath_centerlines_of_vessel(const Vessel* v) const;
         [[nodiscard]] std::string filepath_centerlines_of_vessel(std::string_view name) const;
+        [[nodiscard]] std::string filepath_land_marks_of_vessel(const Vessel* v) const;
+        [[nodiscard]] std::string filepath_land_marks_of_vessel(std::string_view name) const;
         [[nodiscard]] std::string filepath_flowjet_of_vessel(const Vessel* v) const;
         [[nodiscard]] std::string filepath_flowjet_of_vessel(std::string_view name) const;
 

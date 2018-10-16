@@ -199,8 +199,12 @@ set(SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/CardiacCycleDefinitionView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/LandMarkSelectionView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/MeasuringPlanePreviewView.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/FlowJetView.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/PressureView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/ShaderLibrary_CMR.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/UBOFlowJetView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/UBOMeasuringPlanePreview.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/UBOPressureView.cpp
         )
 
 add_library(bkCMR ${SOURCE_FILES})

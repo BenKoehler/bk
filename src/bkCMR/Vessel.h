@@ -40,9 +40,10 @@
 #include <bk/Mesh>
 #include <bk/Line>
 
-#include "ESegmentation3DInfo.h"
-#include "EVesselSemantic.h"
-#include "lib/bkCMR_export.h"
+#include <bkCMR/ESegmentation3DInfo.h>
+#include <bkCMR/EVesselSemantic.h>
+#include <bkCMR/ELandMarkSemantic.h>
+#include <bkCMR/lib/bkCMR_export.h>
 
 namespace bk
 {
@@ -56,6 +57,8 @@ namespace bk
     //class FlowJet_CMR;
     //class LineSet3;
     //class MeasuringPlane_CMR;
+
+    class LandMark;
     // -------------------- forward declaration END
 
     class BKCMR_EXPORT Vessel
@@ -92,8 +95,8 @@ namespace bk
         //===== GETTER
         //====================================================================================================
         [[nodiscard]] const std::string& name() const;
-        [[nodiscard]] VesselSemantic_ semantic() const;
-        [[nodiscard]] bool is_semantic(VesselSemantic_ sem) const;
+        [[nodiscard]] VesselSemantic semantic() const;
+        [[nodiscard]] bool is_semantic(VesselSemantic sem) const;
         [[nodiscard]] bool is_semantic_aorta() const;
         [[nodiscard]] bool is_semantic_left_ventricle() const;
         [[nodiscard]] bool is_semantic_left_atrium() const;
@@ -104,6 +107,13 @@ namespace bk
         [[nodiscard]] bool is_semantic_right_atrium() const;
         [[nodiscard]] bool is_semantic_vena_cava() const;
         [[nodiscard]] bool is_semantic_right_heart() const;
+
+        [[nodiscard]] bool has_land_marks() const;
+        [[nodiscard]] bool has_land_mark(LandMarkSemantic sem) const;
+        [[nodiscard]] int id_of_land_mark(LandMarkSemantic sem) const; // returns -1 if no such land mark is found
+        [[nodiscard]] unsigned int num_land_marks() const;
+        [[nodiscard]] const std::vector<LandMark>& land_marks() const;
+        [[nodiscard]] const LandMark& land_mark(unsigned int id) const;
 
         [[nodiscard]] bool has_segmentation3D() const;
         [[nodiscard]] segmentation3d_type& segmentation3D()&;
@@ -170,10 +180,12 @@ namespace bk
 
         void set_name(std::string_view name);
         void set_name_from_semantic();
-        [[nodiscard]] static std::string Name_from_semantic(VesselSemantic_ s);
+        [[nodiscard]] static std::string Name_from_semantic(VesselSemantic s);
 
-        void set_semantic(VesselSemantic_ sem);
-        void add_semantic(VesselSemantic_ sem);
+        void set_semantic(VesselSemantic sem);
+        void add_semantic(VesselSemantic sem);
+
+        void add_land_mark(LandMarkSemantic sem, unsigned int centerline_id, unsigned int point_id);
 
         void set_seg3d_was_performed_on_magnitude_TMIP();
         void set_seg3d_was_performed_on_LPC();
@@ -206,6 +218,8 @@ namespace bk
         [[maybe_unused]] bool load_centerline_ids(std::string_view filepath);
         [[maybe_unused]] bool save_centerlines(std::string_view filepath) const;
         [[maybe_unused]] bool load_centerlines(std::string_view filepath);
+        [[maybe_unused]] bool save_land_marks(std::string_view filepath) const;
+        [[maybe_unused]] bool load_land_marks(std::string_view filepath);
         //[[maybe_unused]] bool save_measuringplanes(std::string_view filepath) const;
         //[[maybe_unused]] bool load_measuringplanes(std::string_view filepath);
         //[[maybe_unused]] bool save_flowjets(std::string_view filepath) const;
