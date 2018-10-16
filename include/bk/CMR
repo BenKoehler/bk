@@ -36,4 +36,5 @@
 #include <bkCMR/ESegmentation3DInfo.h>
 
 #include <bkCMR/gl/CardiacCycleDefinitionView.h>
+#include <bkCMR/gl/LandMarkSelectionView.h>
 #include <bkCMR/gl/MeasuringPlanePreviewView.h>

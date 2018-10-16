@@ -251,7 +251,6 @@ namespace bk
       void init(TLinesIterator linesBegin, TLinesIterator linesEnd, const std::string& color_attribute_name = "", const ScalarLineFilter* filter = nullptr);
       /// @}
 
-    protected:
       /// @{ -------------------------------------------------- EVENTS
       virtual void on_resize(GLint w, GLint h) override;
       virtual void on_oit_enabled(bool b) override;
@@ -268,6 +267,7 @@ namespace bk
       virtual void on_ssaa_factor_changed(GLint ssaa_factor) override;
       /// @}
 
+    protected:
       /// @{ -------------------------------------------------- DRAW
       virtual void draw_opaque_impl() override;
       virtual void draw_transparent_impl() override;

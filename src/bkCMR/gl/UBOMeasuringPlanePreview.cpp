@@ -46,7 +46,10 @@ namespace bk
         BK_UBO_SPECIALIZATION_REGISTER(color_r, GL_FLOAT)
         BK_UBO_SPECIALIZATION_REGISTER(color_g, GL_FLOAT)
         BK_UBO_SPECIALIZATION_REGISTER(color_b, GL_FLOAT)
-        BK_UBO_SPECIALIZATION_REGISTER(color_a, GL_FLOAT)
+        BK_UBO_SPECIALIZATION_REGISTER(lightcolor_r, GL_FLOAT)
+        BK_UBO_SPECIALIZATION_REGISTER(lightcolor_g, GL_FLOAT)
+        BK_UBO_SPECIALIZATION_REGISTER(lightcolor_b, GL_FLOAT)
+        BK_UBO_SPECIALIZATION_REGISTER(shininess, GL_FLOAT)
     }
 
     UBOMeasuringPlanePreview::UBOMeasuringPlanePreview(self_type&&) noexcept = default;
@@ -69,6 +72,9 @@ namespace bk
     BK_UBO_SPECIALIZATION_DEFINE(UBOMeasuringPlanePreview, color_r, GL_FLOAT)
     BK_UBO_SPECIALIZATION_DEFINE(UBOMeasuringPlanePreview, color_g, GL_FLOAT)
     BK_UBO_SPECIALIZATION_DEFINE(UBOMeasuringPlanePreview, color_b, GL_FLOAT)
-    BK_UBO_SPECIALIZATION_DEFINE(UBOMeasuringPlanePreview, color_a, GL_FLOAT)
+    BK_UBO_SPECIALIZATION_DEFINE(UBOMeasuringPlanePreview, lightcolor_r, GL_FLOAT)
+    BK_UBO_SPECIALIZATION_DEFINE(UBOMeasuringPlanePreview, lightcolor_g, GL_FLOAT)
+    BK_UBO_SPECIALIZATION_DEFINE(UBOMeasuringPlanePreview, lightcolor_b, GL_FLOAT)
+    BK_UBO_SPECIALIZATION_DEFINE(UBOMeasuringPlanePreview, shininess, GL_FLOAT)
   } // inline namespace cmr
 } // namespace bk

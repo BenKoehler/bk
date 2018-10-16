@@ -197,6 +197,7 @@ set(SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/sampling/sampling_sphere_section.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/VesselSegmentationInFlowFieldSizeImageFilter.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/CardiacCycleDefinitionView.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/LandMarkSelectionView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/MeasuringPlanePreviewView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/ShaderLibrary_CMR.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/UBOMeasuringPlanePreview.cpp

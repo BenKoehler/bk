@@ -24,11 +24,10 @@
 
 #pragma once
 
-#ifndef BK_MEASURINGPLANEPREVIEWVIEW_H
-#define BK_MEASURINGPLANEPREVIEWVIEW_H
+#ifndef BK_LANDMARKSELECTIONVIEW_H
+#define BK_LANDMARKSELECTIONVIEW_H
 
 #include <bk/CopyablePIMPL>
-#include <bk/Matrix>
 #include <bkGL/renderable/AbstractSceneRenderable.h>
 #include <bkCMR/lib/bkCMR_export.h>
 
@@ -36,23 +35,26 @@ namespace bk
 {
   // ------ forward declaration -------
   class ColorRGBA;
-  // ------ forward declaration -------
+  class TriangularMesh3DView;
+  class LineView;
 
   inline namespace cmr
   {
-    class BKCMR_EXPORT MeasuringPlanePreviewView : public bk::details::AbstractSceneRenderable
+    class MeasuringPlanePreviewView;
+    // ------ forward declaration -------
+
+    class BKCMR_EXPORT LandMarkSelectionView : public bk::details::AbstractSceneRenderable
     {
         //====================================================================================================
         //===== DEFINITIONS
         //====================================================================================================
-        using self_type = MeasuringPlanePreviewView;
+        using self_type = LandMarkSelectionView;
         using base_type = bk::details::AbstractSceneRenderable;
 
         //====================================================================================================
         //===== MEMBERS
         //====================================================================================================
         class Impl;
-
         bk::cpimpl<Impl> _pdata;
 
         //====================================================================================================
@@ -61,35 +63,30 @@ namespace bk
       public:
         /// @{ -------------------------------------------------- CTOR
         #ifndef BK_LIB_QT_AVAILABLE
-        MeasuringPlanePreviewView();
+        LandMarkSelectionView();
         #else
-        MeasuringPlanePreviewView(bk::qt_gl_functions* gl);
+        LandMarkSelectionView(bk::qt_gl_functions* gl);
         #endif
-        MeasuringPlanePreviewView(const self_type&) = delete;
-        MeasuringPlanePreviewView(self_type&&) noexcept;
+        LandMarkSelectionView(const self_type&) = delete;
+        LandMarkSelectionView(self_type&&) noexcept;
         /// @}
 
         /// @{ -------------------------------------------------- DTOR
-        virtual ~MeasuringPlanePreviewView();
+        virtual ~LandMarkSelectionView();
         /// @}
 
         //====================================================================================================
         //===== GETTER
         //====================================================================================================
-        /// @{ -------------------------------------------------- GET POSITION
-        [[nodiscard]] const Vec3<GLfloat>& position() const;
-        [[nodiscard]] const Vec3<GLfloat>& plane_normal() const;
-        [[nodiscard]] const Vec3<GLfloat>& plane_nx() const;
-        [[nodiscard]] const Vec3<GLfloat>& plane_ny() const;
-        [[nodiscard]] GLfloat vessel_radius() const;
-        /// @}
+        /// @{ -------------------------------------------------- GET VIEWS
+        [[nodiscard]] TriangularMesh3DView& mesh_view();
+        [[nodiscard]] const TriangularMesh3DView& mesh_view() const;
 
-        /// @{ -------------------------------------------------- GET RADIUS SCALE
-        [[nodiscard]] GLfloat radius_scale() const;
-        /// @}
+        [[nodiscard]] LineView& centerline_view();
+        [[nodiscard]] const LineView& centerline_view() const;
 
-        /// @{ -------------------------------------------------- GET COLOR
-        [[nodiscard]] const ColorRGBA& color() const;
+        [[nodiscard]] MeasuringPlanePreviewView& measuring_plane_view();
+        [[nodiscard]] const MeasuringPlanePreviewView& measuring_plane_view() const;
         /// @}
 
         /// @{ -------------------------------------------------- GET CENTER
@@ -103,19 +100,6 @@ namespace bk
         //====================================================================================================
         //===== SETTER
         //====================================================================================================
-        /// @{ -------------------------------------------------- SET POSITION
-        void set_position(const Vec3<GLfloat>& pos, const Vec3<GLfloat>& nz, const Vec3<GLfloat>& nx, const Vec3<GLfloat>& ny, GLfloat vessel_radius);
-        /// @}
-
-        /// @{ -------------------------------------------------- SET RADIUS SCALE
-        void set_radius_scale(GLfloat s);
-        /// @}
-
-        /// @{ -------------------------------------------------- SET COLOR
-        void set_color(const ColorRGBA& c);
-        void set_color(double r, double g, double b, double a = 1);
-        /// @}
-
         /// @{ -------------------------------------------------- OPERATOR =
         [[maybe_unused]] auto operator=(const self_type&) -> self_type& = delete;
         [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
@@ -125,22 +109,12 @@ namespace bk
         //===== FUNCTIONS
         //====================================================================================================
         /// @{ -------------------------------------------------- CLEAR
-      private:
-        void clear_shader();
-        void clear_buffers();
-      public:
+
         void clear();
         /// @}
 
         /// @{ -------------------------------------------------- INIT
-      private:
-        Vec3<GLfloat> normal_of_vertex(const Vec3<GLfloat>& v) const;
-        [[nodiscard]] std::vector<Vec3<GLfloat>> vertices_normals_interleaved() const;
-        void init_buffer();
-        void init_shader();
-        void init_ubo();
-      public:
-        void init(const Vec3<GLfloat>& pos, const Vec3<GLfloat>& nz, const Vec3<GLfloat>& nx, const Vec3<GLfloat>& ny, GLfloat vessel_radius);
+        void init();
         /// @}
 
         /// @{ -------------------------------------------------- EVENTS
@@ -165,8 +139,8 @@ namespace bk
         virtual void draw_transparent_impl() override;
       public:
         /// @}
-    }; // class MeasuringPlanePreviewView
+    }; // class LandMarkSelectionView
   } // inline namespace cmr
 } // namespace bk
 
-#endif //BK_MEASURINGPLANEPREVIEWVIEW_H
+#endif //BK_LANDMARKSELECTIONVIEW_H

@@ -89,8 +89,33 @@ namespace bk
         s << "layout(location = 0) out vec4 color_out;\n";
 
         s << comment_region_functions();
+        s << function_camera_position();
         s << function_main_begin();
-        s << "   color_out = vec4(" << bk::UBOMeasuringPlanePreview::name_color_r() << ", " << bk::UBOMeasuringPlanePreview::name_color_g() << ", " << bk::UBOMeasuringPlanePreview::name_color_b() << ", " << bk::UBOMeasuringPlanePreview::name_color_a() << ");\n";
+        //s << "   color_out = vec4(" << bk::UBOMeasuringPlanePreview::name_color_r() << ", " << bk::UBOMeasuringPlanePreview::name_color_g() << ", " << bk::UBOMeasuringPlanePreview::name_color_b() << ", " << bk::UBOMeasuringPlanePreview::name_color_a() << ");\n";
+
+        s << "   const vec3 camPos = camera_position();\n";
+        s << "   const vec3 E = normalize(position_frag - camPos);\n";
+        s << "   const vec3 P = position_frag; // world coordinates\n";
+        s << "   const vec3 L = -E; // // headlight\n";
+        s << "   const vec3 N = normalize(normal_frag);\n";
+        s << "   const vec3 R = normalize(reflect(L, N)); // for specular\n\n";
+
+        s << "   vec3 color = vec3(" << bk::UBOMeasuringPlanePreview::name_color_r() << ", " << bk::UBOMeasuringPlanePreview::name_color_g() << ", " << bk::UBOMeasuringPlanePreview::name_color_b() << ");\n\n";
+
+        s << "   // alpha\n";
+        s << "   color_out.a = 1;\n\n";
+
+        s << "   // ambient\n";
+        s << "   color_out.rgb = 0.1 * color;\n\n";
+
+        s << "   // diffuse\n";
+        s << "   const float NdotL = dot(N, L);\n";
+        s << "   color_out.rgb += abs(NdotL) * (NdotL >= 0 ? 1.0f : 0.75f) * color;\n\n";
+
+        s << "   // specular\n";
+        s << "   const vec3 light_color = vec3(" << bk::UBOMeasuringPlanePreview::name_lightcolor_r() << ", " << bk::UBOMeasuringPlanePreview::name_lightcolor_g() << ", " << bk::UBOMeasuringPlanePreview::name_lightcolor_b() << ");\n";
+        s << "   color_out.rgb += light_color * pow(clamp(abs(dot(R, E)), 0.0, 1.0), " << bk::UBOMeasuringPlanePreview::name_shininess() << ");\n";
+
         s << function_main_end();
 
         return s.str();

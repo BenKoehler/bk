@@ -44,7 +44,7 @@ namespace bk
     //====================================================================================================
     //===== MEMBERS
     //====================================================================================================
-    struct MeaasuringPlanePreviewView::Impl
+    struct MeasuringPlanePreviewView::Impl
     {
         VBO vbo;
         VAO vao;
@@ -92,11 +92,11 @@ namespace bk
     /// @{ -------------------------------------------------- CTOR
     #ifndef BK_LIB_QT_AVAILABLE
 
-    MeaasuringPlanePreviewView::MeaasuringPlanePreviewView()
+    MeasuringPlanePreviewView::MeasuringPlanePreviewView()
         : base_type()
     #else
 
-    MeaasuringPlanePreviewView::MeaasuringPlanePreviewView(bk::qt_gl_functions* gl)
+    MeasuringPlanePreviewView::MeasuringPlanePreviewView(bk::qt_gl_functions* gl)
       : base_type(gl),
         _pdata(gl)
     #endif
@@ -106,50 +106,50 @@ namespace bk
         _pdata->vao.add_default_attribute_normal_3xfloat();
     }
 
-    MeaasuringPlanePreviewView::MeaasuringPlanePreviewView(self_type&&) noexcept = default;
+    MeasuringPlanePreviewView::MeasuringPlanePreviewView(self_type&&) noexcept = default;
     /// @}
 
     /// @{ -------------------------------------------------- DTOR
-    MeaasuringPlanePreviewView::~MeaasuringPlanePreviewView() = default;
+    MeasuringPlanePreviewView::~MeasuringPlanePreviewView() = default;
     /// @}
 
     //====================================================================================================
     //===== GETTER
     //====================================================================================================
     /// @{ -------------------------------------------------- GET POSITION
-    const Vec3<GLfloat>& MeaasuringPlanePreviewView::position() const
+    const Vec3<GLfloat>& MeasuringPlanePreviewView::position() const
     { return _pdata->pos; }
 
-    const Vec3<GLfloat>& MeaasuringPlanePreviewView::plane_normal() const
+    const Vec3<GLfloat>& MeasuringPlanePreviewView::plane_normal() const
     { return _pdata->nz; }
 
-    const Vec3<GLfloat>& MeaasuringPlanePreviewView::plane_nx() const
+    const Vec3<GLfloat>& MeasuringPlanePreviewView::plane_nx() const
     { return _pdata->nx; }
 
-    const Vec3<GLfloat>& MeaasuringPlanePreviewView::plane_ny() const
+    const Vec3<GLfloat>& MeasuringPlanePreviewView::plane_ny() const
     { return _pdata->ny; }
 
-    GLfloat MeaasuringPlanePreviewView::vessel_radius() const
+    GLfloat MeasuringPlanePreviewView::vessel_radius() const
     { return _pdata->radius; }
     /// @}
 
     /// @{ -------------------------------------------------- GET RADIUS SCALE
-    [[nodiscard]] GLfloat MeaasuringPlanePreviewView::radius_scale() const
+    [[nodiscard]] GLfloat MeasuringPlanePreviewView::radius_scale() const
     { return _pdata->radius_scale; }
     /// @}
 
     /// @{ -------------------------------------------------- GET COLOR
-    [[nodiscard]] const ColorRGBA& MeaasuringPlanePreviewView::color() const
+    [[nodiscard]] const ColorRGBA& MeasuringPlanePreviewView::color() const
     { return _pdata->color; }
     /// @}
 
     /// @{ -------------------------------------------------- GET CENTER
-    auto MeaasuringPlanePreviewView::center() const -> Vec3<GLfloat>
+    auto MeasuringPlanePreviewView::center() const -> Vec3<GLfloat>
     { return _pdata->center; }
     /// @}
 
     /// @{ -------------------------------------------------- IS INITIALIZED
-    bool MeaasuringPlanePreviewView::is_initialized() const
+    bool MeasuringPlanePreviewView::is_initialized() const
     { return _pdata->vao.is_initialized(); }
     /// @}
 
@@ -157,26 +157,40 @@ namespace bk
     //===== SETTER
     //====================================================================================================
     /// @{ -------------------------------------------------- SET POSITION
-    void set_position(const Vec3<GLfloat>& pos, const Vec3<GLfloat>& nz, const Vec3<GLfloat>& nx, const Vec3<GLfloat>& ny, GLfloat vessel_radius); // todo
+    void MeasuringPlanePreviewView::set_position(const Vec3<GLfloat>& pos, const Vec3<GLfloat>& nz, const Vec3<GLfloat>& nx, const Vec3<GLfloat>& ny, GLfloat vessel_radius)
+    {
+        _pdata->nx = nx;
+        _pdata->ny = ny;
+        _pdata->nz = nz;
+        _pdata->radius = vessel_radius;
+        _pdata->pos = pos;
+
+        if (this->is_initialized())
+        {
+            init_buffer();
+            this->emit_signal_update_required();
+        }
+    }
     /// @}
 
     /// @{ -------------------------------------------------- SET RADIUS SCALE
-    void MeaasuringPlanePreviewView::set_radius_scale(GLfloat s)
+    void MeasuringPlanePreviewView::set_radius_scale(GLfloat s)
     {
         _pdata->radius_scale = s;
 
         if (this->is_initialized())
         {
-            // todo
+            init_buffer();
+            this->emit_signal_update_required();
         }
     }
     /// @}
 
     /// @{ -------------------------------------------------- SET COLOR
-    void MeaasuringPlanePreviewView::set_color(const ColorRGBA& c)
+    void MeasuringPlanePreviewView::set_color(const ColorRGBA& c)
     { set_color(c[0], c[1], c[2], c[3]); }
 
-    void MeaasuringPlanePreviewView::set_color(double r, double g, double b, double a)
+    void MeasuringPlanePreviewView::set_color(double r, double g, double b, double a)
     {
         _pdata->color.set(r, g, b, a);
 
@@ -192,24 +206,24 @@ namespace bk
     /// @}
 
     /// @{ -------------------------------------------------- OPERATOR =
-    auto MeaasuringPlanePreviewView::operator=(self_type&&) noexcept -> self_type& = default;
+    auto MeasuringPlanePreviewView::operator=(self_type&&) noexcept -> self_type& = default;
     /// @}
 
     //====================================================================================================
     //===== FUNCTIONS
     //====================================================================================================
     /// @{ -------------------------------------------------- CLEAR
-    void MeaasuringPlanePreviewView::clear_shader()
+    void MeasuringPlanePreviewView::clear_shader()
     { _pdata->shader.clear(); }
 
-    void MeaasuringPlanePreviewView::clear_buffers()
+    void MeasuringPlanePreviewView::clear_buffers()
     {
         _pdata->vbo.clear();
         _pdata->vao.clear();
         _pdata->ubo.clear();
     }
 
-    void MeaasuringPlanePreviewView::clear()
+    void MeasuringPlanePreviewView::clear()
     {
         clear_shader();
         clear_buffers();
@@ -219,34 +233,30 @@ namespace bk
     /// @}
 
     /// @{ -------------------------------------------------- INIT
-    std::vector<Vec3<GLfloat>> MeaasuringPlanePreviewView::vertices_normals_interleaved() const
+    Vec3<GLfloat> MeasuringPlanePreviewView::normal_of_vertex(const Vec3<GLfloat>& v) const
+    { return 0.5 * ((v - _pdata->pos).normalize() + _pdata->nz); }
+
+    std::vector<Vec3<GLfloat>> MeasuringPlanePreviewView::vertices_normals_interleaved() const
     {
-        const auto calc_normal = [&](const Vec3<GLfloat>& v)
-        { return 0.5 * ((v - _pdata->pos).normalize() + _pdata->nz); };
+        const GLfloat r = _pdata->radius * _pdata->radius_scale;
+        
+        const Vec3<GLfloat> v0 = _pdata->pos + r * _pdata->nx + r * _pdata->ny;
+        const Vec3<GLfloat> n0 = normal_of_vertex(v0);
 
-        const Vec3<GLfloat> v0 = _pdata->pos + _pdata->radius * _pdata->nx + _pdata->radius * _pdata->ny;
-        const Vec3<GLfloat> n0 = calc_normal(v0);
+        const Vec3<GLfloat> v1 = _pdata->pos + r * _pdata->nx - r * _pdata->ny;
+        const Vec3<GLfloat> n1 = normal_of_vertex(v1);
 
-        const Vec3<GLfloat> v1 = _pdata->pos + _pdata->radius * _pdata->nx - _pdata->radius * _pdata->ny;
-        const Vec3<GLfloat> n1 = calc_normal(v1);
+        const Vec3<GLfloat> v2 = _pdata->pos - r * _pdata->nx - r * _pdata->ny;
+        const Vec3<GLfloat> n2 = normal_of_vertex(v2);
 
-        const Vec3<GLfloat> v2 = _pdata->pos - _pdata->radius * _pdata->nx - _pdata->radius * _pdata->ny;
-        const Vec3<GLfloat> n2 = calc_normal(v2);
-
-        const Vec3<GLfloat> v3 = _pdata->pos - _pdata->radius * _pdata->nx + _pdata->radius * _pdata->ny;
-        const Vec3<GLfloat> n3 = calc_normal(v3);
+        const Vec3<GLfloat> v3 = _pdata->pos - r * _pdata->nx + r * _pdata->ny;
+        const Vec3<GLfloat> n3 = normal_of_vertex(v3);
 
         return {v0, n0, v1, n1, v2, n2, v3, n3};
     }
 
-    void MeaasuringPlanePreviewView::init_buffer(const Vec3<GLfloat>& pos, const Vec3<GLfloat>& nz, const Vec3<GLfloat>& nx, const Vec3<GLfloat>& ny, GLfloat vessel_radius)
+    void MeasuringPlanePreviewView::init_buffer()
     {
-        _pdata->nx = nx;
-        _pdata->ny = ny;
-        _pdata->nz = nz;
-        _pdata->radius = vessel_radius;
-        _pdata->pos = pos;
-
         const std::vector<Vec3<GLfloat>> verticesNormals = vertices_normals_interleaved();
 
         this->_pdata->center = 0.25 * std::accumulate(verticesNormals.begin(), verticesNormals.end(), Vec3<GLfloat>(0, 0, 0));
@@ -257,7 +267,7 @@ namespace bk
         this->emit_signal_scene_changed();
     }
 
-    void MeaasuringPlanePreviewView::init_shader()
+    void MeasuringPlanePreviewView::init_shader()
     {
         clear_shader();
 
@@ -265,7 +275,7 @@ namespace bk
         _pdata->shader.init_from_sources(SL::measuring_plane_preview::vert(), SL::measuring_plane_preview::frag());
     }
 
-    void MeaasuringPlanePreviewView::init_ubo()
+    void MeasuringPlanePreviewView::init_ubo()
     {
         _pdata->ubo.clear();
         _pdata->ubo.init_from_registered_values_size();
@@ -273,14 +283,27 @@ namespace bk
         _pdata->ubo.set_color_r(_pdata->color[0]);
         _pdata->ubo.set_color_g(_pdata->color[1]);
         _pdata->ubo.set_color_b(_pdata->color[2]);
-        _pdata->ubo.set_color_a(_pdata->color[3]);
+
+        const GLfloat lightCol = 0.5;
+        _pdata->ubo.set_lightcolor_r(lightCol);
+        _pdata->ubo.set_lightcolor_g(lightCol);
+        _pdata->ubo.set_lightcolor_b(lightCol);
+
+        const GLfloat shininess = 50;
+        _pdata->ubo.set_shininess(shininess);
 
         _pdata->ubo.release();
     }
 
-    void MeaasuringPlanePreviewView::init(const Vec3<GLfloat>& pos, const Vec3<GLfloat>& nz, const Vec3<GLfloat>& nx, const Vec3<GLfloat>& ny, GLfloat vessel_radius)
+    void MeasuringPlanePreviewView::init(const Vec3<GLfloat>& pos, const Vec3<GLfloat>& nz, const Vec3<GLfloat>& nx, const Vec3<GLfloat>& ny, GLfloat vessel_radius)
     {
-        init_buffer(pos, nz, nx, ny, vessel_radius);
+        _pdata->nx = nx;
+        _pdata->ny = ny;
+        _pdata->nz = nz;
+        _pdata->radius = vessel_radius;
+        _pdata->pos = pos;
+
+        init_buffer();
         init_shader();
         init_ubo();
 
@@ -290,48 +313,48 @@ namespace bk
     /// @}
 
     /// @{ -------------------------------------------------- EVENTS
-    void MeaasuringPlanePreviewView::on_resize(GLint /*w*/, GLint /*h*/)
+    void MeasuringPlanePreviewView::on_resize(GLint /*w*/, GLint /*h*/)
     { /* do nothing */ }
 
-    void MeaasuringPlanePreviewView::on_oit_enabled(bool /*b*/)
+    void MeasuringPlanePreviewView::on_oit_enabled(bool /*b*/)
     { /* do nothing */ }
 
-    void MeaasuringPlanePreviewView::on_animation_enabled(bool /*b*/)
+    void MeasuringPlanePreviewView::on_animation_enabled(bool /*b*/)
     { /* do nothing */ }
 
-    void MeaasuringPlanePreviewView::on_modelview_changed(bool /*b*/)
+    void MeasuringPlanePreviewView::on_modelview_changed(bool /*b*/)
     { /* do nothing */ }
 
-    void MeaasuringPlanePreviewView::on_visible_changed(bool /*b*/)
+    void MeasuringPlanePreviewView::on_visible_changed(bool /*b*/)
     { /* do nothing */ }
 
-    void MeaasuringPlanePreviewView::on_mouse_pos_changed(GLint /*x*/, GLint /*y*/)
+    void MeasuringPlanePreviewView::on_mouse_pos_changed(GLint /*x*/, GLint /*y*/)
     { /* do nothing */ }
 
-    void MeaasuringPlanePreviewView::on_mouse_button_pressed(MouseButton_ /*btn*/)
+    void MeasuringPlanePreviewView::on_mouse_button_pressed(MouseButton_ /*btn*/)
     { /* do nothing */ }
 
-    void MeaasuringPlanePreviewView::on_mouse_button_released(MouseButton_ /*btn*/)
+    void MeasuringPlanePreviewView::on_mouse_button_released(MouseButton_ /*btn*/)
     { /* do nothing */ }
 
-    void MeaasuringPlanePreviewView::on_key_pressed(Key_ /*k*/)
+    void MeasuringPlanePreviewView::on_key_pressed(Key_ /*k*/)
     { /* do nothing */ }
 
-    void MeaasuringPlanePreviewView::on_key_released(Key_ /*k*/)
+    void MeasuringPlanePreviewView::on_key_released(Key_ /*k*/)
     { /* do nothing */ }
 
-    void MeaasuringPlanePreviewView::on_mouse_wheel_up()
+    void MeasuringPlanePreviewView::on_mouse_wheel_up()
     { /* do nothing */ }
 
-    void MeaasuringPlanePreviewView::on_mouse_wheel_down()
+    void MeasuringPlanePreviewView::on_mouse_wheel_down()
     { /* do nothing */ }
 
-    void MeaasuringPlanePreviewView::on_ssaa_factor_changed(GLint /*ssaa_factor*/)
+    void MeasuringPlanePreviewView::on_ssaa_factor_changed(GLint /*ssaa_factor*/)
     { /* do nothing */ }
     /// @}
 
     /// @{ -------------------------------------------------- DRAW
-    void MeaasuringPlanePreviewView::draw_opaque_impl()
+    void MeasuringPlanePreviewView::draw_opaque_impl()
     {
         // ubo 0 must be global ubo with modelview/projection matrices
         _pdata->ubo.bind_to_default_base();
@@ -345,7 +368,7 @@ namespace bk
         _pdata->ubo.release_from_base();
     }
 
-    void MeaasuringPlanePreviewView::draw_transparent_impl()
+    void MeasuringPlanePreviewView::draw_transparent_impl()
     { /* do nothing */ }
     /// @}
   } // inline namespace cmr

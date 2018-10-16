@@ -81,7 +81,10 @@ namespace bk
         BK_UBO_SPECIALIZATION_DECLARE(color_r, GL_FLOAT)
         BK_UBO_SPECIALIZATION_DECLARE(color_g, GL_FLOAT)
         BK_UBO_SPECIALIZATION_DECLARE(color_b, GL_FLOAT)
-        BK_UBO_SPECIALIZATION_DECLARE(color_a, GL_FLOAT)
+        BK_UBO_SPECIALIZATION_DECLARE(lightcolor_r, GL_FLOAT)
+        BK_UBO_SPECIALIZATION_DECLARE(lightcolor_g, GL_FLOAT)
+        BK_UBO_SPECIALIZATION_DECLARE(lightcolor_b, GL_FLOAT)
+        BK_UBO_SPECIALIZATION_DECLARE(shininess, GL_FLOAT)
     }; // class UBOMeasuringPlanePreview
   } // inline namespace cmr
 } // namespace bk
