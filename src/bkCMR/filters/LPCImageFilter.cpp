@@ -25,12 +25,10 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
-#include <vector>
 
-#include <bkAlgorithm/standard_deviation.h>
-#include <bkCMR/IVSDImageFilter.h>
+#include <bkCMR/filters/LPCImageFilter.h>
 
-#include <bkCMR/FlowImage3DT.h>
+#include <bkCMR/dataset/FlowImage3DT.h>
 #include <bkMath/functions/list_grid_id_conversion.h>
 #include <bk/Matrix>
 
@@ -46,26 +44,26 @@ namespace bk
   //====================================================================================================
   //===== CONSTRUCTORS & DESTRUCTOR
   //====================================================================================================
-  IVSDImageFilter::IVSDImageFilter() = default;
-  IVSDImageFilter::IVSDImageFilter(const IVSDImageFilter&) = default;
-  IVSDImageFilter::IVSDImageFilter(IVSDImageFilter&&) noexcept = default;
-  IVSDImageFilter::~IVSDImageFilter() = default;
+  LPCImageFilter::LPCImageFilter() = default;
+  LPCImageFilter::LPCImageFilter(const LPCImageFilter&) = default;
+  LPCImageFilter::LPCImageFilter(LPCImageFilter&&) noexcept = default;
+  LPCImageFilter::~LPCImageFilter() = default;
 
   //====================================================================================================
   //===== SETTER
   //====================================================================================================
-  IVSDImageFilter& IVSDImageFilter::operator=(const IVSDImageFilter&) = default;
-  IVSDImageFilter& IVSDImageFilter::operator=(IVSDImageFilter&&) noexcept = default;
+  LPCImageFilter& LPCImageFilter::operator=(const LPCImageFilter&) = default;
+  LPCImageFilter& LPCImageFilter::operator=(LPCImageFilter&&) noexcept = default;
 
   //====================================================================================================
   //===== FUNCTIONS
   //====================================================================================================
-  std::unique_ptr<DicomImage<double, 3>> IVSDImageFilter::apply(const FlowImage3DT& ff)
+  std::unique_ptr<DicomImage<double, 3>> LPCImageFilter::apply(const FlowImage3DT& ff)
   {
       const auto& size = ff.size();
 
       #ifdef BK_EMIT_PROGRESS
-      bk::Progress& prog = bk_progress.emplace_task(ff.num_values() / size[3], ___("Calculating IVSD"));
+      bk::Progress& prog = bk_progress.emplace_task(ff.num_values() / size[3], ___("Calculating LPC"));
       #endif
 
       auto res = std::make_unique<DicomImage<double, 3>>();
@@ -78,33 +76,62 @@ namespace bk
       #pragma omp parallel for
       for (unsigned int x = 0; x < size[0]; ++x)
       {
-          std::vector<double> tempx(size[3]);
-          std::vector<double> tempy(size[3]);
-          std::vector<double> tempz(size[3]);
-
           for (unsigned int y = 0; y < size[1]; ++y)
           {
               for (unsigned int z = 0; z < size[2]; ++z)
               {
                   unsigned int lid = bk::grid_to_list_id(size, x, y, z, 0);
 
+                  double temporalAverage = 0;
+
                   for (unsigned int t = 0; t < size[3]; ++t, lid += stride_t)
                   {
-                      tempx[t] = ff(x, y, z, t)[0];
-                      tempy[t] = ff(x, y, z, t)[1];
-                      tempz[t] = ff(x, y, z, t)[2];
+                      Vec3d vn(ff(x, y, z, t));
+                      vn.normalize_internal();
+
+                      double angleSum = 0;
+
+                      for (int dx = -1; dx <= 1; ++dx)
+                      {
+                          const int ddx = static_cast<int>(x) + dx;
+
+                          if (ddx < 0 || ddx >= static_cast<int>(size[0]))
+                          { continue; }
+
+                          for (int dy = -1; dy <= 1; ++dy)
+                          {
+                              const int ddy = static_cast<int>(y) + dy;
+
+                              if (ddy < 0 || ddy >= static_cast<int>(size[1]))
+                              { continue; }
+
+                              for (int dz = -1; dz <= 1; ++dz)
+                              {
+                                  if (dx == 0 && dy == 0 && dz == 0)
+                                  { continue; }
+
+                                  const int ddz = static_cast<int>(z) + dz;
+
+                                  if (ddz < 0 || ddz >= static_cast<int>(size[2]))
+                                  { continue; }
+
+                                  Vec3d neigh(ff(ddx, ddy, ddz, t));
+                                  neigh.normalize_internal();
+                                  angleSum += std::abs(vn.dot(neigh));
+                              } // for dz
+                          } // for dy
+                      } // for dx
+
+                      //temporalAverage += angleSum / 26 /*neighborhood size = 3*3*3 - 1*/;
                   }
 
-                  const double stdevx = bk::standard_deviation(tempx.begin(), tempx.end());
-                  const double stdevy = bk::standard_deviation(tempy.begin(), tempy.end());
-                  const double stdevz = bk::standard_deviation(tempz.begin(), tempz.end());
-
-                  (*res)(x, y, z) = Vec3d(stdevx, stdevy, stdevz).norm();
+                  //(*res)(x, y, z) = temporalAverage / size[3];
+                  (*res)(x, y, z) = temporalAverage / (size[3] * 26 /*= 3*3*3 - 1 = neighborhood size*/);
               }
           }
 
           #ifdef BK_EMIT_PROGRESS
-              #pragma omp critical(IVSDImageFilter_progress)
+              #pragma omp critical(LPCImageFilter_progress)
           { prog.increment(size[1] * size[2]); }
           #endif
       }

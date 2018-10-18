@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include <bkCMR/PhaseUnwrapping3DT.h>
+#include <bkCMR/filters/PhaseUnwrapping3DT.h>
 
 #include <cassert>
 #include <complex>
@@ -42,7 +42,7 @@
 
 #endif
 
-#include <bkCMR/FlowImage3DT.h>
+#include <bkCMR/dataset/FlowImage3DT.h>
 
 namespace bk
 {

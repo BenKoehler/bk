@@ -5,8 +5,8 @@
 #include <vector>
 
 #include <bkAlgorithm/smooth.h>
-#include <bkCMR/Dataset.h>
-#include <bkCMR/Vessel.h>
+#include <bkCMR/dataset/Dataset.h>
+#include <bkCMR/dataset/Vessel.h>
 #include <bk/Clock>
 #include <bkDataset/attributes/attribute_info.h>
 #include <bk/Matrix>

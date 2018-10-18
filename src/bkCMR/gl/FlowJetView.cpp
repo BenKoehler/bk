@@ -26,8 +26,8 @@
 
 #include <vector>
 
-#include <bkCMR/FlowJet.h>
-#include <bkCMR/FlowJetPoint.h>
+#include <bkCMR/dataset/FlowJet.h>
+#include <bkCMR/dataset/FlowJetPoint.h>
 #include <bkCMR/gl/UBOFlowJetView.h>
 #include <bkCMR/gl/ShaderLibrary_CMR.h>
 #include <bkGL/buffer/IBO.h>
@@ -958,7 +958,7 @@ namespace bk
       { return; }
 
       // ubo 0 must be global ubo with modelview/projection matrices
-      _pdata->ubo.bind_to_base(1);
+      _pdata->ubo.bind_to_default_base();
 
       if (_pdata->show_jet_area)
       {
@@ -1002,7 +1002,7 @@ namespace bk
       { return; }
 
       // ubo 0 must be global ubo with modelview/projection matrices
-      _pdata->ubo.bind_to_base(1);
+      _pdata->ubo.bind_to_default_base();
 
       BK_QT_GL glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
       BK_QT_GL glDepthMask(GL_FALSE);

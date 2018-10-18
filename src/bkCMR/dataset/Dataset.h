@@ -35,6 +35,7 @@
 #include <bk/CopyablePIMPL>
 #include <bk/Image>
 #include <bk/Matrix>
+#include <bk/Mesh>
 #include <bkCMR/lib/bkCMR_export.h>
 #include "Vessel.h"
 
@@ -331,8 +332,8 @@ namespace bk
 
         [[maybe_unused]] bool save_mesh_of_vessel(const Vessel* v) const;
         [[maybe_unused]] bool save_mesh_of_vessel(std::string_view name) const;
-        [[maybe_unused]] bool save_mesh_of_vessel(const Vessel::mesh_type& mesh, const Vessel* v) const;
-        [[maybe_unused]] bool save_mesh_of_vessel(const Vessel::mesh_type& mesh, std::string_view name) const;
+        [[maybe_unused]] bool save_mesh_of_vessel(const TriangularMesh3D& mesh, const Vessel* v) const;
+        [[maybe_unused]] bool save_mesh_of_vessel(const TriangularMesh3D& mesh, std::string_view name) const;
 
         [[maybe_unused]] bool delete_file_segmentation3D_of_vessel(const Vessel* v) const;
         [[maybe_unused]] bool delete_file_segmentation3D_of_vessel(std::string_view name) const;

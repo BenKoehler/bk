@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include <bkCMR/PhaseUnwrapping2DT.h>
+#include <bkCMR/filters/PhaseUnwrapping2DT.h>
 
 #include <array>
 #include <cassert>
@@ -44,7 +44,7 @@
 
 #endif
 
-#include <bkCMR/FlowImage2DT.h>
+#include <bkCMR/dataset/FlowImage2DT.h>
 
 namespace bk
 {

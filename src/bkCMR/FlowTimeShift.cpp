@@ -30,7 +30,7 @@
 #include <string>
 
 #include <bk/StringUtils>
-#include <bkCMR/FlowImage3DT.h>
+#include <bkCMR/dataset/FlowImage3DT.h>
 
 namespace bk
 {
@@ -95,9 +95,9 @@ namespace bk
     void FlowTimeShift::set_shift(int shift, unsigned int numTimes, double temporalResolutionInMs)
     {
         if (shift < 0)
-        { shift += numTimes; }
-        else if (shift >= numTimes)
-        { shift -= numTimes; }
+        { shift += static_cast<int>(numTimes); }
+        else if (shift >= static_cast<int>(numTimes))
+        { shift -= static_cast<int>(numTimes); }
 
         _pdata->num_times = numTimes;
         _pdata->temporal_resolution = temporalResolutionInMs;

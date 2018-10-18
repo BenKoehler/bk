@@ -179,30 +179,36 @@ endif ()
 # ----------
 set(SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/CardiacCycleDefinition.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/CenterlineExtractor.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/Dataset.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/Vessel.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/CenterlineExtractor.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/dataset/Dataset.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/dataset/Vessel.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowDirCorrection.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowImage2DT.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowImage3DT.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowJet.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/dataset/FlowImage2DT.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/dataset/FlowImage3DT.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/dataset/FlowJet.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/FlowJetExtractor.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowTimeShift.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/IVSDImageFilter.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/LPCImageFilter.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/TMIPImageFilter.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/PhaseUnwrapping2DT.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/PhaseUnwrapping3DT.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/PressureMapImageFilter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/IVSDImageFilter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/LPCImageFilter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/dataset/transformation/MeasuringPlaneTransformation.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/dataset/MeasuringPlane.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/TMIPImageFilter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/PhaseUnwrapping2DT.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/PhaseUnwrapping3DT.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/PressureMapImageFilter.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/rotation_angle_2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/sampling/sampling_sphere_section.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/VesselSegmentationInFlowFieldSizeImageFilter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/sampling/VesselSegmentationInFlowFieldSizeImageFilter.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/CardiacCycleDefinitionView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/LandMarkSelectionView.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/MeasuringPlaneView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/MeasuringPlanePreviewView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/FlowJetView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/PressureView.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/VesselView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/ShaderLibrary_CMR.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/UBOFlowJetView.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/UBOMeasuringPlane.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/UBOMeasuringPlanePreview.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/UBOPressureView.cpp
         )

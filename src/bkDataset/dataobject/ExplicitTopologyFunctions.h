@@ -178,6 +178,14 @@ namespace bk::details
       }
       /// @}
 
+      /// @{ -------------------------------------------------- REMOVE CELL ATTRIBUTE
+      [[maybe_unused]] bool remove_cell_attribute(unsigned long long attribute_hash)
+      { return deriv()->cell_attribute_map().remove_attribute(attribute_hash) != 0; }
+
+      [[maybe_unused]] bool remove_cell_attribute(std::string_view attribute_name)
+      { return remove_cell_attribute(deriv()->cell_attribute_map().hash(attribute_name)); }
+      /// @}
+      
   }; // class TopologyFunctions
 } // namespace bk::details
 

@@ -30,7 +30,7 @@
 #include <string>
 
 #include <bk/StringUtils>
-#include <bkCMR/FlowImage3DT.h>
+#include <bkCMR/dataset/FlowImage3DT.h>
 
 namespace bk
 {

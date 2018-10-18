@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include <bkCMR/Vessel.h>
+#include <bkCMR/dataset/Vessel.h>
 
 #include <algorithm>
 #include <cstdint>
@@ -30,7 +30,6 @@
 #include <iterator>
 #include <vector>
 
-#include <bkCMR/rotation_angle_2d.h>
 #include <bk/BitVector>
 #include <bk/Clock>
 #include <bk/Line>
@@ -45,9 +44,9 @@
 
 #endif
 
-//#include "FlowJetSet_CMR.h"
-//#include "FlowJet_CMR.h"
-
+#include <bkCMR/dataset/FlowJet.h>
+#include <bkCMR/dataset/MeasuringPlane.h>
+#include <bkCMR/rotation_angle_2d.h>
 
 namespace bk
 {
@@ -64,16 +63,14 @@ namespace bk
         std::vector<unsigned int> seg3insideids;
         std::vector<unsigned int> seg3outsideids;
         VesselSemantic semantic;
-        mesh_type mesh;
-        //pathlineset_type pathlines;
+        bk::TriangularMesh3D mesh;
+        std::vector<bk::Line3D> pathlines;
         unsigned int centerline_seed_id;
         std::vector<unsigned int> centerline_target_ids;
         std::vector<Line3D> centerlines;
         std::vector<LandMark> land_marks;
-
-        //std::vector<measuring_plane_type> measuring_planes;
-        //std::vector<FlowJet_CMR> flowjets;
-        //FlowJetSet_CMR flowjets;
+        std::vector<MeasuringPlane> measuring_planes;
+        std::vector<FlowJet> flowjets;
 
         Impl()
             : name(""),
@@ -196,23 +193,26 @@ namespace bk
     bool Vessel::has_mesh() const
     { return _pdata->mesh.geometry().num_points() > 1 && _pdata->mesh.topology().num_cells() > 1; }
 
-    auto Vessel::mesh()& -> mesh_type&
+    bk::TriangularMesh3D& Vessel::mesh()&
     { return _pdata->mesh; }
 
-    auto Vessel::mesh() const& -> const mesh_type&
+    const bk::TriangularMesh3D& Vessel::mesh() const&
     { return _pdata->mesh; }
 
-    auto Vessel::mesh()&& -> mesh_type&&
+    bk::TriangularMesh3D&& Vessel::mesh()&&
     { return std::move(_pdata->mesh); }
 
-    //auto Vessel::pathlines() const -> const pathlineset_type&
-    //{ return _pdata->pathlines; }
-    //
-    //auto Vessel::pathlines() -> pathlineset_type&
-    //{ return _pdata->pathlines; }
-    //
-    //unsigned int Vessel::num_pathlines() const
-    //{ return _pdata->pathlines.size(); }
+    bool Vessel::has_pathlines() const
+    { return num_pathlines() != 0; }
+
+    unsigned int Vessel::num_pathlines() const
+    { return _pdata->pathlines.size(); }
+
+    const std::vector<bk::Line3D>& Vessel::pathlines() const
+    { return _pdata->pathlines; }
+
+    std::vector<bk::Line3D>& Vessel::pathlines()
+    { return _pdata->pathlines; }
 
     std::vector<Line3D>& Vessel::centerlines()&
     { return _pdata->centerlines; }
@@ -238,41 +238,61 @@ namespace bk
     bool Vessel::has_centerlines() const
     { return !_pdata->centerlines.empty(); }
 
-    //auto Vessel::measuring_planes() -> std::vector<measuring_plane_type>&
-    //{ return _pdata->measuring_planes; }
-    //
-    //auto Vessel::measuring_planes() const -> const std::vector<measuring_plane_type>&
-    //{ return _pdata->measuring_planes; }
-    //
-    //auto Vessel::measuring_plane(unsigned int i) const -> const measuring_plane_type*
-    //{ return i < _pdata->measuring_planes.size() ? &_pdata->measuring_planes[i] : nullptr; }
-    //
-    //auto Vessel::measuring_plane(unsigned int i) -> measuring_plane_type*
-    //{ return i < _pdata->measuring_planes.size() ? &_pdata->measuring_planes[i] : nullptr; }
-    //
-    //bool Vessel::has_measuring_planes() const
-    //{ return !_pdata->measuring_planes.empty(); }
-    //
-    //unsigned int Vessel::num_measuring_planes() const
-    //{ return _pdata->measuring_planes.size(); }
-    //
-    //auto Vessel::flowjets() -> flowjetset_type&
-    //{ return _pdata->flowjets; }
-    //
-    //auto Vessel::flowjets() const -> const flowjetset_type&
-    //{ return _pdata->flowjets; }
-    //
-    //unsigned int Vessel::num_flowjets() const
-    //{ return _pdata->flowjets.num_flowjets(); }
-    //
-    //bool Vessel::has_flowjets()
-    //{ return num_flowjets() != 0; }
-    //
-    //FlowJet_CMR* Vessel::flowjet(unsigned int i)
-    //{ return _pdata->flowjets[i]; }
-    //
-    //const FlowJet_CMR* Vessel::flowjet(unsigned int i) const
-    //{ return _pdata->flowjets[i]; }
+    std::pair<int /*centerlineId*/, bk::KDPointInfo<bk::Vec3d>> Vessel::closest_centerline_and_point_id(const bk::Vec3d& pt)
+    {
+        for (unsigned int centerlineId = 0; centerlineId < num_centerlines(); ++centerlineId)
+        {
+            Line3D& cl = _pdata->centerlines[centerlineId];
+
+            #pragma omp critical
+            {
+                if (!cl.geometry().has_kdtree())
+                { cl.geometry().construct_kd_tree(); }
+            };
+        } // for centerlineId
+
+        int closestCenterlineId = -1;
+        bk::KDPointInfo<bk::Vec3d> closest;
+        closest.distance_to_query = std::numeric_limits<double>::max();
+
+        for (unsigned int clid = 0; clid < num_centerlines(); ++clid)
+        {
+            Line3D& cl = _pdata->centerlines[clid];
+            bk::KDPointInfo<bk::Vec3d> cp = cl.geometry().closest_point(pt);
+
+            if (cp.distance_to_query < closest.distance_to_query)
+            {
+                closest = std::move(cp);
+                closestCenterlineId = clid;
+            }
+        } // for clid
+
+        return std::make_pair(closestCenterlineId, std::move(closest));
+    }
+
+    std::vector<MeasuringPlane>& Vessel::measuring_planes()
+    { return _pdata->measuring_planes; }
+
+    const std::vector<MeasuringPlane>& Vessel::measuring_planes() const
+    { return _pdata->measuring_planes; }
+
+    bool Vessel::has_measuring_planes() const
+    { return num_measuring_planes() != 0; }
+
+    unsigned int Vessel::num_measuring_planes() const
+    { return _pdata->measuring_planes.size(); }
+
+    std::vector<FlowJet>& Vessel::flowjets()
+    { return _pdata->flowjets; }
+
+    const std::vector<FlowJet>& Vessel::flowjets() const
+    { return _pdata->flowjets; }
+
+    unsigned int Vessel::num_flowjets() const
+    { return _pdata->flowjets.size(); }
+
+    bool Vessel::has_flowjets()
+    { return num_flowjets() != 0; }
 
     //====================================================================================================
     //===== SETTER
@@ -306,10 +326,7 @@ namespace bk
     { _pdata->mesh.clear(); }
 
     void Vessel::clear_pathlines()
-    {
-        //_pdata->pathlines.clear();
-        // todo
-    }
+    { _pdata->pathlines.clear(); }
 
     void Vessel::clear_centerlines()
     { _pdata->centerlines.clear(); }
@@ -327,10 +344,7 @@ namespace bk
     }
 
     void Vessel::clear_flowjets()
-    {
-        //_pdata->flowjets.clear();
-        // todo
-    }
+    { _pdata->flowjets.clear(); }
 
     void Vessel::set_name(std::string_view name)
     { _pdata->name = name; }
@@ -630,37 +644,9 @@ namespace bk
     //    std::cout << "Calculated Advanced Attributes (" << numLines << " lines; " << numPointsTotal << " points) in " << clock.time_in_sec() << " seconds" << std::endl;
     //}
 
-    std::pair<int /*centerlineId*/, bk::KDPointInfo<bk::Vec3d>> Vessel::closest_centerline_and_point_id(const bk::Vec3d& pt)
-    {
-        for (unsigned int centerlineId = 0; centerlineId < num_centerlines(); ++centerlineId)
-        {
-            Line3D& cl = _pdata->centerlines[centerlineId];
 
-            #pragma omp critical
-            {
-                if (!cl.geometry().has_kdtree())
-                { cl.geometry().construct_kd_tree(); }
-            };
-        } // for centerlineId
 
-        int closestCenterlineId = -1;
-        bk::KDPointInfo<bk::Vec3d> closest;
-        closest.distance_to_query = std::numeric_limits<double>::max();
 
-        for (unsigned int clid = 0; clid < num_centerlines(); ++clid)
-        {
-            Line3D& cl = _pdata->centerlines[clid];
-            bk::KDPointInfo<bk::Vec3d> cp = cl.geometry().closest_point(pt);
-
-            if (cp.distance_to_query < closest.distance_to_query)
-            {
-                closest = std::move(cp);
-                closestCenterlineId = clid;
-            }
-        } // for clid
-
-        return std::make_pair(closestCenterlineId, std::move(closest));
-    }
 
     //====================================================================================================
     //===== I/O

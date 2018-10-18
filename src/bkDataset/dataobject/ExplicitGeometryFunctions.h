@@ -183,6 +183,14 @@ namespace bk::details
       }
       /// @}
 
+      /// @{ -------------------------------------------------- REMOVE POINT ATTRIBUTE
+      [[maybe_unused]] bool remove_point_attribute(unsigned long long attribute_hash)
+      { return deriv()->point_attribute_map().remove_attribute(attribute_hash) != 0; }
+
+      [[maybe_unused]] bool remove_point_attribute(std::string_view attribute_name)
+      { return remove_point_attribute(deriv()->point_attribute_map().hash(attribute_name)); }
+      /// @}
+
       //====================================================================================================
       //===== FUNCTIONS
       //====================================================================================================

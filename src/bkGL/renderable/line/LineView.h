@@ -248,7 +248,7 @@ namespace bk
       void init_lineao();
     public:
       template<typename TLinesIterator>
-      void init(TLinesIterator linesBegin, TLinesIterator linesEnd, const std::string& color_attribute_name = "", const ScalarLineFilter* filter = nullptr);
+      void init(TLinesIterator linesBegin, TLinesIterator linesEnd, std::string_view color_attribute_name = "", const ScalarLineFilter* filter = nullptr);
       /// @}
 
       /// @{ -------------------------------------------------- EVENTS

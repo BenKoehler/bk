@@ -27,6 +27,8 @@
 #ifndef BK_TRANSFORMABLEGEOMETRY_H
 #define BK_TRANSFORMABLEGEOMETRY_H
 
+#include <utility>
+
 namespace bk
 {
   template<typename TGeometry, typename TTransformation> class TransformableGeometry : public TGeometry

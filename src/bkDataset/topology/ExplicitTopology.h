@@ -37,6 +37,7 @@
 #include <vector>
 
 #include <bkDataset/topology/Cell.h>
+#include <bk/StringUtils>
 
 namespace bk
 {

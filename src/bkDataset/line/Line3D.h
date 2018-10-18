@@ -49,7 +49,7 @@ namespace bk
       using base_type = details::LineBase<3>;
 
       /// @{ -------------------------------------------------- ATTRIBUTES
-      static constexpr const char* LocalCoordinateSystemAttributeName()
+      [[nodiscard]] static constexpr const char* LocalCoordinateSystemAttributeName()
       { return "Line<3>_attrib_lcs"; }
       /// @}
 

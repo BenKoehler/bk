@@ -29,21 +29,21 @@
 #include <utility>
 
 #include <bk/Clock>
-#include <bkCMR/Dataset.h>
+#include <bkCMR/dataset/Dataset.h>
 #include <bkCMR/CardiacCycleDefinition.h>
-#include <bkCMR/CenterlineExtractor.h>
+#include <bkCMR/filters/CenterlineExtractor.h>
 #include <bkCMR/FlowDirCorrection.h>
-#include <bkCMR/FlowImage2DT.h>
-#include <bkCMR/FlowImage3DT.h>
+#include <bkCMR/dataset/FlowImage2DT.h>
+#include <bkCMR/dataset/FlowImage3DT.h>
 #include <bkCMR/FlowTimeShift.h>
-#include <bkCMR/IVSDImageFilter.h>
-#include <bkCMR/TMIPImageFilter.h>
-#include <bkCMR/LPCImageFilter.h>
-#include <bkCMR/PhaseUnwrapping2DT.h>
-#include <bkCMR/PhaseUnwrapping3DT.h>
-#include <bkCMR/PressureMapImageFilter.h>
-#include <bkCMR/Vessel.h>
-#include <bkCMR/VesselSegmentationInFlowFieldSizeImageFilter.h>
+#include <bkCMR/filters/IVSDImageFilter.h>
+#include <bkCMR/filters/TMIPImageFilter.h>
+#include <bkCMR/filters/LPCImageFilter.h>
+#include <bkCMR/filters/PhaseUnwrapping2DT.h>
+#include <bkCMR/filters/PhaseUnwrapping3DT.h>
+#include <bkCMR/filters/PressureMapImageFilter.h>
+#include <bkCMR/dataset/Vessel.h>
+#include <bkCMR/sampling/VesselSegmentationInFlowFieldSizeImageFilter.h>
 #include <bkDicom/DicomDirImporter_CMR.h>
 #include <bkDicom/DicomImageInfos.h>
 #include <bk/StringUtils>
@@ -1775,10 +1775,10 @@ namespace bk
     bool Dataset::save_mesh_of_vessel(std::string_view name) const
     { return save_mesh_of_vessel(vessel(name)); }
 
-    bool Dataset::save_mesh_of_vessel(const Vessel::mesh_type& mesh, const Vessel* v) const
+    bool Dataset::save_mesh_of_vessel(const TriangularMesh3D& mesh, const Vessel* v) const
     { return v == nullptr ? false : save_mesh_of_vessel(mesh, v->name()); }
 
-    bool Dataset::save_mesh_of_vessel(const Vessel::mesh_type& mesh, std::string_view name) const
+    bool Dataset::save_mesh_of_vessel(const TriangularMesh3D& mesh, std::string_view name) const
     { return mesh.save(filepath_mesh_of_vessel(name)); }
 
     bool Dataset::delete_file_segmentation3D_of_vessel(const Vessel* v) const

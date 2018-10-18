@@ -40,9 +40,9 @@
 #include <bk/Mesh>
 #include <bk/Line>
 
-#include <bkCMR/ESegmentation3DInfo.h>
-#include <bkCMR/EVesselSemantic.h>
-#include <bkCMR/ELandMarkSemantic.h>
+#include <bkCMR/dataset/ESegmentation3DInfo.h>
+#include <bkCMR/dataset/EVesselSemantic.h>
+#include <bkCMR/dataset/ELandMarkSemantic.h>
 #include <bkCMR/lib/bkCMR_export.h>
 
 namespace bk
@@ -52,11 +52,9 @@ namespace bk
 
   inline namespace cmr
   {
-    //class DicomSegmentation3D;
-    //class FlowJetSet_CMR;
-    //class FlowJet_CMR;
-    //class LineSet3;
-    //class MeasuringPlane_CMR;
+    class FlowJet;
+
+    class MeasuringPlane;
 
     class LandMark;
     // -------------------- forward declaration END
@@ -68,11 +66,6 @@ namespace bk
         //====================================================================================================
       public:
         using segmentation3d_type = bk::DicomImage<unsigned char, 3>;
-        using mesh_type = bk::TriangularMesh3D;
-        using pathline_type = bk::Line3D;
-        //using pathlineset_type = std::vector<pathline_type>;
-        //using   measuring_plane_type = MeasuringPlane_CMR;
-        //using        flowjetset_type = FlowJetSet_CMR;
 
         //====================================================================================================
         //===== MEMBERS
@@ -126,14 +119,14 @@ namespace bk
         [[nodiscard]] const std::vector<unsigned int>& segmentation3D_outside_ids() const;
 
         [[nodiscard]] bool has_mesh() const;
-        [[nodiscard]] mesh_type& mesh()&;
-        [[nodiscard]] const mesh_type& mesh() const&;
-        [[nodiscard]] mesh_type&& mesh()&&;
+        [[nodiscard]] bk::TriangularMesh3D& mesh()&;
+        [[nodiscard]] const bk::TriangularMesh3D& mesh() const&;
+        [[nodiscard]] bk::TriangularMesh3D&& mesh()&&;
 
-        //[[nodiscard]] bool has_pathlines () const;
-        //[[nodiscard]] unsigned int num_pathlines () const;
-        //[[nodiscard]] const pathlineset_type& pathlines () const;
-        //[[nodiscard]] pathlineset_type& pathlines ();
+        [[nodiscard]] bool has_pathlines() const;
+        [[nodiscard]] unsigned int num_pathlines() const;
+        [[nodiscard]] const std::vector<bk::Line3D>& pathlines() const;
+        [[nodiscard]] std::vector<bk::Line3D>& pathlines();
 
         [[nodiscard]] unsigned int num_centerlines() const;
         [[nodiscard]] std::vector<Line3D>& centerlines()&;
@@ -143,24 +136,19 @@ namespace bk
         [[nodiscard]] bool has_centerline_ids() const;
         [[nodiscard]] unsigned int centerline_seed_id() const;
         [[nodiscard]] const std::vector<unsigned int>& centerline_target_ids() const;
-
         [[nodiscard]] bool has_centerlines() const;
 
-        //[[nodiscard]] auto measuring_planes() -> std::vector<measuring_plane_type>&;
-        //[[nodiscard]] auto measuring_planes() const -> const std::vector<measuring_plane_type>&;
-        //[[nodiscard]] auto measuring_plane(unsigned int i) const -> const measuring_plane_type*;
-        //[[nodiscard]] auto measuring_plane(unsigned int i) -> measuring_plane_type*;
-        //[[nodiscard]] bool has_measuring_planes() const;
-        //[[nodiscard]] unsigned int num_measuring_planes() const;
-        //
-        //[[nodiscard]] auto flowjets() -> flowjetset_type&;
-        //[[nodiscard]] auto flowjets() const -> const flowjetset_type&;
-        //[[nodiscard]] unsigned int num_flowjets() const;
-        //[[nodiscard]] bool has_flowjets();
-        //[[nodiscard]] FlowJet* flowjet(unsigned int i);
-        //[[nodiscard]] const FlowJet* flowjet(unsigned int i) const;
-
         [[nodiscard]] std::pair<int, bk::KDPointInfo<bk::Vec3d>> closest_centerline_and_point_id(const bk::Vec3d& pt);
+
+        [[nodiscard]] std::vector<MeasuringPlane>& measuring_planes();
+        [[nodiscard]] const std::vector<MeasuringPlane>& measuring_planes() const;
+        [[nodiscard]] bool has_measuring_planes() const;
+        [[nodiscard]] unsigned int num_measuring_planes() const;
+
+        [[nodiscard]] std::vector<FlowJet>& flowjets();
+        [[nodiscard]] const std::vector<FlowJet>& flowjets() const;
+        [[nodiscard]] unsigned int num_flowjets() const;
+        [[nodiscard]] bool has_flowjets();
 
         //====================================================================================================
         //===== SETTER

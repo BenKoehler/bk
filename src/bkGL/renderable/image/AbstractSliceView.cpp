@@ -52,7 +52,7 @@
 #include <bkGL/Mouse.h>
 #include <bkGL/WindowGeometry.h>
 #include <bkGL/renderable/transfer_function/WindowingTransferFunctionView.h>
-#include <src/bkGL/renderable/ScreenQuad.h>
+#include <bkGL/renderable/ScreenQuad.h>
 
 namespace bk::details
 {

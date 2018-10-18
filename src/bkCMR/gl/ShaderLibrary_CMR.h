@@ -39,6 +39,7 @@ namespace bk
         /// @{ -------------------------------------------------- UBO
         [[nodiscard]] static std::string ubo_definition_flowjet_view();
         [[nodiscard]] static std::string ubo_definition_measuring_plane_preview();
+        [[nodiscard]] static std::string ubo_definition_measuring_plane();
         [[nodiscard]] static std::string ubo_definition_pressure_view();
         /// @}
 
@@ -49,6 +50,16 @@ namespace bk
         {
             [[nodiscard]] static std::string vert();
             [[nodiscard]] static std::string frag();
+        };
+
+        //====================================================================================================
+        //===== MEASURING PLANE
+        //====================================================================================================
+        struct measuring_plane
+        {
+            [[nodiscard]] static std::string vert();
+            [[nodiscard]] static std::string frag();
+            [[nodiscard]] static std::string geom();
         };
 
         //====================================================================================================

@@ -252,7 +252,7 @@ namespace bk
   }
 
   template<typename TLinesIterator>
-  void LineView::init(TLinesIterator linesBegin, TLinesIterator linesEnd, const std::string& color_attribute_name, const ScalarLineFilter* filter)
+  void LineView::init(TLinesIterator linesBegin, TLinesIterator linesEnd, std::string_view color_attribute_name, const ScalarLineFilter* filter)
   {
       init_lines(linesBegin, linesEnd, color_attribute_name, filter);
       init_shader();

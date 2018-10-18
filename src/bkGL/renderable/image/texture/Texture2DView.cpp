@@ -41,16 +41,16 @@ namespace bk
       Shader shader;
       GLuint tex_unit;
 
-      #ifndef BK_LIB_QT_AVAILABLE
+          #ifndef BK_LIB_QT_AVAILABLE
 
       Impl()
           :
-      #else
+          #else
       explicit Impl(bk::qt_gl_functions* gl)
           : screenquad(gl),
             ubo(gl),
             shader(gl),
-      #endif
+          #endif
           tex_unit(0)
       {}
   };
@@ -85,7 +85,7 @@ namespace bk
 
   /// @{ -------------------------------------------------- IS INITIALIZED
   bool Texture2DView::is_initialized() const
-  {return _pdata->screenquad.is_initialized();}
+  { return _pdata->screenquad.is_initialized(); }
   /// @}
 
   //====================================================================================================
@@ -130,7 +130,9 @@ namespace bk
   void Texture2DView::init_shader()
   {
       clear_shader();
-      _pdata->shader.init("shader/texture/render_texture.vert", "shader/texture/render_texture_rgb.frag");
+
+      using SL = details::ShaderLibrary::render_texture;
+      _pdata->shader.init_from_sources(SL::vert(), SL::frag(_pdata->tex_unit, false));
   }
 
   void Texture2DView::init_ubo()
@@ -150,19 +152,44 @@ namespace bk
   }
 
   /// @{ -------------------------------------------------- EVENTS
-  void Texture2DView::on_resize(GLint /*w*/, GLint /*h*/) { /* do nothing */ }
-  void Texture2DView::on_oit_enabled(bool /*b*/) { /* do nothing */ }
-  void Texture2DView::on_animation_enabled(bool /*b*/) { /* do nothing */ }
-  void Texture2DView::on_modelview_changed(bool /*b*/) { /* do nothing */ }
-  void Texture2DView::on_visible_changed(bool /*b*/) { /* do nothing */ }
-  void Texture2DView::on_mouse_pos_changed(GLint /*x*/, GLint /*y*/) { /* do nothing */ }
-  void Texture2DView::on_mouse_button_pressed(MouseButton_ /*btn*/) { /* do nothing */ }
-  void Texture2DView::on_mouse_button_released(MouseButton_ /*btn*/) { /* do nothing */ }
-  void Texture2DView::on_key_pressed(Key_ /*k*/){ /* do nothing */ }
-  void Texture2DView::on_key_released(Key_ /*k*/){ /* do nothing */ }
-  void Texture2DView::on_mouse_wheel_up(){ /* do nothing */ }
-  void Texture2DView::on_mouse_wheel_down(){ /* do nothing */ }
-  void Texture2DView::on_ssaa_factor_changed(GLint /*ssaa_factor*/) { /* do nothing */ }
+  void Texture2DView::on_resize(GLint /*w*/, GLint /*h*/)
+  { /* do nothing */ }
+
+  void Texture2DView::on_oit_enabled(bool /*b*/)
+  { /* do nothing */ }
+
+  void Texture2DView::on_animation_enabled(bool /*b*/)
+  { /* do nothing */ }
+
+  void Texture2DView::on_modelview_changed(bool /*b*/)
+  { /* do nothing */ }
+
+  void Texture2DView::on_visible_changed(bool /*b*/)
+  { /* do nothing */ }
+
+  void Texture2DView::on_mouse_pos_changed(GLint /*x*/, GLint /*y*/)
+  { /* do nothing */ }
+
+  void Texture2DView::on_mouse_button_pressed(MouseButton_ /*btn*/)
+  { /* do nothing */ }
+
+  void Texture2DView::on_mouse_button_released(MouseButton_ /*btn*/)
+  { /* do nothing */ }
+
+  void Texture2DView::on_key_pressed(Key_ /*k*/)
+  { /* do nothing */ }
+
+  void Texture2DView::on_key_released(Key_ /*k*/)
+  { /* do nothing */ }
+
+  void Texture2DView::on_mouse_wheel_up()
+  { /* do nothing */ }
+
+  void Texture2DView::on_mouse_wheel_down()
+  { /* do nothing */ }
+
+  void Texture2DView::on_ssaa_factor_changed(GLint /*ssaa_factor*/)
+  { /* do nothing */ }
   /// @}
 
   void Texture2DView::draw_impl()

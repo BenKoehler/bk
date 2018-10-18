@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include <bkCMR/FlowImage2DT.h>
+#include <bkCMR/dataset/FlowImage2DT.h>
 
 namespace bk
 {

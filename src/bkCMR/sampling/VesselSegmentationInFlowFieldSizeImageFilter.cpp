@@ -26,10 +26,10 @@
 #include <cassert>
 #include <cmath>
 
-#include <bkCMR/VesselSegmentationInFlowFieldSizeImageFilter.h>
+#include <bkCMR/sampling/VesselSegmentationInFlowFieldSizeImageFilter.h>
 
-#include <bkCMR/FlowImage3DT.h>
-#include <bkCMR/Vessel.h>
+#include <bkCMR/dataset/FlowImage3DT.h>
+#include <bkCMR/dataset/Vessel.h>
 #include <bkMath/functions/list_grid_id_conversion.h>
 #include <bk/Matrix>
 

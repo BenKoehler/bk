@@ -22,11 +22,11 @@
  * SOFTWARE.
  */
 
-#include <bkCMR/FlowJet.h>
+#include <bkCMR/dataset/FlowJet.h>
 
 #include <limits>
 
-#include <bkCMR/FlowJetPoint.h>
+#include <bkCMR/dataset/FlowJetPoint.h>
 #include <bkMath/functions/binomial_coefficient.h>
 
 namespace bk

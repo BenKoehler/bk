@@ -26,13 +26,13 @@
 #include <cassert>
 #include <cmath>
 
-#include <bkCMR/PressureMapImageFilter.h>
+#include <bkCMR/filters/PressureMapImageFilter.h>
 
 #include <bkAlgorithm/quantile.h>
 #include <bk/Clock>
-#include <bkCMR/FlowImage3DT.h>
-#include <bkCMR/Vessel.h>
-#include <bkCMR/VesselSegmentationInFlowFieldSizeImageFilter.h>
+#include <bkCMR/dataset/FlowImage3DT.h>
+#include <bkCMR/dataset/Vessel.h>
+#include <bkCMR/sampling/VesselSegmentationInFlowFieldSizeImageFilter.h>
 #include <bkMath/functions/list_grid_id_conversion.h>
 #include <bk/Matrix>
 

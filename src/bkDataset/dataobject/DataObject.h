@@ -226,6 +226,14 @@ namespace bk
       }
       /// @}
 
+      /// @{ -------------------------------------------------- REMOVE OBJECT ATTRIBUTE
+      [[maybe_unused]] bool remove_object_attribute(unsigned long long attribute_hash)
+      { return _object_attributes.remove_attribute(attribute_hash) != 0; }
+
+      [[maybe_unused]] bool remove_object_attribute(std::string_view attribute_name)
+      { return remove_object_attribute(_object_attributes.hash(attribute_name)); }
+      /// @}
+
       /// @{ -------------------------------------------------- OBJECT ATTRIBUTE TO CELL ATTRIBUTE
       template<typename TObjectAttribute, typename TPointAttribute>
       [[maybe_unused]] bool object_attribute_of_type_to_point_attribute_of_type(unsigned long long object_attribute_hash, unsigned long long point_attribute_hash)

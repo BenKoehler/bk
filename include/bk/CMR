@@ -22,21 +22,25 @@
  * SOFTWARE.
  */
 
-#include <bkCMR/Dataset.h>
+#include <bkCMR/dataset/Dataset.h>
 #include <bkCMR/FlowDirCorrection.h>
 #include <bkCMR/FlowTimeShift.h>
-#include <bkCMR/CenterlineExtractor.h>
-#include <bkCMR/Vessel.h>
-#include <bkCMR/ELandMarkSemantic.h>
-#include <bkCMR/EVesselSemantic.h>
-#include <bkCMR/FlowImage2DT.h>
-#include <bkCMR/FlowImage3DT.h>
-#include <bkCMR/FlowJet.h>
-#include <bkCMR/PhaseUnwrapping2DT.h>
-#include <bkCMR/PhaseUnwrapping3DT.h>
-#include <bkCMR/ESegmentation3DInfo.h>
+#include <bkCMR/filters/CenterlineExtractor.h>
+#include <bkCMR/dataset/Vessel.h>
+#include <bkCMR/dataset/ELandMarkSemantic.h>
+#include <bkCMR/dataset/EVesselSemantic.h>
+#include <bkCMR/dataset/FlowImage2DT.h>
+#include <bkCMR/dataset/FlowImage3DT.h>
+#include <bkCMR/dataset/FlowJet.h>
+#include <bkCMR/filters/FlowJetExtractor.h>
+#include <bkCMR/filters/PhaseUnwrapping2DT.h>
+#include <bkCMR/filters/PhaseUnwrapping3DT.h>
+#include <bkCMR/dataset/ESegmentation3DInfo.h>
 
 #include <bkCMR/gl/CardiacCycleDefinitionView.h>
 #include <bkCMR/gl/LandMarkSelectionView.h>
-#include <bkCMR/gl/PressureView.h>
+#include <bkCMR/gl/FlowJetView.h>
 #include <bkCMR/gl/MeasuringPlanePreviewView.h>
+#include <bkCMR/gl/MeasuringPlaneView.h>
+#include <bkCMR/gl/PressureView.h>
+#include <bkCMR/gl/VesselView.h>

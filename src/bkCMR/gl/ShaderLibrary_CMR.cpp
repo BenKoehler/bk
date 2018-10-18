@@ -28,6 +28,7 @@
 
 #include <bkCMR/gl/UBOFlowJetView.h>
 #include <bkCMR/gl/UBOMeasuringPlanePreview.h>
+#include <bkCMR/gl/UBOMeasuringPlane.h>
 #include <bkCMR/gl/UBOPressureView.h>
 #include <bkGL/UBOGlobal.h>
 
@@ -48,6 +49,15 @@ namespace bk
     std::string ShaderLibrary_CMR::ubo_definition_measuring_plane_preview()
     {
         return ubo_definition(bk::UBOMeasuringPlanePreview(
+        #ifdef BK_LIB_QT_AVAILABLE
+            nullptr
+        #endif
+        ));
+    }
+
+    std::string ShaderLibrary_CMR::ubo_definition_measuring_plane()
+    {
+        return ubo_definition(bk::UBOMeasuringPlane(
         #ifdef BK_LIB_QT_AVAILABLE
             nullptr
         #endif
@@ -120,8 +130,7 @@ namespace bk
         s << "   const vec3 N = normalize(normal_frag);\n";
         s << "   const vec3 R = normalize(reflect(L, N)); // for specular\n\n";
 
-        s << "   vec3 color = vec3(" << bk::UBOMeasuringPlanePreview::name_color_r() << ", " << bk::UBOMeasuringPlanePreview::name_color_g() << ", " << bk::UBOMeasuringPlanePreview::name_color_b()
-          << ");\n\n";
+        s << "   vec3 color = vec3(" << bk::UBOMeasuringPlanePreview::name_color_r() << ", " << bk::UBOMeasuringPlanePreview::name_color_g() << ", " << bk::UBOMeasuringPlanePreview::name_color_b() << ");\n\n";
 
         s << "   // alpha\n";
         s << "   color_out.a = 1;\n\n";
@@ -134,10 +143,118 @@ namespace bk
         s << "   color_out.rgb += abs(NdotL) * (NdotL >= 0 ? 1.0f : 0.75f) * color;\n\n";
 
         s << "   // specular\n";
-        s << "   const vec3 light_color = vec3(" << bk::UBOMeasuringPlanePreview::name_lightcolor_r() << ", " << bk::UBOMeasuringPlanePreview::name_lightcolor_g() << ", "
-          << bk::UBOMeasuringPlanePreview::name_lightcolor_b() << ");\n";
+        s << "   const vec3 light_color = vec3(" << bk::UBOMeasuringPlanePreview::name_lightcolor_r() << ", " << bk::UBOMeasuringPlanePreview::name_lightcolor_g() << ", " << bk::UBOMeasuringPlanePreview::name_lightcolor_b() << ");\n";
         s << "   color_out.rgb += light_color * pow(clamp(abs(dot(R, E)), 0.0, 1.0), " << bk::UBOMeasuringPlanePreview::name_shininess() << ");\n";
 
+        s << function_main_end();
+
+        return s.str();
+    }
+
+    //====================================================================================================
+    //===== MEASURING PLANE
+    //====================================================================================================
+    std::string ShaderLibrary_CMR::measuring_plane::vert()
+    {
+        std::stringstream s;
+
+        s << comment_tag_vertex_shader("MEASURING PLANE");
+        s << version();
+
+        s << comment_region_input();
+        s << "layout(location = 0) in float dummy;\n";
+
+        s << comment_region_functions();
+        s << function_main_begin();
+        s << "   /* do nothing */";
+        s << function_main_end();
+
+        return s.str();
+    }
+
+    std::string ShaderLibrary_CMR::measuring_plane::geom()
+    {
+        std::stringstream s;
+
+        s << comment_tag_geometry_shader("MEASURING PLANE");
+        s << version();
+
+        s << comment_region_input();
+        s << ubo_definition_global();
+        s << ubo_definition_measuring_plane();
+        s << geom_layout_in_points();
+
+        s << comment_region_output();
+        s << "layout(location = 0) out vec3 position_frag;\n";
+        s << "layout(location = 1) out vec2 texcoords_frag;\n";
+        s << geom_layout_out_triangle_strip(4);
+
+        s << comment_region_functions();
+        s << function_main_begin();
+        s << "   const vec3 center = vec3(" << UBOMeasuringPlane::name_center_x() << ", " << UBOMeasuringPlane::name_center_y() << ", " << UBOMeasuringPlane::name_center_z() << ");\n";
+        s << "   const vec3 nx = vec3(" << UBOMeasuringPlane::name_nx_x() << ", " << UBOMeasuringPlane::name_nx_y() << ", " << UBOMeasuringPlane::name_nx_z() << ");\n";
+        s << "   const vec3 ny = vec3(" << UBOMeasuringPlane::name_ny_x() << ", " << UBOMeasuringPlane::name_ny_y() << ", " << UBOMeasuringPlane::name_ny_z() << ");\n\n";
+
+        s << "   position_frag = center + nx*(0.5*" << UBOMeasuringPlane::name_grid_size_x() << "*" << UBOMeasuringPlane::name_scale_x() << ") + ny*(0.5*" << UBOMeasuringPlane::name_grid_size_y() << "*" << UBOMeasuringPlane::name_scale_y() << ");\n";
+        s << "   texcoords_frag = vec2(1,1);\n";
+        s << "   gl_Position = " << details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_frag, 1);\n";
+        s << "   EmitVertex();\n\n";
+
+        s << "   position_frag = center - nx*(0.5*" << UBOMeasuringPlane::name_grid_size_x() << "*" << UBOMeasuringPlane::name_scale_x() << ") + ny*(0.5*" << UBOMeasuringPlane::name_grid_size_y() << "*" << UBOMeasuringPlane::name_scale_y() << ");\n";
+        s << "   texcoords_frag = vec2(0,1);\n";
+        s << "   gl_Position = " << details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_frag, 1);\n";
+        s << "   EmitVertex();\n\n";
+
+        s << "   position_frag = center + nx*(0.5*" << UBOMeasuringPlane::name_grid_size_x() << "*" << UBOMeasuringPlane::name_scale_x() << ") - ny*(0.5*" << UBOMeasuringPlane::name_grid_size_y() << "*" << UBOMeasuringPlane::name_scale_y() << ");\n";
+        s << "   texcoords_frag = vec2(1,0);\n";
+        s << "   gl_Position = " << details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_frag, 1);\n";
+        s << "   EmitVertex();\n\n";
+
+        s << "   position_frag = center - nx*(0.5*" << UBOMeasuringPlane::name_grid_size_x() << "*" << UBOMeasuringPlane::name_scale_x() << ") - ny*(0.5*" << UBOMeasuringPlane::name_grid_size_y() << "*" << UBOMeasuringPlane::name_scale_y() << ");\n";
+        s << "   texcoords_frag = vec2(0,0);\n";
+        s << "   gl_Position = " << details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_frag, 1);\n";
+        s << "   EmitVertex();\n";
+        s << function_main_end();
+
+        return s.str();
+    }
+
+    std::string ShaderLibrary_CMR::measuring_plane::frag()
+    {
+        std::stringstream s;
+
+        s << comment_tag_fragment_shader("MEASURING PLANE");
+        s << version();
+
+        s << comment_region_input();
+        s << "layout(location = 0) in vec3 position_frag;\n";
+        s << "layout(location = 1) in vec2 texcoords_frag;\n";
+        s << ubo_definition_global();
+        s << ubo_definition_measuring_plane();
+        s << "layout(binding = 7, std430) buffer _ColorBar\n";
+        s << "{ vec3 ColorBar[]; };\n\n";
+        s << "layout(binding = 1) uniform sampler3D veloTP_tex; // throughPlane velocity (scalar)\n";
+
+        s << comment_region_output();
+        s << "layout(location = 0) out vec4 color_out;\n";
+
+        s << comment_region_functions();
+        s << function_main_begin();
+        s << "   if (" << UBOMeasuringPlane::name_values_initialized() << " != 0)\n";
+        s << "   {\n";
+        s << "   const vec3 texcoords = vec3(texcoords_frag, " << details::UBOGlobal::name_animation_current_time() << "/" << details::UBOGlobal::name_animation_max_time() << ");\n";
+        s << "   const float vtp = texture(veloTP_tex, texcoords).r;\n\n";
+
+        s << "   const float temp = (" << UBOMeasuringPlane::name_num_colors() << " - 1) * (vtp - " << UBOMeasuringPlane::name_vmin() << ") / (" << UBOMeasuringPlane::name_vmax() << " - " << UBOMeasuringPlane::name_vmin() << ");\n";
+        s << "   const uint colid0 = uint(floor(temp));\n";
+        s << "   const uint colid1 = uint(ceil(temp));\n";
+        s << "   const float w = temp - colid0;\n\n";
+
+        s << "   color_out.rgb = mix(ColorBar[colid0], ColorBar[colid1], w);\n";
+        s << "   color_out.a = 1;\n";
+        s << "   }\n";
+        s << "   else\n";
+        s << "   { color_out = vec4(" << UBOMeasuringPlane::name_color_r() << ", " << UBOMeasuringPlane::name_color_g() << ", " << UBOMeasuringPlane::name_color_b() << ", 1); }\n";
         s << function_main_end();
 
         return s.str();
@@ -185,8 +302,7 @@ namespace bk
 
         s << comment_region_functions();
         s << function_main_begin();
-        s << "   const vec2 texcoord = vec2(float(gl_FragCoord.x)/float(" << bk::details::UBOGlobal::name_window_width() << "), float(gl_FragCoord.y)/float("
-          << bk::details::UBOGlobal::name_window_height() << "));\n";
+        s << "   const vec2 texcoord = vec2(float(gl_FragCoord.x)/float(" << bk::details::UBOGlobal::name_window_width() << "), float(gl_FragCoord.y)/float(" << bk::details::UBOGlobal::name_window_height() << "));\n";
         s << "   const vec3 entry = texture(entry_tex, texcoord).rgb;\n";
         s << "   const vec3 exit = texture(exit_tex, texcoord).rgb;\n";
         s << "   const vec3 ray_increment = (exit - entry) / (" << UBOPressureView::name_num_ray_samples() << "-1);\n\n";
@@ -195,8 +311,7 @@ namespace bk
         s << "   float minDataVal = 10000000;\n";
         s << "   float maxDataVal = -minDataVal;\n\n";
 
-        s << "   const float wimg = (" << bk::details::UBOGlobal::name_animation_current_time() << " / " << UBOPressureView::name_temporal_resolution() << ") - " << UBOPressureView::name_current_t0()
-          << ";\n\n";
+        s << "   const float wimg = (" << bk::details::UBOGlobal::name_animation_current_time() << " / " << UBOPressureView::name_temporal_resolution() << ") - " << UBOPressureView::name_current_t0() << ";\n\n";
 
         s << "   for (int i = 0; i < " << UBOPressureView::name_num_ray_samples() << "; ++i)\n\n";
         s << "   {\n";
@@ -350,8 +465,7 @@ namespace bk
         s << "   if (abs(halo_percent_frag) >= 1.0f-" << UBOFlowJetView::name_area_halo_width_in_percent() << ")\n";
         s << "   {\n";
         s << "       const float diff = (1 - abs(halo_percent_frag)) / " << UBOFlowJetView::name_area_halo_width_in_percent() << ";\n;";
-        s << "       color = mix(vec3(0), vec3(" << UBOFlowJetView::name_area_color_r() << ", " << UBOFlowJetView::name_area_color_g() << ", " << UBOFlowJetView::name_area_color_b()
-          << "), diff*diff); // faded halo color\n";
+        s << "       color = mix(vec3(0), vec3(" << UBOFlowJetView::name_area_color_r() << ", " << UBOFlowJetView::name_area_color_g() << ", " << UBOFlowJetView::name_area_color_b() << "), diff*diff); // faded halo color\n";
         s << "   }\n";
         s << "   else\n";
         s << "   { color = vec3(" << UBOFlowJetView::name_area_color_r() << ", " << UBOFlowJetView::name_area_color_g() << ", " << UBOFlowJetView::name_area_color_b() << "); }\n\n";
@@ -408,8 +522,7 @@ namespace bk
         s << "   if (abs(halo_percent_frag) >= 1.0f-" << UBOFlowJetView::name_area_halo_width_in_percent() << ")\n";
         s << "   {\n";
         s << "       const float diff = (1 - abs(halo_percent_frag)) / " << UBOFlowJetView::name_area_halo_width_in_percent() << ";\n;";
-        s << "       color = mix(vec3(0), vec3(" << UBOFlowJetView::name_area_color_r() << ", " << UBOFlowJetView::name_area_color_g() << ", " << UBOFlowJetView::name_area_color_b()
-          << "), diff*diff); // faded halo color\n";
+        s << "       color = mix(vec3(0), vec3(" << UBOFlowJetView::name_area_color_r() << ", " << UBOFlowJetView::name_area_color_g() << ", " << UBOFlowJetView::name_area_color_b() << "), diff*diff); // faded halo color\n";
         s << "   }\n";
         s << "   else\n";
         s << "   { color = vec3(" << UBOFlowJetView::name_area_color_r() << ", " << UBOFlowJetView::name_area_color_g() << ", " << UBOFlowJetView::name_area_color_b() << "); }\n\n";
@@ -581,8 +694,7 @@ namespace bk
         s << "   color_out.rgb += abs(dot(N, L)) * color;  // diffuse\n";
         s << "   const vec3 R = normalize(reflect(L, N)); // specular\n";
 
-        s << "   const vec3 light_color = vec3(" << UBOFlowJetView::name_jet_light_color_r() << ", " << UBOFlowJetView::name_jet_light_color_g() << ", " << UBOFlowJetView::name_jet_light_color_b()
-          << ");\n";
+        s << "   const vec3 light_color = vec3(" << UBOFlowJetView::name_jet_light_color_r() << ", " << UBOFlowJetView::name_jet_light_color_g() << ", " << UBOFlowJetView::name_jet_light_color_b() << ");\n";
         s << "   color_out.rgb += light_color * pow(clamp(abs(dot(R, E)), 0.0, 1.0), " << UBOFlowJetView::name_jet_shininess() << ");\n";
         s << function_main_end();
 
@@ -647,8 +759,7 @@ namespace bk
         s << "   color_out.rgb += abs(dot(N, L)) * color;  // diffuse\n";
         s << "   const vec3 R = normalize(reflect(L, N)); // specular\n";
 
-        s << "   const vec3 light_color = vec3(" << UBOFlowJetView::name_jet_light_color_r() << ", " << UBOFlowJetView::name_jet_light_color_g() << ", " << UBOFlowJetView::name_jet_light_color_b()
-          << ");\n";
+        s << "   const vec3 light_color = vec3(" << UBOFlowJetView::name_jet_light_color_r() << ", " << UBOFlowJetView::name_jet_light_color_g() << ", " << UBOFlowJetView::name_jet_light_color_b() << ");\n";
         s << "   color_out.rgb += light_color * pow(clamp(abs(dot(R, E)), 0.0, 1.0), " << UBOFlowJetView::name_jet_shininess() << ");\n";
         s << oit_assign_from_color_out();
         s << function_main_end();

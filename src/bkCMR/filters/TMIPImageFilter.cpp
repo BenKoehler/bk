@@ -26,7 +26,7 @@
 #include <cassert>
 #include <cmath>
 
-#include <bkCMR/TMIPImageFilter.h>
+#include <bkCMR/filters/TMIPImageFilter.h>
 
 #include <bkMath/functions/list_grid_id_conversion.h>
 #include <bk/Matrix>
