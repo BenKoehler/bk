@@ -27,11 +27,10 @@
 #ifndef BK_PRESSUREVIEW_H
 #define BK_PRESSUREVIEW_H
 
-#include <memory>
-
 #include <bk/CopyablePIMPL>
-#include <bk/Matrix>
 #include <bk/Image>
+#include <bk/Matrix>
+#include <bk/Mesh>
 #include <bkGL/renderable/AbstractSceneRenderable.h>
 
 namespace bk
@@ -176,8 +175,7 @@ namespace bk
         void init_shader();
         void init_ubo();
         void init_fbo(GLuint window_width, GLuint window_height);
-        template<typename Mesh3D_, typename Img4D_, typename Seg3D_>
-        void init(const Mesh3D_& mesh, const Img4D_& pressureMap, const Seg3D_& vesselSeg, GLuint window_width, GLuint window_height);
+        void init(const TriangularMesh3D& mesh, const DicomImage<double,4>& pressureMap, const DicomImage<double,3>& vesselSegFFSize, GLuint window_width, GLuint window_height);
         /// @}
 
         /// @{ -------------------------------------------------- EVENTS
@@ -206,7 +204,5 @@ namespace bk
     }; // class PressureView
   } // inline namespace cmr
 } // namespace bk
-
-#include "PressureView.hpp"
 
 #endif //BK_// PRESSUREVIEW_H

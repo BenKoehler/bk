@@ -122,11 +122,13 @@ namespace bk
         [[nodiscard]] bk::TriangularMesh3D& mesh()&;
         [[nodiscard]] const bk::TriangularMesh3D& mesh() const&;
         [[nodiscard]] bk::TriangularMesh3D&& mesh()&&;
+        [[nodiscard]] std::pair<double,double> min_max_scalar_mesh_point_attribute(std::string_view attribute_name) const;
 
         [[nodiscard]] bool has_pathlines() const;
         [[nodiscard]] unsigned int num_pathlines() const;
         [[nodiscard]] const std::vector<bk::Line3D>& pathlines() const;
         [[nodiscard]] std::vector<bk::Line3D>& pathlines();
+        [[nodiscard]] std::pair<double,double> min_max_scalar_pathline_point_attribute(std::string_view attribute_name) const;
 
         [[nodiscard]] unsigned int num_centerlines() const;
         [[nodiscard]] std::vector<Line3D>& centerlines()&;
@@ -144,11 +146,12 @@ namespace bk
         [[nodiscard]] const std::vector<MeasuringPlane>& measuring_planes() const;
         [[nodiscard]] bool has_measuring_planes() const;
         [[nodiscard]] unsigned int num_measuring_planes() const;
+        [[nodiscard]] std::pair<double,double> min_max_scalar_measuring_plane_point_attribute(std::string_view attribute_name) const;
 
         [[nodiscard]] std::vector<FlowJet>& flowjets();
         [[nodiscard]] const std::vector<FlowJet>& flowjets() const;
         [[nodiscard]] unsigned int num_flowjets() const;
-        [[nodiscard]] bool has_flowjets();
+        [[nodiscard]] bool has_flowjets() const;
 
         //====================================================================================================
         //===== SETTER
@@ -208,10 +211,10 @@ namespace bk
         [[maybe_unused]] bool load_centerlines(std::string_view filepath);
         [[maybe_unused]] bool save_land_marks(std::string_view filepath) const;
         [[maybe_unused]] bool load_land_marks(std::string_view filepath);
-        //[[maybe_unused]] bool save_measuringplanes(std::string_view filepath) const;
-        //[[maybe_unused]] bool load_measuringplanes(std::string_view filepath);
-        //[[maybe_unused]] bool save_flowjets(std::string_view filepath) const;
-        //[[maybe_unused]] bool load_flowjets(std::string_view filepath);
+        [[maybe_unused]] bool save_measuringplanes(std::string_view filepath) const;
+        [[maybe_unused]] bool load_measuringplanes(std::string_view filepath);
+        [[maybe_unused]] bool save_flowjets(std::string_view filepath) const;
+        [[maybe_unused]] bool load_flowjets(std::string_view filepath);
 
         //void save(const std::string& filepath) const;
         //void save_pathlines(const std::string& filepath) const;

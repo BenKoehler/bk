@@ -79,6 +79,7 @@ namespace bk
   //===== CONSTRUCTORS & DESTRUCTOR
   //====================================================================================================
   #ifndef BK_LIB_QT_AVAILABLE
+
   VesselView::VesselView()
   #else
   VesselView::VesselView(bk::qt_gl_functions* gl)
@@ -89,9 +90,24 @@ namespace bk
       _pdata->centerlineview.set_color(ColorRGBA::White());
 
       _pdata->pathlineview.enable_color_by_attribute();
+
+      //_pdata->meshview.set_mode_front_face_culling_with_ghosted_view();
+      _pdata->meshview.set_mode_silhouette();
+
+      this->forward_signals(&_pdata->meshview);
+      this->forward_signals(&_pdata->pathlineview);
+      this->forward_signals(&_pdata->centerlineview);
+      this->forward_signals(&_pdata->flowjetview);
+      this->forward_signals(&_pdata->pressureview);
+
+      this->forward_settings(&_pdata->meshview);
+      this->forward_settings(&_pdata->pathlineview);
+      this->forward_settings(&_pdata->centerlineview);
+      this->forward_settings(&_pdata->flowjetview);
+      this->forward_settings(&_pdata->pressureview);
   }
 
-  VesselView::VesselView(VesselView&&) noexcept= default;
+  VesselView::VesselView(VesselView&&) noexcept = default;
   VesselView::~VesselView() = default;
 
   //====================================================================================================
@@ -142,69 +158,97 @@ namespace bk
   const MeasuringPlaneView* VesselView::measuringplaneview(unsigned int i) const
   { return i < _pdata->measuringplaneviews.size() ? &_pdata->measuringplaneviews[i] : nullptr; }
 
+  Vec3<GLfloat> VesselView::center() const
+  {
+      Vec3<GLfloat> c(0, 0, 0);
+      unsigned int cnt = 0;
+
+      if (_pdata->meshview.is_initialized())
+      {
+          c += _pdata->meshview.center();
+          ++cnt;
+      }
+
+      if (_pdata->pathlineview.is_initialized())
+      {
+          c += _pdata->pathlineview.center();
+          ++cnt;
+      }
+
+      if (cnt > 1)
+      { c /= cnt; }
+
+      return c;
+  }
+
   bool VesselView::is_initialized() const
-{return _pdata->meshview.is_initialized();}
+  { return _pdata->meshview.is_initialized() || _pdata->centerlineview.is_initialized() || _pdata->pathlineview.is_initialized() || _pdata->flowjetview.is_initialized() || _pdata->pressureview.is_initialized(); }
 
   //====================================================================================================
   //===== SETTER
   //====================================================================================================
-  void VesselView::set_vessel(const Vessel& v, Dataset& ds, std::string_view line_color_attribute_name)
+  void VesselView::set_name(std::string_view n)
+  {_pdata->name = n;}
+
+  void VesselView::set_line_color_attribute(const Vessel& v, std::string_view color_attribute_name)
   {
-      this->set_name(v.name());
+      _pdata->pathlineview.set_color_attribute(v.pathlines().begin(), v.pathlines().end(), color_attribute_name);
+      //determine_visualization_mode();
+  }
+
+  void VesselView::set_measuringplane_color_attribute(const Vessel& v, std::string_view color_attribute_name)
+  {
+      for (unsigned int i = 0; i < _pdata->measuringplaneviews.size(); ++i)
+      { _pdata->measuringplaneviews[i].set_color_attribute(v.measuring_planes()[i], color_attribute_name); }
+  }
+
+  VesselView& VesselView::operator=(VesselView&&) noexcept = default;
+
+  //====================================================================================================
+  //===== FUNCTIONS
+  //====================================================================================================
+  void VesselView::clear()
+  {
+      _pdata->pathlineview.clear();
+      _pdata->centerlineview.clear();
+      _pdata->meshview.clear();
+      _pdata->flowjetview.clear();
+      _pdata->measuringplaneviews.clear();
+      _pdata->pressureview.clear();
+      set_name("vessel");
+      this->emit_signal_scene_changed();
+      this->emit_signal_update_required();
+  }
+
+  void VesselView::init(const Vessel& v, Dataset& ds, GLuint window_width, GLuint window_height, VesselViewComponent flags)
+  {
+      set_name(v.name());
 
       this->set_visible();
 
-      /*
-       * mesh
-       */
-      if (v.has_mesh())
-      { _pdata->meshview.init(v.mesh()); }
+      if (flags & VesselViewComponent_Mesh && v.has_mesh())
+      {
+          _pdata->meshview.set_color(v.is_semantic_left_heart() ? ColorRGBA::Red() : v.is_semantic_right_heart() ? ColorRGBA::Blue() : ColorRGBA::Green());
+          _pdata->meshview.init(v.mesh());
+      }
 
-      _pdata->meshview.set_mode_front_face_culling_with_ghosted_view();
-
-      this->forward_signals(&_pdata->meshview);
-      this->forward_settings(&_pdata->meshview);
-
-      /*
-       * pathlines
-       */
-      if (!v.has_pathlines())
-      { _pdata->pathlineview.init(v.pathlines().begin(), v.pathlines().end(), line_color_attribute_name); }
-
-      this->forward_signals(&_pdata->pathlineview);
-      this->forward_settings(&_pdata->pathlineview);
-
-      /*
-       * centerlines
-       */
-      if (v.has_centerlines())
+      if (flags & VesselViewComponent_Centerlines && v.has_centerlines())
       { _pdata->centerlineview.init(v.centerlines().begin(), v.centerlines().end()); }
 
-      this->forward_signals(&_pdata->centerlineview);
-      this->forward_settings(&_pdata->centerlineview);
+      if (flags & VesselViewComponent_Pathlines && v.has_pathlines())
+      { _pdata->pathlineview.init(v.pathlines().begin(), v.pathlines().end()); }
 
-      /*
-       * flow jet
-       */
-      _pdata->flowjetview.init(v.flowjets(), ds.flow_image_3dt()->geometry().transformation().scale(3));
+      if (flags & VesselViewComponent_FlowJet && v.has_flowjets())
+      { _pdata->flowjetview.init(v.flowjets(), ds.flow_image_3dt()->geometry().transformation().scale(3)); }
 
-      this->forward_signals(&_pdata->flowjetview);
-      this->forward_settings(&_pdata->flowjetview);
+      if (flags & VesselViewComponent_PressureMap && v.has_mesh() && v.has_segmentation3D())
+      {
+          std::unique_ptr<DicomImage<double, 3>> seg = ds.vessel_segmentation_in_flow_field_3dt_size(v);
+          _pdata->pressureview.init(v.mesh(), *ds.pressure_map(), *seg, window_width, window_height);
+      }
 
-      /*
-       * pressure map
-       */
-      //_pdata->pressureview.init(ds.pressure_map(), *v.segmentation3D()); // todo: segmentation in flow field size
-
-      this->forward_signals(&_pdata->pressureview);
-      this->forward_settings(&_pdata->pressureview);
-
-      /*
-       * measuring planes
-       */
-      init_measuringplanes(v);
-
-      //determine_visualization_mode();
+      if (flags & VesselViewComponent_MeasuringPlanes && v.has_measuring_planes())
+      { init_measuringplanes(v); }
 
       this->emit_signal_scene_changed();
       this->emit_signal_update_required();
@@ -221,7 +265,6 @@ namespace bk
 
       _pdata->measuringplaneviews.clear();
 
-      //for (auto& mp: v.measuring_planes())
       for (unsigned int i = 0; i < v.measuring_planes().size(); ++i)
       {
           auto& mp = v.measuring_planes()[i];
@@ -246,108 +289,6 @@ namespace bk
           { mpv.set_visible(current_visibility[i]); }
       }
 
-      this->emit_signal_update_required();
-  }
-
-  void VesselView::set_name(std::string_view n)
-  {
-      // todo: use vessel semantics
-
-      _pdata->name = n;
-
-      if (string_utils::contains(_pdata->name, "aort", false) || string_utils::contains(_pdata->name, "aao", false) || string_utils::contains(_pdata->name, "dao", false) || string_utils::contains(_pdata->name, "left", false) || string_utils::contains(_pdata->name, "lv", false))
-      { _pdata->meshview.set_color(ColorRGBA::Red()); }
-      else if (string_utils::contains(_pdata->name, "pulm", false) || string_utils::contains(_pdata->name, "pa", false) || string_utils::contains(_pdata->name, "rv", false))
-      { _pdata->meshview.set_color(ColorRGBA::Blue()); }
-      else
-      { _pdata->meshview.set_color(ColorRGBA::Green()); }
-  }
-
-  void VesselView::set_line_color_attribute(const Vessel& v, std::string_view color_attribute_name)
-  {
-      _pdata->pathlineview.set_color_attribute(v.pathlines().begin(), v.pathlines().end(), color_attribute_name);
-      //determine_visualization_mode();
-  }
-
-  void VesselView::set_measuringplane_color_attribute(const Vessel& v, std::string_view color_attribute_name)
-  {
-      for (unsigned int i = 0; i < _pdata->measuringplaneviews.size(); ++i)
-      {
-          auto& mp = v.measuring_planes()[i];
-
-          auto mpv = measuringplaneview(i);
-          if (mpv == nullptr)
-          { break; }
-
-          mpv->set_color_attribute(*mp, color_attribute_name);
-      }
-  }
-
-  VesselView& VesselView::operator=(VesselView&& ) noexcept = default;
-
-  //====================================================================================================
-  //===== FUNCTIONS
-  //====================================================================================================
-  Vec3<GLfloat> VesselView::center() const 
-  {
-      Vec3<GLfloat> c(0, 0, 0);
-      unsigned int cnt = 0;
-
-      if (_pdata->meshview.is_initialized())
-      {
-          c += _pdata->meshview.center();
-          ++cnt;
-      }
-
-      if (_pdata->pathlineview.is_initialized())
-      {
-          c += _pdata->pathlineview.center();
-          ++cnt;
-      }
-
-      if (cnt > 1)
-      { c /= cnt; }
-
-      return c;
-  }
-
-  /*void VesselView::determine_visualization_mode()
-  {
-      if (_pdata->pathlineview.has_color_attribute())
-      { set_visualization_mode_line_quantification(); }
-      else
-      { set_visualization_mode_default(); }
-  }
-
-  void VesselView::set_visualization_mode_default()
-  {
-      //_pdata->meshview.set_mode_front_face_culling_with_ghosted_view();
-      //_pdata->meshview.set_mode_silhouette();
-      _pdata->pathlineview.set_isl_enabled(true);
-      _pdata->pathlineview.set_halo_enabled(true);
-
-      this->emit_signal_update_required();
-  }
-
-  void VesselView::set_visualization_mode_line_quantification()
-  {
-      //_pdata->meshview.set_mode_silhouette();
-      _pdata->pathlineview.set_isl_enabled(false);
-      _pdata->pathlineview.set_halo_enabled(false);
-
-      this->emit_signal_update_required();
-  }*/
-
-  void VesselView::clear()
-  {
-      _pdata->pathlineview.clear();
-      _pdata->centerlineview.clear();
-      _pdata->meshview.clear();
-      _pdata->flowjetview.clear();
-      _pdata->measuringplaneviews.clear();
-      _pdata->pressureview.clear();
-      set_name("vessel");
-      this->emit_signal_scene_changed();
       this->emit_signal_update_required();
   }
 
@@ -411,17 +352,20 @@ namespace bk
       { mpv.set_visible(b); }
   }
 
-  void VesselView::on_mouse_pos_changed(GLint x, GLint y) {
-      _pdata->pathlineview.on_mouse_pos_changed(x,y);
-      _pdata->centerlineview.on_mouse_pos_changed(x,y);
-      _pdata->meshview.on_mouse_pos_changed(x,y);
-      _pdata->flowjetview.on_mouse_pos_changed(x,y);
-      _pdata->pressureview.on_mouse_pos_changed(x,y);
+  void VesselView::on_mouse_pos_changed(GLint x, GLint y)
+  {
+      _pdata->pathlineview.on_mouse_pos_changed(x, y);
+      _pdata->centerlineview.on_mouse_pos_changed(x, y);
+      _pdata->meshview.on_mouse_pos_changed(x, y);
+      _pdata->flowjetview.on_mouse_pos_changed(x, y);
+      _pdata->pressureview.on_mouse_pos_changed(x, y);
 
       for (auto& mpv: _pdata->measuringplaneviews)
-      { mpv.on_mouse_pos_changed(x,y); }
+      { mpv.on_mouse_pos_changed(x, y); }
   }
-  void VesselView::on_mouse_button_pressed(MouseButton_ btn) {
+
+  void VesselView::on_mouse_button_pressed(MouseButton_ btn)
+  {
       _pdata->pathlineview.on_mouse_button_pressed(btn);
       _pdata->centerlineview.on_mouse_button_pressed(btn);
       _pdata->meshview.on_mouse_button_pressed(btn);
@@ -431,7 +375,9 @@ namespace bk
       for (auto& mpv: _pdata->measuringplaneviews)
       { mpv.on_mouse_button_pressed(btn); }
   }
-  void VesselView::on_mouse_button_released(MouseButton_ btn) {
+
+  void VesselView::on_mouse_button_released(MouseButton_ btn)
+  {
       _pdata->pathlineview.on_mouse_button_released(btn);
       _pdata->centerlineview.on_mouse_button_released(btn);
       _pdata->meshview.on_mouse_button_released(btn);
@@ -441,7 +387,9 @@ namespace bk
       for (auto& mpv: _pdata->measuringplaneviews)
       { mpv.on_mouse_button_released(btn); }
   }
-  void VesselView::on_key_pressed(Key_ k) {
+
+  void VesselView::on_key_pressed(Key_ k)
+  {
       _pdata->pathlineview.on_key_pressed(k);
       _pdata->centerlineview.on_key_pressed(k);
       _pdata->meshview.on_key_pressed(k);
@@ -451,7 +399,9 @@ namespace bk
       for (auto& mpv: _pdata->measuringplaneviews)
       { mpv.on_key_pressed(k); }
   }
-  void VesselView::on_key_released(Key_ k) {
+
+  void VesselView::on_key_released(Key_ k)
+  {
       _pdata->pathlineview.on_key_released(k);
       _pdata->centerlineview.on_key_released(k);
       _pdata->meshview.on_key_released(k);
@@ -461,7 +411,9 @@ namespace bk
       for (auto& mpv: _pdata->measuringplaneviews)
       { mpv.on_key_released(k); }
   }
-  void VesselView::on_mouse_wheel_up() {
+
+  void VesselView::on_mouse_wheel_up()
+  {
       _pdata->pathlineview.on_mouse_wheel_up();
       _pdata->centerlineview.on_mouse_wheel_up();
       _pdata->meshview.on_mouse_wheel_up();
@@ -471,7 +423,9 @@ namespace bk
       for (auto& mpv: _pdata->measuringplaneviews)
       { mpv.on_mouse_wheel_up(); }
   }
-  void VesselView::on_mouse_wheel_down() {
+
+  void VesselView::on_mouse_wheel_down()
+  {
       _pdata->pathlineview.on_mouse_wheel_down();
       _pdata->centerlineview.on_mouse_wheel_down();
       _pdata->meshview.on_mouse_wheel_down();
@@ -481,7 +435,9 @@ namespace bk
       for (auto& mpv: _pdata->measuringplaneviews)
       { mpv.on_mouse_wheel_down(); }
   }
-  void VesselView::on_ssaa_factor_changed(GLint ssaa_factor) {
+
+  void VesselView::on_ssaa_factor_changed(GLint ssaa_factor)
+  {
       _pdata->pathlineview.on_ssaa_factor_changed(ssaa_factor);
       _pdata->centerlineview.on_ssaa_factor_changed(ssaa_factor);
       _pdata->meshview.on_ssaa_factor_changed(ssaa_factor);
@@ -491,9 +447,9 @@ namespace bk
       for (auto& mpv: _pdata->measuringplaneviews)
       { mpv.on_ssaa_factor_changed(ssaa_factor); }
   }
-  
+
   void VesselView::on_animation_time_changed(double d)
-  { _pdata->pressureview.on_animation_time_changed(d);}
+  { _pdata->pressureview.on_animation_time_changed(d); }
 
   void VesselView::draw_opaque_impl()
   {

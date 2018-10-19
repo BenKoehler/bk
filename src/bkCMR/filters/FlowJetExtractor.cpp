@@ -36,12 +36,14 @@
 #include <bk/Line>
 #include <bk/Matrix>
 #include <bk/StringUtils>
+
 #ifdef BK_EMIT_PROGRESS
 
     #include <bk/Localization>
     #include <bk/Progress>
 
 #endif
+
 #include <bkMath/functions/list_grid_id_conversion.h>
 #include <bkCMR/dataset/Dataset.h>
 #include <bkCMR/dataset/FlowImage3DT.h>
@@ -137,7 +139,7 @@ namespace bk
     void FlowJetExtractor::calculate_flowjets(Dataset& ds) const
     {
         if (!ds.is_flow_image_3dt_loaded())
-        {ds.load_flow_image_3dt();}
+        { ds.load_flow_image_3dt(); }
 
         if (!ds.is_flow_image_3dt_loaded())
         {
@@ -194,15 +196,11 @@ namespace bk
 
         MeasuringPlane mp;
         mp.set_size(_pdata->measuring_plane_size, _pdata->measuring_plane_size, numTimes);
-        //mp.geometry().transformation().set_grid_size(size); // todo remove (not necessary anymore)
 
         std::vector<double> mpvelo(numel, 0);
 
         for (unsigned int vid = 0; vid < numVessels; ++vid)
         {
-            //unsigned int cnt_cl_instead_of_fj = 0;  // todo remove
-            //unsigned int cnt_cl_instead_of_fj_total = 0;  // todo remove
-
             if (hasFlowJets[vid])
             { continue; }
 
@@ -217,7 +215,6 @@ namespace bk
 
             mp.set_vesselID(vid);
 
-            //v.flowjets().resize(numCenterlines);
             for (unsigned int fjid = 0; fjid < numCenterlines; ++fjid)
             { v.flowjets().emplace_back(); }
 
@@ -248,12 +245,8 @@ namespace bk
                     ++numFlowJetPositions;
                 }
 
-
-                //const unsigned int numPoints = cl.geometry().num_points();
-                /*double*/ currentSqDist = sqEquiDist;
-                //FlowJet& flowjet = v.flowjets()[clid];
+                currentSqDist = sqEquiDist;
                 FlowJet& flowjet = v.flowjets()[clid];
-                //flowjet.set_num_times(numTimes);
                 flowjet.resize(numFlowJetPositions, numTimes);
 
                 bool firstFlowJetPosition = true;
@@ -283,14 +276,10 @@ namespace bk
                         { currentSqDist -= sqEquiDist; }
                     }
 
-                    //currentSqDist = 0;
-
                     if (firstFlowJetPosition)
                     { firstFlowJetPosition = false; }
                     else
                     { ++flowJetPositionID; }
-
-                    //flowjet.add_center();
 
                     Mat3d lcs = cl.local_coordinate_system_at_point(pid);
 
@@ -308,18 +297,12 @@ namespace bk
                     mp.geometry().transformation().set_ny(ny);
                     mp.geometry().transformation().set_nz(nz);
 
-                    //auto seg = measuring_plane_segmentation_from_vessel_mesh(mp);
-                    //seg.connected_component_analysis_keep_largest_fast3D_internal();
-                    //mp.set_measuring_plane_segmentation(seg);
-
                     mp.sample_segmentation_from_vessel_mesh(v);
-                    //mp.set_measuring_plane_segmentation(ds.measuring_plane_segmentation_from_vessel_mesh(mp)); // todo remove
 
                     const auto& seg = mp.segmentation_cross_section();
-                    //seg.connected_component_analysis_keep_largest_fast3D_internal(); // todo remove
+                    //seg.connected_component_analysis_keep_largest_fast3D_internal(); // todo remove (should not be necessary)
 
                     mp.sample_from_flow_field(*ds.flow_image_3dt());
-                    //ds.measuring_plane_sample_from_flowfield_within_segmentation(mp);
 
                     // --------------- veloq for each time separately
 
@@ -327,7 +310,7 @@ namespace bk
                     std::vector<double> veloq_min(numTimes, 0);
                     double maxVelo = 0; // for velocity normalization
 
-                    #pragma omp parallel for
+                    #pragma omp parallel for reduction(max: maxVelo)
                     for (unsigned int t = 0; t < numTimes; ++t)
                     {
                         std::vector<double> velo_abs;
@@ -360,12 +343,7 @@ namespace bk
 
                         veloq_max[t] = velo_abs.empty() ? 0 : velo_abs[static_cast<unsigned int>(std::round(_pdata->maxVelocity_clamp_quantile_p * (velo_abs.size() - 1)))];
                         veloq_min[t] = velo_abs.empty() ? 0 : velo_abs[static_cast<unsigned int>(std::round((1.0 - _pdata->maxVelocity_clamp_quantile_p) * (velo_abs.size() - 1)))];
-                        //veloq[t] = velo_abs.empty() ? 0 : velo_abs.back();
 
-                        //#pragma omp critical
-                        //maxVelo = std::max(maxVelo, velo_abs.back());
-
-                            #pragma omp critical
                         maxVelo = std::max(maxVelo, veloq_max[t]);
                     } // for t : numTimes
 
@@ -381,61 +359,14 @@ namespace bk
                     { mpvelo[i] /= maxVelo; }
 
                     /*
-                     * apply threshold -> create mask
-                     */
-                    //#pragma omp parallel for
-                    //for (unsigned int x = 0; x < _pdata->measuring_plane_size; ++x)
-                    //{
-                    //    for (unsigned int y = 0; y < _pdata->measuring_plane_size; ++y)
-                    //    {
-                    //        //for (unsigned int t = 0; t < numTimes; ++t)
-                    //        //{ mask(x, y, t) = 0; }
-                    //
-                    //        if (seg(x, y, 0) == 0)
-                    //        { continue; }
-                    //
-                    //        for (unsigned int t = 0; t < numTimes; ++t)
-                    //        {
-                    //            const unsigned int lid = grid_to_list_id(size, x,y,t);
-                    //
-                    //            //mp[lid] /= maxVelo;
-                    //
-                    //            mpvelo[lid] /= maxVelo;
-                    //
-                    //            const double relative_cross_section_velo = std::min(mpvelo[lid], veloq[t]) / veloq[t];
-                    //
-                    //            if (relative_cross_section_velo >= percentaged_velocity_threshold)
-                    //            { mask[lid] = relative_cross_section_velo; }
-                    //            else
-                    //            { mask[lid] = 0; }
-                    //        } // for t : numTimes
-                    //    } // for y : _pdata->measuring_plane_size
-                    //} // for x : _pdata->measuring_plane_size
-
-                    // ----------
-
-                    /*
                      * - calc weighted center
                      * - calc weighted PCA
                      */
                     auto weight_fn_jet = [](double x) -> double
                     { return std::pow(x, 10); };
-                    //auto weight_fn_area = [&](double x) -> double
-                    //{ return x; };
-
-                    //auto weight_fn_area = [&](double x) -> double
-                    //{ return std::max(0.0, x - percentaged_velocity_threshold); };
-
-                    //auto weight_fn_area = [&](double x, int t) -> double
-                    //{ return std::max(0.0, (std::min(x, veloq[t]) / veloq[t]) - percentaged_velocity_threshold); };
 
                     auto weight_fn_area = [&](double x, int t) -> double
-                    {
-                        //return std::max(0.0, std::min(x, veloq_max[t]) / veloq_max[t] - percentaged_velocity_threshold) != 0 ? 1 : 0;
-                        return std::max(0.0, x / veloq_max[t] - _pdata->percentaged_velocity_threshold) != 0 ? 1 : 0;
-
-                        //return std::max(0.0, (x - veloq_min[t]) / (veloq_max[t] - veloq_min[t]) - percentaged_velocity_threshold) != 0 ? 1 : 0;
-                    };
+                    { return std::max(0.0, x / veloq_max[t] - _pdata->percentaged_velocity_threshold) != 0 ? 1 : 0; };
 
                     for (int t = 0; t < static_cast<int>(numTimes); ++t)
                     {
@@ -443,9 +374,6 @@ namespace bk
                         double center_jet_w = 0;
                         Vec3d center_area(0, 0, 0);
                         double center_area_w = 0;
-
-                        //unsigned int cnt = 0;
-                        //unsigned int maskcnt = 0;
 
                         for (int x = 0; x < static_cast<int>(_pdata->measuring_plane_size); ++x)
                         {
@@ -455,7 +383,7 @@ namespace bk
                                 { continue; }
 
                                 const unsigned int lid = grid_to_list_id(size, x, y, t);
-                                const Vec3d wp = mp.geometry().transformation().to_world_coordinates(x, y, 0).sub_vector<0,2>();
+                                const Vec3d wp = mp.geometry().transformation().to_world_coordinates(x, y, 0).sub_vector<0, 2>();
 
                                 // forward
                                 const double w_jet = weight_fn_jet(mpvelo[lid]);
@@ -463,8 +391,6 @@ namespace bk
                                 center_jet += wp * w_jet;
                                 center_jet_w += w_jet;
 
-                                //const double w_area = weight_fn_area(mask[lid]);
-                                //const double w_area = weight_fn_area(mpvelo[lid]);
                                 const double w_area = weight_fn_area(mpvelo[lid], t);
 
                                 if (w_area != 0)
@@ -472,12 +398,6 @@ namespace bk
                                     center_area += wp * w_area;
                                     center_area_w += w_area;
                                 }
-
-                                //++cnt;
-
-                                //if (mask[lid] != 0)
-                                //if (w_area != 0)
-                                //{ ++maskcnt; }
                             } // for y
                         } // for x
 
@@ -488,18 +408,10 @@ namespace bk
                             center_jet_w = 1;
                             center_area = clpoint;
                             center_area_w = 1;
-
-                            //++cnt_cl_instead_of_fj;  // todo remove;
-
-                            //continue;
                         }
-
-                        //++cnt_cl_instead_of_fj_total; // todo remove
 
                         const Vec3d center_jet_weighted = center_jet / center_jet_w;
                         Vec3d center_area_weighted = center_area / center_area_w;
-
-                        // weighted PCA: http://download.springer.com/static/pdf/54/bok%253A978-3-540-69497-7.pdf?originUrl=http%3A%2F%2Flink.springer.com%2Fbook%2F10.1007%2F978-3-540-69497-7&token2=exp=1497510648~acl=%2Fstatic%2Fpdf%2F54%2Fbok%25253A978-3-540-69497-7.pdf%3ForiginUrl%3Dhttp%253A%252F%252Flink.springer.com%252Fbook%252F10.1007%252F978-3-540-69497-7*~hmac=6a3ea79a031fda52182fa3d829213538ef3a660286e1422da11fc0aa6495e441
 
                         Mat3d A;
                         A.set_zero();
@@ -514,20 +426,11 @@ namespace bk
 
                                 const unsigned int lid = bk::grid_to_list_id(size, x, y, t);
 
-                                //if (mask[lid] == 0)
-                                //{ continue; }
-                                //
-                                //const Vec3d wp = mp.geometry().transformation().to_world_coordinates(x, y);
-                                //
-                                //const Vec3d diff = wp - center_area_weighted;
-                                //const Mat3d addA = (diff * diff->transpose()) * weight_fn_area(mask[lid]);
-
-                                //const double w_area = weight_fn_area(mpvelo[lid]);
                                 const double w_area = weight_fn_area(mpvelo[lid], t);
 
                                 if (w_area != 0)
                                 {
-                                    const Vec3d wp = mp.geometry().transformation().to_world_coordinates(x, y, 0).sub_vector<0,2>();
+                                    const Vec3d wp = mp.geometry().transformation().to_world_coordinates(x, y, 0).sub_vector<0, 2>();
                                     const Vec3d diff = wp - center_area_weighted;
                                     const Mat3d addA = (diff * diff.transpose()) * w_area;
 
@@ -537,8 +440,6 @@ namespace bk
                             } // for y
                         } // for x
 
-                        //A /= cnt;
-                        //A /= maskcnt;
                         A /= center_area_w != 0 ? center_area_w : 1;
 
                         const auto eig = A.eigenanalysis_symmetric();
@@ -645,7 +546,7 @@ namespace bk
                         fjp.area_radius_x = dir0.first;
                         fjp.area_radius_y = dir1.first;
 
-                        flowjet.point(flowJetPositionID,t) = std::move(fjp);
+                        flowjet.point(flowJetPositionID, t) = std::move(fjp);
                     } // for t: numTimes
 
                     #ifdef BK_EMIT_PROGRESS
@@ -658,9 +559,6 @@ namespace bk
 
                 flowjet.smooth_spatial_binomial(_pdata->num_smooth_iterations, _pdata->smooth_kernel_size);
             } // for clid : numCenterlines
-
-            //std::cout << "cnt_cl_instead_of_fj: " << cnt_cl_instead_of_fj << " of "<<cnt_cl_instead_of_fj_total<<" ("<< static_cast<double>(cnt_cl_instead_of_fj)/ static_cast<double>(cnt_cl_instead_of_fj_total)<<" %)" << std::endl;  // todo remove;
-
         } // for vid : numVessels
 
         clock.stop();

@@ -45,7 +45,7 @@ namespace bk
       using difference_type = int;
       using value_type = std::decay_t<typename ndgrid_type::value_type>;
       using reference = std::conditional_t<std::is_const_v<TNDGrid>, const value_type&, value_type&>;
-      using const_reference = std::conditional_t<std::is_const_v<TNDGrid>, value_type&, const value_type&>;
+      using const_reference = const value_type&;
       using pointer = value_type*;
       using iterator_category = std::random_access_iterator_tag;
       using size_type = unsigned int;

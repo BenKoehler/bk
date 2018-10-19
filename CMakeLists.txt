@@ -196,6 +196,7 @@ set(SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/PhaseUnwrapping2DT.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/PhaseUnwrapping3DT.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/PressureMapImageFilter.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/VelocityOffsetCorrector3DT.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/rotation_angle_2d.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/sampling/sampling_sphere_section.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/sampling/VesselSegmentationInFlowFieldSizeImageFilter.cpp
@@ -203,6 +204,7 @@ set(SOURCE_FILES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/LandMarkSelectionView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/MeasuringPlaneView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/MeasuringPlanePreviewView.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/DatasetView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/FlowJetView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/PressureView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/VesselView.cpp

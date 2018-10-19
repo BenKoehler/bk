@@ -233,7 +233,6 @@ namespace bk
           _update_vbo_positions();
       }
   }
-
   /// @}
 
   /// @{ -------------------------------------------------- SET RANGE

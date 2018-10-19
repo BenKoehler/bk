@@ -36,7 +36,9 @@
 #include <bkCMR/filters/PhaseUnwrapping2DT.h>
 #include <bkCMR/filters/PhaseUnwrapping3DT.h>
 #include <bkCMR/dataset/ESegmentation3DInfo.h>
+#include <bkCMR/filters/VelocityOffsetCorrector3DT.h>
 
+// gl
 #include <bkCMR/gl/CardiacCycleDefinitionView.h>
 #include <bkCMR/gl/LandMarkSelectionView.h>
 #include <bkCMR/gl/FlowJetView.h>

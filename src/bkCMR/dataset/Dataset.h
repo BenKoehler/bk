@@ -245,6 +245,7 @@ namespace bk
         //====================================================================================================
         [[maybe_unused]] bool determine_phase_wraps_2dt();
         [[maybe_unused]] bool determine_phase_wraps_3dt(bool reload_flow_image = true);
+        [[maybe_unused]] bool determine_velocity_offset_3dt(bool reload_flow_image = true);
 
         // todo velocity offset correction 3dt
         // todo velocity offset correction 2dt
@@ -267,6 +268,8 @@ namespace bk
         [[nodiscard]] std::string filepath_cardiac_cycle_definition() const;
         [[nodiscard]] std::string filepath_phase_unwrapping_2dt() const;
         [[nodiscard]] std::string filepath_phase_unwrapping_3dt() const;
+        [[nodiscard]] std::string filepath_velocity_offset_correction_2dt() const;
+        [[nodiscard]] std::string filepath_velocity_offset_correction_3dt() const;
         [[nodiscard]] std::string dirpath_vessels() const;
         [[nodiscard]] std::string dirpath_vessels_without_slash_ending() const;
         [[nodiscard]] std::string dirpath_vessel(const Vessel* v) const;
@@ -320,6 +323,10 @@ namespace bk
         [[maybe_unused]] bool load_phase_unwrapping_3dt();
         [[maybe_unused]] bool delete_file_phase_unwrapping_3dt();
 
+        [[maybe_unused]] bool save_velocity_offset_correction_3dt();
+        [[maybe_unused]] bool load_velocity_offset_correction_3dt();
+        [[maybe_unused]] bool delete_file_velocity_offset_correction_3dt();
+        
         [[maybe_unused]] bool save_ivsd();
         [[maybe_unused]] bool save_magnitude_tmip_3dt();
         [[maybe_unused]] bool save_anatomical_tmip_3dt(unsigned int imgId);

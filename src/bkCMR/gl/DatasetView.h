@@ -24,52 +24,30 @@
 
 #pragma once
 
-#ifndef BK_VESSELVIEW_H
-#define BK_VESSELVIEW_H
+#ifndef BK_DATASETVIEW_H
+#define BK_DATASETVIEW_H
 
-#include <string>
 #include <string_view>
 
 #include <bk/CopyablePIMPL>
-#include <bkGL/renderable/AbstractSceneRenderable.h>
-#include <bk/Image>
 #include <bk/Matrix>
+#include <bkGL/renderable/AbstractSceneRenderable.h>
 #include <bkCMR/lib/bkCMR_export.h>
+#include <bkCMR/gl/VesselView.h>
 
 namespace bk
 {
   // -------------------- forward declaration
-  class TriangularMesh3DView;
-
-  class LineView;
+  class ColorBarView;
 
   inline namespace cmr
   {
-    class Vessel;
-
     class Dataset;
-
-    class FlowJetView;
-
-    class PressureView;
-
-    class MeasuringPlaneView;
+    class Vessel;
+    class VesselView;
     // -------------------- forward declaration END
 
-    enum VesselViewComponent_ : unsigned int
-    {
-        VesselViewComponent_Mesh = 1 << 0, //
-        VesselViewComponent_Centerlines = 1 << 1, //
-        VesselViewComponent_Pathlines = 1 << 2, //
-        VesselViewComponent_FlowJet = 1 << 3, //
-        VesselViewComponent_PressureMap = 1 << 4, //
-        VesselViewComponent_MeasuringPlanes = 1 << 5, //
-        VesselViewComponent_All = VesselViewComponent_Mesh || VesselViewComponent_Centerlines || VesselViewComponent_Pathlines || VesselViewComponent_FlowJet || VesselViewComponent_PressureMap || VesselViewComponent_MeasuringPlanes,
-    };
-
-    using VesselViewComponent = unsigned int;
-
-    class BKCMR_EXPORT VesselView : public details::AbstractSceneRenderable
+    class BKCMR_EXPORT DatasetView : public details::AbstractSceneRenderable
     {
         //====================================================================================================
         //===== DEFINITIONS
@@ -80,7 +58,6 @@ namespace bk
         //===== MEMBERS
         //====================================================================================================
         class Impl;
-
         bk::cpimpl<Impl> _pdata;
 
         //====================================================================================================
@@ -89,93 +66,109 @@ namespace bk
       public:
         /// @{ -------------------------------------------------- CONSTRUCTORS
         #ifndef BK_LIB_QT_AVAILABLE
-        VesselView();
+        DatasetView();
         #else
-        explicit VesselView(bk::qt_gl_functions* gl);
+        explicit DatasetView(bk::qt_gl_functions* gl);
         #endif
-        VesselView(const VesselView&) = delete;
-        VesselView(VesselView&&) noexcept;
+        DatasetView(const DatasetView& ) = delete;
+        DatasetView(DatasetView&& ) noexcept;
         /// @}
 
         /// @{ -------------------------------------------------- DESTRUCTOR
-        virtual ~VesselView();
+        ~DatasetView();
         /// @}
 
         //====================================================================================================
         //===== GETTER
         //====================================================================================================
-        /// @{ -------------------------------------------------- GET NAME
-        [[nodiscard]] const std::string& name() const;
+        [[nodiscard]] unsigned int num_vessels() const;
+
+        /// @{ -------------------------------------------------- GET VESSELVIEW
+        [[nodiscard]] VesselView* vesselview(unsigned int i);
+        [[nodiscard]] const VesselView* vesselview(unsigned int i) const;
+        [[nodiscard]] VesselView* vesselview(std::string_view name);
+        [[nodiscard]] const VesselView* vesselview(std::string_view name) const;
         /// @}
 
-        /// @{ -------------------------------------------------- GET MESHVIEW
-        [[nodiscard]] TriangularMesh3DView& meshview();
-        [[nodiscard]] const TriangularMesh3DView& meshview() const;
+        /// @{ -------------------------------------------------- GET COLORBARVIEW
+        [[nodiscard]] ColorBarView* colorbarview_pathlines();
+        [[nodiscard]] const ColorBarView* colorbarview_pathlines() const;
+        [[nodiscard]] ColorBarView* colorbarview_measuringplanes();
+        [[nodiscard]] const ColorBarView* colorbarview_measuringplanes() const;
+        [[nodiscard]] ColorBarView* colorbarview_surface();
+        [[nodiscard]] const ColorBarView* colorbarview_surface() const;
+        [[nodiscard]] ColorBarView* colorbarview_flowjet();
+        [[nodiscard]] const ColorBarView* colorbarview_flowjet() const;
+        [[nodiscard]] ColorBarView* colorbarview_pressure();
+        [[nodiscard]] const ColorBarView* colorbarview_pressure() const;
         /// @}
 
-        /// @{ -------------------------------------------------- GET PATHLINEVIEW
-        [[nodiscard]] LineView& pathlineview();
-        [[nodiscard]] const LineView& pathlineview() const;
-        /// @}
-
-        /// @{ -------------------------------------------------- GET CENTERLINEVIEW
-        [[nodiscard]] LineView& centerlineview();
-        [[nodiscard]] const LineView& centerlineview() const;
-        /// @}
-
-        /// @{ -------------------------------------------------- GET FLOWJETVIEW
-        [[nodiscard]] FlowJetView& flowjetview();
-        [[nodiscard]] const FlowJetView& flowjetview() const;
-        /// @}
-
-        /// @{ -------------------------------------------------- GET PRESSUREVIEW
-        [[nodiscard]] PressureView& pressureview();
-        [[nodiscard]] const PressureView& pressureview() const;
-        /// @}
-
-        /// @{ -------------------------------------------------- GET MEASURING PLANES VIEW
-        [[nodiscard]] std::vector<MeasuringPlaneView>& measuringplaneviews();
-        [[nodiscard]] const std::vector<MeasuringPlaneView>& measuringplaneviews() const;
-        [[nodiscard]] MeasuringPlaneView* measuringplaneview(unsigned int i);
-        [[nodiscard]] const MeasuringPlaneView* measuringplaneview(unsigned int i) const;
-        /// @}
-
-        /// @{ -------------------------------------------------- GET CENTER
         [[nodiscard]] virtual Vec3<GLfloat> center() const override;
-        /// @}
 
-        /// @{ -------------------------------------------------- IS INITIALIZED
         [[nodiscard]] virtual bool is_initialized() const override;
-        /// @}
 
         //====================================================================================================
         //===== SETTER
         //====================================================================================================
-        /// @{ -------------------------------------------------- SET NAME
-        void set_name(std::string_view n);
-        /// @}
-
-        /// @{ -------------------------------------------------- COLOR ATTRIBUTES
-        void set_line_color_attribute(const Vessel& v, std::string_view color_attribute_name);
-        void set_measuringplane_color_attribute(const Vessel& v, std::string_view color_attribute_name);
-        /// @}
-
         /// @{ -------------------------------------------------- OPERATOR =
-        [[maybe_unused]] VesselView& operator=(const VesselView&) = delete;
-        [[maybe_unused]] VesselView& operator=(VesselView&&) noexcept;
+        [[maybe_unused]] DatasetView& operator=(const DatasetView& )  = delete;
+        [[maybe_unused]] DatasetView& operator=(DatasetView&& ) noexcept ;
         /// @}
 
+        /// @{ -------------------------------------------------- ADD VESSEL
+        [[maybe_unused]] VesselView* add_vessel(const Vessel& v, Dataset& ds, GLuint window_width, GLuint window_height, VesselViewComponent flags = VesselViewComponent_All);
+        [[maybe_unused]] VesselView* add_vessel(std::string_view name);
+        void add_vessels_from_dataset(Dataset& ds, GLuint window_width, GLuint window_height, VesselViewComponent flags = VesselViewComponent_All);
+        /// @}
+
+        /// @{ -------------------------------------------------- SET PATHLINE COLOR
+        void set_line_color_attribute(const Dataset& ds, std::string_view color_attribute_name);
+        void set_colorbar_pathlines_heat();
+        void set_colorbar_pathlines_rainbow();
+        void set_colorbar_pathlines_blue_to_red();
+        void set_colorbar_pathlines_magenta();
+        void set_colorbar_pathlines_uniform_yellow();
+        void set_colorbar_pathlines_cluster();
+        void show_colorbar_pathlines();
+        void hide_colorbar_pathlines();
+        /// @}
+
+        /// @{ -------------------------------------------------- SET MEASURING PLANE COLOR
+        void set_measuringplanes_color_attribute(const Dataset& ds, std::string_view color_attribute_name);
+        void set_colorbar_measuringplanes_heat();
+        void set_colorbar_measuringplanes_rainbow();
+        void set_colorbar_measuringplanes_blue_to_red();
+        void set_colorbar_measuringplanes_magenta();
+        void set_colorbar_measuringplanes_uniform_yellow();
+        void show_colorbar_measuringplanes();
+        void hide_colorbar_measuringplanes();
+        /// @}
+
+        /// @{ -------------------------------------------------- SET SURFACE COLOR
+        void set_surface_color_attribute(const Dataset& ds, std::string_view color_attribute_name);
+        void set_colorbar_surface_heat();
+        void set_colorbar_surface_rainbow();
+        void set_colorbar_surface_blue_to_red();
+        void set_colorbar_surface_magenta();
+        void show_colorbar_surface();
+        void hide_colorbar_surface();
+        /// @}
+
+        /// @{ -------------------------------------------------- SET FLOWJET COLOR
+        void show_colorbar_flowjet();
+        void hide_colorbar_flowjet();
+        /// @}
+
+        /// @{ -------------------------------------------------- SET PRESSURE COLOR
+        void set_colorbar_pressure_blue_to_red();
+        void update_colorbar_pressure();
+        void show_colorbar_pressure();
+        void hide_colorbar_pressure();
+        /// @}
         //====================================================================================================
         //===== FUNCTIONS
         //====================================================================================================
-        /// @{ -------------------------------------------------- CLEAR
         void clear();
-        /// @}
-
-        /// @{ -------------------------------------------------- INIT
-        void init(const Vessel& v, Dataset& ds, GLuint window_width, GLuint window_height, VesselViewComponent flags = VesselViewComponent_All);
-        void init_measuringplanes(const Vessel& v);
-        /// @}
 
         /// @{ -------------------------------------------------- EVENTS
         virtual void on_resize(GLint w, GLint h) override;
@@ -195,13 +188,11 @@ namespace bk
         /// @}
 
         /// @{ -------------------------------------------------- DRAW
-      protected:
         virtual void draw_opaque_impl() override;
         virtual void draw_transparent_impl() override;
-      public:
         /// @}
-    }; // class VesselView 
+    }; // class DatasetView
   } // inline namespace cmr
 } // namespace bk
 
-#endif //BK_VESSELVIEW_H
+#endif //BK_DATASETVIEW_H

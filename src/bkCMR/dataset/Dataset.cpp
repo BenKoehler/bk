@@ -42,6 +42,7 @@
 #include <bkCMR/filters/PhaseUnwrapping2DT.h>
 #include <bkCMR/filters/PhaseUnwrapping3DT.h>
 #include <bkCMR/filters/PressureMapImageFilter.h>
+#include <bkCMR/filters/VelocityOffsetCorrector3DT.h>
 #include <bkCMR/dataset/Vessel.h>
 #include <bkCMR/sampling/VesselSegmentationInFlowFieldSizeImageFilter.h>
 #include <bkDicom/DicomDirImporter_CMR.h>
@@ -74,8 +75,8 @@ namespace bk
         std::vector<Vessel> vessels;
         PhaseUnwrapping3DT phase_unwrapping_3dt;
         std::map<unsigned int/*imgId*/, PhaseUnwrapping2DT> phase_unwrapping_2dt;
-
-        // todo velocity offset correction
+        VelocityOffsetCorrector3DT velocity_offset_correction_3dt;
+        // todo velocity offset correction 2dt
     };
 
     //====================================================================================================
@@ -662,9 +663,8 @@ namespace bk
 
         if (flags & DatasetFilter_VelocityOffset)
         {
-            //load_eddy_current_correction_3dt();
-            //correct_eddy_currents_3dt();
-            // todo
+            load_velocity_offset_correction_3dt();
+            _pdata->velocity_offset_correction_3dt.apply(_pdata->flow_image_3dt);
         }
 
         if (flags & DatasetFilter_TimeShift)
@@ -705,8 +705,17 @@ namespace bk
 
         if (flags & DatasetFilter_PhaseUnwrapping)
         {
-            PhaseUnwrapping2DT pu;
-            pu.apply(*ff, _pdata->importer.venc_in_m_per_s(dcm_id));
+            load_phase_unwrapping_2dt();
+
+            const auto it = _pdata->phase_unwrapping_2dt.find(dcm_id);
+
+            if (it == _pdata->phase_unwrapping_2dt.end())
+            { std::cerr << "Dataset::flow_image_2dt - could not find phase unwrapping for 2dt flow image with id " << dcm_id << std::endl; }
+            else
+            {
+                PhaseUnwrapping2DT& pu = it->second;
+                pu.apply(*ff, _pdata->importer.venc_in_m_per_s(dcm_id));
+            }
         }
 
         if (flags & DatasetFilter_VelocityOffset)
@@ -1106,6 +1115,20 @@ namespace bk
         return true;
     }
 
+    bool Dataset::determine_velocity_offset_3dt(bool reload_flow_image)
+    {
+        if (reload_flow_image)
+        { load_flow_image_3dt(DatasetFilter_FlowDirCorrection & DatasetFilter_PhaseUnwrapping); }
+
+        if (!is_flow_image_3dt_loaded())
+        { return false; }
+
+        const bk::Clock clock = _pdata->velocity_offset_correction_3dt.init(_pdata->flow_image_3dt, *ivsd());
+        std::cout << "velocity offsets 3D+T determined in " << clock.time_in_sec() << " s" << std::endl;
+
+        return true;
+    }
+
     //====================================================================================================
     //===== FUNCTIONS
     //====================================================================================================
@@ -1246,6 +1269,12 @@ namespace bk
     std::string Dataset::filepath_phase_unwrapping_3dt() const
     { return _pdata->project_path + "phase_wraps_3dt.pu"; }
 
+    std::string Dataset::filepath_velocity_offset_correction_2dt() const
+    { return _pdata->project_path + "veloff_2dt.voc"; }
+
+    std::string Dataset::filepath_velocity_offset_correction_3dt() const
+    { return _pdata->project_path + "veloff_3dt.voc"; }
+
     std::string Dataset::dirpath_vessels() const
     { return dirpath_vessels_without_slash_ending() + "/"; }
 
@@ -1296,8 +1325,11 @@ namespace bk
     std::string Dataset::filepath_centerlines_of_vessel(std::string_view name) const
     { return dirpath_vessel(name) + name.data() + ".cl"; }
 
-    std::string Dataset::filepath_land_marks_of_vessel(const Vessel* v) const { return filepath_land_marks_of_vessel(v->name()); }
-    std::string Dataset::filepath_land_marks_of_vessel(std::string_view name) const { return dirpath_vessel(name) + name.data() + ".lm"; }
+    std::string Dataset::filepath_land_marks_of_vessel(const Vessel* v) const
+    { return filepath_land_marks_of_vessel(v->name()); }
+
+    std::string Dataset::filepath_land_marks_of_vessel(std::string_view name) const
+    { return dirpath_vessel(name) + name.data() + ".lm"; }
 
     std::string Dataset::filepath_flowjet_of_vessel(const Vessel* v) const
     { return filepath_flowjet_of_vessel(v->name()); }
@@ -1586,6 +1618,15 @@ namespace bk
 
     bool Dataset::delete_file_phase_unwrapping_3dt()
     { return delete_file_if_exists(filepath_phase_unwrapping_3dt()); }
+
+    bool Dataset::save_velocity_offset_correction_3dt()
+    { return _pdata->velocity_offset_correction_3dt.save(filepath_velocity_offset_correction_3dt()); }
+
+    bool Dataset::load_velocity_offset_correction_3dt()
+    { return _pdata->velocity_offset_correction_3dt.load(filepath_velocity_offset_correction_3dt()); }
+
+    bool Dataset::delete_file_velocity_offset_correction_3dt()
+    { return delete_file_if_exists(filepath_velocity_offset_correction_3dt()); }
 
     bool Dataset::save_ivsd()
     {

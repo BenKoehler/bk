@@ -28,6 +28,7 @@
 #include <cstdint>
 #include <fstream>
 #include <iterator>
+#include <limits>
 #include <vector>
 
 #include <bk/BitVector>
@@ -45,6 +46,7 @@
 #endif
 
 #include <bkCMR/dataset/FlowJet.h>
+#include <bkCMR/dataset/FlowJetPoint.h>
 #include <bkCMR/dataset/MeasuringPlane.h>
 #include <bkCMR/rotation_angle_2d.h>
 
@@ -202,6 +204,22 @@ namespace bk
     bk::TriangularMesh3D&& Vessel::mesh()&&
     { return std::move(_pdata->mesh); }
 
+    std::pair<double, double> Vessel::min_max_scalar_mesh_point_attribute(std::string_view attribute_name) const
+    {
+        std::pair minmax(std::numeric_limits<double>::max(), std::numeric_limits<double>::lowest());
+
+        if (_pdata->mesh.point_attribute_map().has_attribute(attribute_name))
+        {
+            const std::vector<double>& avec = _pdata->mesh.point_attribute_vector_of_type<double>(attribute_name);
+            const auto itMinMax = std::minmax_element(avec.begin(), avec.end());
+
+            minmax.first = std::min(minmax.first, *itMinMax.first);
+            minmax.second = std::max(minmax.second, *itMinMax.second);
+        }
+
+        return minmax;
+    }
+
     bool Vessel::has_pathlines() const
     { return num_pathlines() != 0; }
 
@@ -213,6 +231,31 @@ namespace bk
 
     std::vector<bk::Line3D>& Vessel::pathlines()
     { return _pdata->pathlines; }
+
+    std::pair<double, double> Vessel::min_max_scalar_pathline_point_attribute(std::string_view attribute_name) const
+    {
+        std::pair minmax(std::numeric_limits<double>::max(), std::numeric_limits<double>::lowest());
+
+        #pragma omp parallel for
+        for (unsigned int i = 0; i < num_pathlines(); ++i)
+        {
+            const Line3D& p = _pdata->pathlines[i];
+
+            if (p.point_attribute_map().has_attribute(attribute_name))
+            {
+                const std::vector<double>& avec = p.point_attribute_vector_of_type<double>(attribute_name);
+                const auto itMinMax = std::minmax_element(avec.begin(), avec.end());
+
+                #pragma omp critical(min_max_scalar_pathline_point_attribute)
+                {
+                    minmax.first = std::min(minmax.first, *itMinMax.first);
+                    minmax.second = std::max(minmax.second, *itMinMax.second);
+                }
+            }
+        }
+
+        return minmax;
+    }
 
     std::vector<Line3D>& Vessel::centerlines()&
     { return _pdata->centerlines; }
@@ -282,6 +325,31 @@ namespace bk
     unsigned int Vessel::num_measuring_planes() const
     { return _pdata->measuring_planes.size(); }
 
+    std::pair<double, double> Vessel::min_max_scalar_measuring_plane_point_attribute(std::string_view attribute_name) const
+    {
+        std::pair minmax(std::numeric_limits<double>::max(), std::numeric_limits<double>::lowest());
+
+        #pragma omp parallel for
+        for (unsigned int i = 0; i < num_measuring_planes(); ++i)
+        {
+            const MeasuringPlane& mp = _pdata->measuring_planes[i];
+
+            if (mp.point_attribute_map().has_attribute(attribute_name))
+            {
+                const NDVector<double>& avec = mp.point_attribute_vector_of_type<double>(attribute_name);
+                const auto itMinMax = std::minmax_element(avec.begin(), avec.end());
+
+                #pragma omp critical(min_max_scalar_pathline_point_attribute)
+                {
+                    minmax.first = std::min(minmax.first, *itMinMax.first);
+                    minmax.second = std::max(minmax.second, *itMinMax.second);
+                }
+            }
+        }
+
+        return minmax;
+    }
+
     std::vector<FlowJet>& Vessel::flowjets()
     { return _pdata->flowjets; }
 
@@ -291,7 +359,7 @@ namespace bk
     unsigned int Vessel::num_flowjets() const
     { return _pdata->flowjets.size(); }
 
-    bool Vessel::has_flowjets()
+    bool Vessel::has_flowjets() const
     { return num_flowjets() != 0; }
 
     //====================================================================================================
@@ -1317,512 +1385,525 @@ namespace bk
         return true;
     }
 
-    //bool Vessel::save_measuringplanes(std::string_view filepath) const
-    //{
-    //    #ifdef BK_EMIT_PROGRESS
-    //    Progress& prog           = bk_progress.emplace_task(0, 3, ___("Saving measuring planes"));
-    //    #endif
-    //
-    //    //------------------------------------------------------------------------------------------------------
-    //    // check filename
-    //    //------------------------------------------------------------------------------------------------------
-    //    std::string       fname(filepath);
-    //    const std::string suffix = ".mp";
-    //    if (fname.empty())
-    //    { fname = "measuringplanes" + suffix; }
-    //    else if (!string_utils::ends_with(fname, suffix))
-    //    { fname.append(suffix); }
-    //
-    //    //------------------------------------------------------------------------------------------------------
-    //    // create file
-    //    //------------------------------------------------------------------------------------------------------
-    //    std::ofstream file(fname, std::ios_base::out | std::ios_base::binary);
-    //    if (!file.good())
-    //    {
-    //        #ifdef BK_EMIT_PROGRESS
-    //        prog.set_finished();
-    //        #endif
-    //        return false;
-    //    }
-    //
-    //    #ifdef BK_EMIT_PROGRESS
-    //    prog.increment(1);
-    //    #endif
-    //
-    //    // temp
-    //    std::uint32_t ui32temp = 0;
-    //    double        dtemp    = 0;
-    //    std::uint8_t  ui8temp  = 0;
-    //
-    //    // num measuring planes
-    //    ui32temp = static_cast<std::uint32_t>(measuring_planes().size());
-    //    file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
-    //
-    //    // measuring planes
-    //    for (unsigned int i = 0; i < measuring_planes().size(); ++i)
-    //    {
-    //        const auto& mp = *measuring_plane(i);
-    //
-    //        // vessel id
-    //        ui8temp = mp.vesselID();
-    //        file.write(reinterpret_cast<char*>(&ui8temp), sizeof(std::uint8_t));
-    //
-    //        // grid size
-    //        for (unsigned int s = 0; s < 3; ++s)
-    //        {
-    //            ui32temp = mp.geometry().size(s);
-    //            file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
-    //        }
-    //
-    //        // center
-    //        for (unsigned int s = 0; s < 3; ++s)
-    //        {
-    //            dtemp = mp.geometry().transformation().center()[s];
-    //            file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //        }
-    //
-    //        // scale
-    //        for (unsigned int s = 0; s < 3; ++s)
-    //        {
-    //            dtemp = mp.geometry().transformation().scale(s);
-    //            file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //        }
-    //
-    //        // nx
-    //        for (unsigned int s = 0; s < 3; ++s)
-    //        {
-    //            dtemp = mp.geometry().transformation().nx()[s];
-    //            file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //        }
-    //
-    //        // ny
-    //        for (unsigned int s = 0; s < 3; ++s)
-    //        {
-    //            dtemp = mp.geometry().transformation().ny()[s];
-    //            file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //        }
-    //
-    //        // nz
-    //        for (unsigned int s = 0; s < 3; ++s)
-    //        {
-    //            dtemp = mp.geometry().transformation().nz()[s];
-    //            file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //        }
-    //
-    //        // diameter
-    //        dtemp = mp.diameter_mm();
-    //        file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //
-    //        // velocity vectors (N = grid_size[0] * grid_size[1] * grid_size[2])
-    //        for (unsigned int k = 0; k < mp.num_values(); ++k)
-    //        {
-    //            // vvec
-    //            for (unsigned int s = 0; s < 3; ++s)
-    //            {
-    //                dtemp = mp[k][s];
-    //                file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //            }
-    //        }
-    //
-    //        // through-plane velocity (N = grid_size[0] * grid_size[1] * grid_size[2])
-    //        for (unsigned int k = 0; k < mp.num_values(); ++k)
-    //        {
-    //            const auto vtp_ptr = mp.point_attributes().get_velocity_throughplane_value(k);
-    //            dtemp = vtp_ptr != nullptr ? *vtp_ptr : 0;
-    //            file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //        }
-    //
-    //        // segmentation
-    //        for (unsigned int k = 0; k < mp.num_values(); ++k)
-    //        {
-    //            ui8temp = mp.segmentation_cross_section()[k] != 0 ? 1 : 0;
-    //            file.write(reinterpret_cast<char*>(&ui8temp), sizeof(std::uint8_t));
-    //        }
-    //    }
-    //
-    //    file.close();
-    //
-    //    #ifdef BK_EMIT_PROGRESS
-    //    prog.set_finished();
-    //    #endif
-    //
-    //    return true;
-    //}
-    //
-    //bool Vessel::load_measuringplanes(std::string_view filepath)
-    //{
-    //    #ifdef BK_EMIT_PROGRESS
-    //    Progress& prog = bk_progress.emplace_task(0, 3, ___("loading measuring planes"));
-    //    #endif
-    //
-    //    //------------------------------------------------------------------------------------------------------
-    //    // check file ending
-    //    //------------------------------------------------------------------------------------------------------
-    //    const std::string suffix = ".mp";
-    //    if (!string_utils::ends_with(filepath, suffix))
-    //    {
-    //        #ifdef BK_EMIT_PROGRESS
-    //        prog.set_finished();
-    //        #endif
-    //        return false;
-    //    }
-    //
-    //    //------------------------------------------------------------------------------------------------------
-    //    // open file
-    //    //------------------------------------------------------------------------------------------------------
-    //    std::ifstream file(filepath, std::ios_base::in | std::ios_base::binary);
-    //    if (!file.good())
-    //    {
-    //        #ifdef BK_EMIT_PROGRESS
-    //        prog.set_finished();
-    //        #endif
-    //        return false;
-    //    }
-    //
-    //    #ifdef BK_EMIT_PROGRESS
-    //    prog.increment(1);
-    //    #endif
-    //
-    //    // num measuring planes
-    //    std::uint32_t numMeasuringPlanes = 0;
-    //    file.read(reinterpret_cast<char*>(&numMeasuringPlanes), sizeof(std::uint32_t));
-    //    _pdata->measuring_planes.resize(numMeasuringPlanes);
-    //
-    //    // measuring planes
-    //    for (unsigned int i = 0; i < numMeasuringPlanes; ++i)
-    //    {
-    //        auto& mp = *measuring_plane(i);
-    //
-    //        // vessel id
-    //        std::uint8_t id = 0;
-    //        file.read(reinterpret_cast<char*>(&id), sizeof(std::uint8_t));
-    //        mp.set_vesselID(id);
-    //
-    //        // grid size
-    //        std::uint32_t gs[3] = {0, 0, 0};
-    //        file.read(reinterpret_cast<char*>(gs), 3 * sizeof(std::uint32_t));
-    //        mp.set_size(gs[0], gs[1], gs[2]);
-    //        mp.geometry().transformation().set_grid_size(gs[0], gs[1], gs[2]);
-    //
-    //        const unsigned int  N = 5 * 3 + mp.num_values() * 4 + 1;
-    //        std::vector<double> dbuf(N);
-    //
-    //        file.read(reinterpret_cast<char*>(dbuf.data()), N * sizeof(double));
-    //
-    //        auto fut_set_mp = bk_threadpool.enqueue([&]()
-    //                                                {
-    //                                                    unsigned int cnt = 0;
-    //
-    //                                                    // center
-    //                                                    mp.geometry().transformation().set_center(dbuf[cnt], dbuf[cnt + 1], dbuf[cnt + 2]);
-    //                                                    cnt += 3;
-    //
-    //                                                    // scale
-    //                                                    mp.geometry().transformation().set_scale(dbuf[cnt], dbuf[cnt + 1], dbuf[cnt + 2]);
-    //                                                    cnt += 3;
-    //
-    //                                                    // nx
-    //                                                    mp.geometry().transformation().set_nx(dbuf[cnt], dbuf[cnt + 1], dbuf[cnt + 2]);
-    //                                                    cnt += 3;
-    //
-    //                                                    // ny
-    //                                                    mp.geometry().transformation().set_ny(dbuf[cnt], dbuf[cnt + 1], dbuf[cnt + 2]);
-    //                                                    cnt += 3;
-    //
-    //                                                    // nz
-    //                                                    mp.geometry().transformation().set_nz(dbuf[cnt], dbuf[cnt + 1], dbuf[cnt + 2]);
-    //                                                    cnt += 3;
-    //
-    //                                                    // diameter
-    //                                                    mp.set_diameter_mm(dbuf[cnt++]);
-    //
-    //                                                    // velocity vectors (N = grid_size[0] * grid_size[1] * grid_size[2])
-    //                                                    for (unsigned int k = 0; k < mp.num_values(); ++k)
-    //                                                    {
-    //                                                        mp[k].set(dbuf[cnt], dbuf[cnt + 1], dbuf[cnt + 2]);
-    //                                                        cnt += 3;
-    //                                                    }
-    //
-    //                                                    // through-plane velocity (N = grid_size[0] * grid_size[1] * grid_size[2])
-    //                                                    for (unsigned int k = 0; k < mp.num_values(); ++k)
-    //                                                    { mp.point_attributes().set_velocity_throughplane_value(k, dbuf[cnt++]); }
-    //                                                });
-    //
-    //        // segmentation
-    //        CartesianImage<std::uint8_t, 3> seg;
-    //        seg.set_size(gs[0], gs[1], gs[2]);
-    //
-    //        std::vector<std::uint8_t> ui8buf(mp.num_values());
-    //        file.read(reinterpret_cast<char*>(ui8buf.data()), mp.num_values() * sizeof(std::uint8_t));
-    //
-    //        #pragma omp parallel for
-    //        for (unsigned int k = 0; k < mp.num_values(); ++k)
-    //        { seg[k] = ui8buf[k]; }
-    //
-    //        mp.set_measuring_plane_segmentation(seg);
-    //
-    //        fut_set_mp.get();
-    //    }
-    //
-    //    file.close();
-    //
-    //    #ifdef BK_EMIT_PROGRESS
-    //    prog.set_finished();
-    //    #endif
-    //
-    //    return true;
-    //}
-    //
-    //bool Vessel::save_flowjets(std::string_view filepath) const
-    //{
-    //    #ifdef BK_EMIT_PROGRESS
-    //    Progress& prog           = bk_progress.emplace_task(0, 3, ___("Saving flow jets"));
-    //    #endif
-    //
-    //    //------------------------------------------------------------------------------------------------------
-    //    // check filename
-    //    //------------------------------------------------------------------------------------------------------
-    //    std::string       fname(filepath);
-    //    const std::string suffix = ".fj";
-    //    if (fname.empty())
-    //    { fname = "flowjets" + suffix; }
-    //    else if (!string_utils::ends_with(fname, suffix))
-    //    { fname.append(suffix); }
-    //
-    //    //------------------------------------------------------------------------------------------------------
-    //    // create file
-    //    //------------------------------------------------------------------------------------------------------
-    //    std::ofstream file(fname, std::ios_base::out | std::ios_base::binary);
-    //    if (!file.good())
-    //    {
-    //        #ifdef BK_EMIT_PROGRESS
-    //        prog.set_finished();
-    //        #endif
-    //        return false;
-    //    }
-    //
-    //    #ifdef BK_EMIT_PROGRESS
-    //    prog.increment(1);
-    //    #endif
-    //
-    //    // temp
-    //    std::uint8_t  ui8temp  = 0;
-    //    std::uint32_t ui32temp = 0;
-    //    double        dtemp    = 0;
-    //
-    //    // num jets
-    //    ui8temp = num_flowjets();
-    //    file.write(reinterpret_cast<char*>(&ui8temp), sizeof(std::uint8_t));
-    //
-    //    constexpr const double _invalid = std::numeric_limits<double>::max();
-    //
-    //    for (const FlowJet_CMR& fj: _pdata->flowjets.flowjets())
-    //    {
-    //        // num planes
-    //        ui32temp = fj.num_positions();
-    //        file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
-    //
-    //        // num times
-    //        ui32temp = fj.num_times();
-    //        file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
-    //
-    //        for (unsigned int pid = 0; pid < fj.num_positions(); ++pid)
-    //        {
-    //            // vessel center
-    //            const auto        vcenter = fj.vessel_center(pid);
-    //            for (unsigned int i: {0, 1, 2})
-    //            {
-    //                dtemp = vcenter != nullptr ? (*vcenter)[i] : _invalid;
-    //                file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //            }
-    //
-    //            // vessel radius
-    //            dtemp = *fj.vessel_radius(pid);
-    //            file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //
-    //            // jet lcs x
-    //            const auto        jlcs = fj.jet_local_coord_sys(pid);
-    //            for (unsigned int i: {0, 1, 2})
-    //            {
-    //                dtemp = jlcs != nullptr ? jlcs->first[i] : _invalid;
-    //                file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //            }
-    //
-    //            // jet lcs y
-    //            for (unsigned int i: {0, 1, 2})
-    //            {
-    //                dtemp = jlcs != nullptr ? jlcs->second[i] : _invalid;
-    //                file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //            }
-    //
-    //            for (unsigned int tid = 0; tid < fj.num_times(); ++tid)
-    //            {
-    //                // jet center
-    //                const auto        jcenter = fj.jet_position(pid, tid);
-    //                for (unsigned int i: {0, 1, 2})
-    //                {
-    //                    dtemp = jcenter != nullptr ? (*jcenter)[i] : _invalid;
-    //                    file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //                }
-    //
-    //                // jet velocity
-    //                dtemp = *fj.jet_velocity(pid, tid);
-    //                file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //
-    //                // area center
-    //                const auto        acenter = fj.area_center(pid, tid);
-    //                for (unsigned int i: {0, 1, 2})
-    //                {
-    //                    dtemp = acenter != nullptr ? (*acenter)[i] : _invalid;
-    //                    file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //                }
-    //
-    //                // area radii
-    //                const auto aradii = fj.area_radii(pid, tid);
-    //                dtemp = aradii != nullptr ? aradii->first : _invalid;
-    //                file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //                dtemp = aradii != nullptr ? aradii->second : _invalid;
-    //                file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //
-    //                // area dirs
-    //                const auto        adirs = fj.area_dirs(pid, tid);
-    //                for (unsigned int i: {0, 1, 2})
-    //                {
-    //                    dtemp = adirs != nullptr ? adirs->first[i] : _invalid;
-    //                    file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //                }
-    //
-    //                for (unsigned int i: {0, 1, 2})
-    //                {
-    //                    dtemp = adirs != nullptr ? adirs->second[i] : _invalid;
-    //                    file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
-    //                }
-    //            } // for tid : fj.num_times()
-    //        } // for pid : fj.num_positions()
-    //    } // for fjid : num_flowjets()
-    //
-    //    file.close();
-    //
-    //    #ifdef BK_EMIT_PROGRESS
-    //    prog.set_finished();
-    //    #endif
-    //
-    //    return true;
-    //}
-    //
-    //bool Vessel::load_flowjets(std::string_view filepath)
-    //{
-    //    #ifdef BK_EMIT_PROGRESS
-    //    Progress& prog = bk_progress.emplace_task(0, 3, ___("Loading flow jets"));
-    //    #endif
-    //
-    //    //------------------------------------------------------------------------------------------------------
-    //    // check file ending
-    //    //------------------------------------------------------------------------------------------------------
-    //    const std::string suffix = ".fj";
-    //    if (!string_utils::ends_with(filepath, suffix))
-    //    {
-    //        #ifdef BK_EMIT_PROGRESS
-    //        prog.set_finished();
-    //        #endif
-    //        return false;
-    //    }
-    //
-    //    //------------------------------------------------------------------------------------------------------
-    //    // open file
-    //    //------------------------------------------------------------------------------------------------------
-    //    std::ifstream file(filepath, std::ios_base::in | std::ios_base::binary);
-    //    if (!file.good())
-    //    {
-    //        #ifdef BK_EMIT_PROGRESS
-    //        prog.set_finished();
-    //        #endif
-    //        return false;
-    //    }
-    //
-    //    clear_flowjets();
-    //
-    //    #ifdef BK_EMIT_PROGRESS
-    //    prog.increment(1);
-    //    #endif
-    //
-    //    std::uint8_t numFlowjets = 0;
-    //    file.read(reinterpret_cast<char*>(&numFlowjets), sizeof(std::uint8_t));
-    //
-    //    _pdata->flowjets.set_num_flowjets(numFlowjets);
-    //
-    //    for (unsigned int fjid = 0; fjid < numFlowjets; ++fjid)
-    //    {
-    //        FlowJet_CMR& fj = *_pdata->flowjets[fjid];
-    //
-    //        // num planes
-    //        std::uint32_t numPlanes = 0;
-    //        file.read(reinterpret_cast<char*>(&numPlanes), sizeof(std::uint32_t));
-    //
-    //        // num times
-    //        std::uint32_t numTimes = 0;
-    //        file.read(reinterpret_cast<char*>(&numTimes), sizeof(std::uint32_t));
-    //
-    //        fj.set_num_positions_and_times(numPlanes, numTimes);
-    //
-    //        for (unsigned int pid = 0; pid < fj.num_positions(); ++pid)
-    //        {
-    //            // vessel center
-    //            double buf_vcenter[3] = {0, 0, 0};
-    //            file.read(reinterpret_cast<char*>(buf_vcenter), 3 * sizeof(double));
-    //
-    //            // vessel radius
-    //            double vradius = *fj.vessel_radius(pid);
-    //            file.read(reinterpret_cast<char*>(&vradius), sizeof(double));
-    //
-    //            // jet lcs
-    //            double buf_lcsx[3] = {0, 0, 0};
-    //            file.read(reinterpret_cast<char*>(buf_lcsx), 3 * sizeof(double));
-    //
-    //            double buf_lcsy[3] = {0, 0, 0};
-    //            file.read(reinterpret_cast<char*>(buf_lcsy), 3 * sizeof(double));
-    //
-    //            for (unsigned int tid = 0; tid < fj.num_times(); ++tid)
-    //            {
-    //                // jet center
-    //                double buf_jcenter[3] = {0, 0, 0};
-    //                file.read(reinterpret_cast<char*>(buf_jcenter), 3 * sizeof(double));
-    //
-    //                // jet velocity
-    //                double jvelocity = 0;
-    //                file.read(reinterpret_cast<char*>(&jvelocity), sizeof(double));
-    //
-    //                // area center
-    //                double buf_acenter[3] = {0, 0, 0};
-    //                file.read(reinterpret_cast<char*>(buf_acenter), 3 * sizeof(double));
-    //
-    //                // area radii
-    //                double arad0 = 0;
-    //                file.read(reinterpret_cast<char*>(&arad0), sizeof(double));
-    //
-    //                double arad1 = 0;
-    //                file.read(reinterpret_cast<char*>(&arad1), sizeof(double));
-    //
-    //                // area dirs
-    //                double buf_adir0[3] = {0, 0, 0};
-    //                file.read(reinterpret_cast<char*>(buf_adir0), 3 * sizeof(double));
-    //
-    //                double buf_adir1[3] = {0, 0, 0};
-    //                file.read(reinterpret_cast<char*>(buf_adir1), 3 * sizeof(double));
-    //
-    //                fj.set_center(pid, tid, Vec3d(buf_jcenter[0], buf_jcenter[1], buf_jcenter[2]), jvelocity, Vec3d(buf_lcsx[0], buf_lcsx[1], buf_lcsx[2]), Vec3d(buf_lcsy[0], buf_lcsy[1], buf_lcsy[2]), Vec3d(buf_acenter[0], buf_acenter[1], buf_acenter[2]), arad0, arad1, Vec3d(buf_adir0[0], buf_adir0[1], buf_adir0[2]), Vec3d(buf_adir1[0], buf_adir1[1], buf_adir1[2]), Vec3d(buf_vcenter[0], buf_vcenter[1], buf_vcenter[2]), vradius);
-    //            } // for tid : fj.num_times()
-    //        } // for pid : fj.num_positions()
-    //    } // for fjid: numFlowhjets
-    //
-    //    file.close();
-    //
-    //    #ifdef BK_EMIT_PROGRESS
-    //    prog.set_finished();
-    //    #endif
-    //
-    //    return true;
-    //}
+    bool Vessel::save_measuringplanes(std::string_view filepath) const
+    {
+        #ifdef BK_EMIT_PROGRESS
+        Progress& prog = bk_progress.emplace_task(num_measuring_planes() + 3, ___("Saving measuring planes"));
+        #endif
+
+        //------------------------------------------------------------------------------------------------------
+        // check filename
+        //------------------------------------------------------------------------------------------------------
+        std::string fname(filepath);
+        const std::string suffix = ".mp";
+        if (fname.empty())
+        { fname = "measuringplanes" + suffix; }
+        else if (!string_utils::ends_with(fname, suffix))
+        { fname.append(suffix); }
+
+        //------------------------------------------------------------------------------------------------------
+        // create file
+        //------------------------------------------------------------------------------------------------------
+        std::ofstream file(fname, std::ios_base::out | std::ios_base::binary);
+        if (!file.good())
+        {
+            #ifdef BK_EMIT_PROGRESS
+            prog.set_finished();
+            #endif
+
+            return false;
+        }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
+
+        // temp
+        std::uint32_t ui32temp = 0;
+        double dtemp = 0;
+        std::uint8_t ui8temp = 0;
+
+        // num measuring planes
+        ui32temp = static_cast<std::uint32_t>(num_measuring_planes());
+        file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
+
+        // measuring planes
+        for (unsigned int i = 0; i < num_measuring_planes(); ++i)
+        {
+            const MeasuringPlane& mp = _pdata->measuring_planes[i];
+
+            // vessel id
+            ui8temp = mp.vesselID();
+            file.write(reinterpret_cast<char*>(&ui8temp), sizeof(std::uint8_t));
+
+            // grid size
+            for (unsigned int s = 0; s < 3; ++s)
+            {
+                ui32temp = mp.geometry().size(s);
+                file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
+            }
+
+            // center
+            for (unsigned int s = 0; s < 3; ++s)
+            {
+                dtemp = mp.geometry().transformation().center()[s];
+                file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
+            }
+
+            // scale
+            for (unsigned int s = 0; s < 3; ++s)
+            {
+                dtemp = mp.geometry().transformation().scale(s);
+                file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
+            }
+
+            // nx
+            for (unsigned int s = 0; s < 3; ++s)
+            {
+                dtemp = mp.geometry().transformation().nx()[s];
+                file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
+            }
+
+            // ny
+            for (unsigned int s = 0; s < 3; ++s)
+            {
+                dtemp = mp.geometry().transformation().ny()[s];
+                file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
+            }
+
+            // nz
+            for (unsigned int s = 0; s < 3; ++s)
+            {
+                dtemp = mp.geometry().transformation().nz()[s];
+                file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
+            }
+
+            // diameter
+            dtemp = mp.diameter_mm();
+            file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
+
+            // velocity vectors (N = grid_size[0] * grid_size[1] * grid_size[2])
+            for (unsigned int k = 0; k < mp.num_values(); ++k)
+            {
+                // vvec
+                for (unsigned int s = 0; s < 3; ++s)
+                {
+                    dtemp = mp[k][s];
+                    file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
+                }
+            }
+
+            // through-plane velocity (N = grid_size[0] * grid_size[1] * grid_size[2])
+            //for(unsigned int x = 0; x < mp.size(0); ++x)
+            //{
+            //    for(unsigned int y = 0; y < mp.size(1); ++y)
+            //    {
+            //        for(unsigned int z = 0; z < mp.size(2); ++z)
+            //        {
+            //            dtemp = mp.velocity_through_plane(x,y,z);
+            //            file.write(reinterpret_cast<char*>(&dtemp), sizeof(double));
+            //        }
+            //    }
+            //}
+
+            // segmentation
+            const auto& seg = mp.segmentation_cross_section();
+            for (unsigned int k = 0; k < mp.num_values(); ++k)
+            {
+                ui8temp = seg[k] != 0 ? 1 : 0;
+                file.write(reinterpret_cast<char*>(&ui8temp), sizeof(std::uint8_t));
+            }
+
+            #ifdef BK_EMIT_PROGRESS
+            prog.increment(1);
+            #endif
+        }
+
+        file.close();
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        return true;
+    }
+
+    bool Vessel::load_measuringplanes(std::string_view filepath)
+    {
+        #ifdef BK_EMIT_PROGRESS
+        Progress& prog = bk_progress.emplace_task(3, ___("loading measuring planes"));
+        #endif
+
+        //------------------------------------------------------------------------------------------------------
+        // check file ending
+        //------------------------------------------------------------------------------------------------------
+        const std::string suffix = ".mp";
+        if (!string_utils::ends_with(filepath, suffix))
+        {
+            #ifdef BK_EMIT_PROGRESS
+            prog.set_finished();
+            #endif
+            return false;
+        }
+
+        //------------------------------------------------------------------------------------------------------
+        // open file
+        //------------------------------------------------------------------------------------------------------
+        std::ifstream file(filepath.data(), std::ios_base::in | std::ios_base::binary);
+        if (!file.good())
+        {
+            #ifdef BK_EMIT_PROGRESS
+            prog.set_finished();
+            #endif
+
+            return false;
+        }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
+
+        // num measuring planes
+        std::uint32_t numMeasuringPlanes = 0;
+        file.read(reinterpret_cast<char*>(&numMeasuringPlanes), sizeof(std::uint32_t));
+        _pdata->measuring_planes.resize(numMeasuringPlanes);
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_max(prog.max() + numMeasuringPlanes);
+        #endif
+
+        std::vector<std::future<void>> fut_calc_stats;
+        fut_calc_stats.reserve(numMeasuringPlanes);
+
+        // measuring planes
+        for (unsigned int i = 0; i < numMeasuringPlanes; ++i)
+        {
+            MeasuringPlane& mp = _pdata->measuring_planes[i];
+
+            // vessel id
+            std::uint8_t id = 0;
+            file.read(reinterpret_cast<char*>(&id), sizeof(std::uint8_t));
+            mp.set_vesselID(id);
+
+            // grid size
+            std::uint32_t gs[3] = {0, 0, 0};
+            file.read(reinterpret_cast<char*>(gs), 3 * sizeof(std::uint32_t));
+            mp.set_size(gs[0], gs[1], gs[2]);
+            mp.geometry().transformation().set_grid_size(gs[0], gs[1], gs[2]);
+
+            const unsigned int N = 5 * 3 + mp.num_values() * 4 + 1;
+            std::vector<double> dbuf(N);
+
+            file.read(reinterpret_cast<char*>(dbuf.data()), N * sizeof(double));
+
+            auto fut_set_mp = bk_threadpool.enqueue([&]()
+                                                    {
+                                                        unsigned int cnt = 0;
+
+                                                        // center
+                                                        mp.geometry().transformation().set_center(dbuf[cnt], dbuf[cnt + 1], dbuf[cnt + 2]);
+                                                        cnt += 3;
+
+                                                        // scale
+                                                        mp.geometry().transformation().set_scale(dbuf[cnt], dbuf[cnt + 1], dbuf[cnt + 2]);
+                                                        cnt += 3;
+
+                                                        // nx
+                                                        mp.geometry().transformation().set_nx(dbuf[cnt], dbuf[cnt + 1], dbuf[cnt + 2]);
+                                                        cnt += 3;
+
+                                                        // ny
+                                                        mp.geometry().transformation().set_ny(dbuf[cnt], dbuf[cnt + 1], dbuf[cnt + 2]);
+                                                        cnt += 3;
+
+                                                        // nz
+                                                        mp.geometry().transformation().set_nz(dbuf[cnt], dbuf[cnt + 1], dbuf[cnt + 2]);
+                                                        cnt += 3;
+
+                                                        // diameter
+                                                        mp.set_diameter_mm(dbuf[cnt++]);
+
+                                                        // velocity vectors (N = grid_size[0] * grid_size[1] * grid_size[2])
+                                                        for (unsigned int k = 0; k < mp.num_values(); ++k)
+                                                        {
+                                                            mp[k].set(dbuf[cnt], dbuf[cnt + 1], dbuf[cnt + 2]);
+                                                            cnt += 3;
+                                                        }
+
+                                                        // through-plane velocity (N = grid_size[0] * grid_size[1] * grid_size[2])
+                                                        //for (unsigned int k = 0; k < mp.num_values(); ++k)
+                                                        //{ mp.point_attributes().set_velocity_throughplane_value(k, dbuf[cnt++]); }
+                                                        //
+                                                        //for(unsigned int x = 0; x < mp.size(0); ++x)
+                                                        //{
+                                                        //    for(unsigned int y = 0; y < mp.size(1); ++y)
+                                                        //    {
+                                                        //        for(unsigned int z = 0; z < mp.size(2); ++z)
+                                                        //        {mp.velocity_through_plane(x,y,z) = dbuf[cnt++];}
+                                                        //    }
+                                                        //}
+                                                    });
+
+            // segmentation
+            CartesianImage<std::uint8_t, 3> seg;
+            seg.set_size(gs[0], gs[1], gs[2]);
+
+            std::vector<std::uint8_t> ui8buf(mp.num_values());
+            file.read(reinterpret_cast<char*>(ui8buf.data()), mp.num_values() * sizeof(std::uint8_t));
+
+            #pragma omp parallel for
+            for (unsigned int k = 0; k < mp.num_values(); ++k)
+            { seg[k] = ui8buf[k]; }
+
+            fut_set_mp.get();
+
+            mp.set_measuring_plane_segmentation(seg);
+            fut_calc_stats.emplace_back(bk_threadpool.enqueue([&]()
+                                                              { mp.calc_statistics(); }));
+        }
+
+        file.close();
+
+        for (std::future<void>& f: fut_calc_stats)
+        { f.get(); }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        return true;
+    }
+
+    bool Vessel::save_flowjets(std::string_view filepath) const
+    {
+        #ifdef BK_EMIT_PROGRESS
+        Progress& prog = bk_progress.emplace_task(num_flowjets() + 3, ___("Saving flow jets"));
+        #endif
+
+        //------------------------------------------------------------------------------------------------------
+        // check filename
+        //------------------------------------------------------------------------------------------------------
+        std::string fname(filepath);
+        const std::string suffix = ".fj";
+        if (fname.empty())
+        { fname = "flowjets" + suffix; }
+        else if (!string_utils::ends_with(fname, suffix))
+        { fname.append(suffix); }
+
+        //------------------------------------------------------------------------------------------------------
+        // create file
+        //------------------------------------------------------------------------------------------------------
+        std::ofstream file(fname, std::ios_base::out | std::ios_base::binary);
+        if (!file.good())
+        {
+            #ifdef BK_EMIT_PROGRESS
+            prog.set_finished();
+            #endif
+
+            return false;
+        }
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
+
+        // temp
+        std::uint8_t ui8temp = 0;
+        std::uint32_t ui32temp = 0;
+
+        // num jets
+        ui8temp = num_flowjets();
+        file.write(reinterpret_cast<char*>(&ui8temp), sizeof(std::uint8_t));
+
+        for (const FlowJet& fj: _pdata->flowjets)
+        {
+            // num planes
+            ui32temp = fj.num_positions();
+            file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
+
+            // num times
+            ui32temp = fj.num_times();
+            file.write(reinterpret_cast<char*>(&ui32temp), sizeof(std::uint32_t));
+
+            for (unsigned int pid = 0; pid < fj.num_positions(); ++pid)
+            {
+                for (unsigned int tid = 0; tid < fj.num_times(); ++tid)
+                {
+                    const FlowJetPoint& fjp = fj.point(pid, tid);
+
+                    // vessel center
+                    for (unsigned int i = 0; i < 3; ++i)
+                    { file.write(reinterpret_cast<const char*>(&fjp.vessel_center[i]), sizeof(double)); }
+
+                    // vessel radius
+                    file.write(reinterpret_cast<const char*>(&fjp.vessel_radius), sizeof(double));
+
+                    // jet lcs x
+                    for (unsigned int i = 0; i < 3; ++i)
+                    { file.write(reinterpret_cast<const char*>(&fjp.local_coord_sys_x[i]), sizeof(double)); }
+
+                    // jet lcs y
+                    for (unsigned int i = 0; i < 3; ++i)
+                    { file.write(reinterpret_cast<const char*>(&fjp.local_coord_sys_y[i]), sizeof(double)); }
+
+                    // jet center
+                    for (unsigned int i = 0; i < 3; ++i)
+                    { file.write(reinterpret_cast<const char*>(&fjp.peak_velocity_position[i]), sizeof(double)); }
+
+                    // jet velocity
+                    file.write(reinterpret_cast<const char*>(&fjp.peak_velocity), sizeof(double));
+
+                    // area center
+                    for (unsigned int i = 0; i < 3; ++i)
+                    { file.write(reinterpret_cast<const char*>(&fjp.area_center[i]), sizeof(double)); }
+
+                    // area radii
+                    file.write(reinterpret_cast<const char*>(&fjp.area_radius_x), sizeof(double));
+                    file.write(reinterpret_cast<const char*>(&fjp.area_radius_y), sizeof(double));
+
+                    // area dir x
+                    for (unsigned int i = 0; i < 3; ++i)
+                    { file.write(reinterpret_cast<const char*>(&fjp.area_dir_x[i]), sizeof(double)); }
+
+                    // area dir y
+                    for (unsigned int i = 0; i < 3; ++i)
+                    { file.write(reinterpret_cast<const char*>(&fjp.area_dir_y[i]), sizeof(double)); }
+                } // for tid : fj.num_times()
+            } // for pid : fj.num_positions()
+
+            #ifdef BK_EMIT_PROGRESS
+            prog.increment(1);
+            #endif
+        } // for fjid : num_flowjets()
+
+        file.close();
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        return true;
+    }
+
+    bool Vessel::load_flowjets(std::string_view filepath)
+    {
+        #ifdef BK_EMIT_PROGRESS
+        Progress& prog = bk_progress.emplace_task(3, ___("Loading flow jets"));
+        #endif
+
+        //------------------------------------------------------------------------------------------------------
+        // check file ending
+        //------------------------------------------------------------------------------------------------------
+        const std::string suffix = ".fj";
+        if (!string_utils::ends_with(filepath, suffix))
+        {
+            #ifdef BK_EMIT_PROGRESS
+            prog.set_finished();
+            #endif
+            return false;
+        }
+
+        //------------------------------------------------------------------------------------------------------
+        // open file
+        //------------------------------------------------------------------------------------------------------
+        std::ifstream file(filepath.data(), std::ios_base::in | std::ios_base::binary);
+        if (!file.good())
+        {
+            #ifdef BK_EMIT_PROGRESS
+            prog.set_finished();
+            #endif
+
+            return false;
+        }
+
+        clear_flowjets();
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.increment(1);
+        #endif
+
+        std::uint8_t numFlowjets = 0;
+        file.read(reinterpret_cast<char*>(&numFlowjets), sizeof(std::uint8_t));
+
+        _pdata->flowjets.resize(numFlowjets);
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_max(prog.max() + static_cast<int>(numFlowjets));
+        #endif
+
+        for (unsigned int fjid = 0; fjid < numFlowjets; ++fjid)
+        {
+            FlowJet& fj = _pdata->flowjets[fjid];
+
+            // num planes
+            std::uint32_t numPlanes = 0;
+            file.read(reinterpret_cast<char*>(&numPlanes), sizeof(std::uint32_t));
+
+            // num times
+            std::uint32_t numTimes = 0;
+            file.read(reinterpret_cast<char*>(&numTimes), sizeof(std::uint32_t));
+
+            fj.resize(numPlanes, numTimes);
+
+            for (unsigned int pid = 0; pid < fj.num_positions(); ++pid)
+            {
+                for (unsigned int tid = 0; tid < fj.num_times(); ++tid)
+                {
+                    FlowJetPoint& fjp = fj.point(pid, tid);
+
+                    // vessel center
+                    for (unsigned int i = 0; i < 3; ++i)
+                    { file.read(reinterpret_cast<char*>(&fjp.vessel_center[i]), sizeof(double)); }
+
+                    // vessel radius
+                    file.read(reinterpret_cast<char*>(&fjp.vessel_radius), sizeof(double));
+
+                    // jet lcs x
+                    for (unsigned int i = 0; i < 3; ++i)
+                    { file.read(reinterpret_cast<char*>(&fjp.local_coord_sys_x[i]), sizeof(double)); }
+
+                    // jet lcs y
+                    for (unsigned int i = 0; i < 3; ++i)
+                    { file.read(reinterpret_cast<char*>(&fjp.local_coord_sys_y[i]), sizeof(double)); }
+
+                    // jet center
+                    for (unsigned int i = 0; i < 3; ++i)
+                    { file.read(reinterpret_cast<char*>(&fjp.peak_velocity_position[i]), sizeof(double)); }
+
+                    // jet velocity
+                    file.read(reinterpret_cast<char*>(&fjp.peak_velocity), sizeof(double));
+
+                    // area center
+                    for (unsigned int i = 0; i < 3; ++i)
+                    { file.read(reinterpret_cast<char*>(&fjp.area_center[i]), sizeof(double)); }
+
+                    // area radii
+                    file.read(reinterpret_cast<char*>(&fjp.area_radius_x), sizeof(double));
+                    file.read(reinterpret_cast<char*>(&fjp.area_radius_y), sizeof(double));
+
+                    // area dir x
+                    for (unsigned int i = 0; i < 3; ++i)
+                    { file.read(reinterpret_cast<char*>(&fjp.area_dir_x[i]), sizeof(double)); }
+
+                    // area dir y
+                    for (unsigned int i = 0; i < 3; ++i)
+                    { file.read(reinterpret_cast<char*>(&fjp.area_dir_y[i]), sizeof(double)); }
+                } // for tid : fj.num_times()
+            } // for pid : fj.num_positions()
+
+            #ifdef BK_EMIT_PROGRESS
+            prog.increment(1);
+            #endif
+        } // for fjid: numFlowhjets
+
+        file.close();
+
+        #ifdef BK_EMIT_PROGRESS
+        prog.set_finished();
+        #endif
+
+        return true;
+    }
   } // inline namespace cmr
 } // namespace bk
 
