@@ -145,40 +145,6 @@ namespace bk
   }
   /// @}
 
-  /// @{ -------------------------------------------------- EVENTS
-  void ScreenQuad::on_resize(GLint /*w*/, GLint /*h*/)
-  { /* do nothing */ }
-
-  void ScreenQuad::on_oit_enabled(bool /*b*/)
-  { /* do nothing */ }
-
-  void ScreenQuad::on_animation_enabled(bool /*b*/)
-  { /* do nothing */ }
-
-  void ScreenQuad::on_modelview_changed(bool)
-  { /* do nothing */ }
-
-  void ScreenQuad::on_visible_changed(bool)
-  { /* do nothing */ }
-
-  void ScreenQuad::on_mouse_pos_changed(GLint /*x*/, GLint /*y*/)
-  { /* do nothing */ }
-
-  void ScreenQuad::on_mouse_button_pressed(MouseButton_ /*btn*/)
-  { /* do nothing */ }
-
-  void ScreenQuad::on_mouse_button_released(MouseButton_ /*btn*/)
-  { /* do nothing */ }
-
-  void ScreenQuad::on_key_pressed(Key_ /*k*/){ /* do nothing */ }
-  void ScreenQuad::on_key_released(Key_ /*k*/){ /* do nothing */ }
-  void ScreenQuad::on_mouse_wheel_up(){ /* do nothing */ }
-  void ScreenQuad::on_mouse_wheel_down(){ /* do nothing */ }
-
-  void ScreenQuad::on_ssaa_factor_changed(GLint /*ssaa_factor*/)
-  { /* do nothing */ }
-  /// @}
-
   /// @{ -------------------------------------------------- DRAW
   void ScreenQuad::draw_impl()
   {

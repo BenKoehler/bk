@@ -44,12 +44,6 @@ if (NOT bkGL_FOUND AND NOT TARGET bk::bkGL)
     find_package(bkGL REQUIRED)
 endif ()
 
-find_package(bkCMR QUIET)
-if (NOT bkCMR_FOUND AND NOT TARGET bk::bkCMR)
-set(bkCMR_DIR "${CMAKE_CURRENT_LIST_DIR}/../bkCMR")
-find_package(bkCMR REQUIRED)
-endif ()
-
 if(NOT TARGET bk::bk)
     include(${CMAKE_CURRENT_LIST_DIR}/bkTargets.cmake)
 endif()

@@ -429,10 +429,22 @@ namespace bk
       _pdata->line_upper.on_animation_enabled(b);
   }
 
-  void PlotArea::on_modelview_changed(bool b)
+  void PlotArea::on_modelview_matrix_changed(bool b)
   {
-      _pdata->line_lower.on_modelview_changed(b);
-      _pdata->line_upper.on_modelview_changed(b);
+      _pdata->line_lower.on_modelview_matrix_changed(b);
+      _pdata->line_upper.on_modelview_matrix_changed(b);
+  }
+
+  void PlotArea::on_new_modelview_matrix(const ColMat4<GLfloat>& m)
+  {
+      _pdata->line_lower.on_new_modelview_matrix(m);
+      _pdata->line_upper.on_new_modelview_matrix(m);
+  }
+
+  void PlotArea::on_new_projection_matrix(const ColMat4<GLfloat>& p)
+  {
+      _pdata->line_lower.on_new_projection_matrix(p);
+      _pdata->line_upper.on_new_projection_matrix(p);
   }
 
   void PlotArea::on_visible_changed(bool b)
@@ -487,6 +499,12 @@ namespace bk
   {
       _pdata->line_lower.on_ssaa_factor_changed(ssaa_factor);
       _pdata->line_upper.on_ssaa_factor_changed(ssaa_factor);
+  }
+
+  void PlotArea::on_animation_time_changed(GLfloat t)
+  {
+      _pdata->line_lower.on_animation_time_changed(t);
+      _pdata->line_upper.on_animation_time_changed(t);
   }
 
   void PlotArea::draw_impl()

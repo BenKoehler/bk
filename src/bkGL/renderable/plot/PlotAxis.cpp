@@ -638,12 +638,28 @@ namespace bk
       { t.on_animation_enabled(b); }
   }
 
-  void PlotAxis::on_modelview_changed(bool b)
+  void PlotAxis::on_modelview_matrix_changed(bool b)
   {
-      _pdata->textview_label.on_modelview_changed(b);
+      _pdata->textview_label.on_modelview_matrix_changed(b);
 
       for (TextView& t: _pdata->textview_ticks)
-      { t.on_modelview_changed(b); }
+      { t.on_modelview_matrix_changed(b); }
+  }
+
+  void PlotAxis::on_new_modelview_matrix(const ColMat4<GLfloat>& m)
+  {
+      _pdata->textview_label.on_new_modelview_matrix(m);
+
+      for (TextView& t: _pdata->textview_ticks)
+      { t.on_new_modelview_matrix(m); }
+  }
+
+  void PlotAxis::on_new_projection_matrix(const ColMat4<GLfloat>& p)
+  {
+      _pdata->textview_label.on_new_projection_matrix(p);
+
+      for (TextView& t: _pdata->textview_ticks)
+      { t.on_new_projection_matrix(p); }
   }
 
   void PlotAxis::on_visible_changed(bool b)
@@ -723,6 +739,14 @@ namespace bk
           init_textview();
           emit_signal_update_required();
       }
+  }
+
+  void PlotAxis::on_animation_time_changed(GLfloat t)
+  {
+      _pdata->textview_label.on_animation_time_changed(t);
+
+      for (TextView& tv: _pdata->textview_ticks)
+      { tv.on_animation_time_changed(t); }
   }
 
   void PlotAxis::draw_ticks()

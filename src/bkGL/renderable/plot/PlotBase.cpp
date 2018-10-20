@@ -622,16 +622,40 @@ namespace bk
       _pdata->yaxis.on_animation_enabled(b);
   }
 
-  void PlotBase::on_modelview_changed(bool b)
+  void PlotBase::on_modelview_matrix_changed(bool b)
   {
       for (auto& o: _pdata->plotobjects)
-      { o->on_modelview_changed(b); }
+      { o->on_modelview_matrix_changed(b); }
 
       for (auto& o: _pdata->markers)
-      { o->on_modelview_changed(b); }
+      { o->on_modelview_matrix_changed(b); }
 
-      _pdata->xaxis.on_modelview_changed(b);
-      _pdata->yaxis.on_modelview_changed(b);
+      _pdata->xaxis.on_modelview_matrix_changed(b);
+      _pdata->yaxis.on_modelview_matrix_changed(b);
+  }
+
+  void PlotBase::on_new_modelview_matrix(const ColMat4<GLfloat>& m)
+  {
+      for (auto& o: _pdata->plotobjects)
+      { o->on_new_modelview_matrix(m); }
+
+      for (auto& o: _pdata->markers)
+      { o->on_new_modelview_matrix(m); }
+
+      _pdata->xaxis.on_new_modelview_matrix(m);
+      _pdata->yaxis.on_new_modelview_matrix(m);
+  }
+
+  void PlotBase::on_new_projection_matrix(const ColMat4<GLfloat>& p)
+  {
+      for (auto& o: _pdata->plotobjects)
+      { o->on_new_projection_matrix(p); }
+
+      for (auto& o: _pdata->markers)
+      { o->on_new_projection_matrix(p); }
+
+      _pdata->xaxis.on_new_projection_matrix(p);
+      _pdata->yaxis.on_new_projection_matrix(p);
   }
 
   void PlotBase::on_visible_changed(bool b)
@@ -740,6 +764,18 @@ namespace bk
 
       _pdata->xaxis.on_ssaa_factor_changed(ssaa_factor);
       _pdata->yaxis.on_ssaa_factor_changed(ssaa_factor);
+  }
+
+  void PlotBase::on_animation_time_changed(GLfloat t)
+  {
+      for (auto& o: _pdata->plotobjects)
+      { o->on_animation_time_changed(t); }
+
+      for (auto& o: _pdata->markers)
+      { o->on_animation_time_changed(t); }
+
+      _pdata->xaxis.on_animation_time_changed(t);
+      _pdata->yaxis.on_animation_time_changed(t);
   }
 
   void PlotBase::draw_impl()

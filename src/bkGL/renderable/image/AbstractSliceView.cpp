@@ -697,12 +697,6 @@ namespace bk::details
   void AbstractSliceView::on_animation_enabled(bool b)
   { _pdata->tf_view.set_animation_is_enabled(b); }
 
-  void AbstractSliceView::on_modelview_changed(bool)
-  { /* do nothing */ }
-
-  void AbstractSliceView::on_visible_changed(bool)
-  { /* do nothing */ }
-
   void AbstractSliceView::on_mouse_pos_changed(GLint x, GLint y)
   {
       _pdata->mouse.set_pos(x, y);
@@ -769,17 +763,11 @@ namespace bk::details
       { previousSlice(); }
   }
 
-  void AbstractSliceView::on_key_released(Key_ /*k*/)
-  { /* do nothing */ }
-
   void AbstractSliceView::on_mouse_wheel_up()
   { nextSlice(); }
 
   void AbstractSliceView::on_mouse_wheel_down()
   { previousSlice(); }
-
-  void AbstractSliceView::on_ssaa_factor_changed(GLint /*ssaa_factor*/)
-  { /* do nothing */ }
 
   bool AbstractSliceView::on_mouse_pos_changed_impl(GLint /*x*/, GLint /*y*/)
   { return true; }

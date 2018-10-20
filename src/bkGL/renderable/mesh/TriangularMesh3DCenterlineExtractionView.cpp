@@ -636,15 +636,6 @@ namespace bk
       { init_shader(); }
   }
 
-  void TriangularMesh3DCenterlineExtractionView::on_animation_enabled(bool /*b*/)
-  { /* do nothing */ }
-
-  void TriangularMesh3DCenterlineExtractionView::on_modelview_changed(bool /*b*/)
-  { /* do nothing */ }
-
-  void TriangularMesh3DCenterlineExtractionView::on_visible_changed(bool /*b*/)
-  { /* do nothing */ }
-
   void TriangularMesh3DCenterlineExtractionView::on_mouse_pos_changed(GLint x, GLint y)
   {
       _pdata->mouse_x = x;
@@ -662,21 +653,6 @@ namespace bk
       else if (btn == MouseButton_Right)
       { add_current_point_id_as_end_point(); }
   }
-
-  void TriangularMesh3DCenterlineExtractionView::on_mouse_button_released(MouseButton_ /*btn*/)
-  { /* do nothing */ }
-
-  void TriangularMesh3DCenterlineExtractionView::on_key_pressed(Key_ /*k*/)
-  { /* do nothing */ }
-
-  void TriangularMesh3DCenterlineExtractionView::on_key_released(Key_ /*k*/)
-  { /* do nothing */ }
-
-  void TriangularMesh3DCenterlineExtractionView::on_mouse_wheel_up()
-  { /* do nothing */ }
-
-  void TriangularMesh3DCenterlineExtractionView::on_mouse_wheel_down()
-  { /* do nothing */ }
 
   void TriangularMesh3DCenterlineExtractionView::on_ssaa_factor_changed(GLint ssaa_factor)
   { _pdata->ssaa_factor = ssaa_factor; }

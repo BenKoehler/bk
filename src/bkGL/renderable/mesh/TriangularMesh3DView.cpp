@@ -784,8 +784,14 @@ namespace bk
   void TriangularMesh3DView::on_animation_enabled(bool b)
   { _pdata->colorbarview.on_animation_enabled(b); }
 
-  void TriangularMesh3DView::on_modelview_changed(bool b)
-  { _pdata->colorbarview.on_modelview_changed(b); }
+  void TriangularMesh3DView::on_modelview_matrix_changed(bool b)
+  { _pdata->colorbarview.on_modelview_matrix_changed(b); }
+
+  void TriangularMesh3DView::on_new_modelview_matrix(const ColMat4<GLfloat>& m)
+  { _pdata->colorbarview.on_new_modelview_matrix(m); }
+
+  void TriangularMesh3DView::on_new_projection_matrix(const ColMat4<GLfloat>& p)
+  { _pdata->colorbarview.on_new_projection_matrix(p); }
 
   void TriangularMesh3DView::on_visible_changed(bool b)
   { _pdata->colorbarview.on_visible_changed(b); }
@@ -806,6 +812,9 @@ namespace bk
 
   void TriangularMesh3DView::on_ssaa_factor_changed(GLint ssaa_factor)
   { _pdata->colorbarview.on_ssaa_factor_changed(ssaa_factor); }
+
+  void TriangularMesh3DView::on_animation_time_changed(GLfloat t)
+  { _pdata->colorbarview.on_animation_time_changed(t); }
   /// @}
 
   /// @{ -------------------------------------------------- DRAW

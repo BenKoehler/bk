@@ -85,7 +85,7 @@ namespace bk
       WindowGeometry window_geometry;
       Interactor interactor;
       Camera camera;
-      bk::ColMat4<GLfloat> modelview_matrix;
+      ColMat4<GLfloat> modelview_matrix;
       bool modelview_matrix_changed;
       GLuint fbo_default_id;
       bk::Vec3<GLfloat> center_translation;
@@ -94,6 +94,7 @@ namespace bk
       std::vector<std::shared_ptr<details::AbstractRenderable>> renderables;
       Animator animator;
       bk::Signal<> s_update_required;
+      bk::Signal<const ColMat4<GLfloat>&> s_new_modelview_matrix;
       bk::Signal<std::string, std::shared_ptr<bk::CartesianImage<bk::Vec<3, double>, 2>>> s_video_rendering_new_frame;
 
           #ifndef BK_LIB_QT_AVAILABLE
@@ -465,6 +466,13 @@ namespace bk
       _pdata->interactor.connect_signals(r);
       r->on_mouse_pos_changed(_pdata->interactor.mouse().x(), _pdata->interactor.mouse().y());
 
+      _pdata->camera.connect_signals(r);
+      r->set_new_projection_matrix(_pdata->camera.projection_matrix());
+
+      _pdata->s_new_modelview_matrix.connect([=](const ColMat4<GLfloat>& m)
+                                             { r->set_new_modelview_matrix(m); });
+      r->set_new_modelview_matrix(_pdata->modelview_matrix);
+
       r->set_modelview_matrix_changed(_pdata->modelview_matrix_changed);
   }
 
@@ -494,6 +502,13 @@ namespace bk
 
       _pdata->interactor.connect_signals(r);
       r->on_mouse_pos_changed(_pdata->interactor.mouse().x(), _pdata->interactor.mouse().y());
+
+      _pdata->camera.connect_signals(r);
+      r->set_new_projection_matrix(_pdata->camera.projection_matrix());
+
+      _pdata->s_new_modelview_matrix.connect([=](const ColMat4<GLfloat>& m)
+                                             { r->set_new_modelview_matrix(m); });
+      r->set_new_modelview_matrix(_pdata->modelview_matrix);
 
       r->set_modelview_matrix_changed(_pdata->modelview_matrix_changed);
   }
@@ -871,6 +886,8 @@ namespace bk
           // update modelview matrix in buffer
           _pdata->modelview_matrix_changed = false;
           BK_QT_GL glGetFloatv(GL_MODELVIEW_MATRIX, &_pdata->modelview_matrix[0]);
+
+          _pdata->s_new_modelview_matrix.emit_signal(_pdata->modelview_matrix);
 
           _pdata->ubo_global.set_modelview_matrix(&_pdata->modelview_matrix[0]);
           _pdata->ubo_global.set_rotation_matrix(_pdata->interactor.trackball().rotation_matrix_ptr());

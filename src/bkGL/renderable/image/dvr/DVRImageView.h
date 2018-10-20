@@ -185,17 +185,13 @@ namespace bk
       virtual void on_resize(GLint w, GLint h) override;
       virtual void on_oit_enabled(bool b) override;
       virtual void on_animation_enabled(bool b) override;
-      virtual void on_modelview_changed(bool) override;
+      virtual void on_modelview_matrix_changed(bool) override;
+      virtual void on_new_modelview_matrix(const ColMat4<GLfloat>& m) override;
+      virtual void on_new_projection_matrix(const ColMat4<GLfloat>& p) override;
       virtual void on_visible_changed(bool b) override;
-      virtual void on_animation_time_changed(double d) = 0;
       virtual void on_mouse_pos_changed(GLint x, GLint y) override;
       virtual void on_mouse_button_pressed(MouseButton_ btn) override;
       virtual void on_mouse_button_released(MouseButton_ btn) override;
-      virtual void on_key_pressed(Key_ k) override;
-      virtual void on_key_released(Key_ k) override;
-      virtual void on_mouse_wheel_up() override;
-      virtual void on_mouse_wheel_down() override;
-      virtual void on_ssaa_factor_changed(GLint ssaa_factor) override;
       /// @}
 
       /// @{ -------------------------------------------------- DRAW

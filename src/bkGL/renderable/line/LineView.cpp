@@ -394,7 +394,7 @@ namespace bk
                   _pdata->colorbarview.init_uniform_yellow();
                   break;
               }
-              //case ColorScaleType::Gray: [[fallthrough]]
+                  //case ColorScaleType::Gray: [[fallthrough]]
               default:
               { /* do nothing */ }
           }
@@ -1186,8 +1186,14 @@ namespace bk
       init_lineao_shader();
   }
 
-  void LineView::on_modelview_changed(bool b)
-  { _pdata->colorbarview.on_modelview_changed(b); }
+  void LineView::on_modelview_matrix_changed(bool b)
+  { _pdata->colorbarview.on_modelview_matrix_changed(b); }
+
+  void LineView::on_new_modelview_matrix(const ColMat4<GLfloat>& m)
+  { _pdata->colorbarview.on_new_modelview_matrix(m); }
+
+  void LineView::on_new_projection_matrix(const ColMat4<GLfloat>& p)
+  { _pdata->colorbarview.on_new_projection_matrix(p); }
 
   void LineView::on_visible_changed(bool b)
   { _pdata->colorbarview.on_visible_changed(b); }
@@ -1201,13 +1207,23 @@ namespace bk
   void LineView::on_mouse_button_released(MouseButton_ btn)
   { _pdata->colorbarview.on_mouse_button_released(btn); }
 
-  void LineView::on_key_pressed(Key_ /*k*/){ /* do nothing */ }
-  void LineView::on_key_released(Key_ /*k*/){ /* do nothing */ }
-  void LineView::on_mouse_wheel_up(){ /* do nothing */ }
-  void LineView::on_mouse_wheel_down(){ /* do nothing */ }
+  void LineView::on_key_pressed(Key_ /*k*/)
+  { /* do nothing */ }
+
+  void LineView::on_key_released(Key_ /*k*/)
+  { /* do nothing */ }
+
+  void LineView::on_mouse_wheel_up()
+  { /* do nothing */ }
+
+  void LineView::on_mouse_wheel_down()
+  { /* do nothing */ }
 
   void LineView::on_ssaa_factor_changed(GLint ssaa_factor)
   { _pdata->colorbarview.on_ssaa_factor_changed(ssaa_factor); }
+
+  void LineView::on_animation_time_changed(GLfloat t)
+  { _pdata->colorbarview.on_animation_time_changed(t); }
   /// @}
 
   /// @{ -------------------------------------------------- DRAW

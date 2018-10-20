@@ -108,7 +108,7 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- EVENTS
-      virtual void on_animation_time_changed(double d) override;
+      virtual void on_animation_time_changed(GLfloat d) override;
       /// @}
 
       /// @{ -------------------------------------------------- DRAW

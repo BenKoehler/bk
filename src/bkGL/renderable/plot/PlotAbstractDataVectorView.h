@@ -78,22 +78,6 @@ namespace bk::details
       [[maybe_unused]] virtual bool init() = 0;
       virtual void clear() = 0;
 
-      /// @{ -------------------------------------------------- EVENTS
-      virtual void on_resize(GLint w, GLint h) override;
-      virtual void on_oit_enabled(bool b) override;
-      virtual void on_animation_enabled(bool b) override;
-      virtual void on_modelview_changed(bool) override;
-      virtual void on_visible_changed(bool b) override;
-      virtual void on_mouse_pos_changed(GLint x, GLint y) override;
-      virtual void on_mouse_button_pressed(MouseButton_ btn) override;
-      virtual void on_mouse_button_released(MouseButton_ btn) override;
-      virtual void on_key_pressed(Key_ k) override;
-      virtual void on_key_released(Key_ k) override;
-      virtual void on_mouse_wheel_up() override;
-      virtual void on_mouse_wheel_down() override;
-      virtual void on_ssaa_factor_changed(GLint ssaa_factor) override;
-      /// @}
-
   }; // class PlotAbstractDataVectorView
 } // namespace bk::details
 

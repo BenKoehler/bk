@@ -126,7 +126,7 @@ namespace bk
   /// @}
 
   /// @{ -------------------------------------------------- EVENTS
-  void DVRImage4DView::on_animation_time_changed(double d)
+  void DVRImage4DView::on_animation_time_changed(GLfloat d)
   {
       const auto& image_size = _pdata->img.geometry().size();
       const auto& image_scale = _pdata->img.geometry().transformation().scale();

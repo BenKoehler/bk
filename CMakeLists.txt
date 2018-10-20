@@ -175,62 +175,6 @@ if (BUILD_EXAMPLES)
 endif ()
 
 # ------------------------------------------------------------------------------------------------------------------------------------
-# add library bkCMR
-# ----------
-set(SOURCE_FILES
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/CardiacCycleDefinition.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/CenterlineExtractor.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/dataset/Dataset.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/dataset/Vessel.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowDirCorrection.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/dataset/FlowImage2DT.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/dataset/FlowImage3DT.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/dataset/FlowJet.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/FlowJetExtractor.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/FlowTimeShift.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/IVSDImageFilter.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/LPCImageFilter.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/dataset/transformation/MeasuringPlaneTransformation.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/dataset/MeasuringPlane.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/TMIPImageFilter.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/PhaseUnwrapping2DT.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/PhaseUnwrapping3DT.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/PressureMapImageFilter.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/filters/VelocityOffsetCorrector3DT.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/rotation_angle_2d.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/sampling/sampling_sphere_section.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/sampling/VesselSegmentationInFlowFieldSizeImageFilter.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/CardiacCycleDefinitionView.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/LandMarkSelectionView.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/MeasuringPlaneView.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/MeasuringPlanePreviewView.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/DatasetView.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/FlowJetView.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/PressureView.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/VesselView.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/ShaderLibrary_CMR.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/UBOFlowJetView.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/UBOMeasuringPlane.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/UBOMeasuringPlanePreview.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkCMR/gl/UBOPressureView.cpp
-        )
-
-add_library(bkCMR ${SOURCE_FILES})
-_bk_make_lib(cmr CMR)
-
-target_link_libraries(bkCMR PUBLIC Threads::Threads)
-target_link_libraries(bkCMR PUBLIC stdc++fs)
-target_link_libraries(bkCMR PUBLIC bk::bkAlgorithm)
-target_link_libraries(bkCMR PUBLIC bk::bkDataset)
-target_link_libraries(bkCMR PUBLIC bk::bkDicom)
-target_link_libraries(bkCMR PUBLIC bk::bkTools)
-target_link_libraries(bkCMR PUBLIC bk::bkMath)
-target_link_libraries(bkCMR PUBLIC bk::bkTypeTraits)
-target_link_libraries(bkCMR PUBLIC bk::bkGL)
-
-_bk_install_lib(cmr CMR CMR)
-
-# ------------------------------------------------------------------------------------------------------------------------------------
 # add library bkDataset
 # ----------
 set(SOURCE_FILES
@@ -289,7 +233,6 @@ _bk_install_lib(dataset Dataset DATASET)
 if (GDCM_FOUND)
     set(SOURCE_FILES
             ${CMAKE_CURRENT_SOURCE_DIR}/src/bkDicom/DicomDirImporter.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/bkDicom/DicomDirImporter_CMR.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/bkDicom/DicomFileInfos.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/bkDicom/DicomImageInfos.cpp)
 
@@ -618,7 +561,6 @@ set_target_properties(bk PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 target_link_libraries(bk PUBLIC bk::bkAlgorithm)
-target_link_libraries(bk PUBLIC bk::bkCMR)
 target_link_libraries(bk PUBLIC bk::bkDataset)
 target_link_libraries(bk PUBLIC bk::bkDicom)
 target_link_libraries(bk PUBLIC bk::bkGL)

@@ -499,8 +499,14 @@ namespace bk
   void DVRImageView::on_animation_enabled(bool b)
   { _pdata->tf_view.set_animation_is_enabled(b); }
 
-  void DVRImageView::on_modelview_changed(bool b)
+  void DVRImageView::on_modelview_matrix_changed(bool b)
   { _pdata->tf_view.set_modelview_matrix_changed(b); }
+
+  void DVRImageView::on_new_modelview_matrix(const ColMat4<GLfloat>& m)
+  { _pdata->tf_view.on_new_modelview_matrix(m); }
+
+  void DVRImageView::on_new_projection_matrix(const ColMat4<GLfloat>& p)
+  { _pdata->tf_view.on_new_projection_matrix(p); }
 
   void DVRImageView::on_visible_changed(bool b)
   {
@@ -508,38 +514,24 @@ namespace bk
       { this->set_modelview_matrix_changed(true); }
   }
 
-  void DVRImageView::on_mouse_pos_changed(GLint /*x*/, GLint /*y*/)
-  { /* do nothing */ }
-  //void DVRImageView::on_mouse_pos_changed(GLint x, GLint y)
-  //{ _pdata->tf_view.on_mouse_pos_changed(x, y); }
+  void DVRImageView::on_mouse_pos_changed(GLint x, GLint y)
+  { _pdata->tf_view.on_mouse_pos_changed(x, y); }
 
-  void DVRImageView::on_mouse_button_pressed(MouseButton_ /*btn*/)
-  { /* do nothing */ }
-  //void DVRImageView::on_mouse_button_pressed(MouseButton_ btn)
-  //{
-  //    _pdata->tf_view.on_mouse_button_pressed(btn);
-  //
-  //    if (btn == MouseButton_Right)
-  //    { show_transfer_function(); }
-  //}
+  void DVRImageView::on_mouse_button_pressed(MouseButton_ btn)
+  {
+      _pdata->tf_view.on_mouse_button_pressed(btn);
 
-  void DVRImageView::on_mouse_button_released(MouseButton_ /*btn*/)
-  { /* do nothing */ }
-  //void DVRImageView::on_mouse_button_released(MouseButton_ btn)
-  //{
-  //    _pdata->tf_view.on_mouse_button_released(btn);
-  //
-  //    if (btn == MouseButton_Right)
-  //    { hide_transfer_function(); }
-  //}
+      if (btn == MouseButton_Right)
+      { show_transfer_function(); }
+  }
 
-  void DVRImageView::on_key_pressed(Key_ /*k*/){ /* do nothing */ }
-  void DVRImageView::on_key_released(Key_ /*k*/){ /* do nothing */ }
-  void DVRImageView::on_mouse_wheel_up(){ /* do nothing */ }
-  void DVRImageView::on_mouse_wheel_down(){ /* do nothing */ }
+  void DVRImageView::on_mouse_button_released(MouseButton_ btn)
+  {
+      _pdata->tf_view.on_mouse_button_released(btn);
 
-  void DVRImageView::on_ssaa_factor_changed(GLint /*ssaa_factor*/)
-  { /* do nothing */ }
+      if (btn == MouseButton_Right)
+      { hide_transfer_function(); }
+  }
   /// @}
 
   /// @{ -------------------------------------------------- DRAW

@@ -104,10 +104,6 @@ namespace bk
       void init(const Image3D_& img, GLuint window_width, GLuint window_height);
       /// @}
 
-      /// @{ -------------------------------------------------- EVENTS
-      virtual void on_animation_time_changed(double d) override;
-      /// @}
-
       /// @{ -------------------------------------------------- DRAW
     protected:
       virtual void bind_image_textures() override;

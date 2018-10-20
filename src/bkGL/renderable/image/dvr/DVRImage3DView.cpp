@@ -111,11 +111,6 @@ namespace bk
   }
   /// @}
 
-  /// @{ -------------------------------------------------- EVENTS
-  void DVRImage3DView::on_animation_time_changed(double /*d*/)
-  { /*do nothing*/ }
-  /// @}
-
   /// @{ -------------------------------------------------- DRAW
   void DVRImage3DView::bind_image_textures()
   { _pdata->image_tex.bind(); /*bound to tex unit 2*/ }

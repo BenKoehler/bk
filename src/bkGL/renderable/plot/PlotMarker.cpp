@@ -302,45 +302,6 @@ namespace bk
       clear_ubo();
   }
 
-  void PlotMarker::on_resize(GLint /*w*/, GLint /*h*/)
-  { /* do nothing */ }
-
-  void PlotMarker::on_oit_enabled(bool /*b*/)
-  { /* do nothing */ }
-
-  void PlotMarker::on_animation_enabled(bool /*b*/)
-  { /* do nothing */ }
-
-  void PlotMarker::on_modelview_changed(bool /*b*/)
-  { /* do nothing */ }
-
-  void PlotMarker::on_visible_changed(bool /*b*/)
-  { /* do nothing */ }
-
-  void PlotMarker::on_mouse_pos_changed(GLint /*x*/, GLint /*y*/)
-  { /* do nothing */ }
-
-  void PlotMarker::on_mouse_button_pressed(MouseButton_ /*btn*/)
-  { /* do nothing */ }
-
-  void PlotMarker::on_mouse_button_released(MouseButton_ /*btn*/)
-  { /* do nothing */ }
-
-  void PlotMarker::on_key_pressed(Key_ /*k*/)
-  { /* do nothing */ }
-
-  void PlotMarker::on_key_released(Key_ /*k*/)
-  { /* do nothing */ }
-
-  void PlotMarker::on_mouse_wheel_up()
-  { /* do nothing */ }
-
-  void PlotMarker::on_mouse_wheel_down()
-  { /* do nothing */ }
-
-  void PlotMarker::on_ssaa_factor_changed(GLint /*ssaa_factor*/)
-  { /* do nothing */ }
-
   void PlotMarker::draw_impl()
   {
       _pdata->ubo.bind_to_default_base();

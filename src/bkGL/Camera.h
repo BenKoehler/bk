@@ -36,6 +36,12 @@ namespace bk
 {
   // -------------------- forward declaration
   template<typename...> class Signal;
+
+  namespace details
+  {
+    class AbstractRenderable;
+    class AbstractSceneRenderable;
+  } // namespace details
   // -------------------- forward declaration END
 
   class BKGL_EXPORT Camera
@@ -122,11 +128,17 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- GET SIGNALS
-      bk::Signal<>& signal_projection_matrix_changed();
-      const bk::Signal<>& signal_projection_matrix_changed() const;
+      [[nodiscard]] bk::Signal<>& signal_projection_matrix_changed();
+      [[nodiscard]] const bk::Signal<>& signal_projection_matrix_changed() const;
 
-      bk::Signal<>& signal_lookat_matrix_changed();
-      const bk::Signal<>& signal_lookat_matrix_changed() const;
+      [[nodiscard]] bk::Signal<const ColMat4<GLfloat>&>& signal_new_projection_matrix();
+      [[nodiscard]] const bk::Signal<const ColMat4<GLfloat>&>& signal_new_projection_matrix() const;
+
+      [[nodiscard]] bk::Signal<>& signal_lookat_matrix_changed();
+      [[nodiscard]] const bk::Signal<>& signal_lookat_matrix_changed() const;
+
+      [[nodiscard]] bk::Signal<const ColMat4<GLfloat>&>& signal_new_lookat_matrix();
+      [[nodiscard]] const bk::Signal<const ColMat4<GLfloat>&>& signal_new_lookat_matrix() const;
       /// @}
 
       //====================================================================================================
@@ -182,6 +194,11 @@ namespace bk
       //====================================================================================================
       /// @{ -------------------------------------------------- INIT
       void init();
+      /// @}
+
+      /// @{ -------------------------------------------------- CONNECT SIGNALS
+      void connect_signals(std::shared_ptr<details::AbstractRenderable>& r);
+      void connect_signals(std::shared_ptr<details::AbstractSceneRenderable>& r);
       /// @}
 
       /// @{ -------------------------------------------------- CALC MATRICES

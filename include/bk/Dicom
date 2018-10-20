@@ -23,7 +23,6 @@
  */
 
 #include "bkDicom/DicomDirImporter.h"
-#include "bkDicom/DicomDirImporter_CMR.h"
 #include "bkDicom/DicomFileInfos.h"
 #include "bkDicom/DicomImageInfos.h"
 #include "bkDicom/EDicomImageClass.h"

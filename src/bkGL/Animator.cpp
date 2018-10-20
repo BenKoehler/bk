@@ -48,7 +48,7 @@ namespace bk
       GLfloat speed_factor; // 1 = double time, 0.5 = half speed, 2 = double speed, ...
       GLfloat target_fps;
       GLfloat update_interval_in_ms;
-      
+
       bk::Signal<GLfloat> s_current_time_changed;
       bk::Signal<GLfloat> s_max_time_changed;
       bk::Signal<bool> s_enabled_changed;
@@ -56,17 +56,17 @@ namespace bk
       bk::Signal<> s_speed_settings_changed;
       bk::Clock update_timer;
 
-      Impl():
-          enabled(false),
-          is_paused(false),
-          current_time(0),
-          max_time(0),
-          time_delta(0),
-          speed_factor(0.3),
-          target_fps(60),
-          update_interval_in_ms(static_cast<GLfloat>(1000) * speed_factor / target_fps)
+      Impl()
+          : enabled(false),
+            is_paused(false),
+            current_time(0),
+            max_time(0),
+            time_delta(0),
+            speed_factor(0.3),
+            target_fps(60),
+            update_interval_in_ms(static_cast<GLfloat>(1000) * speed_factor / target_fps)
       { /* do nothing */ }
-      
+
       Impl(const Impl&) = delete;
       Impl(Impl&&) noexcept = default;
 
@@ -111,7 +111,7 @@ namespace bk
 
   /// @{ -------------------------------------------------- GET CURRENT TIME
   GLfloat Animator::current_time() const
-  { return _pdata->current_time; }  
+  { return _pdata->current_time; }
   /// @}
 
   /// @{ -------------------------------------------------- GET MAX TIME
@@ -166,7 +166,7 @@ namespace bk
   { return _pdata->s_speed_settings_changed; }
 
   /// @}
-  
+
   //====================================================================================================
   //===== SETTER
   //====================================================================================================
@@ -249,7 +249,7 @@ namespace bk
       _pdata->s_speed_settings_changed.mute(setMuted);
   }
   /// @}
-  
+
   //====================================================================================================
   //===== FUNCTIONS
   //====================================================================================================
@@ -257,13 +257,19 @@ namespace bk
   void Animator::connect_signals(std::shared_ptr<details::AbstractRenderable>& r)
   {
       _pdata->s_enabled_changed.connect([=](bool enabled)
-                                        {r->set_animation_is_enabled(enabled);});
+                                        { r->set_animation_is_enabled(enabled); });
+
+      _pdata->s_current_time_changed.connect([=](GLfloat t)
+                                             { r->set_animation_time(t); });
   }
 
   void Animator::connect_signals(std::shared_ptr<details::AbstractSceneRenderable>& r)
   {
       _pdata->s_enabled_changed.connect([=](bool enabled)
-                                        {r->set_animation_is_enabled(enabled);});
+                                        { r->set_animation_is_enabled(enabled); });
+
+      _pdata->s_current_time_changed.connect([=](GLfloat t)
+                                             { r->set_animation_time(t); });
   }
   /// @}
 

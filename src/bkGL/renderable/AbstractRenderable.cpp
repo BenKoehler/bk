@@ -170,9 +170,18 @@ namespace bk::details
       if (_pdata->modelview_changed != b)
       {
           _pdata->modelview_changed = b;
-          on_modelview_changed(_pdata->modelview_changed);
+          on_modelview_matrix_changed(_pdata->modelview_changed);
       }
   }
+
+  void AbstractRenderable::set_new_modelview_matrix(const ColMat4<GLfloat>& m)
+  {on_new_modelview_matrix(m);}
+
+  void AbstractRenderable::set_new_projection_matrix(const ColMat4<GLfloat>& p)
+  {on_new_projection_matrix(p);}
+
+  void AbstractRenderable::set_animation_time(double t)
+  { on_animation_time_changed(t); }
   /// @}
 
   /// @{ -------------------------------------------------- SET VISIBILITY
@@ -263,6 +272,56 @@ namespace bk::details
   }
 
   void AbstractRenderable::_forward_settings(AbstractRenderable*)
+  { /* do nothing */ }
+  /// @}
+
+  /// @{ -------------------------------------------------- EVENTS
+  void AbstractRenderable::on_resize(GLint /*w*/, GLint /*h*/)
+  { /* do nothing */ }
+
+  void AbstractRenderable::on_oit_enabled(bool /*b*/)
+  { /* do nothing */ }
+
+  void AbstractRenderable::on_animation_enabled(bool /*b*/)
+  { /* do nothing */ }
+
+  void AbstractRenderable::on_modelview_matrix_changed(bool /*b*/)
+  { /* do nothing */ }
+
+  void AbstractRenderable::on_new_modelview_matrix(const ColMat4<GLfloat>& /*m*/)
+  { /* do nothing */ }
+
+  void AbstractRenderable::on_new_projection_matrix(const ColMat4<GLfloat>& /*p*/)
+  { /* do nothing */ }
+
+  void AbstractRenderable::on_visible_changed(bool /*b*/)
+  { /* do nothing */ }
+
+  void AbstractRenderable::on_mouse_pos_changed(GLint /*x*/, GLint /*y*/)
+  { /* do nothing */ }
+
+  void AbstractRenderable::on_mouse_button_pressed(MouseButton_ /*btn*/)
+  { /* do nothing */ }
+
+  void AbstractRenderable::on_mouse_button_released(MouseButton_ /*btn*/)
+  { /* do nothing */ }
+
+  void AbstractRenderable::on_key_pressed(Key_ /*k*/)
+  { /* do nothing */ }
+
+  void AbstractRenderable::on_key_released(Key_ /*k*/)
+  { /* do nothing */ }
+
+  void AbstractRenderable::on_mouse_wheel_up()
+  { /* do nothing */ }
+
+  void AbstractRenderable::on_mouse_wheel_down()
+  { /* do nothing */ }
+
+  void AbstractRenderable::on_ssaa_factor_changed(GLint /*ssaa_factor*/)
+  { /* do nothing */ }
+
+  void AbstractRenderable::on_animation_time_changed(GLfloat /*t*/)
   { /* do nothing */ }
   /// @}
 

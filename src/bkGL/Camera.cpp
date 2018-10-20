@@ -27,6 +27,8 @@
 #include <cmath>
 
 #include <bk/Signal>
+#include <bkGL/renderable/AbstractRenderable.h>
+#include <bkGL/renderable/AbstractSceneRenderable.h>
 #include <bkMath/functions/radians_degree_conversion.h>
 #include <bkMath/constants/pi.h>
 
@@ -57,6 +59,8 @@ namespace bk
       mutable bool projection_matrix_is_up2date;
       bk::Signal<> s_projection_matrix_changed;
       bk::Signal<> s_lookat_matrix_changed;
+      bk::Signal<const ColMat4<GLfloat>&> s_new_projection_matrix;
+      bk::Signal<const ColMat4<GLfloat>&> s_new_lookat_matrix;
 
       Impl()
           : pos(0, -2.5, 0), // in dicom patient coords, this is in front of the patient
@@ -75,7 +79,7 @@ namespace bk
 
       Impl(const Impl&) = delete;
       Impl(Impl&&) noexcept = default;
-      ~Impl() {s_projection_matrix_changed.disconnect_all();s_lookat_matrix_changed.disconnect_all();}
+      ~Impl() = default;
       [[maybe_unused]] Impl& operator=(const Impl&) = delete;
       [[maybe_unused]] Impl& operator=(Impl&&) noexcept = default;
   };
@@ -193,12 +197,23 @@ namespace bk
   const bk::Signal<>& Camera::signal_projection_matrix_changed() const
   { return _pdata->s_projection_matrix_changed; }
 
+  bk::Signal<const ColMat4<GLfloat>&>& Camera::signal_new_projection_matrix()
+  { return _pdata->s_new_projection_matrix; }
+
+  const bk::Signal<const ColMat4<GLfloat>&>& Camera::signal_new_projection_matrix() const
+  { return _pdata->s_new_projection_matrix; }
+
   bk::Signal<>& Camera::signal_lookat_matrix_changed()
   { return _pdata->s_lookat_matrix_changed; }
 
   const bk::Signal<>& Camera::signal_lookat_matrix_changed() const
   { return _pdata->s_lookat_matrix_changed; }
 
+  bk::Signal<const ColMat4<GLfloat>&>& Camera::signal_new_lookat_matrix()
+  { return _pdata->s_new_lookat_matrix; }
+
+  const bk::Signal<const ColMat4<GLfloat>&>& Camera::signal_new_lookat_matrix() const
+  { return _pdata->s_new_lookat_matrix; }
   /// @}
 
   //====================================================================================================
@@ -351,6 +366,20 @@ namespace bk
   }
   /// @}
 
+  /// @{ -------------------------------------------------- CONNECT SIGNALS
+  void Camera::connect_signals(std::shared_ptr<details::AbstractRenderable>& r)
+  {
+      _pdata->s_new_projection_matrix.connect([=](const ColMat4<GLfloat>& p)
+                                              { r->set_new_projection_matrix(p); });
+  }
+
+  void Camera::connect_signals(std::shared_ptr<details::AbstractSceneRenderable>& r)
+  {
+      _pdata->s_new_projection_matrix.connect([=](const ColMat4<GLfloat>& p)
+                                              { r->set_new_projection_matrix(p); });
+  }
+  /// @}
+
   /// @{ -------------------------------------------------- CALC MATRICES
   void Camera::calc_look_at_matrix()
   {
@@ -374,8 +403,9 @@ namespace bk
       _pdata->look_at_matrix[15] = 1;
 
       _pdata->look_at_matrix_is_up2date = true;
-      
+
       _pdata->s_lookat_matrix_changed.emit_signal();
+      _pdata->s_new_lookat_matrix.emit_signal(_pdata->look_at_matrix);
   }
 
   void Camera::calc_projection_matrix()
@@ -393,6 +423,7 @@ namespace bk
       _pdata->projection_matrix_is_up2date = true;
 
       _pdata->s_projection_matrix_changed.emit_signal();
+      _pdata->s_new_projection_matrix.emit_signal(_pdata->projection_matrix);
   }
 
   void Camera::calc_projection_matrix_perspective()

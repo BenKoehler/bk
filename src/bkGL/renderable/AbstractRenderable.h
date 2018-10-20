@@ -28,6 +28,7 @@
 #define BKGL_ABSTRACTRENDERABLE_H
 
 #include <bk/CopyablePIMPL>
+#include <bk/Matrix>
 #include <bkGL/AbstractObject.h>
 #include <bkGL/EKey.h>
 #include <bkGL/EMouseButton.h>
@@ -109,6 +110,9 @@ namespace bk::details
       void set_oit_available(bool b);
       void set_animation_is_enabled(bool b);
       void set_modelview_matrix_changed(bool b);
+      void set_new_modelview_matrix(const ColMat4<GLfloat>& m);
+      void set_new_projection_matrix(const ColMat4<GLfloat>& p);
+      void set_animation_time(double t);
       /// @}
 
       /// @{ -------------------------------------------------- SET VISIBILITY
@@ -145,19 +149,22 @@ namespace bk::details
       /// @}
 
       /// @{ -------------------------------------------------- EVENTS
-      virtual void on_resize(GLint w, GLint h) = 0;
-      virtual void on_oit_enabled(bool b) = 0;
-      virtual void on_animation_enabled(bool b) = 0;
-      virtual void on_modelview_changed(bool b) = 0;
-      virtual void on_visible_changed(bool b) = 0;
-      virtual void on_mouse_pos_changed(GLint x, GLint y) = 0;
-      virtual void on_mouse_button_pressed(MouseButton_ btn) = 0;
-      virtual void on_mouse_button_released(MouseButton_ btn) = 0;
-      virtual void on_key_pressed(Key_ k) = 0;
-      virtual void on_key_released(Key_ k) = 0;
-      virtual void on_mouse_wheel_up() = 0;
-      virtual void on_mouse_wheel_down() = 0;
-      virtual void on_ssaa_factor_changed(GLint ssaa_factor) = 0;
+      virtual void on_resize(GLint w, GLint h);
+      virtual void on_oit_enabled(bool b);
+      virtual void on_animation_enabled(bool b);
+      virtual void on_modelview_matrix_changed(bool b);
+      virtual void on_new_modelview_matrix(const ColMat4<GLfloat>& m);
+      virtual void on_new_projection_matrix(const ColMat4<GLfloat>& p);
+      virtual void on_visible_changed(bool b);
+      virtual void on_mouse_pos_changed(GLint x, GLint y);
+      virtual void on_mouse_button_pressed(MouseButton_ btn);
+      virtual void on_mouse_button_released(MouseButton_ btn);
+      virtual void on_key_pressed(Key_ k);
+      virtual void on_key_released(Key_ k);
+      virtual void on_mouse_wheel_up();
+      virtual void on_mouse_wheel_down();
+      virtual void on_ssaa_factor_changed(GLint ssaa_factor);
+      virtual void on_animation_time_changed(GLfloat t);
       /// @}
 
       /// @{ -------------------------------------------------- DRAW

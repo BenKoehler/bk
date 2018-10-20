@@ -742,13 +742,31 @@ namespace bk
       { _pdata->textview_ticks[i].on_animation_enabled(b); }
   }
 
-  void ColorBarView::on_modelview_changed(bool b)
+  void ColorBarView::on_modelview_matrix_changed(bool b)
   {
-      _pdata->textview_title.on_modelview_changed(b);
-      _pdata->textview_min.on_modelview_changed(b);
-      _pdata->textview_max.on_modelview_changed(b);
+      _pdata->textview_title.on_modelview_matrix_changed(b);
+      _pdata->textview_min.on_modelview_matrix_changed(b);
+      _pdata->textview_max.on_modelview_matrix_changed(b);
       for (unsigned int i = 0; i < _pdata->textview_ticks.size(); ++i)
-      { _pdata->textview_ticks[i].on_modelview_changed(b); }
+      { _pdata->textview_ticks[i].on_modelview_matrix_changed(b); }
+  }
+
+  void ColorBarView::on_new_modelview_matrix(const ColMat4<GLfloat>& m)
+  {
+      _pdata->textview_title.on_new_modelview_matrix(m);
+      _pdata->textview_min.on_new_modelview_matrix(m);
+      _pdata->textview_max.on_new_modelview_matrix(m);
+      for (unsigned int i = 0; i < _pdata->textview_ticks.size(); ++i)
+      { _pdata->textview_ticks[i].on_new_modelview_matrix(m); }
+  }
+
+  void ColorBarView::on_new_projection_matrix(const ColMat4<GLfloat>& p)
+  {
+      _pdata->textview_title.on_new_projection_matrix(p);
+      _pdata->textview_min.on_new_projection_matrix(p);
+      _pdata->textview_max.on_new_projection_matrix(p);
+      for (unsigned int i = 0; i < _pdata->textview_ticks.size(); ++i)
+      { _pdata->textview_ticks[i].on_new_projection_matrix(p); }
   }
 
   void ColorBarView::on_visible_changed(bool b)
@@ -787,10 +805,17 @@ namespace bk
       { _pdata->textview_ticks[i].on_mouse_button_released(btn); }
   }
 
-  void ColorBarView::on_key_pressed(Key_ /*k*/){ /* do nothing */ }
-  void ColorBarView::on_key_released(Key_ /*k*/){ /* do nothing */ }
-  void ColorBarView::on_mouse_wheel_up(){ /* do nothing */ }
-  void ColorBarView::on_mouse_wheel_down(){ /* do nothing */ }
+  void ColorBarView::on_key_pressed(Key_ /*k*/)
+  { /* do nothing */ }
+
+  void ColorBarView::on_key_released(Key_ /*k*/)
+  { /* do nothing */ }
+
+  void ColorBarView::on_mouse_wheel_up()
+  { /* do nothing */ }
+
+  void ColorBarView::on_mouse_wheel_down()
+  { /* do nothing */ }
 
   void ColorBarView::on_ssaa_factor_changed(GLint ssaa_factor)
   {
@@ -799,6 +824,15 @@ namespace bk
       _pdata->textview_max.on_ssaa_factor_changed(ssaa_factor);
       for (unsigned int i = 0; i < _pdata->textview_ticks.size(); ++i)
       { _pdata->textview_ticks[i].on_ssaa_factor_changed(ssaa_factor); }
+  }
+
+  void ColorBarView::on_animation_time_changed(GLfloat t)
+  {
+      _pdata->textview_title.on_animation_time_changed(t);
+      _pdata->textview_min.on_animation_time_changed(t);
+      _pdata->textview_max.on_animation_time_changed(t);
+      for (unsigned int i = 0; i < _pdata->textview_ticks.size(); ++i)
+      { _pdata->textview_ticks[i].on_animation_time_changed(t); }
   }
   /// @}
 
