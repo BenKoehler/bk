@@ -25,5 +25,3 @@
 #include "bkDicom/DicomDirImporter.h"
 #include "bkDicom/DicomFileInfos.h"
 #include "bkDicom/DicomImageInfos.h"
-#include "bkDicom/EDicomImageClass.h"
-#include "bkDicom/EFlowImageOrdering.h"

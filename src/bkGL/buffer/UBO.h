@@ -210,16 +210,16 @@ namespace bk
 //====================================================================================================
 #define BK_UBO_SPECIALIZATION_DECLARE(NAME,TYPE) \
 \
-    using NAME##_value_type = gl_underlying_type_t< TYPE > ;\
+    using NAME##_value_type = bk::gl_underlying_type_t< TYPE > ;\
 \
     [[nodiscard]] static constexpr const char* name_##NAME () noexcept\
     { return #NAME; }\
 \
     [[nodiscard]] static constexpr unsigned int numel_##NAME () noexcept\
-    { return gl_type_traits< TYPE >::numel ;}\
+    { return bk::gl_type_traits< TYPE >::numel ;}\
 \
     [[nodiscard]] static constexpr unsigned int bytes_##NAME () noexcept\
-    { return gl_type_traits< TYPE >::size_in_bytes; }\
+    { return bk::gl_type_traits< TYPE >::size_in_bytes; }\
 \
     [[nodiscard]] static constexpr const char* typename_##NAME##_glsl () noexcept\
     { return bk::details::glenum_to_glsl_type_name( TYPE ) ;}\
@@ -235,7 +235,7 @@ namespace bk
     {\
         if (this->is_initialized())\
         { \
-            gl_underlying_cast_type_t< TYPE > temp = static_cast<gl_underlying_cast_type_t< TYPE >>(val);\
+            bk::gl_underlying_cast_type_t< TYPE > temp = static_cast<bk::gl_underlying_cast_type_t< TYPE >>(val);\
             this->write_registered_value( name_##NAME (), &temp); \
         }\
     }\

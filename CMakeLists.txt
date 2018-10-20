@@ -285,8 +285,7 @@ set(SOURCE_FILES # BUFFER
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/GrayDICOMSliceView.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/GrayImageLiveThresholdSliceView.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/GrayImagePlusSegmentationSliceView.cpp 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/GrayImageSliceView.cpp 
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/RGBDICOMFlowImageSliceView.cpp 
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/GrayImageSliceView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/RGBDICOMSliceView.cpp 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/image/RGBImageSliceView.cpp 
         #        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/imageplane/ImagePlanePreviewView.cpp # TODO

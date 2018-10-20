@@ -49,7 +49,6 @@
 #include "bkGL/renderable/image/GrayImageLiveThresholdSliceView.h"
 #include "bkGL/renderable/image/GrayImagePlusSegmentationSliceView.h"
 #include "bkGL/renderable/image/GrayImageSliceView.h"
-#include "bkGL/renderable/image/RGBDICOMFlowImageSliceView.h"
 #include "bkGL/renderable/image/RGBDICOMSliceView.h"
 #include "bkGL/renderable/image/RGBImageSliceView.h"
 #include "bkGL/renderable/line/LineView.h"
