@@ -562,6 +562,8 @@ namespace bk
           bk::Progress& prog = bk_progress.emplace_task(1 + _image.geometry().size(1) * _image.geometry().size(0));
           #endif
 
+          const bool isRunning = _pdata->gc_is_running; // racing fix
+
           //for (GLuint y = 0; y < static_cast<GLuint>(_size[1]); ++y)
           for (int y = static_cast<int>(_image.geometry().size(1) - 1); y >= 0; --y) // y is inverted, because GL coord system starts top left and image coord system starts bottom left
           {
@@ -575,7 +577,8 @@ namespace bk
                   if (_pdata->out(x, y, zcurrent()) != 0)
                   { b |= OutsideBit; }
 
-                  if (_pdata->seg(x, y, zcurrent()) != 0)
+                  //if (_pdata->seg(x, y, zcurrent()) != 0)
+                  if (!isRunning && _pdata->seg(x, y, zcurrent()) != 0) // racing fix
                   { b |= SegmentationBit; }
 
                   inout[cnt++] = b;
