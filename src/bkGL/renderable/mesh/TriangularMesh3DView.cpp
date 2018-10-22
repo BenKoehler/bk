@@ -405,10 +405,10 @@ namespace bk
                   _pdata->colorbarview.init_magenta();
                   break;
               }
-              //case ColorScaleType::Gray: [[fallthrough]]
-              //case ColorScaleType::Cluster: [[fallthrough]]
-              //case ColorScaleType::TrafficLight: [[fallthrough]]
-              //case ColorScaleType::UniformYellow: [[fallthrough]]
+                  //case ColorScaleType::Gray: [[fallthrough]]
+                  //case ColorScaleType::Cluster: [[fallthrough]]
+                  //case ColorScaleType::TrafficLight: [[fallthrough]]
+                  //case ColorScaleType::UniformYellow: [[fallthrough]]
               default:
               { /* do nothing */ }
           }
@@ -805,10 +805,17 @@ namespace bk
   void TriangularMesh3DView::on_mouse_button_released(MouseButton_ btn)
   { _pdata->colorbarview.on_mouse_button_released(btn); }
 
-  void TriangularMesh3DView::on_key_pressed(Key_ /*k*/){ /* do nothing */ }
-  void TriangularMesh3DView::on_key_released(Key_ /*k*/){ /* do nothing */ }
-  void TriangularMesh3DView::on_mouse_wheel_up(){ /* do nothing */ }
-  void TriangularMesh3DView::on_mouse_wheel_down(){ /* do nothing */ }
+  void TriangularMesh3DView::on_key_pressed(Key_ /*k*/)
+  { /* do nothing */ }
+
+  void TriangularMesh3DView::on_key_released(Key_ /*k*/)
+  { /* do nothing */ }
+
+  void TriangularMesh3DView::on_mouse_wheel_up()
+  { /* do nothing */ }
+
+  void TriangularMesh3DView::on_mouse_wheel_down()
+  { /* do nothing */ }
 
   void TriangularMesh3DView::on_ssaa_factor_changed(GLint ssaa_factor)
   { _pdata->colorbarview.on_ssaa_factor_changed(ssaa_factor); }
@@ -820,60 +827,57 @@ namespace bk
   /// @{ -------------------------------------------------- DRAW
   void TriangularMesh3DView::draw_opaque_impl()
   {
-      if (this->is_initialized() && this->is_visible())
+      // ubo 0 must be global ubo with modelview/projection matrices
+      _pdata->ubo.bind_to_default_base();
+
+      if (_pdata->color_enabled)
+      { _pdata->ssbo_colorbar.bind_to_base(7); }
+
+      if (_pdata->mode == details::MeshRenderMode_FrontFaceCullingWithGhostedView)
       {
-          // ubo 0 must be global ubo with modelview/projection matrices
-          _pdata->ubo.bind_to_default_base();
+          // first pass: back side
+          BK_QT_GL glPushAttrib(GL_POLYGON_BIT);
 
-          if (_pdata->color_enabled)
-          { _pdata->ssbo_colorbar.bind_to_base(7); }
+          BK_QT_GL glEnable(GL_CULL_FACE);
+          BK_QT_GL glFrontFace(GL_CCW);
+          BK_QT_GL glCullFace(GL_FRONT);
 
-          if (_pdata->mode == details::MeshRenderMode_FrontFaceCullingWithGhostedView)
-          {
-              // first pass: back side
-              BK_QT_GL glPushAttrib(GL_POLYGON_BIT);
+          _pdata->vao.bind();
+          _pdata->shader.bind();
+          BK_QT_GL glDrawElements(GL_TRIANGLES, _pdata->sizeInd, GL_UNSIGNED_INT, nullptr);
+          _pdata->shader.release();
+          _pdata->vao.release();
 
-              BK_QT_GL glEnable(GL_CULL_FACE);
-              BK_QT_GL glFrontFace(GL_CCW);
-              BK_QT_GL glCullFace(GL_FRONT);
-
-              _pdata->vao.bind();
-              _pdata->shader.bind();
-              BK_QT_GL glDrawElements(GL_TRIANGLES, _pdata->sizeInd, GL_UNSIGNED_INT, nullptr);
-              _pdata->shader.release();
-              _pdata->vao.release();
-
-              BK_QT_GL glPopAttrib();
-          }
-          else
-          {
-              BK_QT_GL glDepthFunc(GL_LEQUAL);
-
-              _pdata->vao.bind();
-              _pdata->shader.bind();
-              BK_QT_GL glDrawElements(GL_TRIANGLES, _pdata->sizeInd, GL_UNSIGNED_INT, nullptr);
-              _pdata->shader.release();
-              _pdata->vao.release();
-
-              BK_QT_GL glDepthFunc(GL_LESS);
-          }
-
-          if (_pdata->color_enabled)
-          { _pdata->ssbo_colorbar.release_from_base(); }
-
-          _pdata->ubo.release_from_base();
-
-          //------------------------------------------------------------------------------------------------------
-          // colorbar view
-          //------------------------------------------------------------------------------------------------------
-          if (_pdata->color_enabled)
-          { _pdata->colorbarview.draw(); }
+          BK_QT_GL glPopAttrib();
       }
+      else
+      {
+          BK_QT_GL glDepthFunc(GL_LEQUAL);
+
+          _pdata->vao.bind();
+          _pdata->shader.bind();
+          BK_QT_GL glDrawElements(GL_TRIANGLES, _pdata->sizeInd, GL_UNSIGNED_INT, nullptr);
+          _pdata->shader.release();
+          _pdata->vao.release();
+
+          BK_QT_GL glDepthFunc(GL_LESS);
+      }
+
+      if (_pdata->color_enabled)
+      { _pdata->ssbo_colorbar.release_from_base(); }
+
+      _pdata->ubo.release_from_base();
+
+      //------------------------------------------------------------------------------------------------------
+      // colorbar view
+      //------------------------------------------------------------------------------------------------------
+      if (_pdata->color_enabled)
+      { _pdata->colorbarview.draw(); }
   }
 
   void TriangularMesh3DView::draw_transparent_impl()
   {
-      if (this->is_initialized() && this->is_visible() && _pdata->mode == details::MeshRenderMode_FrontFaceCullingWithGhostedView)
+      if (_pdata->mode == details::MeshRenderMode_FrontFaceCullingWithGhostedView)
       {
           // ubo 0 must be global ubo with modelview/projection matrices
           _pdata->ubo.bind_to_default_base();

@@ -62,7 +62,7 @@ namespace bk::details
       : base_type()
   #else
 
-      AbstractSceneRenderable::AbstractSceneRenderable(bk::qt_gl_functions* gl) : base_type(gl)
+  AbstractSceneRenderable::AbstractSceneRenderable(bk::qt_gl_functions* gl) : base_type(gl)
   #endif
   { /* do nothing */ }
 
@@ -112,10 +112,16 @@ namespace bk::details
 
   /// @{ -------------------------------------------------- DRAW
   void AbstractSceneRenderable::draw_opaque()
-  { draw_opaque_impl(); }
+  {
+      if (this->is_initialized() && this->is_visible())
+      { draw_opaque_impl(); }
+  }
 
   void AbstractSceneRenderable::draw_transparent()
-  { draw_transparent_impl(); }
+  {
+      if (this->is_initialized() && this->is_visible())
+      { draw_transparent_impl(); }
+  }
 
   void AbstractSceneRenderable::draw_impl()
   {
