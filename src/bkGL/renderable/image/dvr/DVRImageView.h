@@ -159,6 +159,11 @@ namespace bk
       void hide_transfer_function();
       /// @}
 
+      /// @{ -------------------------------------------------- ENABLE/DISABLE TRANSFER FUNCTION INTERACTION
+      void enable_transfer_function_right_click_interaction();
+      void disable_transfer_function_right_click_interaction();
+      /// @}
+
       //====================================================================================================
       //===== FUNCTIONS
       //====================================================================================================

@@ -75,6 +75,7 @@ namespace bk
       details::DVRMode mode;
       bk::Vec3<GLuint> image_size;
       bk::Vec3<GLfloat> image_scale;
+      bool tf_interaction_enabled;
 
           #ifndef BK_LIB_QT_AVAILABLE
 
@@ -99,7 +100,8 @@ namespace bk
           sizeInd(0),
           center(MatrixFactory::Zero_Vec_3D<GLfloat>()),
           num_ray_samples(100), // todo options
-          mode(details::DVRMode::MIP)
+          mode(details::DVRMode::MIP),
+          tf_interaction_enabled(true)
       { /* do nothing */ }
   };
 
@@ -361,6 +363,14 @@ namespace bk
   { _pdata->show_tf = false; }
   /// @}
 
+  /// @{ -------------------------------------------------- ENABLE/DISABLE TRANSFER FUNCTION INTERACTION
+  void DVRImageView::enable_transfer_function_right_click_interaction()
+  { _pdata->tf_interaction_enabled = true; }
+
+  void DVRImageView::disable_transfer_function_right_click_interaction()
+  { _pdata->tf_interaction_enabled = false; }
+  /// @}
+
   //====================================================================================================
   //===== FUNCTIONS
   //====================================================================================================
@@ -515,22 +525,31 @@ namespace bk
   }
 
   void DVRImageView::on_mouse_pos_changed(GLint x, GLint y)
-  { _pdata->tf_view.on_mouse_pos_changed(x, y); }
+  {
+      if (_pdata->tf_interaction_enabled)
+      { _pdata->tf_view.on_mouse_pos_changed(x, y); }
+  }
 
   void DVRImageView::on_mouse_button_pressed(MouseButton_ btn)
   {
-      _pdata->tf_view.on_mouse_button_pressed(btn);
+      if (_pdata->tf_interaction_enabled)
+      {
+          _pdata->tf_view.on_mouse_button_pressed(btn);
 
-      if (btn == MouseButton_Right)
-      { show_transfer_function(); }
+          if (btn == MouseButton_Right)
+          { show_transfer_function(); }
+      }
   }
 
   void DVRImageView::on_mouse_button_released(MouseButton_ btn)
   {
-      _pdata->tf_view.on_mouse_button_released(btn);
+      if (_pdata->tf_interaction_enabled)
+      {
+          _pdata->tf_view.on_mouse_button_released(btn);
 
-      if (btn == MouseButton_Right)
-      { hide_transfer_function(); }
+          if (btn == MouseButton_Right)
+          { hide_transfer_function(); }
+      }
   }
   /// @}
 
