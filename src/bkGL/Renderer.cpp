@@ -215,7 +215,7 @@ namespace bk
                                                                         this->_pdata->ubo_global.set_window_height(h);
                                                                         this->_pdata->ubo_global.release();
 
-                                                                        this->_pdata->oit.on_resize(w, h);
+                                                                        //this->_pdata->oit.on_resize(w, h);
 
                                                                         this->emit_signal_update_required();
                                                                     }
@@ -969,6 +969,8 @@ namespace bk
 
       _pdata->supersampler.set_window_size(w, h);
       _pdata->supersampler.init();
+
+      _pdata->oit.on_resize(_pdata->supersampler.width_upsampled(), _pdata->supersampler.height_upsampled());
 
       _pdata->camera.set_aspect_ratio(_pdata->window_geometry.aspect_ratio());
       _pdata->camera.calc_projection_matrix();

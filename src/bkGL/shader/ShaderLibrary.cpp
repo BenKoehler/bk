@@ -596,7 +596,7 @@ namespace bk::details
 
       std::stringstream s;
 
-      s << comment_tag_fragment_shader("OIT");
+      s << comment_tag_fragment_shader("OIT CLEAR LINKED LIST");
       s << version();
 
       s << comment_region_input();
@@ -623,7 +623,7 @@ namespace bk::details
 
       std::stringstream s;
 
-      s << comment_tag_fragment_shader("OIT");
+      s << comment_tag_fragment_shader("OIT RENDER");
       s << version();
       s << oit_definition_max_fragments();
 
