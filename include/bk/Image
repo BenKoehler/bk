@@ -30,6 +30,7 @@
 #include "bkDataset/image/filter/ConnectedComponentsAnalysisImageFilter.h"
 #include "bkDataset/image/filter/ConnectedComponentsAnalysisKeepLargestRegionImageFilter.h"
 #include "bkDataset/image/filter/DistanceMapImageFilter.h"
+#include "bkDataset/image/filter/FillHolesInSegmentationFilter.h"
 #include "bkDataset/image/filter/FFTAbsLogRealImageFilter.h"
 #include "bkDataset/image/filter/FFTImageFilter.h"
 #include "bkDataset/image/filter/FFTShiftImageFilter.h"

@@ -41,7 +41,7 @@ namespace bk
   template<typename TIter, typename TCompare>
   void invert_minmax(TIter first, TIter last, TCompare compare)
   {
-      auto[itMinElement, itMaxElement] = std::minmax_element(first, last, compare);
+      const auto[itMinElement, itMaxElement] = std::minmax_element(first, last, compare);
       const auto minval = *itMinElement;
       const auto maxval = *itMaxElement;
 
@@ -56,7 +56,7 @@ namespace bk
 
   template<typename TIter>
   void invert_minmax(TIter first, TIter last)
-  { invert_minmax(first, last, std::less < std::decay_t < decltype(*first) >> ()); }
+  { invert_minmax(first, last, std::less<std::decay_t<decltype(*first) >>()); }
 } // namespace bk
 
 #endif //BK_ALGORITHMS_INVERT_MINMAX_H

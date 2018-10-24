@@ -363,9 +363,11 @@ namespace bk::details
   std::string ShaderLibrary::oit_definition()
   {
       std::stringstream s;
+
       s << oit_definition_atomic_counter();
       s << oit_definition_fragments();
       s << oit_definition_linked_list();
+
       return s.str();
   }
 
@@ -1061,10 +1063,10 @@ namespace bk::details
       s << ubo_definition_phong();
       s << "layout(binding = 7, std430) buffer _ColorBar\n";
       s << "{ vec3 ColorBar[]; };\n";
+      s << early_fragment_test();
 
       s << comment_region_output();
       s << oit_definition();
-      s << early_fragment_test();
       s << "layout(location = 0) out vec4 color_out;\n";
 
       s << comment_region_functions();

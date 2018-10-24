@@ -24,15 +24,11 @@
 
 #pragma once
 
-#ifndef BK_CONNECTEDCOMPONENTSANALYSISKEEPLARGESTREGIONIMAGEFILTER_H
-#define BK_CONNECTEDCOMPONENTSANALYSISKEEPLARGESTREGIONIMAGEFILTER_H
+#ifndef BK_FILLHOLESINSEGMENTATIONFILTER_H
+#define BK_FILLHOLESINSEGMENTATIONFILTER_H
 
-#include <map>
-#include <queue>
-#include <vector>
-
-#include <bkDataset/image/filter/ConnectedComponentsAnalysisImageFilter.h>
-#include <bkDataset/lib/bkDataset_export.h>
+#include <bkDataset/image/filter/ConnectedComponentsAnalysisKeepLargestRegionImageFilter.h>
+#include <bkDataset/image/filter/InvertIntensityImageFilter.h>
 
 #ifdef BK_EMIT_PROGRESS
     #include <bk/Progress>
@@ -41,83 +37,63 @@
 
 namespace bk
 {
-  class BKDATASET_EXPORT ConnectedComponentAnalysisKeepLargestRegionImageFilter
+  class FillHolesInSegmentationFilter
   {
-      //====================================================================================================
-      //===== DEFINITIONS
-      //====================================================================================================
-      using self_type = ConnectedComponentAnalysisKeepLargestRegionImageFilter;
-
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR
       //====================================================================================================
     public:
       /// @{ -------------------------------------------------- CTOR
-      ConnectedComponentAnalysisKeepLargestRegionImageFilter();
-      ConnectedComponentAnalysisKeepLargestRegionImageFilter(const self_type&);
-      ConnectedComponentAnalysisKeepLargestRegionImageFilter(self_type&&) noexcept;
+      constexpr FillHolesInSegmentationFilter() = default;
+      constexpr FillHolesInSegmentationFilter(const FillHolesInSegmentationFilter&) = default;
+      constexpr FillHolesInSegmentationFilter(FillHolesInSegmentationFilter&&) noexcept = default;
       /// @}
 
       /// @{ -------------------------------------------------- DTOR
-      ~ConnectedComponentAnalysisKeepLargestRegionImageFilter();
+      ~FillHolesInSegmentationFilter() = default;
       /// @}
 
       //====================================================================================================
       //===== SETTER
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
-      [[maybe_unused]] auto operator=(const self_type&) -> self_type&;
-      [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
+      [[maybe_unused]] constexpr auto operator=(const FillHolesInSegmentationFilter&) -> FillHolesInSegmentationFilter& = default;
+      [[maybe_unused]] constexpr auto operator=(FillHolesInSegmentationFilter&&) noexcept -> FillHolesInSegmentationFilter& = default;
       /// @}
 
       //====================================================================================================
       //===== FUNCTIONS
       //====================================================================================================
       /// @{ -------------------------------------------------- APPLY
-      template<typename TImage>
-      [[nodiscard]] static typename TImage::template self_template_type<int> apply(const TImage& img)
+      template<typename TSegmentation>
+      [[nodiscard]] static constexpr TSegmentation apply(const TSegmentation& seg)
       {
           #ifdef BK_EMIT_PROGRESS
-          bk::Progress& prog = bk_progress.emplace_task(9, ___("CCA largest region"));
+          bk::Progress& prog = bk_progress.emplace_task(9, ___("Filling holes in segmentation"));
           #endif
 
-          ConnectedComponentAnalysisImageFilter f_cca;
-          auto labels = img.filter(f_cca);
+          auto segInverted = InvertIntensityImageFilter::apply(seg);
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(2);
+          #endif
+
+          auto temp = ConnectedComponentAnalysisKeepLargestRegionImageFilter::apply(segInverted);
 
           #ifdef BK_EMIT_PROGRESS
           prog.increment(5);
           #endif
 
-          // determine max size label
-
-          unsigned int maxSizeLabelId = 0;
-          unsigned int maxSize = 0;
-
-          for (const auto[id, num_pixels] : f_cca.labels())
-          {
-              if (num_pixels > maxSize)
-              {
-                  maxSize = num_pixels;
-                  maxSizeLabelId = id;
-              }
-          }
-
-          #ifdef BK_EMIT_PROGRESS
-          prog.increment(1);
-          #endif
-
-          #pragma omp parallel for
-          for (unsigned int i = 0; i < labels.num_values(); ++i)
-          { labels[i] = labels[i] != static_cast<int>(maxSizeLabelId )? 0 : 1; }
+          TSegmentation res = InvertIntensityImageFilter::apply(temp);
 
           #ifdef BK_EMIT_PROGRESS
           prog.set_finished();
           #endif
 
-          return labels;
+          return std::move(res);
       }
       /// @}
-  }; // class ConnectedComponentAnalysisKeepLargestRegionImageFilter
+  }; // class FillHolesInSegmentationFilter
 } // namespace bk
 
-#endif //BK_CONNECTEDCOMPONENTSANALYSISKEEPLARGESTREGIONIMAGEFILTER_H
+#endif //BK_FILLHOLESINSEGMENTATIONFILTER_H

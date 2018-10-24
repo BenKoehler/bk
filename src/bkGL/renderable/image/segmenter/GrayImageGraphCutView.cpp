@@ -498,8 +498,26 @@ namespace bk
 
                   _pdata->gc->run();
 
+                  /*
+                  * - write segmentation
+                  * - enforce that regions drawn as inside/outside are 1/0 in segmentation
+                  */
+                  #pragma omp parallel for
+                  for (GLuint i = 0; i < static_cast<GLuint>(_pdata->seg.num_values()); ++i)
+                  {
+                      if (_pdata->in[i] != 0)
+                      { _pdata->seg[i] = 1; }
+                      else if (_pdata->out[i] != 0)
+                      { _pdata->seg[i] = 0; }
+                      else
+                      {
+                          const auto gid = bk::list_to_grid_id(_pdata->in.size(), i);
+                          _pdata->seg[i] = _pdata->gc->is_in_segmentation(gid[0], gid[1], gid[2]) ? 1 : 0;
+                      }
+                  }
+
                   #ifdef BK_EMIT_PROGRESS
-                  bk::Progress& prog_postpro = bk_progress.emplace_task(5, ___("Post-processing graph cut result"));
+                  bk::Progress& prog_postpro = bk_progress.emplace_task(6, ___("Post-processing graph cut result"));
                   #endif
 
                   /*
@@ -518,21 +536,27 @@ namespace bk
                   prog_postpro.increment(1);
                   #endif
 
+                  _pdata->seg = bk::FillHolesInSegmentationFilter::apply(_pdata->seg);
+
+                  #ifdef BK_EMIT_PROGRESS
+                  prog_postpro.increment(1);
+                  #endif
+
                   /*
-                  * - write segmentation
-                  * - enforce that regions drawn as inside/outside are 1/0 in segmentation
-                  */
+                   * - enforce that regions drawn as inside/outside are 1/0 in segmentation (also after filtering)
+                   */
+                  #pragma omp parallel for
                   for (GLuint i = 0; i < static_cast<GLuint>(_pdata->seg.num_values()); ++i)
                   {
                       if (_pdata->in[i] != 0)
                       { _pdata->seg[i] = 1; }
                       else if (_pdata->out[i] != 0)
                       { _pdata->seg[i] = 0; }
-                      else
-                      {
-                          const auto gid = bk::list_to_grid_id(_pdata->in.size(), i);
-                          _pdata->seg[i] = _pdata->gc->is_in_segmentation(gid[0], gid[1], gid[2]) ? 1 : 0;
-                      }
+                      //else
+                      //{
+                      //    const auto gid = bk::list_to_grid_id(_pdata->in.size(), i);
+                      //    _pdata->seg[i] = _pdata->gc->is_in_segmentation(gid[0], gid[1], gid[2]) ? 1 : 0;
+                      //}
                   }
 
                   #ifdef BK_EMIT_PROGRESS
