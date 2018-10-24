@@ -114,6 +114,7 @@ namespace bk
           // top (2 6 3 7)
           2, 6, 3, 3, 6, 7};
 
+
       size_ind() = NUM_INDICES;
 
       vbo_cuboid().init(static_cast<const GLvoid*>(vertCol), NUM_VALUES_VBO * sizeof(GLfloat));
@@ -141,7 +142,7 @@ namespace bk
       #pragma omp parallel for
       for (unsigned int z = 0; z < image_size[2]; ++z)
       {
-          unsigned int cnt = z*image_size[1]*image_size[0];
+          unsigned int cnt = z * image_size[1] * image_size[0];
 
           for (unsigned int y = 0; y < image_size[1]; ++y)
           {

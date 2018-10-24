@@ -76,6 +76,14 @@ namespace bk
       bk::Vec3<GLuint> image_size;
       bk::Vec3<GLfloat> image_scale;
       bool tf_interaction_enabled;
+      bk::Vec3<GLfloat> p000;
+      bk::Vec3<GLfloat> p001;
+      bk::Vec3<GLfloat> p010;
+      bk::Vec3<GLfloat> p011;
+      bk::Vec3<GLfloat> p100;
+      bk::Vec3<GLfloat> p101;
+      bk::Vec3<GLfloat> p110;
+      bk::Vec3<GLfloat> p111;
 
           #ifndef BK_LIB_QT_AVAILABLE
 
@@ -624,6 +632,77 @@ namespace bk
       if (_pdata->show_tf)
       { _pdata->tf_view.draw(); }
   }
+
+  //void DVRImageView::draw_opaque_impl()
+  //{
+  //    if (this->modelview_matrix_changed() || _pdata->show_tf || !is_up_to_date())
+  //    {
+  //        BK_QT_GL glPushAttrib(GL_POLYGON_BIT);
+  //
+  //        // ubo 0 must be global ubo with modelview/projection matrices
+  //
+  //        BK_QT_GL glDepthMask(GL_FALSE);
+  //
+  //        BK_QT_GL glEnable(GL_CULL_FACE);
+  //        BK_QT_GL glCullFace(GL_BACK);
+  //
+  //        /*
+  //         * first pass: render cuboid front faces with position colors
+  //         */
+  //        _pdata->ubo.bind_to_default_base();
+  //
+  //        _pdata->fbo.bind();
+  //        BK_QT_GL glClear(GL_COLOR_BUFFER_BIT);
+  //
+  //        _pdata->vao_cuboid.bind();
+  //        _pdata->shader_cuboid.bind();
+  //        BK_QT_GL glDrawElements(GL_TRIANGLES, _pdata->sizeInd, GL_UNSIGNED_INT, nullptr);
+  //        _pdata->shader_cuboid.release();
+  //        _pdata->vao_cuboid.release();
+  //
+  //        _pdata->fbo.release();
+  //        //this->emit_signal_bind_default_fbo();
+  //
+  //        /*
+  //         * second pass: render cuboid back faces, determine directions via entry_tex,
+  //         * and perform ray casting
+  //         */
+  //        BK_QT_GL glCullFace(GL_FRONT);
+  //
+  //        _pdata->fbo_result.bind(); // color tex bound to tex unit 3
+  //        BK_QT_GL glClearColor(0, 0, 0, 0);
+  //        BK_QT_GL glClear(GL_COLOR_BUFFER_BIT);
+  //
+  //        _pdata->fbo.color_attachment(0)->bind(); // bound to tex unit 1
+  //        bind_image_textures(); //_pdata->image_tex.bind(); // bound to tex unit 2
+  //
+  //        _pdata->vao_cuboid.bind();
+  //        _pdata->shader_dvr.bind();
+  //        BK_QT_GL glDrawElements(GL_TRIANGLES, _pdata->sizeInd, GL_UNSIGNED_INT, nullptr);
+  //        _pdata->shader_dvr.release();
+  //        _pdata->vao_cuboid.release();
+  //
+  //        _pdata->fbo_result.release();
+  //        _pdata->fbo.color_attachment(0)->release();
+  //        release_image_textures(); //_pdata->image_tex.release();
+  //        _pdata->ubo.release_from_base();
+  //
+  //        this->emit_signal_bind_default_fbo();
+  //
+  //        BK_QT_GL glDepthMask(GL_TRUE);
+  //
+  //        BK_QT_GL glPopAttrib();
+  //    }
+  //
+  //    _pdata->fbo_result.color_attachment(0)->bind(); // bound to tex unit 3
+  //    _pdata->shader_screenquad_texture.bind();
+  //    _pdata->screenquad.draw();
+  //    _pdata->shader_screenquad_texture.release();
+  //    _pdata->fbo_result.color_attachment(0)->release();
+  //
+  //    if (_pdata->show_tf)
+  //    { _pdata->tf_view.draw(); }
+  //}
 
   void DVRImageView::draw_transparent_impl()
   { /* do nothing */ }
