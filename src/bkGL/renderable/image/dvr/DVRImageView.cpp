@@ -530,30 +530,35 @@ namespace bk
   void DVRImageView::on_mouse_pos_changed(GLint x, GLint y)
   {
       _pdata->mouse.set_pos(x, y);
-      
+
       if (_pdata->tf_interaction_enabled)
       {
           _pdata->tf_view.on_mouse_pos_changed(x, y);
 
-          static constexpr const GLfloat percent = 0.4;
+          if (_pdata->mouse.right_button_is_pressed())
+          {
+              static constexpr const GLfloat percent = 0.4;
 
-          if (_pdata->mouse.last_move_was_down())
-          { transfer_function_decrease_width(percent * std::abs(_pdata->mouse.dy())); }
-          else if (_pdata->mouse.last_move_was_up())
-          { transfer_function_increase_width(percent * std::abs(_pdata->mouse.dy())); }
+              if (_pdata->mouse.last_move_was_down())
+              { transfer_function_decrease_width(percent * std::abs(_pdata->mouse.dy())); }
+              else if (_pdata->mouse.last_move_was_up())
+              { transfer_function_increase_width(percent * std::abs(_pdata->mouse.dy())); }
 
-          if (_pdata->mouse.last_move_was_left())
-          { transfer_function_shift_center_left(percent * std::abs(_pdata->mouse.dx())); }
-          else if (_pdata->mouse.last_move_was_right())
-          { transfer_function_shift_center_right(percent * std::abs(_pdata->mouse.dx())); }
-          
-          if (this->is_initialized())
-          { this->emit_signal_update_required(); }
+              if (_pdata->mouse.last_move_was_left())
+              { transfer_function_shift_center_left(percent * std::abs(_pdata->mouse.dx())); }
+              else if (_pdata->mouse.last_move_was_right())
+              { transfer_function_shift_center_right(percent * std::abs(_pdata->mouse.dx())); }
+
+              if (this->is_initialized())
+              { this->emit_signal_update_required(); }
+          }
       }
   }
 
   void DVRImageView::on_mouse_button_pressed(MouseButton_ btn)
   {
+      _pdata->mouse.set_button_pressed(btn, true);
+
       if (_pdata->tf_interaction_enabled)
       {
           _pdata->tf_view.on_mouse_button_pressed(btn);
@@ -568,6 +573,8 @@ namespace bk
 
   void DVRImageView::on_mouse_button_released(MouseButton_ btn)
   {
+      _pdata->mouse.set_button_pressed(btn, false);
+
       if (_pdata->tf_interaction_enabled)
       {
           _pdata->tf_view.on_mouse_button_released(btn);

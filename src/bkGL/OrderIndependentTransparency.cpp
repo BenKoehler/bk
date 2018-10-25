@@ -228,10 +228,10 @@ namespace bk
           _pdata->enabled = b;
           _pdata->screenquad.set_oit_available(_pdata->enabled);
 
-          if (_pdata->enabled)
-          { init(); }
-          else
-          { clear(); }
+          //if (_pdata->enabled)
+          //{ init(); }
+          //else
+          //{ clear(); }
 
           _pdata->s_enabled_changed.emit_signal(_pdata->enabled);
       }

@@ -650,8 +650,8 @@ namespace bk::details
 
       s << "   //fetch stored fragment values from buffer\n";
       s << "   uint numFragments = 0; // count entries\n";
-      s << "   FragmentVals currentFragVals[" << oit_var_max_fragments() << "];\n";
-      s << "\n";
+      s << "   FragmentVals currentFragVals[" << oit_var_max_fragments() << "];\n\n";
+
       s << "   // while hasNext && space available\n";
       s << "   while (id != 0xFFFFFF && numFragments < " << oit_var_max_fragments() << ")\n";
       s << "   {\n";

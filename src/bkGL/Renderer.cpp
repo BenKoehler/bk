@@ -205,8 +205,11 @@ namespace bk
                                                                {
                                                                    this->_pdata->ubo_global.set_ssaa_factor(x);
                                                                    this->_pdata->ubo_global.release();
+
+                                                                   this->_pdata->oit.on_resize(_pdata->supersampler.width_upsampled(), _pdata->supersampler.height_upsampled());
                                                                }
                                                            });
+
       _pdata->supersampler.signal_window_size_changed().connect([&](GLuint w, GLuint h)
                                                                 {
                                                                     if (this->is_initialized())
@@ -573,6 +576,7 @@ namespace bk
       _pdata->interactor.trackball().set_radius(1);
       _pdata->interactor.trackball().set_upvector_id(2);
 
+      _pdata->oit.set_window_size(_pdata->supersampler.width_upsampled(), _pdata->supersampler.height_upsampled());
       _pdata->oit.init_if_enabled();
 
       _pdata->supersampler.init();
