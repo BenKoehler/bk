@@ -130,13 +130,13 @@ namespace bk
   /// @}
 
   /// @{ -------------------------------------------------- HELPERS: COMPILE SHADER (FROM SOURCE)
-  std::pair<bool/*success*/, std::string/*log*/> ComputeShader::compile_shader(const std::string& source)
+  std::pair<bool/*success*/, std::string/*log*/> ComputeShader::compile_shader(std::string_view source)
   {
       GLuint shader_id = 0;
       shader_id = BK_QT_GL glCreateShader(GL_COMPUTE_SHADER);
       _compute_shader_id = shader_id;
 
-      const char* sourcePtr = source.c_str();
+      const char* sourcePtr = source.data();
       BK_QT_GL glShaderSource(shader_id, 1, &sourcePtr, nullptr);
       BK_QT_GL glCompileShader(shader_id);
 
@@ -152,15 +152,15 @@ namespace bk
       return p;
   }
 
-  std::pair<bool/*success*/, std::string/*log*/> ComputeShader::compile_shader_from_file(const std::string& filename)
+  std::pair<bool/*success*/, std::string/*log*/> ComputeShader::compile_shader_from_file(std::string_view filename)
   { return compile_shader(bk::read_text_file(filename)); }
   /// @}
 
   /// @{ -------------------------------------------------- SET COMPUTE SHADER
-  std::pair<bool, std::string> ComputeShader::set_compute_shader(const std::string& source)
+  std::pair<bool, std::string> ComputeShader::set_compute_shader(std::string_view source)
   { return compile_shader(source); }
 
-  std::pair<bool, std::string> ComputeShader::set_compute_shader_from_file(const std::string& filename)
+  std::pair<bool, std::string> ComputeShader::set_compute_shader_from_file(std::string_view filename)
   { return compile_shader_from_file(filename); }
   /// @}
 
@@ -219,7 +219,23 @@ namespace bk
   /// @}
 
   /// @{ -------------------------------------------------- INIT
-  bool ComputeShader::init(const std::string& compShaderPath)
+  bool ComputeShader::init_from_sources(std::string_view compShaderSource)
+  {
+      clear();
+
+      const bool successComp = set_compute_shader(compShaderSource).first;
+      const bool successProgram = compile_program().first;
+
+      if (!successComp)
+      { std::cerr << "ComputeShader::init_from_sources - COMPUTE SHADER FAILED" << std::endl; }
+
+      if (!successProgram)
+      { std::cerr << "Shader::init_from_sources - PROGRAM FAILED" << std::endl; }
+
+      return successComp && successProgram;
+  }
+
+  bool ComputeShader::init(std::string_view compShaderPath)
   {
       clear();
 
@@ -233,7 +249,7 @@ namespace bk
       /*
        * compile compute shader
        */
-      std::string csp = string_utils::replace(compShaderPath, "\\", "/");
+      std::string csp = string_utils::replace(compShaderPath.data(), "\\", "/");
       const info_type success_vert = set_compute_shader_from_file(csp);
 
       if (!success_vert.first)

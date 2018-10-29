@@ -28,6 +28,7 @@
 #define BKGL_COMPUTESHADER_H
 
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include <bkGL/AbstractBindable.h>
@@ -59,7 +60,7 @@ namespace bk
       #else
       explicit ComputeShader(qt_gl_functions* gl);
       #endif
-      ComputeShader(const self_type& other) = delete;
+      ComputeShader(const self_type&) = delete;
       ComputeShader(self_type&&) noexcept;
       /// @}
 
@@ -87,20 +88,20 @@ namespace bk
       //===== SETTER
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
-      [[maybe_unused]] auto operator=(const self_type& other) -> self_type& = delete;
+      [[maybe_unused]] auto operator=(const self_type&) -> self_type& = delete;
       [[maybe_unused]] auto operator=(self_type&&) noexcept -> self_type&;
       /// @}
 
     private:
       /// @{ -------------------------------------------------- HELPERS: COMPILE SHADER (FROM SOURCE)
-      [[maybe_unused]] std::pair<bool/*success*/, std::string/*log*/> compile_shader(const std::string& source);
-      [[maybe_unused]] std::pair<bool/*success*/, std::string/*log*/> compile_shader_from_file(const std::string& filename);
+      [[maybe_unused]] std::pair<bool/*success*/, std::string/*log*/> compile_shader(std::string_view source);
+      [[maybe_unused]] std::pair<bool/*success*/, std::string/*log*/> compile_shader_from_file(std::string_view filename);
       /// @}
 
     public:
       /// @{ -------------------------------------------------- SET COMPUTE SHADER
-      [[maybe_unused]] std::pair<bool, std::string> set_compute_shader(const std::string& source);
-      [[maybe_unused]] std::pair<bool, std::string> set_compute_shader_from_file(const std::string& filename);
+      [[maybe_unused]] std::pair<bool, std::string> set_compute_shader(std::string_view source);
+      [[maybe_unused]] std::pair<bool, std::string> set_compute_shader_from_file(std::string_view filename);
       /// @}
 
       //====================================================================================================
@@ -119,7 +120,8 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- INIT
-      [[maybe_unused]] bool init(const std::string& compShaderPath);
+      [[maybe_unused]] bool init_from_sources(std::string_view compShaderSource);
+      [[maybe_unused]] bool init(std::string_view compShaderPath);
       /// @}
 
       /// @{ -------------------------------------------------- (UN)BIND
