@@ -219,7 +219,7 @@ namespace bk
   /// @}
 
   /// @{ -------------------------------------------------- INIT
-  bool ComputeShader::init_from_sources(std::string_view compShaderSource)
+  bool ComputeShader::init_from_source(std::string_view compShaderSource)
   {
       clear();
 

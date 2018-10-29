@@ -120,7 +120,7 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- INIT
-      [[maybe_unused]] bool init_from_sources(std::string_view compShaderSource);
+      [[maybe_unused]] bool init_from_source(std::string_view compShaderSource);
       [[maybe_unused]] bool init(std::string_view compShaderPath);
       /// @}
 
