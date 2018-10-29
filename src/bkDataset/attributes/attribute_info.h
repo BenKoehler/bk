@@ -73,6 +73,8 @@ namespace bk::attribute_info
 
   BK_DEFINE_ATTRIBUTE_HASH(velocity, double)
 
+  BK_DEFINE_ATTRIBUTE_HASH(pressure, double)
+
   BK_DEFINE_ATTRIBUTE_HASH(length, double)
 
   BK_DEFINE_ATTRIBUTE_HASH(angle, double)
@@ -92,7 +94,7 @@ namespace bk::attribute_info
   BK_DEFINE_ATTRIBUTE_HASH(id, int)
 } // namespace bk::attribute_info
 
-#undef BK_DEFINE_ATTRIBUTE_HASH
+//#undef BK_DEFINE_ATTRIBUTE_HASH
 
 #endif //BK_ATTRIBUTE_INFO_H
 
