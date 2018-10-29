@@ -218,7 +218,7 @@ namespace bk
                                                                         this->_pdata->ubo_global.set_window_height(h);
                                                                         this->_pdata->ubo_global.release();
 
-                                                                        //this->_pdata->oit.on_resize(w, h);
+                                                                        //this->_pdata->oit.on_resize(w, h); // done in Renderer::resize
 
                                                                         this->emit_signal_update_required();
                                                                     }
@@ -919,8 +919,8 @@ namespace bk
       for (const auto& r: _pdata->renderables)
       { r->draw(); }
 
-      _pdata->ubo_global.set_window_width(_pdata->window_geometry.width());
-      _pdata->ubo_global.set_window_height(_pdata->window_geometry.height());
+      _pdata->ubo_global.set_window_width(_pdata->supersampler.width());
+      _pdata->ubo_global.set_window_height(_pdata->supersampler.height());
       _pdata->ubo_global.release();
 
       _bind_default_fbo();
@@ -928,6 +928,7 @@ namespace bk
       _pdata->supersampler.draw_finish();
 
       _pdata->ubo_global.release_from_base();
+
       BK_QT_GL glPopMatrix();
       BK_QT_GL glMatrixMode(GL_PROJECTION);
       BK_QT_GL glPopMatrix();

@@ -62,6 +62,9 @@ namespace bk::details
   std::string ShaderLibrary::comment_tag_geometry_shader(std::string_view name)
   { return comment_tag_shader("GEOMETRY", name); }
 
+  std::string ShaderLibrary::comment_tag_compute_shader(std::string_view name)
+  { return comment_tag_shader("COMPUTE", name); }
+
   std::string ShaderLibrary::comment_region(std::string_view name)
   {
       std::stringstream s;
@@ -138,7 +141,7 @@ namespace bk::details
 
       s << "// transform image coordinate (x,y) to list id\n";
       s << "uint grid_to_list_id(ivec2 xy)\n";
-      s << "{ return xy.x * " << bk::details::UBOGlobal::name_window_width() << " + xy.y; }\n\n";
+      s << "{ return xy.x * " << bk::details::UBOGlobal::name_window_height() << " + xy.y; }\n\n";
 
       return s.str();
   }

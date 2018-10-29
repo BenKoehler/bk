@@ -129,7 +129,7 @@ namespace bk
 
       /// @{ -------------------------------------------------- GET SIGNALS
       [[nodiscard]] bk::Signal<bool>& signal_enabled_changed();
-      const bk::Signal<bool>& signal_enabled_changed() const;
+      [[nodiscard]] const bk::Signal<bool>& signal_enabled_changed() const;
       /// @}
 
       /// @{ -------------------------------------------------- GET SHADER TEXT

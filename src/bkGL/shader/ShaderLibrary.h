@@ -55,6 +55,7 @@ namespace bk::details
       [[nodiscard]] static std::string comment_tag_vertex_shader(std::string_view name);
       [[nodiscard]] static std::string comment_tag_fragment_shader(std::string_view name);
       [[nodiscard]] static std::string comment_tag_geometry_shader(std::string_view name);
+      [[nodiscard]] static std::string comment_tag_compute_shader(std::string_view name);
       [[nodiscard]] static std::string comment_region(std::string_view name);
       [[nodiscard]] static std::string comment_region_input();
       [[nodiscard]] static std::string comment_region_output();

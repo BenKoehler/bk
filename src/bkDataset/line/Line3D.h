@@ -38,6 +38,13 @@
 #include <bkDataset/line/LineBase.h>
 #include <bkDataset/line/Line.h>
 
+#ifdef BK_EMIT_PROGRESS
+
+    #include <bk/Localization>
+    #include <bk/Progress>
+
+#endif
+
 namespace bk
 {
   template<> class Line<3> : public details::LineBase<3>
@@ -66,8 +73,14 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- GET LOCAL COORDINATE SYSTEM AT POINT
+      [[nodiscard]] bool has_local_coordinate_systems() const
+      { return this->point_attribute_map().has_attribute(LocalCoordinateSystemAttributeName()); }
+
       [[nodiscard]] Mat3d local_coordinate_system_at_point(unsigned int pointId) const
       {
+          if (has_local_coordinate_systems())
+          { return this->point_attribute_value_of_type<Mat3d>(LocalCoordinateSystemAttributeName(), pointId); }
+
           const unsigned int nPoints = this->geometry().num_points();
           Mat3d lcs = MatrixFactory::Identity_Mat_3D<double>();
 
@@ -124,8 +137,16 @@ namespace bk
               return false;
           }
 
+          #ifdef BK_EMIT_PROGRESS
+          bk::Progress& prog = bk_progress.emplace_task(3 * nPoints, ___("Calculating consistent local coordinate system"));
+          #endif
+
           // initialization: calculate lcs of first point
           point_lcs[0] = local_coordinate_system_at_point(0);
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(1);
+          #endif
 
           for (unsigned int pointId = 1; pointId < nPoints; ++pointId)
           {
@@ -167,6 +188,10 @@ namespace bk
 
               current_x.normalize_internal();
               current_y.normalize_internal();
+
+              #ifdef BK_EMIT_PROGRESS
+              prog.increment(1);
+              #endif
           } // for pointId: nPoints
 
           /*
@@ -175,15 +200,28 @@ namespace bk
           //bk::smooth_binomial(point_lcs.begin(), point_lcs.end(), point_lcs.begin(), binomial_smooth_iterations, binomial_smooth_kernel_size, MatrixFactory::Zero_Mat_3D());
           bk::smooth_binomial(point_lcs.begin(), point_lcs.end(), binomial_smooth_iterations, binomial_smooth_kernel_size, MatrixFactory::Zero_Mat_3D());
 
+          #ifdef BK_EMIT_PROGRESS
+          prog.increment(nPoints);
+          #endif
+
           #pragma omp parallel for
           for (unsigned int pointId = 0; pointId < nPoints; ++pointId)
           {
               point_lcs[pointId].col_ref<0>().normalize_internal();
               point_lcs[pointId].col_ref<1>().normalize_internal();
               point_lcs[pointId].col_ref<2>().normalize_internal();
+
+              #ifdef BK_EMIT_PROGRESS
+              #pragma omp critical
+              { prog.increment(1); }
+              #endif
           }
 
           this->point_attribute_map().add_attribute(LocalCoordinateSystemAttributeName(), a);
+
+          #ifdef BK_EMIT_PROGRESS
+          prog.set_finished();
+          #endif
 
           return true;
       }
