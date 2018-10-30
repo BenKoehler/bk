@@ -149,6 +149,15 @@ namespace bk
           { p.first = true; }
       }
 
+      if (!p.first)
+      {
+          std::cerr << "Compute shader compilation failed!" << std::endl;
+          std::cerr << p.second << std::endl;
+          std::cout << " ==================================================== source:" << std::endl;
+          std::cout << source << std::endl;
+          std::cout << " ====================================================" << std::endl;
+      }
+
       return p;
   }
 
