@@ -50,7 +50,6 @@ namespace bk
       //===== DEFINITIONS
       //====================================================================================================
       using self_type = Signal<Args...>;
-      //using slot_map_type = std::vector<std::pair<unsigned int /*slot_id*/, std::function<void(Args...)> /*execute_function*/>>;
       using slot_map_type = std::vector<std::tuple<unsigned int /*slot_id*/, bool /*once*/, std::function<void(Args...)> /*execute_function*/>>;
 
       //====================================================================================================

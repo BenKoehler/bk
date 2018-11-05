@@ -572,9 +572,9 @@ namespace bk
 
       _pdata->interactor.set_window_size(_pdata->window_geometry);
       _pdata->interactor.init();
-      _pdata->interactor.trackball().set_current_mouse_position(0, 0);
-      _pdata->interactor.trackball().set_radius(1);
-      _pdata->interactor.trackball().set_upvector_id(2);
+      //_pdata->interactor.trackball().set_current_mouse_position(0, 0);
+      //_pdata->interactor.trackball().set_radius(1);
+      //_pdata->interactor.trackball().set_upvector_id(2);
 
       _pdata->oit.set_window_size(_pdata->supersampler.width_upsampled(), _pdata->supersampler.height_upsampled());
       _pdata->oit.init_if_enabled();
@@ -937,7 +937,7 @@ namespace bk
 
       _pdata->animator.update();
 
-      if (_pdata->animator.is_enabled() && _pdata->animator.is_paused())
+      if (_pdata->animator.is_enabled() && !_pdata->animator.is_paused())
       { this->emit_signal_update_required(); }
   }
 

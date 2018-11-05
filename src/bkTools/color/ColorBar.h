@@ -139,11 +139,26 @@ namespace bk
       void set_default_gray()
       { _set_default(color_type::Black(), color_type::White()); }
 
-      void set_default_red_to_blue()
+      void set_default_white_to_red()
+      { _set_default(color_type::White(), color_type::Red()); }
+
+      void set_default_white_to_green()
+      { _set_default(color_type::White(), color_type::Green()); }
+      
+      void set_default_white_to_blue()
+      { _set_default(color_type::White(), color_type::Blue()); }
+
+      void set_default_red_to_white_to_blue()
       { _set_default(color_type::Red(), color_type::White(), color_type::Blue()); }
 
-      void set_default_blue_to_red()
+      void set_default_blue_to_white_to_red()
       { _set_default(color_type::Blue(), color_type::White(), color_type::Red()); }
+
+      void set_default_red_to_white_to_green()
+      { _set_default(color_type::Red(), color_type::White(), color_type::Green()); }
+
+      void set_default_green_to_white_to_red()
+      { _set_default(color_type::Green(), color_type::White(), color_type::Red()); }
 
       void set_default_heat()
       { _set_default(color_type::Black(), color_type::Red(), color_type::Orange(), color_type::Yellow(), color_type::White()); }
@@ -165,6 +180,15 @@ namespace bk
 
       void set_default_cluster()
       { _set_default(color_type::Yellow(), color_type::Green(), color_type::Red(), color_type::Blue(), color_type::Purple(), color_type::Gray(), color_type::Orange(), color_type::Light_Green(), color_type::Light_Red(), color_type::Light_Blue(), color_type::Pink(), color_type::Light_Gray(), color_type::Dark_Green(), color_type::Dark_Red(), color_type::Dark_Blue(), color_type::Dark_Gray()); }
+
+      void set_default_light_blue_to_black_to_yellow()
+      { _set_default(color_type::Light_Blue(), color_type::Blue(), color_type::Dark_Blue(), color_type::Black(), color_type::Red(), color_type::Orange(), color_type::Yellow()); }
+
+      void set_default_black_to_yellow()
+      { _set_default(color_type::Black(), color_type::Red(), color_type::Orange(), color_type::Yellow()); }
+
+      void set_default_black_to_light_blue()
+      { _set_default(color_type::Black(), color_type::Dark_Blue(), color_type::Blue(), color_type::Light_Blue()); }
       /// @}
 
       /// @{ -------------------------------------------------- DEFAULTS (STATIC)
@@ -182,17 +206,31 @@ namespace bk
           return cb;
       }
 
-      [[nodiscard]] static self_type Red_To_Blue()
+      [[nodiscard]] static self_type Red_White_Blue()
       {
           self_type cb;
-          cb.set_default_red_to_blue();
+          cb.set_default_red_to_white_to_blue();
           return cb;
       }
 
-      [[nodiscard]] static self_type Blue_To_Red()
+      [[nodiscard]] static self_type Blue_White_Red()
       {
           self_type cb;
-          cb.set_default_blue_to_red();
+          cb.set_default_blue_to_white_to_red();
+          return cb;
+      }
+
+      [[nodiscard]] static self_type Green_White_Red()
+      {
+          self_type cb;
+          cb.set_default_green_to_white_to_red();
+          return cb;
+      }
+
+      [[nodiscard]] static self_type Red_White_Green()
+      {
+          self_type cb;
+          cb.set_default_red_to_white_to_green();
           return cb;
       }
 
@@ -207,6 +245,27 @@ namespace bk
       {
           self_type cb;
           cb.set_default_magenta();
+          return cb;
+      }
+
+      [[nodiscard]] static self_type White_Red()
+      {
+          self_type cb;
+          cb.set_default_white_to_red();
+          return cb;
+      }
+
+      [[nodiscard]] static self_type White_Green()
+      {
+          self_type cb;
+          cb.set_default_white_to_green();
+          return cb;
+      }
+      
+      [[nodiscard]] static self_type White_Blue()
+      {
+          self_type cb;
+          cb.set_default_white_to_blue();
           return cb;
       }
 
@@ -242,6 +301,27 @@ namespace bk
       {
           self_type cb;
           cb.set_default_cluster();
+          return cb;
+      }
+
+      [[nodiscard]] static self_type Light_Blue_Black_Yellow()
+      {
+          self_type cb;
+          cb.set_default_light_blue_to_black_to_yellow();
+          return cb;
+      }
+
+      [[nodiscard]] static self_type Black_Yellow()
+      {
+          self_type cb;
+          cb.set_default_black_to_yellow();
+          return cb;
+      }
+
+      [[nodiscard]] static self_type Black_Light_Blue()
+      {
+          self_type cb;
+          cb.set_default_black_to_light_blue();
           return cb;
       }
       /// @}

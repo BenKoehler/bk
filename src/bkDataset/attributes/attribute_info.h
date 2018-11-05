@@ -73,7 +73,13 @@ namespace bk::attribute_info
 
   BK_DEFINE_ATTRIBUTE_HASH(velocity, double)
 
+  BK_DEFINE_ATTRIBUTE_HASH(forward_velocity, double)
+
   BK_DEFINE_ATTRIBUTE_HASH(pressure, double)
+
+  BK_DEFINE_ATTRIBUTE_HASH(cosangle_to_centerline, double)
+
+  BK_DEFINE_ATTRIBUTE_HASH(rotation_direction, double)
 
   BK_DEFINE_ATTRIBUTE_HASH(length, double)
 

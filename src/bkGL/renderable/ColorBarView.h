@@ -225,10 +225,12 @@ namespace bk
       void init_heat();
       void init_rainbow();
       void init_blue_to_red();
+      void init_green_to_white_to_red();
       void init_magenta();
       void init_uniform_yellow();
       void init_traffic_light();
       void init_cluster(int nClusters = -1);
+      void init_light_blue_to_black_to_yellow();
       /// @}
 
       /// @{ -------------------------------------------------- EVENTS

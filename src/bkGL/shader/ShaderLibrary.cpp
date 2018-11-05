@@ -1483,7 +1483,7 @@ namespace bk::details
       return s.str();
   }
 
-  std::string ShaderLibrary::lines::debug::vert_passthrough(bool linesHaveTime, bool colorEnabled)
+  std::string ShaderLibrary::lines::debug::vert_passthrough(bool linesHaveTime, bool linesHaveColor, bool colorEnabled)
   {
       const std::string posType = linesHaveTime ? "vec4" : "vec3";
 
@@ -1493,6 +1493,8 @@ namespace bk::details
           std::stringstream stype;
           stype << "LINES DEBUG linesHaveTime:";
           stype << (linesHaveTime ? "yes" : "no");
+          stype << "linesHaveColor:";
+          stype << (linesHaveColor ? "yes" : "no");
           stype << "colorEnabled:";
           stype << (colorEnabled ? "yes" : "no");
 
@@ -1516,7 +1518,7 @@ namespace bk::details
       return s.str();
   }
 
-  std::string ShaderLibrary::lines::debug::frag_passthrough(bool linesHaveTime, bool colorEnabled)
+  std::string ShaderLibrary::lines::debug::frag_passthrough(bool linesHaveTime, bool linesHaveColor, bool colorEnabled)
   {
       const std::string posType = linesHaveTime ? "vec4" : "vec3";
 
@@ -1526,6 +1528,8 @@ namespace bk::details
           std::stringstream stype;
           stype << "LINES DEBUG linesHaveTime:";
           stype << (linesHaveTime ? "yes" : "no");
+          stype << "linesHaveColor:";
+          stype << (linesHaveColor ? "yes" : "no");
           stype << "colorEnabled:";
           stype << (colorEnabled ? "yes" : "no");
 
@@ -1545,7 +1549,7 @@ namespace bk::details
       return s.str();
   }
 
-  std::string ShaderLibrary::lines::vert(bool linesHaveTime, bool colorEnabled)
+  std::string ShaderLibrary::lines::vert(bool linesHaveTime, bool linesHaveColor, bool colorEnabled)
   {
       const std::string posType = linesHaveTime ? "vec4" : "vec3";
 
@@ -1555,6 +1559,8 @@ namespace bk::details
           std::stringstream stype;
           stype << "LINES linesHaveTime:";
           stype << (linesHaveTime ? "yes" : "no");
+          stype << "linesHaveColor:";
+          stype << (linesHaveColor ? "yes" : "no");
           stype << " colorEnabled:";
           stype << (colorEnabled ? "yes" : "no");
 
@@ -1570,20 +1576,20 @@ namespace bk::details
 
       s << comment_region_output();
       s << "layout(location = 0) out " << posType << " position_geom;\n";
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       { s << "layout(location = 1) out float attrib_geom;\n"; }
 
       s << comment_region_functions();
       s << function_main_begin();
       s << "   position_geom = position_in;\n";
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       { s << "   attrib_geom = attrib_in;\n"; }
       s << function_main_end();
 
       return s.str();
   }
 
-  std::string ShaderLibrary::lines::geom(bool linesHaveTime, bool animationEnabled, bool colorEnabled)
+  std::string ShaderLibrary::lines::geom(bool linesHaveTime, bool animationEnabled, bool linesHaveColor, bool colorEnabled)
   {
       const std::string posType = linesHaveTime ? "vec4" : "vec3";
 
@@ -1595,6 +1601,8 @@ namespace bk::details
           stype << (linesHaveTime ? "yes" : "no");
           stype << " animationEnabled:";
           stype << (animationEnabled ? "yes" : "no");
+          stype << "linesHaveColor:";
+          stype << (linesHaveColor ? "yes" : "no");
           stype << " colorEnabled:";
           stype << (colorEnabled ? "yes" : "no");
 
@@ -1606,7 +1614,7 @@ namespace bk::details
       s << comment_region_input();
       s << "// line strip with adjacency\n";
       s << "layout(location = 0) in " << posType << " position_geom[4];\n";
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       { s << "layout(location = 1) in float attrib_geom[4];\n"; }
       s << ubo_definition_global();
       s << ubo_definition_line();
@@ -1616,7 +1624,7 @@ namespace bk::details
       s << "layout(location = 0) out " << posType << " position_frag;\n";
       s << "layout(location = 1) out vec3 tangent_frag;\n";
       s << "layout(location = 2) out float halo_percent_frag;\n";
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       { s << "layout(location = 3) out float attrib_frag;\n"; }
       s << geom_layout_out_triangle_strip(4);
 
@@ -1662,9 +1670,21 @@ namespace bk::details
       if (animationEnabled && linesHaveTime)
       { s << indent << "   position_frag = vec4(position_geom[1].xyz + w0*" << bk::details::UBOLine::name_line_width() << "*ortho[0], position_geom[1][3]);\n"; }
       else
-      { s << indent << "   position_frag = position_geom[1] + " << bk::details::UBOLine::name_line_width() << "*ortho[0];\n"; }
+      {
+          //s << indent << "   position_frag = position_geom[1] + " << bk::details::UBOLine::name_line_width() << "*ortho[0];\n";
+
+          s << indent << "   position_frag";
+          if (!animationEnabled && linesHaveTime)
+          { s << ".xyz"; }
+
+          s << " = position_geom[1]";
+          if (!animationEnabled && linesHaveTime)
+          { s << ".xyz"; }
+
+          s << " + " << bk::details::UBOLine::name_line_width() << "*ortho[0];\n";
+      }
       s << indent << "   tangent_frag = tangent[0];\n";
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       { s << indent << "attrib_frag = attrib_geom[1];\n"; }
       s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_frag.xyz, 1);\n";
       s << indent << "   EmitVertex();\n\n";
@@ -1673,9 +1693,21 @@ namespace bk::details
       if (animationEnabled && linesHaveTime)
       { s << indent << "   position_frag = vec4(position_geom[2].xyz + w1*" << bk::details::UBOLine::name_line_width() << "*ortho[1], position_geom[2][3]);\n"; }
       else
-      { s << indent << "   position_frag = position_geom[2] + " << bk::details::UBOLine::name_line_width() << "*ortho[1];\n"; }
+      {
+          //s << indent << "   position_frag = position_geom[2] + " << bk::details::UBOLine::name_line_width() << "*ortho[1];\n";
+
+          s << indent << "   position_frag";
+          if (!animationEnabled && linesHaveTime)
+          { s << ".xyz"; }
+
+          s << " = position_geom[2]";
+          if (!animationEnabled && linesHaveTime)
+          { s << ".xyz"; }
+
+          s << " + " << bk::details::UBOLine::name_line_width() << "*ortho[1];\n";
+      }
       s << indent << "   tangent_frag = tangent[1];\n";
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       { s << indent << "attrib_frag = attrib_geom[2];\n"; }
       s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_frag.xyz, 1);\n";
       s << indent << "   EmitVertex();\n\n";
@@ -1685,9 +1717,21 @@ namespace bk::details
       if (animationEnabled && linesHaveTime)
       { s << indent << "   position_frag = vec4(position_geom[1].xyz - w0*" << bk::details::UBOLine::name_line_width() << "*ortho[0], position_geom[1][3]);\n"; }
       else
-      { s << indent << "   position_frag = position_geom[1] - " << bk::details::UBOLine::name_line_width() << "*ortho[0];\n"; }
+      {
+          //s << indent << "   position_frag = position_geom[1] - " << bk::details::UBOLine::name_line_width() << "*ortho[0];\n";
+
+          s << indent << "   position_frag";
+          if (!animationEnabled && linesHaveTime)
+          { s << ".xyz"; }
+
+          s << " = position_geom[1]";
+          if (!animationEnabled && linesHaveTime)
+          { s << ".xyz"; }
+
+          s << " - " << bk::details::UBOLine::name_line_width() << "*ortho[0];\n";
+      }
       s << indent << "   tangent_frag = tangent[0];\n";
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       { s << indent << "attrib_frag = attrib_geom[1];\n"; }
       s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_frag.xyz, 1);\n";
       s << indent << "   EmitVertex();\n\n";
@@ -1696,9 +1740,21 @@ namespace bk::details
       if (animationEnabled && linesHaveTime)
       { s << indent << "   position_frag = vec4(position_geom[2].xyz - w1*" << bk::details::UBOLine::name_line_width() << "*ortho[1], position_geom[2][3]);\n"; }
       else
-      { s << indent << "   position_frag = position_geom[2] - " << bk::details::UBOLine::name_line_width() << "*ortho[1];\n"; }
+      {
+          //s << indent << "   position_frag = position_geom[2] - " << bk::details::UBOLine::name_line_width() << "*ortho[1];\n";
+
+          s << indent << "   position_frag";
+          if (!animationEnabled && linesHaveTime)
+          { s << ".xyz"; }
+
+          s << " = position_geom[2]";
+          if (!animationEnabled && linesHaveTime)
+          { s << ".xyz"; }
+
+          s << " - " << bk::details::UBOLine::name_line_width() << "*ortho[1];\n";
+      }
       s << indent << "   tangent_frag = tangent[1];\n";
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       { s << indent << "attrib_frag = attrib_geom[2];\n"; }
       s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_frag.xyz, 1);\n";
       s << indent << "   EmitVertex();\n\n";
@@ -1711,7 +1767,7 @@ namespace bk::details
       return s.str();
   }
 
-  std::string ShaderLibrary::lines::frag_transparent(bool linesHaveTime, bool animationEnabled, bool colorEnabled, bool oitEnabled)
+  std::string ShaderLibrary::lines::frag_transparent(bool linesHaveTime, bool animationEnabled, bool linesHaveColor, bool colorEnabled, bool oitEnabled)
   {
       const std::string posType = linesHaveTime ? "vec4" : "vec3";
 
@@ -1723,6 +1779,8 @@ namespace bk::details
           stype << (linesHaveTime ? "yes" : "no");
           stype << " animationEnabled:";
           stype << (animationEnabled ? "yes" : "no");
+          stype << "linesHaveColor:";
+          stype << (linesHaveColor ? "yes" : "no");
           stype << " colorEnabled:";
           stype << (colorEnabled ? "yes" : "no");
           stype << " oitEnabled:";
@@ -1739,11 +1797,11 @@ namespace bk::details
       s << "layout(location = 0) in " << posType << " position_frag;\n";
       s << "layout(location = 1) in vec3 tangent_frag;\n";
       s << "layout(location = 2) in float halo_percent_frag;\n";
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       { s << "layout(location = 3) in float attrib_frag;\n"; }
       s << ubo_definition_global();
       s << ubo_definition_line();
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       {
           s << "layout(binding = 7, std430) buffer _ColorBar\n";
           s << "{ vec3 ColorBar[]; };\n";
@@ -1775,7 +1833,7 @@ namespace bk::details
       if (oitEnabled)
       { s << "vec4 "; }
 
-      s << "color_out = vec4(0, 0, 0, 1);\n\n";
+      s << "color_out = vec4(" << bk::details::UBOLine::name_linecol_r() << ", " << bk::details::UBOLine::name_linecol_g() << ", " << bk::details::UBOLine::name_linecol_b() << ", 1);\n\n";
 
       if (linesHaveTime && animationEnabled)
       {
@@ -1790,7 +1848,7 @@ namespace bk::details
           s << discard_low_alpha();
       }
 
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       {
           s << "   if (" << bk::details::UBOLine::name_color_enabled() << " == 0)\n";
           s << "   { " << details::set_color_out_rgb_to_line_color() << "}\n";
@@ -1875,7 +1933,7 @@ namespace bk::details
       return s.str();
   }
 
-  std::string ShaderLibrary::lines::frag_opaque(bool linesHaveTime, bool animationEnabled, bool colorEnabled)
+  std::string ShaderLibrary::lines::frag_opaque(bool linesHaveTime, bool animationEnabled, bool linesHaveColor, bool colorEnabled)
   {
       const std::string posType = linesHaveTime ? "vec4" : "vec3";
 
@@ -1887,6 +1945,8 @@ namespace bk::details
           stype << (linesHaveTime ? "yes" : "no");
           stype << " animationEnabled:";
           stype << (animationEnabled ? "yes" : "no");
+          stype << "linesHaveColor:";
+          stype << (linesHaveColor ? "yes" : "no");
           stype << " colorEnabled:";
           stype << (colorEnabled ? "yes" : "no");
 
@@ -1899,13 +1959,13 @@ namespace bk::details
       s << "layout(location = 0) in " << posType << " position_frag;\n";
       s << "layout(location = 1) in vec3 tangent_frag;\n";
       s << "layout(location = 2) in float halo_percent_frag;\n";
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       { s << "layout(location = 3) in float attrib_frag;\n"; }
       s << "\n";
       s << ubo_definition_global();
       s << ubo_definition_line();
 
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       {
           s << "layout(binding = 7, std430) buffer _ColorBar\n";
           s << "{ vec3 ColorBar[]; };\n";
@@ -1923,7 +1983,7 @@ namespace bk::details
           s << "    { discard; }\n\n";
       }
 
-      s << "   color_out.rgb = vec3(0);\n";
+      s << "   " << details::set_color_out_rgb_to_line_color() << "\n";
       s << "   color_out.a = 1;\n\n";
 
       if (linesHaveTime && animationEnabled)
@@ -1935,7 +1995,7 @@ namespace bk::details
           s << "   { discard; }\n\n";
       }
 
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       {
           s << "   if (" << bk::details::UBOLine::name_color_enabled() << " == 0)\n";
           s << "   { " << details::set_color_out_rgb_to_line_color() << "}\n";
@@ -2247,7 +2307,7 @@ namespace bk::details
       return s.str();
   }
 
-  std::string ShaderLibrary::lines::lineAO::gbuffer::vert(bool linesHaveTime, bool linesHaveColor)
+  std::string ShaderLibrary::lines::lineAO::gbuffer::vert(bool linesHaveTime, bool linesHaveColor, bool colorEnabled)
   {
       const std::string posType = linesHaveTime ? "vec4" : "vec3";
 
@@ -2267,25 +2327,25 @@ namespace bk::details
 
       s << comment_region_input();
       s << "layout(location = 0) in " << posType << " position_in;\n";
-      if (linesHaveColor)
+      if (colorEnabled)
       { s << "layout(location = 1) in float attrib_in;\n"; }
 
       s << comment_region_output();
       s << "layout(location = 0) out " << posType << " position_geom;\n";
-      if (linesHaveColor)
+      if (colorEnabled && linesHaveColor)
       { s << "layout(location = 1) out float attrib_geom;\n"; }
 
       s << comment_region_functions();
       s << function_main_begin();
       s << "   position_geom = position_in;\n";
-      if (linesHaveColor)
+      if (colorEnabled && linesHaveColor)
       { s << "   attrib_geom = attrib_in;;\n"; }
       s << function_main_end();
 
       return s.str();
   }
 
-  std::string ShaderLibrary::lines::lineAO::gbuffer::geom(bool linesHaveTime, bool animationEnabled, bool colorEnabled)
+  std::string ShaderLibrary::lines::lineAO::gbuffer::geom(bool linesHaveTime, bool animationEnabled, bool linesHaveColor, bool colorEnabled)
   {
       const std::string posType = linesHaveTime ? "vec4" : "vec3";
 
@@ -2297,6 +2357,8 @@ namespace bk::details
           stype << (linesHaveTime ? "yes" : "no");
           stype << " animationEnabled:";
           stype << (animationEnabled ? "yes" : "no");
+          stype << "linesHaveColor:";
+          stype << (linesHaveColor ? "yes" : "no");
           stype << " colorEnabled:";
           stype << (colorEnabled ? "yes" : "no");
 
@@ -2307,7 +2369,7 @@ namespace bk::details
 
       s << comment_region_input();
       s << "layout(location = 0) in " << posType << " position_geom[4]; // line strip with adjacency\n";
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       { s << "layout(location = 1) in float attrib_geom[4];\n"; }
       s << ubo_definition_global();
       s << ubo_definition_line();
@@ -2319,7 +2381,7 @@ namespace bk::details
       s << "layout(location = 2) out float halo_percent_frag;\n";
       s << "layout(location = 3) out float zoom_frag;\n";
       s << "layout(location = 4) out float angle_frag;\n";
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       { s << "layout(location = 5) out float attrib_frag;\n"; }
       s << geom_layout_out_triangle_strip(4);
 
@@ -2386,7 +2448,7 @@ namespace bk::details
       s << indent << "   tangent_frag = tangent[0];\n";
       s << indent << "   zoom_frag = zoom0;\n";
       s << indent << "   angle_frag = angle0;\n";
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       { s << indent << "   attrib_frag = attrib_geom[1];\n"; }
       s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_geom[1].xyz + " << w0fac << bk::details::UBOLine::name_line_width() << "*ortho[0], 1);\n";
       s << indent << "   EmitVertex();\n\n";
@@ -2395,7 +2457,7 @@ namespace bk::details
       s << indent << "   tangent_frag = tangent[1];\n";
       s << indent << "   zoom_frag = zoom1;\n";
       s << indent << "   angle_frag = angle1;\n";
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       { s << indent << "   attrib_frag = attrib_geom[2];\n"; }
       s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_geom[2].xyz + " << w1fac << bk::details::UBOLine::name_line_width() << "*ortho[1], 1);\n";
       s << indent << "   EmitVertex();\n\n";
@@ -2405,7 +2467,7 @@ namespace bk::details
       s << indent << "   tangent_frag = tangent[0];\n";
       s << indent << "   zoom_frag = zoom0;\n";
       s << indent << "   angle_frag = angle0;\n";
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       { s << indent << "   attrib_frag = attrib_geom[1];\n"; }
       s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_geom[1].xyz - " << w0fac << bk::details::UBOLine::name_line_width() << "*ortho[0], 1);\n";
       s << indent << "   EmitVertex();\n\n";
@@ -2414,7 +2476,7 @@ namespace bk::details
       s << indent << "   tangent_frag = tangent[1];\n";
       s << indent << "   zoom_frag = zoom1;\n";
       s << indent << "   angle_frag = angle1;\n";
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       { s << indent << "   attrib_frag = attrib_geom[2];\n"; }
       s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_geom[2].xyz - " << w1fac << bk::details::UBOLine::name_line_width() << "*ortho[1], 1);\n";
       s << indent << "   EmitVertex();\n";
@@ -2425,7 +2487,7 @@ namespace bk::details
       return s.str();
   }
 
-  std::string ShaderLibrary::lines::lineAO::gbuffer::frag(bool linesHaveTime, bool animationEnabled, bool colorEnabled)
+  std::string ShaderLibrary::lines::lineAO::gbuffer::frag(bool linesHaveTime, bool animationEnabled, bool linesHaveColor, bool colorEnabled)
   {
       const std::string posType = linesHaveTime ? "vec4" : "vec3";
 
@@ -2437,6 +2499,8 @@ namespace bk::details
           stype << (linesHaveTime ? "yes" : "no");
           stype << " animationEnabled:";
           stype << (animationEnabled ? "yes" : "no");
+          stype << "linesHaveColor:";
+          stype << (linesHaveColor ? "yes" : "no");
           stype << " colorEnabled:";
           stype << (colorEnabled ? "yes" : "no");
 
@@ -2451,7 +2515,7 @@ namespace bk::details
       s << "layout(location = 2) in float halo_percent_frag;\n";
       s << "layout(location = 3) in float zoom_frag;\n";
       s << "layout(location = 4) in float angle_frag;\n";
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       {
           s << "layout(location = 5) in float attrib_frag;\n\n";
 
@@ -2475,7 +2539,7 @@ namespace bk::details
       s << "   pa_map = vec4(0);\n";
       s << "   color_map = vec4(" << bk::details::UBOLine::name_linecol_r() << ", " << bk::details::UBOLine::name_linecol_g() << ", " << bk::details::UBOLine::name_linecol_b() << ", 0);\n\n";
 
-      if (linesHaveTime /*&& animationEnabled*/)
+      if (linesHaveTime && animationEnabled)
       {
           s << "   if (" << bk::details::UBOGlobal::name_animation_enabled() << " != 0 && abs(position_frag[3] - " << bk::details::UBOGlobal::name_animation_current_time() << ") > " << bk::details::UBOLine::name_trail_length_in_ms() << ")\n";
           s << "   { discard; }\n\n";
@@ -2489,7 +2553,7 @@ namespace bk::details
 
       s << "   color_map.a = zoom_frag;\n\n";
 
-      if (colorEnabled)
+      if (colorEnabled && linesHaveColor)
       {
           s << "   if (" << bk::details::UBOLine::name_color_enabled() << " == 1)\n";
           s << "   {\n";

@@ -418,7 +418,13 @@ namespace bk
   void LineView::set_colorbar_blue_to_red()
   {
       _pdata->colorscale_type = ColorScaleType::BlueToRed;
-      _set_colorbar(bk::ColorBarRGBA::Blue_To_Red());
+      _set_colorbar(bk::ColorBarRGBA::Blue_White_Red());
+  }
+
+  void LineView::set_colorbar_green_to_red()
+  {
+      _pdata->colorscale_type = ColorScaleType::GreenToRed;
+      _set_colorbar(bk::ColorBarRGBA::Green_White_Red());
   }
 
   void LineView::set_colorbar_magenta()
@@ -443,6 +449,12 @@ namespace bk
   {
       _pdata->colorscale_type = ColorScaleType::Cluster;
       _set_colorbar_manual_num_colors(bk::ColorBarRGBA::Cluster(), static_cast<int>(_pdata->color_attrib_max) + 1);
+  }
+
+  void LineView::set_colorbar_light_blue_to_yellow()
+  {
+      _pdata->colorscale_type = ColorScaleType::LightBlueToYellow;
+      _set_colorbar(bk::ColorBarRGBA::Light_Blue_Black_Yellow());
   }
   /// @}
 
@@ -618,11 +630,11 @@ namespace bk
               _pdata->ubo.set_lineao_enabled(_pdata->lineao_enabled ? static_cast<GLfloat>(1) : static_cast<GLfloat>(0));
               _pdata->ubo.release();
 
-              set_trail_opaque_part_in_percent(_pdata->lineao_enabled ? 1 : 0.3); // todo options
-
               init_lineao();
+              set_trail_opaque_part_in_percent(_pdata->lineao_enabled ? 1 : 0.3); // todo options
+              // set_trail... emits required update
 
-              this->emit_signal_update_required();
+              //this->emit_signal_update_required();
           }
       }
   }
@@ -849,12 +861,10 @@ namespace bk
 
       using SL = details::ShaderLibrary::lines;
 
-      const bool useColor = _pdata->color_by_attribute_enabled || _pdata->lines_have_color_attribute;
-
-      const std::string vert = SL::vert(_pdata->lines_have_time_attribute, useColor);
-      const std::string geom = SL::geom(_pdata->lines_have_time_attribute, this->animation_is_enabled(), useColor);
-      const std::string frag_opaque = SL::frag_opaque(_pdata->lines_have_time_attribute, this->animation_is_enabled(), useColor);
-      const std::string frag_transparent = SL::frag_transparent(_pdata->lines_have_time_attribute, this->animation_is_enabled(), useColor, this->oit_is_available());
+      const std::string vert = SL::vert(_pdata->lines_have_time_attribute, _pdata->lines_have_color_attribute, _pdata->color_by_attribute_enabled);
+      const std::string geom = SL::geom(_pdata->lines_have_time_attribute, this->animation_is_enabled(), _pdata->lines_have_color_attribute, _pdata->color_by_attribute_enabled);
+      const std::string frag_opaque = SL::frag_opaque(_pdata->lines_have_time_attribute, this->animation_is_enabled(), _pdata->lines_have_color_attribute, _pdata->color_by_attribute_enabled);
+      const std::string frag_transparent = SL::frag_transparent(_pdata->lines_have_time_attribute, this->animation_is_enabled(), _pdata->lines_have_color_attribute, _pdata->color_by_attribute_enabled, this->oit_is_available());
 
       _pdata->shader_opaque.init_from_sources(vert, frag_opaque, geom);
       _pdata->shader_transparent.init_from_sources(vert, frag_transparent, geom);
@@ -869,11 +879,9 @@ namespace bk
 
       using SL = details::ShaderLibrary::lines::lineAO;
 
-      const bool useColor = _pdata->color_by_attribute_enabled || _pdata->lines_have_color_attribute;
-
-      const std::string vert_gbuffer = SL::gbuffer::vert(_pdata->lines_have_time_attribute, useColor);
-      const std::string geom_gbuffer = SL::gbuffer::geom(_pdata->lines_have_time_attribute, this->animation_is_enabled(), useColor);
-      const std::string frag_gbuffer = SL::gbuffer::frag(_pdata->lines_have_time_attribute, this->animation_is_enabled(), useColor);
+      const std::string vert_gbuffer = SL::gbuffer::vert(_pdata->lines_have_time_attribute, _pdata->lines_have_color_attribute, _pdata->color_by_attribute_enabled);
+      const std::string geom_gbuffer = SL::gbuffer::geom(_pdata->lines_have_time_attribute, this->animation_is_enabled(), _pdata->lines_have_color_attribute, _pdata->color_by_attribute_enabled);
+      const std::string frag_gbuffer = SL::gbuffer::frag(_pdata->lines_have_time_attribute, this->animation_is_enabled(), _pdata->lines_have_color_attribute, _pdata->color_by_attribute_enabled);
       _pdata->shader_lineao_gbuffer.init_from_sources(vert_gbuffer, frag_gbuffer, geom_gbuffer);
 
       _pdata->shader_lineao_mipmap0.init_from_sources(SL::mipmap::vert(), SL::mipmap::frag(true));
@@ -1177,6 +1185,7 @@ namespace bk
   void LineView::on_oit_enabled(bool b)
   {
       init_shader();
+      init_lineao_shader();
       _pdata->colorbarview.on_oit_enabled(b);
   }
 

@@ -54,7 +54,7 @@ namespace bk
       bk::Signal<bool> s_enabled_changed;
       bk::Signal<bool> s_paused_changed;
       bk::Signal<> s_speed_settings_changed;
-      bk::Clock update_timer;
+      mutable bk::Clock update_timer;
 
       Impl()
           : enabled(false),
@@ -164,7 +164,19 @@ namespace bk
 
   const bk::Signal<>& Animator::signal_speed_settings_changed() const
   { return _pdata->s_speed_settings_changed; }
+  /// @}
 
+  /// @{ -------------------------------------------------- GET UPDATE REQUIRED
+  bool Animator::update_is_required() const
+  {
+      if (_pdata->enabled && !_pdata->is_paused)
+      {
+          _pdata->update_timer.stop();
+          return _pdata->update_timer.time_in_milli_sec() >= _pdata->update_interval_in_ms;
+      }
+
+      return false;
+  }
   /// @}
 
   //====================================================================================================
@@ -180,13 +192,15 @@ namespace bk
       if (_pdata->enabled != b)
       {
           _pdata->enabled = b;
-          _pdata->is_paused = false;
-          set_current_time(0);
+          //_pdata->is_paused = false;
+          //set_current_time(0);
+          //_pdata->current_time = 0;
 
           if (_pdata->enabled)
           { _pdata->update_timer.start(); }
 
           _pdata->s_enabled_changed.emit_signal(_pdata->enabled);
+          _pdata->s_current_time_changed.emit_signal(_pdata->current_time);
       }
   }
 
@@ -289,17 +303,28 @@ namespace bk
   //! update function called in render loop
   void Animator::update()
   {
-      if (_pdata->enabled && !_pdata->is_paused)
+      if (update_is_required())
       {
-          _pdata->update_timer.stop();
+          _pdata->update_timer.start(); // reset timer
 
-          if (_pdata->update_timer.time_in_milli_sec() >= _pdata->update_interval_in_ms)
-          {
-              _pdata->update_timer.start(); // reset timer
-
-              advance_current_time();
-          }
+          //_pdata->s_current_time_changed.mute(true);
+          advance_current_time();
+          //_pdata->s_current_time_changed.mute(false);
       }
+
+      //if (_pdata->enabled && !_pdata->is_paused)
+      //{
+      //    _pdata->update_timer.stop();
+      //
+      //    if (_pdata->update_timer.time_in_milli_sec() >= _pdata->update_interval_in_ms)
+      //    {
+      //        _pdata->update_timer.start(); // reset timer
+      //
+      //        _pdata->s_current_time_changed.mute(true);
+      //        advance_current_time();
+      //        _pdata->s_current_time_changed.mute(false);
+      //    }
+      //}
   }
   /// @}
 } // namespace bk

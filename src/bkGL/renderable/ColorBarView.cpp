@@ -62,7 +62,7 @@ namespace bk
       inline static bk::ColorRGBA color_text = bk::ColorRGBA(1, 1, 1, 1);
       inline static bk::ColorRGBA color_text_background = bk::ColorRGBA(0, 0, 0, 0.5);
       inline static GLfloat scale_text = 0.66;
-      inline static double boundary_width_in_screenCoords = 0.025;
+      inline static double boundary_width_in_screenCoords = 0.1;
       std::string title;
       bool linear_interpolation_enabled;
       bk::Signal<std::string> s_title_changed;
@@ -89,7 +89,7 @@ namespace bk
           min_clamp_value(0),
           max_clamp_value(1),
           num_colors(0),
-          num_ticks(2),
+          num_ticks(1),
           label_precision(1),
           title(""),
           linear_interpolation_enabled(true)
@@ -692,7 +692,10 @@ namespace bk
   { init(ColorBarRGBA::Rainbow()); }
 
   void ColorBarView::init_blue_to_red()
-  { init(ColorBarRGBA::Blue_To_Red()); }
+  { init(ColorBarRGBA::Blue_White_Red()); }
+
+  void ColorBarView::init_green_to_white_to_red()
+  { init(ColorBarRGBA::Green_White_Red()); }
 
   void ColorBarView::init_magenta()
   { init(ColorBarRGBA::Magenta()); }
@@ -710,6 +713,9 @@ namespace bk
       else
       { init_manual_num_colors(ColorBarRGBA::Cluster(), nClusters); }
   }
+
+  void ColorBarView::init_light_blue_to_black_to_yellow()
+  { init(ColorBarRGBA::Light_Blue_Black_Yellow()); }
   /// @}
 
   /// @{ -------------------------------------------------- EVENTS

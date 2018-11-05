@@ -31,14 +31,16 @@ namespace bk
 {
   enum class ColorScaleType : unsigned short
   {
-      Heat = 0,
-      Rainbow = 1,
-      Magenta = 2,
-      Gray = 3,
-      BlueToRed = 4,
-      UniformYellow = 5,
-      TrafficLight = 6,
-      Cluster = 8
+      Heat = 0, //
+      Rainbow = 1, //
+      Magenta = 2, //
+      Gray = 3, //
+      BlueToRed = 4, //
+      UniformYellow = 5, //
+      TrafficLight = 6, //
+      Cluster = 8, //
+      GreenToRed = 9, //
+      LightBlueToYellow = 10
   };
 } // namespace bk
 

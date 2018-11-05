@@ -233,14 +233,14 @@ namespace bk::details
 
           struct debug
           {
-              [[nodiscard]] static std::string vert_passthrough(bool linesHaveTime, bool colorEnabled);
-              [[nodiscard]] static std::string frag_passthrough(bool linesHaveTime, bool colorEnabled);
+              [[nodiscard]] static std::string vert_passthrough(bool linesHaveTime, bool linesHaveColor, bool colorEnabled);
+              [[nodiscard]] static std::string frag_passthrough(bool linesHaveTime, bool linesHaveColor, bool colorEnabled);
           };
 
-          [[nodiscard]] static std::string vert(bool linesHaveTime, bool colorEnabled);
-          [[nodiscard]] static std::string geom(bool linesHaveTime, bool animationEnabled, bool colorEnabled);
-          [[nodiscard]] static std::string frag_transparent(bool linesHaveTime, bool animationEnabled, bool colorEnabled, bool oitEnabled);
-          [[nodiscard]] static std::string frag_opaque(bool linesHaveTime, bool animationEnabled, bool colorEnabled);
+          [[nodiscard]] static std::string vert(bool linesHaveTime, bool linesHaveColor, bool colorEnabled);
+          [[nodiscard]] static std::string geom(bool linesHaveTime, bool animationEnabled, bool linesHaveColor, bool colorEnabled);
+          [[nodiscard]] static std::string frag_transparent(bool linesHaveTime, bool animationEnabled, bool linesHaveColor, bool colorEnabled, bool oitEnabled);
+          [[nodiscard]] static std::string frag_opaque(bool linesHaveTime, bool animationEnabled, bool linesHaveColor, bool colorEnabled);
 
           struct lineAO
           {
@@ -249,9 +249,9 @@ namespace bk::details
 
               struct gbuffer
               {
-                  [[nodiscard]] static std::string vert(bool linesHaveTime, bool colorEnabled);
-                  [[nodiscard]] static std::string geom(bool linesHaveTime, bool animationEnabled, bool colorEnabled);
-                  [[nodiscard]] static std::string frag(bool linesHaveTime, bool animationEnabled, bool colorEnabled);
+                  [[nodiscard]] static std::string vert(bool linesHaveTime, bool linesHaveColor, bool colorEnabled);
+                  [[nodiscard]] static std::string geom(bool linesHaveTime, bool animationEnabled, bool linesHaveColor, bool colorEnabled);
+                  [[nodiscard]] static std::string frag(bool linesHaveTime, bool animationEnabled, bool linesHaveColor, bool colorEnabled);
               };
 
               struct mipmap

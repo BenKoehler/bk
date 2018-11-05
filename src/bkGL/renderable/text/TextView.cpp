@@ -812,9 +812,10 @@ namespace bk
   {
       _pdata->ubo.bind_to_default_base();
 
-      BK_QT_GL glPushAttrib(GL_COLOR_BUFFER_BIT);
+      BK_QT_GL glPushAttrib(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
       BK_QT_GL glEnable(GL_BLEND);
-      BK_QT_GL glDepthFunc(GL_ALWAYS);
+      //BK_QT_GL glDepthFunc(GL_ALWAYS);
+      BK_QT_GL glDisable(GL_DEPTH_TEST);
 
       BK_QT_GL glMatrixMode(GL_PROJECTION);
       BK_QT_GL glPushMatrix();
@@ -850,13 +851,13 @@ namespace bk
       _pdata->vao_text.release();
       _pdata->shader_text.release();
 
-      BK_QT_GL glDepthFunc(GL_LESS);
-
-      BK_QT_GL glPopAttrib();
+      //BK_QT_GL glDepthFunc(GL_LESS);
 
       BK_QT_GL glPopMatrix();
       BK_QT_GL glMatrixMode(GL_PROJECTION);
       BK_QT_GL glPopMatrix();
+
+      BK_QT_GL glPopAttrib();
 
       _pdata->ubo.release_from_base();
   }

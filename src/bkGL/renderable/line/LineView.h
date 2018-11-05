@@ -162,10 +162,12 @@ namespace bk
       void set_colorbar_heat();
       void set_colorbar_rainbow();
       void set_colorbar_blue_to_red();
+      void set_colorbar_green_to_red();
       void set_colorbar_magenta();
       void set_colorbar_uniform_yellow();
       void set_colorbar_traffic_light();
       void set_colorbar_cluster();
+      void set_colorbar_light_blue_to_yellow();
       /// @}
 
       /// @{ -------------------------------------------------- HELPERS: SET COLOR ATTRIBUTE

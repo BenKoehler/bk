@@ -432,7 +432,7 @@ namespace bk
   void TriangularMesh3DView::set_colorbar_blue_to_red()
   {
       _pdata->colorscale_type = ColorScaleType::BlueToRed;
-      _set_colorbar(ColorBarRGBA::Blue_To_Red());
+      _set_colorbar(ColorBarRGBA::Blue_White_Red());
   }
 
   void TriangularMesh3DView::set_colorbar_magenta()
