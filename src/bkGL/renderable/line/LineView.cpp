@@ -394,6 +394,16 @@ namespace bk
                   _pdata->colorbarview.init_uniform_yellow();
                   break;
               }
+              case ColorScaleType::GreenToRed:
+              {
+                  _pdata->colorbarview.init_green_to_white_to_red();
+                  break;
+              }
+              case ColorScaleType::LightBlueToYellow:
+              {
+                  _pdata->colorbarview.init_light_blue_to_black_to_yellow();
+                  break;
+              }
                   //case ColorScaleType::Gray: [[fallthrough]]
               default:
               { /* do nothing */ }
