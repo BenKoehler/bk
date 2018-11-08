@@ -44,25 +44,25 @@ namespace bk
   class Interactor::Impl
   {
     public:
-      bool                     rotation_enabled;
-      bool                     translation_enabled;
-      bool                     zoom_enabled;
-      bk::Vec3<GLfloat>        translation;
-      bk::Vec3<GLfloat>        scale_manual;
-      GLfloat                  scale_fixed;
-      GLfloat                  translation_speed;
-      KeyBoard                 keyboard;
-      Mouse                    mouse;
-      TrackBall                trackball;
-      bk::Signal<>             s_do_update;
-      bk::Signal<>             s_require_modelview_update;
+      bool rotation_enabled;
+      bool translation_enabled;
+      bool zoom_enabled;
+      bk::Vec3<GLfloat> translation;
+      bk::Vec3<GLfloat> scale_manual;
+      GLfloat scale_fixed;
+      GLfloat translation_speed;
+      KeyBoard keyboard;
+      Mouse mouse;
+      TrackBall trackball;
+      bk::Signal<> s_do_update;
+      bk::Signal<> s_require_modelview_update;
       bk::Signal<GLint, GLint> s_mouse_pos_changed;
       bk::Signal<MouseButton_> s_mouse_button_pressed;
       bk::Signal<MouseButton_> s_mouse_button_released;
-      bk::Signal<Key_>         s_key_pressed;
-      bk::Signal<Key_>         s_key_released;
-      bk::Signal<>             s_wheel_up;
-      bk::Signal<>             s_wheel_down;
+      bk::Signal<Key_> s_key_pressed;
+      bk::Signal<Key_> s_key_released;
+      bk::Signal<> s_wheel_up;
+      bk::Signal<> s_wheel_down;
 
       Impl()
           : rotation_enabled(true),
@@ -377,8 +377,8 @@ namespace bk
           if (_pdata->zoom_enabled)
           {
               constexpr GLfloat minScale = static_cast<GLfloat>(0.05);
-              constexpr GLfloat s        = 0.02; // TODO: more sophisticated choice
-              const GLfloat     dy       = s * static_cast<GLfloat>(_pdata->mouse.dy());
+              constexpr GLfloat s = 0.02; // TODO: more sophisticated choice
+              const GLfloat dy = s * static_cast<GLfloat>(_pdata->mouse.dy());
               _pdata->scale_manual[0] = std::max(_pdata->scale_manual[0] - dy, minScale);
               _pdata->scale_manual[1] = std::max(_pdata->scale_manual[1] - dy, minScale);
               _pdata->scale_manual[2] = std::max(_pdata->scale_manual[2] - dy, minScale);
@@ -414,10 +414,6 @@ namespace bk
               do_update = true;
           }
       }
-      //else if (_pdata->mouse.right_button_is_pressed())
-      //{ /* do nothing */ }
-      //else if (_pdata->mouse.middle_button_is_pressed())
-      //{ /* do nothing */ }
 
       if (emitSignal)
       { _pdata->s_mouse_button_pressed.emit_signal(btn); }
@@ -445,10 +441,6 @@ namespace bk
               do_update = true;
           }
       }
-      //else if (_pdata->mouse.right_button_is_released())
-      //{ /* do nothing */ }
-      //else if (_pdata->mouse.middle_button_is_released())
-      //{ /* do nothing */ }
 
       if (emitSignal)
       { _pdata->s_mouse_button_released.emit_signal(btn); }

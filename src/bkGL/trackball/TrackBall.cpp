@@ -96,6 +96,11 @@ namespace bk
   { return &_pdata->rotation_matrix[0]; }
   /// @}
 
+  /// @{ -------------------------------------------------- GET ROTATION QUATERNION
+  const Quaternion& TrackBall::rotation_quaternion() const
+  { return _pdata->rotation_quaternion_current; }
+  /// @}
+
   /// @{ -------------------------------------------------- IS DRAGGING
   bool TrackBall::is_active() const
   { return _pdata->rotation_is_active; }
@@ -163,6 +168,15 @@ namespace bk
   }
   /// @}
 
+  /// @{ -------------------------------------------------- SET CUSTOM ROTATION
+  void TrackBall::set_custom_rotation(const Quaternion& q)
+  {
+      _pdata->rotation_quaternion_current = q;
+      _pdata->rotation_quaternion_when_finished = _pdata->rotation_quaternion_current;
+      _update_rotation_matrix();
+  }
+  /// @}
+
   //====================================================================================================
   //===== FUNCTIONS
   //====================================================================================================
@@ -195,19 +209,19 @@ namespace bk
   {
       const GLfloat l = q.norm_squared();
       const GLfloat s = l > 0 ? (static_cast<GLfloat>(2) / l) : static_cast<GLfloat>(0);
-      
+
       const GLfloat xs = q[1] * s;
       const GLfloat ys = q[2] * s;
       const GLfloat zs = q[3] * s;
-      
+
       const GLfloat wx = q[0] * xs;
       const GLfloat wy = q[0] * ys;
       const GLfloat wz = q[0] * zs;
-      
+
       const GLfloat xx = q[1] * xs;
       const GLfloat xy = q[1] * ys;
       const GLfloat xz = q[1] * zs;
-      
+
       const GLfloat yy = q[2] * ys;
       const GLfloat yz = q[2] * zs;
       const GLfloat zz = q[3] * zs;

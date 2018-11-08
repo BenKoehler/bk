@@ -1685,7 +1685,7 @@ namespace bk::details
       }
       s << indent << "   tangent_frag = tangent[0];\n";
       if (colorEnabled && linesHaveColor)
-      { s << indent << "attrib_frag = attrib_geom[1];\n"; }
+      { s << indent << "   attrib_frag = attrib_geom[1];\n"; }
       s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_frag.xyz, 1);\n";
       s << indent << "   EmitVertex();\n\n";
 
@@ -1708,7 +1708,7 @@ namespace bk::details
       }
       s << indent << "   tangent_frag = tangent[1];\n";
       if (colorEnabled && linesHaveColor)
-      { s << indent << "attrib_frag = attrib_geom[2];\n"; }
+      { s << indent << "   attrib_frag = attrib_geom[2];\n"; }
       s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_frag.xyz, 1);\n";
       s << indent << "   EmitVertex();\n\n";
 
@@ -1732,7 +1732,7 @@ namespace bk::details
       }
       s << indent << "   tangent_frag = tangent[0];\n";
       if (colorEnabled && linesHaveColor)
-      { s << indent << "attrib_frag = attrib_geom[1];\n"; }
+      { s << indent << "   attrib_frag = attrib_geom[1];\n"; }
       s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_frag.xyz, 1);\n";
       s << indent << "   EmitVertex();\n\n";
 
@@ -1755,7 +1755,7 @@ namespace bk::details
       }
       s << indent << "   tangent_frag = tangent[1];\n";
       if (colorEnabled && linesHaveColor)
-      { s << indent << "attrib_frag = attrib_geom[2];\n"; }
+      { s << indent << "   attrib_frag = attrib_geom[2];\n"; }
       s << indent << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_frag.xyz, 1);\n";
       s << indent << "   EmitVertex();\n\n";
 
@@ -1847,6 +1847,8 @@ namespace bk::details
 
           s << discard_low_alpha();
       }
+      else
+      { s << "   color_out.a = 1;\n\n"; }
 
       if (colorEnabled && linesHaveColor)
       {
@@ -1977,13 +1979,14 @@ namespace bk::details
       s << comment_region_functions();
       s << function_camera_position();
       s << function_main_begin();
+
       if (linesHaveTime && animationEnabled)
       {
           s << "    if (" << bk::details::UBOGlobal::name_animation_enabled() << " != 0 && abs(position_frag[3] - " << bk::details::UBOGlobal::name_animation_current_time() << ") > " << bk::details::UBOLine::name_trail_length_in_ms() << ")\n";
           s << "    { discard; }\n\n";
       }
 
-      s << "   " << details::set_color_out_rgb_to_line_color() << "\n";
+      s << details::set_color_out_rgb_to_line_color();
       s << "   color_out.a = 1;\n\n";
 
       if (linesHaveTime && animationEnabled)
@@ -1997,9 +2000,7 @@ namespace bk::details
 
       if (colorEnabled && linesHaveColor)
       {
-          s << "   if (" << bk::details::UBOLine::name_color_enabled() << " == 0)\n";
-          s << "   { " << details::set_color_out_rgb_to_line_color() << "}\n";
-          s << "   else\n";
+          s << "   if (" << bk::details::UBOLine::name_color_enabled() << " != 0)\n";
           s << "   {\n";
           s << "      if (attrib_frag <= " << bk::details::UBOLine::name_min_value() << ")\n";
           s << "      {\n";
@@ -2040,7 +2041,7 @@ namespace bk::details
       s << "   if (" << bk::details::UBOLine::name_halo_enabled() << " != 0 && abs(halo_percent_frag) >= 1.0f-" << bk::details::UBOLine::name_halo_width_in_percent() << ")\n";
       s << "   {\n";
       s << "       const float diff = (1 - abs(halo_percent_frag)) / " << bk::details::UBOLine::name_halo_width_in_percent() << ";\n";
-      s << "       color_out.rgb = mix(vec3(0), vec3(color_out.r, color_out.g, color_out.b), diff*diff); // faded halo color\n";
+      s << "       color_out.rgb = mix(vec3(0), color_out.rgb, diff*diff); // faded halo color\n";
       s << "   }\n";
       if (!colorEnabled)
       {
@@ -2050,7 +2051,7 @@ namespace bk::details
       else
       {
           s << "\n   if (" << bk::details::UBOLine::name_color_transparency_enabled() << " != 0 && color_out.a < 1)\n";
-          s << "   { discard; }\n";
+          s << "   { discard; }\n\n";
       }
 
       s << "   if (" << bk::details::UBOLine::name_isl_enabled() << " != 0)\n";
@@ -2319,6 +2320,8 @@ namespace bk::details
           stype << (linesHaveTime ? "yes" : "no");
           stype << " linesHaveColor:";
           stype << (linesHaveColor ? "yes" : "no");
+          stype << " colorEnabled:";
+          stype << (colorEnabled ? "yes" : "no");
 
           s << comment_tag_vertex_shader(stype.str());
       }
@@ -2593,7 +2596,7 @@ namespace bk::details
       s << "   {\n";
       s << "       //color_map.rgb = vec3(0); // halo color\n";
       s << "       const float diff = (1 - abs(halo_percent_frag)) / hwp;\n";
-      s << "       color_map.rgb = mix(vec3(0), vec3(" << bk::details::UBOLine::name_linecol_r() << ", " << bk::details::UBOLine::name_linecol_g() << ", " << bk::details::UBOLine::name_linecol_b() << "), diff*diff); // faded halo color\n\n";
+      s << "       color_map.rgb = mix(vec3(0), color_map.rgb, diff*diff); // faded halo color\n\n";
 
       s << "       gl_FragDepth += " << bk::details::UBOLine::name_halo_depth_dependent_dmax() << " * sqrt(abs(halo_percent_frag)); // depth-dependent halo\n";
       s << "   }\n";

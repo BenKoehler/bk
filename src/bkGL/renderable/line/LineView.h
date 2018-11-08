@@ -173,7 +173,8 @@ namespace bk
       /// @{ -------------------------------------------------- HELPERS: SET COLOR ATTRIBUTE
     private:
       void _init_set_color_attribute(std::string_view color_attribute_name);
-      GLfloat* _map_vbo_read_write();
+      [[nodiscard]] GLfloat* _map_vbo();
+      void _unmap_vbo();
       void _reset_color_attribute_min_max();
       void _finalize_set_color_attribute();
     public:
@@ -182,11 +183,13 @@ namespace bk
       /// @{ -------------------------------------------------- SET COLOR ATTRIBUTES
       void set_color_attribute_min(GLfloat v);
       void set_color_attribute_max(GLfloat v);
+      void set_color_attribute_clamp_min(GLfloat v);
+      void set_color_attribute_clamp_max(GLfloat v);
       void set_attrib_scale_to_colorbar(bool b);
       void set_color_attribute_transparency_enabled(bool b);
 
       template<typename TLinesIterator>
-      void set_color_attribute(TLinesIterator linesBegin, TLinesIterator linesEnd, std::string_view color_attribute_name);
+      void set_color_attribute(TLinesIterator linesBegin, TLinesIterator linesEnd, std::string_view color_attribute_name, double quantile_low = 0, double quantile_high = 1, std::string_view custom_colorbar_title = "", const ScalarLineFilter* filter = nullptr);
       /// @}
 
       /// @{ -------------------------------------------------- SET ISL
@@ -236,7 +239,7 @@ namespace bk
       void _update_attribute_min_max(GLfloat newAttribVal);
       void _vao_add_attributes();
       void _init_line_buffers(const std::vector<GLfloat>& vertices, const std::vector<GLuint>& indices, unsigned int num_points_total);
-      void _init_colorbar(std::string_view color_attribute_name);
+      void _init_colorbar(std::string_view color_attribute_name, std::string_view custom_colorbar_title = "");
     public:
       /// @}
 

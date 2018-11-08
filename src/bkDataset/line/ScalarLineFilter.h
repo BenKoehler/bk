@@ -127,6 +127,9 @@ namespace bk
       template<int Dims>
       [[nodiscard]] bool eval(const Line<Dims>& line, unsigned int id = 0) const
       {
+          if (_thresholds.empty())
+          { return true; }
+
           bool valid = _concatenationMode == ConcatenationMode::And ? true : false;
 
           for (const ScalarLineThreshold& t: _thresholds)

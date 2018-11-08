@@ -46,6 +46,8 @@
 #include <bkTools/color/ColorRGBA.h>
 #include <bkTools/color/ColorBarRGBA.h>
 
+#include <bk/Localization>
+
 namespace bk
 {
   //====================================================================================================
@@ -174,9 +176,11 @@ namespace bk
         _pdata(gl)
   #endif
   {
-      _pdata->vbo.set_usage_STATIC_DRAW();
       _pdata->ibo.set_usage_STATIC_DRAW();
+      _pdata->vbo.set_usage_STATIC_DRAW();
       _pdata->ssbo_colorbar.set_usage_STATIC_DRAW();
+      //_pdata->vbo.set_usage_DYNAMIC_DRAW();
+      //_pdata->ssbo_colorbar.set_usage_DYNAMIC_DRAW();
 
       // done in init_lines(); depends on color_and time enabled or not
       //_pdata->vao.add_default_attribute_position_3xfloat_plus_time_1xfloat();
@@ -314,6 +318,9 @@ namespace bk
 
           if (this->is_initialized())
           {
+              _pdata->ubo.set_color_enabled(_pdata->color_by_attribute_enabled ? static_cast<GLint>(1) : static_cast<GLint>(0));
+              _pdata->ubo.release();
+
               init_shader();
               init_lineao_shader();
               this->emit_signal_update_required();
@@ -472,21 +479,20 @@ namespace bk
   void LineView::_init_set_color_attribute(std::string_view color_attribute_name)
   { _pdata->lines_have_color_attribute = !color_attribute_name.empty(); }
 
-  GLfloat* LineView::_map_vbo_read_write()
-  { return _pdata->vbo.map_read_write<GLfloat>(); }
+  GLfloat* LineView::_map_vbo()
+  { return _pdata->vbo.map_write_only<GLfloat>(); }
+
+  void LineView::_unmap_vbo()
+  { _pdata->vbo.unmap_and_release(); }
 
   void LineView::_reset_color_attribute_min_max()
   {
       _pdata->color_attrib_min = std::numeric_limits<GLfloat>::max();
       _pdata->color_attrib_max = -_pdata->color_attrib_min;
-
-      _pdata->colorbarview.set_value_range(_pdata->color_attrib_min, _pdata->color_attrib_max);
   }
 
   void LineView::_finalize_set_color_attribute()
   {
-      _pdata->vbo.unmap_and_release();
-
       _pdata->color_attrib_min_manual = _pdata->color_attrib_min;
       _pdata->color_attrib_max_manual = _pdata->color_attrib_max;
 
@@ -499,6 +505,28 @@ namespace bk
   /// @{ -------------------------------------------------- SET COLOR ATTRIBUTES
   void LineView::set_color_attribute_min(GLfloat v)
   {
+      _pdata->color_attrib_min = v;
+
+      if (this->is_initialized())
+      {
+          _pdata->colorbarview.set_value_range(_pdata->color_attrib_min, _pdata->color_attrib_max);
+          this->emit_signal_update_required();
+      }
+  }
+
+  void LineView::set_color_attribute_max(GLfloat v)
+  {
+      _pdata->color_attrib_max = v;
+
+      if (this->is_initialized())
+      {
+          _pdata->colorbarview.set_value_range(_pdata->color_attrib_min, _pdata->color_attrib_max);
+          this->emit_signal_update_required();
+      }
+  }
+
+  void LineView::set_color_attribute_clamp_min(GLfloat v)
+  {
       _pdata->color_attrib_min_manual = v;
 
       if (this->is_initialized())
@@ -506,13 +534,13 @@ namespace bk
           _pdata->ubo.set_min_value(_pdata->color_attrib_min_manual);
           _pdata->ubo.release();
 
-          _pdata->colorbarview.set_value_range(v, _pdata->color_attrib_max);
+          _pdata->colorbarview.set_clamp_value_range(_pdata->color_attrib_min_manual, _pdata->color_attrib_max_manual);
 
           this->emit_signal_update_required();
       }
   }
 
-  void LineView::set_color_attribute_max(GLfloat v)
+  void LineView::set_color_attribute_clamp_max(GLfloat v)
   {
       _pdata->color_attrib_max_manual = v;
 
@@ -521,7 +549,7 @@ namespace bk
           _pdata->ubo.set_max_value(_pdata->color_attrib_max_manual);
           _pdata->ubo.release();
 
-          _pdata->colorbarview.set_value_range(_pdata->color_attrib_min, v);
+          _pdata->colorbarview.set_clamp_value_range(_pdata->color_attrib_min_manual, _pdata->color_attrib_max_manual);
 
           this->emit_signal_update_required();
       }
@@ -770,7 +798,6 @@ namespace bk
       _pdata->lines_have_time_attribute = true;
       _pdata->lines_have_color_attribute = !color_attribute_name.empty();
       this->_pdata->center.set_zero();
-      _pdata->vao.clear_attributes();
   }
 
   bool LineView::_line_has_time_attribute(const bk::Line<3>& line) const
@@ -821,6 +848,8 @@ namespace bk
 
   void LineView::_vao_add_attributes()
   {
+      _pdata->vao.clear_attributes();
+
       if (!_pdata->lines_have_time_attribute)
       { _pdata->vao.add_default_attribute_position_3xfloat(); }
       else
@@ -851,16 +880,15 @@ namespace bk
       { set_colorbar_heat(); }
   }
 
-  void LineView::_init_colorbar(std::string_view color_attribute_name)
+  void LineView::_init_colorbar(std::string_view color_attribute_name, std::string_view custom_colorbar_title)
   {
       _pdata->colorbarview.set_value_range(_pdata->color_attrib_min, _pdata->color_attrib_max, false);
       _pdata->colorbarview.set_clamp_value_range(_pdata->color_attrib_min_manual, _pdata->color_attrib_max_manual);
 
-      std::stringstream s;
-      s << "Lines: \"";
-      s << color_attribute_name;
-      s << "\"";
-      _pdata->colorbarview.set_title(s.str());
+      if (custom_colorbar_title.empty())
+      { _pdata->colorbarview.set_title(___("Lines: \"@0\"", color_attribute_name)); }
+      else
+      { _pdata->colorbarview.set_title(___("@0", custom_colorbar_title)); }
   }
   /// @}
 

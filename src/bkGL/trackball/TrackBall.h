@@ -75,6 +75,10 @@ namespace bk
       [[nodiscard]] const GLfloat* rotation_matrix_ptr() const;
       /// @}
 
+      /// @{ -------------------------------------------------- GET ROTATION QUATERNION
+      [[nodiscard]] const Quaternion& rotation_quaternion() const;
+      /// @}
+
       /// @{ -------------------------------------------------- IS ACTIVE
       //! mouse is clicked and trackball is dragged
       [[nodiscard]] bool is_active() const;
@@ -112,6 +116,10 @@ namespace bk
       /// @{ -------------------------------------------------- SET ACTIVE
       void set_active();
       void set_inactive();
+      /// @}
+
+      /// @{ -------------------------------------------------- SET CUSTOM ROTATION
+      void set_custom_rotation(const Quaternion& q);
       /// @}
 
       //====================================================================================================

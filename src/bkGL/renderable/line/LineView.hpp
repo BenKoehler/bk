@@ -28,12 +28,13 @@
 #define BKGL_LINEVIEW_HPP
 
 #include <bkGL/renderable/line/LineView.h>
+#include <bkAlgorithm/quantile.h> // todo
 
 namespace bk
 {
   /// @{ -------------------------------------------------- SET COLOR ATTRIBUTES
   template<typename TLinesIterator>
-  void LineView::set_color_attribute(TLinesIterator linesBegin, TLinesIterator linesEnd, std::string_view color_attribute_name)
+  void LineView::set_color_attribute(TLinesIterator linesBegin, TLinesIterator linesEnd, std::string_view color_attribute_name, double quantile_low, double quantile_high, std::string_view custom_colorbar_title, const ScalarLineFilter* filter)
   {
       if (!this->is_initialized())
       { return; }
@@ -54,9 +55,14 @@ namespace bk
       if (num_lines == 0)
       { return; }
 
-      unsigned int num_points_total = 0;
-      for (TLinesIterator itLine = linesBegin; itLine != linesEnd; ++itLine)
-      { num_points_total += itLine->geometry().num_points(); }
+      std::vector<unsigned int> cumulative_num_points(num_lines, 0);
+
+      TLinesIterator itLine = linesBegin;
+
+      for (unsigned int i = 1; i < num_lines; ++i, ++itLine)
+      { cumulative_num_points[i] = cumulative_num_points[i - 1] + itLine->geometry().num_points(); }
+
+      const unsigned int num_points_total = cumulative_num_points.back() + (linesEnd - 1)->geometry().num_points();
 
       if (num_points_total == 0)
       { return; }
@@ -66,7 +72,7 @@ namespace bk
       /*
        * check lines' time attribute
        */
-      for (TLinesIterator itLine = linesBegin; itLine != linesEnd; ++itLine)
+      for (itLine = linesBegin; itLine != linesEnd; ++itLine)
       {
           if (!_line_has_time_attribute(*itLine))
           { break; }
@@ -75,7 +81,7 @@ namespace bk
       /*
        * check lines' color attribute
        */
-      for (TLinesIterator itLine = linesBegin; itLine != linesEnd; ++itLine)
+      for (itLine = linesBegin; itLine != linesEnd; ++itLine)
       {
           if (!_line_has_attribute(*itLine, color_attribute_name))
           { break; }
@@ -83,42 +89,74 @@ namespace bk
 
       if (!_lines_have_color_attribute())
       {
-          init(linesBegin, linesEnd);
+          init(linesBegin, linesEnd, "", filter);
           return;
       }
 
       //------------------------------------------------------------------------------------------------------
       // colors values were allocated in the vbo; map and overwrite
       //------------------------------------------------------------------------------------------------------
-      GLfloat* vbodata = _map_vbo_read_write();
+      const bool useQuantiles = quantile_low != 0 && quantile_high != 1;
+
+      std::vector<GLfloat> attrib_values;
+      if (useQuantiles)
+      { attrib_values.reserve(num_points_total); }
+
+      _reset_color_attribute_min_max();
+
+      GLfloat* vbodata = _map_vbo();
       if (vbodata != nullptr)
       {
           const unsigned int floatsPerVertex = _floats_per_vertex();
 
-          _reset_color_attribute_min_max();
-
-          unsigned int cnt = 0;
-          for (TLinesIterator itLine = linesBegin; itLine != linesEnd; ++itLine)
+          #pragma omp parallel for
+          for (unsigned int i = 0; i < num_lines; ++i)
           {
-              const bool hasAttrib = itLine->point_attribute_map().has_attribute(color_attribute_name);
+              const bk::Line<3>& currentLine = *(linesBegin + i);
+              const unsigned int num_points = currentLine.geometry().num_points();
+              unsigned int cnt_v = cumulative_num_points[i] * floatsPerVertex;
 
-              for (unsigned int k = 0; k < itLine->geometry().num_points(); ++k)
+              for (unsigned int k = 0; k < num_points; ++k)
               {
-                  if (hasAttrib)
-                  {
-                      const GLfloat att = itLine->template point_attribute_value_of_type<double>(color_attribute_name, k);
-                      _update_attribute_min_max(att);
-                      vbodata[floatsPerVertex * cnt + floatsPerVertex - 1] = att;
-                  }
-                  else
-                  { vbodata[floatsPerVertex * cnt + floatsPerVertex - 1] = 0; }
+                  const bool filter_valid = filter != nullptr ? filter->eval(currentLine, k) : true;
 
-                  ++cnt;
+                  const GLfloat att = _lines_have_color_attribute() ? currentLine.point_attribute_value_of_type<double>(color_attribute_name, k) : 0;
+
+                  if (_lines_have_color_attribute())
+                  {
+                      if (useQuantiles)
+                      {
+                          #pragma omp critical
+                          { attrib_values.push_back(att); }
+                      }
+                      else
+                      {
+                          #pragma omp critical
+                          { _update_attribute_min_max(att); }
+                      }
+                  }
+
+                  if (filter_valid)
+                  {
+                      cnt_v += floatsPerVertex - 1;
+
+                      if (_lines_have_color_attribute() || color_by_attribute_is_enabled())
+                      { vbodata[cnt_v++] = att; }
+                  }
               } // for num_points
           } // for num_lines
 
+          _unmap_vbo();
+
+          if (useQuantiles)
+          {
+              std::sort(attrib_values.begin(), attrib_values.end());
+              _update_attribute_min_max(bk::quantile(attrib_values.begin(), attrib_values.end(), quantile_low));
+              _update_attribute_min_max(bk::quantile(attrib_values.begin(), attrib_values.end(), quantile_high));
+          }
+
           _finalize_set_color_attribute();
-          _init_colorbar(color_attribute_name);
+          _init_colorbar(color_attribute_name, custom_colorbar_title);
 
           init_shader();
           init_lineao_shader();
@@ -191,6 +229,22 @@ namespace bk
               const bool filter_valid = filter != nullptr ? filter->eval(currentLine, k) : true;
               const auto& pt = currentLine.geometry().point(k);
 
+              const GLfloat att = _lines_have_color_attribute() ? currentLine.point_attribute_value_of_type<double>(color_attribute_name, k) : 0;
+
+              if (_lines_have_color_attribute())
+              {
+                  //if (useQuantiles)
+                  //{
+                  //    #pragma omp critical
+                  //    { attrib_values.push_back(att); }
+                  //}
+                  //else
+                  {
+                      #pragma omp critical
+                      { _update_attribute_min_max(att); }
+                  }
+              }
+
               if (!filter_valid)
               {
                   if (k == 0 || k == num_points - 1)
@@ -221,20 +275,19 @@ namespace bk
                   #pragma omp critical
                   { _add_to_center(pt[0], pt[1], pt[2]); }
 
-                  if (_lines_have_color_attribute())
+                  if (_lines_have_color_attribute() || color_by_attribute_is_enabled())
                   {
-                      //const GLfloat att = lines[i].point_attribute_value_of_type<double>(color_attribute_name, k);
-                      const GLfloat att = currentLine.point_attribute_value_of_type<double>(color_attribute_name, k);
+                      //const GLfloat att = currentLine.point_attribute_value_of_type<double>(color_attribute_name, k);
                       vertices[cnt_v++] = att;
 
-                      #pragma omp critical
-                      { _update_attribute_min_max(att); }
+                      //#pragma omp critical
+                      //{ _update_attribute_min_max(att); }
                   }
-                  else if (color_by_attribute_is_enabled())
-                  {
+                  //else if (color_by_attribute_is_enabled())
+                  //{
                       // reserve color attribute space for later
-                      vertices[cnt_v++] = 0;
-                  }
+                      //vertices[cnt_v++] = 0;
+                  //}
               }
           } // for num_points
 

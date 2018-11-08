@@ -62,7 +62,7 @@ namespace bk
       inline static bk::ColorRGBA color_text = bk::ColorRGBA(1, 1, 1, 1);
       inline static bk::ColorRGBA color_text_background = bk::ColorRGBA(0, 0, 0, 0.5);
       inline static GLfloat scale_text = 0.66;
-      inline static double boundary_width_in_screenCoords = 0.1;
+      inline static double boundary_width_in_screenCoords = 0.2;
       std::string title;
       bool linear_interpolation_enabled;
       bk::Signal<std::string> s_title_changed;
@@ -242,16 +242,16 @@ namespace bk
       _pdata->max_value = std::max(rmin, rmax);
 
       std::stringstream s;
-      s << std::fixed;
       s.precision(_pdata->label_precision);
-      s << rmin;
+      s << std::fixed;
+      s << _pdata->min_value;
 
       _pdata->textview_min.set_text(s.str());
 
       s.str("");
-      s << std::fixed;
       s.precision(_pdata->label_precision);
-      s << rmax;
+      s << std::fixed;
+      s << _pdata->max_value;
       _pdata->textview_max.set_text(s.str());
 
       if (copytoClampValueRange)
@@ -436,8 +436,13 @@ namespace bk
       {
           const auto[minx, maxx, miny, maxy] = _minx_maxx_miny_maxy_screen_pos();
 
-          const double minx_clamp = minx + (maxx - minx) * (_pdata->min_clamp_value - _pdata->min_value) / (_pdata->max_value - _pdata->min_value);
-          const double maxx_clamp = minx + (maxx - minx) * (_pdata->max_clamp_value - _pdata->min_value) / (_pdata->max_value - _pdata->min_value);
+          double minx_clamp = minx;
+          double maxx_clamp = maxx;
+          if (_pdata->max_value != _pdata->min_value)
+          {
+              minx_clamp = minx + (maxx - minx) * (_pdata->min_clamp_value - _pdata->min_value) / (_pdata->max_value - _pdata->min_value);
+              maxx_clamp = minx + (maxx - minx) * (_pdata->max_clamp_value - _pdata->min_value) / (_pdata->max_value - _pdata->min_value);
+          }
 
           unsigned int nValsVBO = 2 * (_pdata->num_colors + 2) * (2 + 3);
           if (!linear_interpolation_is_enabled())
@@ -474,11 +479,11 @@ namespace bk
 
                   const GLfloat x = minx_clamp + i * delta;
 
-                  vbodata[0 * nValuesPerVertex + off] = x;
-                  vbodata[0 * nValuesPerVertex + off + 1] = miny;
+                  vbodata[off] = x;
+                  vbodata[off + 1] = miny;
 
-                  vbodata[1 * nValuesPerVertex + off] = x;
-                  vbodata[1 * nValuesPerVertex + off + 1] = maxy;
+                  vbodata[off + nValuesPerVertex] = x;
+                  vbodata[off + nValuesPerVertex + 1] = maxy;
               }
           }
           else // if (!linear_interpolation_is_enabled())
@@ -648,10 +653,15 @@ namespace bk
       _pdata->textview_title.init(_pdata->title);
 
       std::stringstream s;
+      s.precision(_pdata->label_precision);
+      s << std::fixed;
+
       s << _pdata->min_value;
       _pdata->textview_min.init(s.str());
 
       s.str("");
+      s.precision(_pdata->label_precision);
+      s << std::fixed;
       s << _pdata->max_value;
       _pdata->textview_max.init(s.str());
 

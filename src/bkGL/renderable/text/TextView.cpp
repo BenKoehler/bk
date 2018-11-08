@@ -319,10 +319,12 @@ namespace bk
   {
       _pdata->text = txt;
 
-      update_vbo_background();
-
       if (this->is_initialized())
-      { this->emit_signal_update_required(); }
+      {
+          init_buffers();
+          update_vbo_background();
+          this->emit_signal_update_required();
+      }
   }
   /// @}
 
@@ -763,7 +765,6 @@ namespace bk
 
               data[6] = x1;
               data[7] = y0;
-
           }
           else
           {
