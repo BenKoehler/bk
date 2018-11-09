@@ -65,7 +65,8 @@
 
 namespace bk
 {
-  template<typename TValue, int TDims, typename TTransformation = NoTransformation<TDims>> class Image : public DataObject<TransformableGeometry<GridGeometry<TDims>, TTransformation>, GridTopology<TDims>>
+  template<typename TValue, int TDims, typename TTransformation = NoTransformation<TDims>>
+  class Image : public DataObject<TransformableGeometry<GridGeometry<TDims>, TTransformation>, GridTopology<TDims>>
   {
       //====================================================================================================
       //===== ASSERTIONS
@@ -325,14 +326,14 @@ namespace bk
           { return value_type(); }
           else
           {
-              value_type   x      = (*this)[0];
+              value_type x = (*this)[0];
               unsigned int listId = 0;
 
               for (unsigned int i = 1; i < num_values(); ++i)
               {
                   if ((*this)[i] < x)
                   {
-                      x      = (*this)[i];
+                      x = (*this)[i];
                       listId = i;
                   }
               }
@@ -408,14 +409,14 @@ namespace bk
           { return value_type(); }
           else
           {
-              value_type   x      = (*this)[0];
+              value_type x = (*this)[0];
               unsigned int listId = 0;
 
               for (unsigned int i = 1; i < num_values(); ++i)
               {
                   if ((*this)[i] < x)
                   {
-                      x      = (*this)[i];
+                      x = (*this)[i];
                       listId = i;
                   }
               }
@@ -494,7 +495,7 @@ namespace bk
                   off[dimId] = i;
 
                   auto gidoff = MatrixFactory::create<int, NumDimensionsAtCompileTime(), 1>(num_dimensions(), 1);
-                  bool valid  = true;
+                  bool valid = true;
 
                   for (unsigned int d = 0; d < num_dimensions(); ++d)
                   {
@@ -520,10 +521,10 @@ namespace bk
       template<typename TIndexAccessible, typename TIndexAccessible2, std::enable_if_t<bk::has_index_operator_v<TIndexAccessible> && bk::has_index_operator_v<TIndexAccessible2>>* = nullptr>
       [[nodiscard]] std::vector<value_type> values_of_neighborhood(const TIndexAccessible& gid, const TIndexAccessible2& neighborhood_size) const
       {
-          auto gidoff                                     = MatrixFactory::create<int, NumDimensionsAtCompileTime(), 1>(num_dimensions(), 1);
+          auto gidoff = MatrixFactory::create<int, NumDimensionsAtCompileTime(), 1>(num_dimensions(), 1);
 
           std::vector<value_type> neighbor_values;
-          const unsigned int      numValuesInNeighborhood = std::accumulate(neighborhood_size.begin(), neighborhood_size.end(), 1, [](unsigned int x, unsigned int y)
+          const unsigned int numValuesInNeighborhood = std::accumulate(neighborhood_size.begin(), neighborhood_size.end(), 1, [](unsigned int x, unsigned int y)
           { return x * y; });
 
           if (numValuesInNeighborhood > 0)
@@ -563,14 +564,50 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- SET SIZE
+    private:
+      template<int I, typename TId0, typename... TIds>
+      bool _has_correct_size(TId0 id0, TIds... ids)
+      {
+          if constexpr (sizeof...(TIds) == 0)
+          { return static_cast<int>(id0) == static_cast<int>(size(I)); }
+          else
+          { return static_cast<int>(id0) == static_cast<int>(size(I)) && _has_correct_size<I + 1>(ids...); }
+      }
+
+    public:
+
       template<typename... TIds>
       void set_size(const TIds& ... ids)
       {
           static_assert(_valid_num_arguments(ids...));
 
-          this->geometry().set_size(ids...);
-          this->topology().set_size(ids...);
-          this->template add_point_attribute_vector_of_type<value_type>(DefaultAttributeHash());
+          bool hasCorrectSizeAlready = false;
+
+          if (sizeof...(TIds) == num_dimensions())
+          {
+              if constexpr (std::conjunction_v<std::is_integral<TIds>...>)
+              { hasCorrectSizeAlready = _has_correct_size<0>(ids...); }
+              else if constexpr(bk::has_index_operator_v<bk::template_parameter_pack_arg_t<0, TIds...>>)
+              {
+                  hasCorrectSizeAlready = true;
+
+                  for (unsigned int i = 0; i < num_dimensions(); ++i)
+                  {
+                      if (size(i) != bk::template_parameter_pack_arg<0, TIds...>::value(ids...)[i])
+                      {
+                          hasCorrectSizeAlready = false;
+                          break;
+                      }
+                  }
+              }
+          }
+
+          if (!hasCorrectSizeAlready)
+          {
+              this->geometry().set_size(ids...);
+              this->topology().set_size(ids...);
+              this->template add_point_attribute_vector_of_type<value_type>(DefaultAttributeHash());
+          }
       }
       /// @}
 
@@ -778,7 +815,7 @@ namespace bk
           {
               for (int i = -halfsize; i <= halfsize; ++i)
               {
-                  off[dimId]        = i;
+                  off[dimId] = i;
                   kernel_gid[dimId] = i + halfsize;
                   _apply_convolution_kernel(dimId + 1, kernel, gid, off, kernel_gid, newval);
               } // for i
@@ -787,7 +824,7 @@ namespace bk
           {
               for (int i = -halfsize; i <= halfsize; ++i)
               {
-                  off[dimId]        = i;
+                  off[dimId] = i;
                   kernel_gid[dimId] = i + halfsize;
 
                   auto gidoff = MatrixFactory::create<int, NumDimensionsAtCompileTime(), 1>(num_dimensions(), 1);
@@ -810,9 +847,9 @@ namespace bk
       template<typename TKernel, typename TIndexAccessible>
       [[nodiscard]] auto apply_convolution_kernel(const TKernel& kernel, const TIndexAccessible& gid) const
       {
-          auto gidoff     = MatrixFactory::create<int, NumDimensionsAtCompileTime(), 1>(num_dimensions(), 1);
+          auto gidoff = MatrixFactory::create<int, NumDimensionsAtCompileTime(), 1>(num_dimensions(), 1);
           auto kernel_gid = MatrixFactory::create<int, NumDimensionsAtCompileTime(), 1>(num_dimensions(), 1);
-          auto res        = allocate_value<double>();
+          auto res = allocate_value<double>();
 
           _apply_convolution_kernel(0, kernel, gid, gidoff, kernel_gid, res);
 
@@ -1008,9 +1045,9 @@ namespace bk
                   return false;
               }
 
-              png_uint_32 width     = static_cast<png_uint_32>(size(0));
-              png_uint_32 height    = static_cast<png_uint_32>(size(1));
-              const int   bit_depth = 8;
+              png_uint_32 width = static_cast<png_uint_32>(size(0));
+              png_uint_32 height = static_cast<png_uint_32>(size(1));
+              const int bit_depth = 8;
 
               unsigned int numel = 1;
               if constexpr (bk::is_matrix_v<value_type>)
@@ -1070,7 +1107,7 @@ namespace bk
 
               for (png_uint_32 y = 0; y < height; ++y)
               {
-                  gid[1]    = y;
+                  gid[1] = y;
                   buffer[y] = new png_byte[width * numel];
 
                   for (png_uint_32 x = 0; x < width; ++x)
@@ -1199,7 +1236,7 @@ namespace bk
           png_init_io(png_ptr, file);
           png_set_sig_bytes(png_ptr, 8);
           png_read_info(png_ptr, info_ptr);
-          const png_uint_32 width  = png_get_image_width(png_ptr, info_ptr);
+          const png_uint_32 width = png_get_image_width(png_ptr, info_ptr);
           const png_uint_32 height = png_get_image_height(png_ptr, info_ptr);
           //const png_byte bit_depth = png_get_bit_depth(png_ptr, info_ptr); // unused
           //const int number_of_passes = png_set_interlace_handling(png_ptr); // unused
@@ -1219,12 +1256,12 @@ namespace bk
           png_bytepp png_data_raw = new png_bytep[height];
 
           const png_size_t rowsize = png_get_rowbytes(png_ptr, info_ptr);
-          for (png_uint_32 y       = 0; y < height; ++y)
+          for (png_uint_32 y = 0; y < height; ++y)
           { png_data_raw[y] = new png_byte[rowsize]; }
 
           png_read_image(png_ptr, png_data_raw);
-          const png_byte     color_type = png_get_color_type(png_ptr, info_ptr);
-          const unsigned int stride     = color_type == PNG_COLOR_TYPE_GRAY ? 1 : color_type == PNG_COLOR_TYPE_GA ? 2 : color_type == PNG_COLOR_TYPE_RGB ? 3 : 4;
+          const png_byte color_type = png_get_color_type(png_ptr, info_ptr);
+          const unsigned int stride = color_type == PNG_COLOR_TYPE_GRAY ? 1 : color_type == PNG_COLOR_TYPE_GA ? 2 : color_type == PNG_COLOR_TYPE_RGB ? 3 : 4;
 
           for (png_uint_32 y = 0; y < height; ++y)
           {

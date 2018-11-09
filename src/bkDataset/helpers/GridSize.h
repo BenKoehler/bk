@@ -115,6 +115,27 @@ namespace bk
       }
       /// @}
 
+      /// @{ -------------------------------------------------- OPERATOR==
+      template<int D>
+      [[nodiscard]] bool operator==(const GridSize<D>& other)
+      {
+          if (num_dimensions() != other.num_dimensions())
+          { return false; }
+
+          for (unsigned int i = 0; i < num_dimensions(); ++i)
+          {
+              if (_size[i] != other._size[i])
+              { return false; }
+          }
+
+          return true;
+      }
+
+      template<int D>
+      [[nodiscard]] bool operator!=(const GridSize<D>& other)
+      { return !operator==(other); }
+      /// @}
+
       //====================================================================================================
       //===== SETTER
       //====================================================================================================
