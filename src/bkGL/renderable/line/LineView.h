@@ -28,6 +28,7 @@
 #define BK_LINE4DVIEW_H
 
 #include <iterator>
+#include <limits>
 #include <string_view>
 #include <vector>
 
@@ -96,10 +97,12 @@ namespace bk
       [[nodiscard]] bool color_by_attribute_is_enabled() const;
       [[nodiscard]] GLfloat color_attribute_min() const;
       [[nodiscard]] GLfloat color_attribute_max() const;
-      /// @}
 
-      /// @{ -------------------------------------------------- COLOR BY ATTRIBUTE IS ENABLED
+    private:
+      [[nodiscard]]  static constexpr GLfloat _invalid_attribute_value() noexcept
+      { return std::numeric_limits<GLfloat>::max(); }
 
+    public:
       /// @}
 
       /// @{ -------------------------------------------------- GET ISL

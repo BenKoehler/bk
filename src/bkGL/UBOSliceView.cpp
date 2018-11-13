@@ -49,7 +49,8 @@ namespace bk::details
       BK_UBO_SPECIALIZATION_REGISTER(voxel_scale1, GL_FLOAT)
       BK_UBO_SPECIALIZATION_REGISTER(tf_center, GL_FLOAT)
       BK_UBO_SPECIALIZATION_REGISTER(tf_width, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_REGISTER(threshold, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_REGISTER(threshold_lower, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_REGISTER(threshold_upper, GL_FLOAT)
   }
 
   UBOSliceView::UBOSliceView(self_type&&) noexcept = default;
@@ -78,5 +79,6 @@ namespace bk::details
   BK_UBO_SPECIALIZATION_DEFINE(UBOSliceView, voxel_scale1, GL_FLOAT)
   BK_UBO_SPECIALIZATION_DEFINE(UBOSliceView, tf_center, GL_FLOAT)
   BK_UBO_SPECIALIZATION_DEFINE(UBOSliceView, tf_width, GL_FLOAT)
-  BK_UBO_SPECIALIZATION_DEFINE(UBOSliceView, threshold, GL_FLOAT)
+  BK_UBO_SPECIALIZATION_DEFINE(UBOSliceView, threshold_lower, GL_FLOAT)
+  BK_UBO_SPECIALIZATION_DEFINE(UBOSliceView, threshold_upper, GL_FLOAT)
 } // namespace bk::details

@@ -816,12 +816,9 @@ namespace bk
 
   unsigned int LineView::_floats_per_vertex() const
   {
-      unsigned int floatPerVertex = 3; // x y z
+      unsigned int floatPerVertex = 4; // x y z attribute
 
       if (_pdata->lines_have_time_attribute)
-      { ++floatPerVertex; }
-
-      if (_pdata->color_by_attribute_enabled || _pdata->lines_have_color_attribute)
       { ++floatPerVertex; }
 
       return floatPerVertex;
@@ -859,9 +856,9 @@ namespace bk
       {
           _pdata->color_attrib_min = std::numeric_limits<GLfloat>::max();
           _pdata->color_attrib_max = -_pdata->color_attrib_min;
-
-          _pdata->vao.add_default_attribute_scalar_1xfloat("colorAttribute");
       }
+
+      _pdata->vao.add_default_attribute_scalar_1xfloat("colorAttribute");
   }
 
   void LineView::_init_line_buffers(const std::vector<GLfloat>& vertices, const std::vector<GLuint>& indices, unsigned int num_points_total)
@@ -956,6 +953,7 @@ namespace bk
       _pdata->ubo.set_lineao_enabled(_pdata->lineao_enabled ? static_cast<GLint>(1) : static_cast<GLint>(0));
       _pdata->ubo.set_lineao_anisotropic(_pdata->lineao_anisotropic ? static_cast<GLint>(1) : static_cast<GLint>(0));
       _pdata->ubo.set_scale_attrib_to_colorbar(_pdata->scale_attrib_to_colorbar ? static_cast<GLint>(1) : static_cast<GLint>(0));
+      _pdata->ubo.set_invalid_attrib_value(_invalid_attribute_value());
 
       _pdata->ubo.release();
   }

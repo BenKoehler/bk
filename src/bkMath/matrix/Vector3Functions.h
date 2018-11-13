@@ -423,6 +423,7 @@ namespace bk::details
               static_assert((bk::is_static_vector_v<std::decay_t<TVec1>> && ((std::decay_t<TVec1>::RowsAtCompileTime() == 3 && std::decay_t<TVec1>::ColsAtCompileTime() == 1) || (std::decay_t<TVec1>::RowsAtCompileTime() == 1 && std::decay_t<TVec1>::ColsAtCompileTime() == 3))) || bk::is_dynamic_matrix_v<std::decay_t<TVec1>>);
               assert(matrix_traits(*rotAxis_out).is_vector_of_size(3));
               assert(rotAxis_out->num_elements() == 3);
+
               *rotAxis_out = std::move(rotAxis);
           }
           return true;

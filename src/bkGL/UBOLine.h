@@ -99,6 +99,7 @@ namespace bk::details
       BK_UBO_SPECIALIZATION_DECLARE(lineao_enabled, GL_INT)
       BK_UBO_SPECIALIZATION_DECLARE(lineao_anisotropic, GL_INT)
       BK_UBO_SPECIALIZATION_DECLARE(scale_attrib_to_colorbar, GL_INT)
+      BK_UBO_SPECIALIZATION_DECLARE(invalid_attrib_value, GL_FLOAT)
   }; // class UBOLine
 } // namespace bk::details
 

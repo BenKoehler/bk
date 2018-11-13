@@ -405,6 +405,16 @@ namespace bk
                   _pdata->colorbarview.init_magenta();
                   break;
               }
+              case ColorScaleType::LightBlueToYellow:
+              {
+                  _pdata->colorbarview.init_light_blue_to_black_to_yellow();
+                  break;
+              }
+              case ColorScaleType::GreenToRed:
+              {
+                  _pdata->colorbarview.init_green_to_white_to_red();
+                  break;
+              }
                   //case ColorScaleType::Gray: [[fallthrough]]
                   //case ColorScaleType::Cluster: [[fallthrough]]
                   //case ColorScaleType::TrafficLight: [[fallthrough]]
@@ -439,6 +449,18 @@ namespace bk
   {
       _pdata->colorscale_type = ColorScaleType::Magenta;
       _set_colorbar(ColorBarRGBA::Magenta());
+  }
+
+  void TriangularMesh3DView::set_colorbar_light_blue_to_yellow()
+  {
+      _pdata->colorscale_type = ColorScaleType::LightBlueToYellow;
+      _set_colorbar(ColorBarRGBA::Light_Blue_Black_Yellow());
+  }
+
+  void TriangularMesh3DView::set_colorbar_green_to_red()
+  {
+      _pdata->colorscale_type = ColorScaleType::GreenToRed;
+      _set_colorbar(ColorBarRGBA::Green_White_Red());
   }
   /// @}
 

@@ -177,6 +177,8 @@ namespace bk
       void set_colorbar_rainbow();
       void set_colorbar_blue_to_red();
       void set_colorbar_magenta();
+      void set_colorbar_light_blue_to_yellow();
+      void set_colorbar_green_to_red();
       /// @}
 
       /// @{ -------------------------------------------------- OPERATOR =

@@ -45,7 +45,8 @@ namespace bk
   {
       Shader shader_live_threshold_overlay;
       bool slice_changed;
-      GLfloat threshold;
+      GLfloat threshold_lower;
+      GLfloat threshold_upper;
 
           #ifndef BK_LIB_QT_AVAILABLE
       Impl() :
@@ -55,7 +56,8 @@ namespace bk
           : shader_live_threshold_overlay(gl),
           #endif
             slice_changed(false),
-            threshold(0.5)
+            threshold_lower(0.5),
+            threshold_upper(1)
       { /* do nothing */ }
 
       Impl(const Impl&) = delete;
@@ -82,19 +84,24 @@ namespace bk
   //====================================================================================================
   //===== GETTER
   //====================================================================================================
-  auto GrayImageLiveThresholdSliceView::threshold() const -> GLfloat
-  { return _pdata->threshold; }
+  GLfloat GrayImageLiveThresholdSliceView::threshold_lower() const 
+  { return _pdata->threshold_lower; }
+
+  GLfloat GrayImageLiveThresholdSliceView::threshold_upper() const
+  { return _pdata->threshold_upper; }
 
   //====================================================================================================
   //===== SETTER
   //====================================================================================================
-  void GrayImageLiveThresholdSliceView::set_threshold(GLfloat threshold)
+  void GrayImageLiveThresholdSliceView::set_threshold(GLfloat threshold_lower, GLfloat threshold_upper)
   {
-      _pdata->threshold = threshold;
+      _pdata->threshold_lower = threshold_lower;
+      _pdata->threshold_upper = threshold_upper;
 
       if (this->is_initialized())
       {
-          _ubo().set_threshold(_pdata->threshold);
+          _ubo().set_threshold_lower(_pdata->threshold_lower);
+          _ubo().set_threshold_upper(_pdata->threshold_upper);
           _ubo().release();
 
           this->emit_signal_update_required();

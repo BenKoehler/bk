@@ -1571,19 +1571,16 @@ namespace bk::details
 
       s << comment_region_input();
       s << "layout(location = 0) in " << posType << " position_in;\n";
-      if (colorEnabled)
-      { s << "layout(location = 1) in float attrib_in;\n"; }
+      s << "layout(location = 1) in float attrib_in;\n";
 
       s << comment_region_output();
       s << "layout(location = 0) out " << posType << " position_geom;\n";
-      if (colorEnabled && linesHaveColor)
-      { s << "layout(location = 1) out float attrib_geom;\n"; }
+      s << "layout(location = 1) out float attrib_geom;\n";
 
       s << comment_region_functions();
       s << function_main_begin();
       s << "   position_geom = position_in;\n";
-      if (colorEnabled && linesHaveColor)
-      { s << "   attrib_geom = attrib_in;\n"; }
+      s << "   attrib_geom = attrib_in;\n";
       s << function_main_end();
 
       return s.str();
@@ -1614,8 +1611,7 @@ namespace bk::details
       s << comment_region_input();
       s << "// line strip with adjacency\n";
       s << "layout(location = 0) in " << posType << " position_geom[4];\n";
-      if (colorEnabled && linesHaveColor)
-      { s << "layout(location = 1) in float attrib_geom[4];\n"; }
+      s << "layout(location = 1) in float attrib_geom[4];\n";
       s << ubo_definition_global();
       s << ubo_definition_line();
       s << geom_layout_in_lines_adjacency();
@@ -1631,6 +1627,9 @@ namespace bk::details
       s << comment_region_functions();
       s << function_camera_position();
       s << function_main_begin();
+
+      s << "   if (abs(attrib_geom[1] - " << UBOLine::name_invalid_attrib_value() << ") > 1e-2 && abs(attrib_geom[2] - " << UBOLine::name_invalid_attrib_value() << ") > 1e-2) {\n";
+
       if (linesHaveTime && animationEnabled)
       {
           s << "   const float dt0 = abs(position_geom[1][3] - " << bk::details::UBOGlobal::name_animation_current_time() << ");\n";
@@ -1761,6 +1760,8 @@ namespace bk::details
 
       if (animationEnabled && linesHaveTime)
       { s << "   }\n"; }
+
+      s << "   }\n"; // invalid attribute
 
       s << function_main_end();
 
@@ -2330,19 +2331,16 @@ namespace bk::details
 
       s << comment_region_input();
       s << "layout(location = 0) in " << posType << " position_in;\n";
-      if (colorEnabled)
-      { s << "layout(location = 1) in float attrib_in;\n"; }
+      s << "layout(location = 1) in float attrib_in;\n";
 
       s << comment_region_output();
       s << "layout(location = 0) out " << posType << " position_geom;\n";
-      if (colorEnabled && linesHaveColor)
-      { s << "layout(location = 1) out float attrib_geom;\n"; }
+      s << "layout(location = 1) out float attrib_geom;\n";
 
       s << comment_region_functions();
       s << function_main_begin();
       s << "   position_geom = position_in;\n";
-      if (colorEnabled && linesHaveColor)
-      { s << "   attrib_geom = attrib_in;;\n"; }
+      s << "   attrib_geom = attrib_in;;\n";
       s << function_main_end();
 
       return s.str();
@@ -2372,8 +2370,7 @@ namespace bk::details
 
       s << comment_region_input();
       s << "layout(location = 0) in " << posType << " position_geom[4]; // line strip with adjacency\n";
-      if (colorEnabled && linesHaveColor)
-      { s << "layout(location = 1) in float attrib_geom[4];\n"; }
+      s << "layout(location = 1) in float attrib_geom[4];\n";
       s << ubo_definition_global();
       s << ubo_definition_line();
       s << geom_layout_in_lines_adjacency();
@@ -2391,6 +2388,8 @@ namespace bk::details
       s << comment_region_functions();
       s << function_camera_position();
       s << function_main_begin();
+
+      s << "   if (abs(attrib_geom[1] - " << UBOLine::name_invalid_attrib_value() << ") > 1e-2 && abs(attrib_geom[2] - " << UBOLine::name_invalid_attrib_value() << ") > 1e-2) {\n";
 
       const std::string indent = linesHaveTime && animationEnabled ? "   " : "";
 
@@ -2485,6 +2484,9 @@ namespace bk::details
       s << indent << "   EmitVertex();\n";
       if (linesHaveTime && animationEnabled)
       { s << "   }\n"; }
+
+      s << "   }\n"; // invalid attribute
+
       s << function_main_end();
 
       return s.str();
@@ -3360,7 +3362,7 @@ namespace bk::details
 
       s << "   const uint id = uint((position_in.y)*(" << bk::details::UBOSliceView::name_xyzt_max0() << "+1) + (position_in.x));\n\n";
 
-      s << "   if (intensity[id] < " << bk::details::UBOSliceView::name_threshold() << ")\n";
+      s << "   if (intensity[id] >= " << bk::details::UBOSliceView::name_threshold_lower() << " && intensity[id] <= " << bk::details::UBOSliceView::name_threshold_upper() << ")\n";
       s << "   { color_frag.a = 0.5; }\n";
       s << function_main_end();
 

@@ -61,8 +61,8 @@ namespace bk::details
       //===== SETTER
       //====================================================================================================
       /// @{ -------------------------------------------------- OPERATOR =
-      auto operator=(const self_type& other) -> self_type& = default;
-      auto operator=(self_type&& other) noexcept -> self_type& = default;
+      [[maybe_unused]] auto operator=(const self_type& other) -> self_type& = default;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type& = default;
       /// @}
 
       //====================================================================================================
@@ -87,7 +87,7 @@ namespace bk::details
       /// @}
 
       /// @{ -------------------------------------------------- TANGENT AT POINT
-      Vec<TDims, double> tangent_at_point(unsigned int pointId) const
+      [[nodiscard]] Vec<TDims, double> tangent_at_point(unsigned int pointId) const
       {
           const unsigned int nPoints = this->geometry().num_points();
 
@@ -106,7 +106,7 @@ namespace bk::details
       /// @}
 
       /// @{ -------------------------------------------------- LENGTH
-      double length() const
+      [[nodiscard]] double length() const
       {
           double len = 0.0;
           const unsigned int nPoints = this->geometry().num_points();

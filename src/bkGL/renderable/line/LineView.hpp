@@ -28,7 +28,7 @@
 #define BKGL_LINEVIEW_HPP
 
 #include <bkGL/renderable/line/LineView.h>
-#include <bkAlgorithm/quantile.h> // todo
+#include <bkAlgorithm/quantile.h>
 
 namespace bk
 {
@@ -87,20 +87,19 @@ namespace bk
           { break; }
       }
 
-      if (!_lines_have_color_attribute())
+      //if (!_lines_have_color_attribute())
+      if (!this->is_initialized())
       {
-          init(linesBegin, linesEnd, "", filter);
+          init(linesBegin, linesEnd, color_attribute_name, filter);
           return;
       }
 
       //------------------------------------------------------------------------------------------------------
       // colors values were allocated in the vbo; map and overwrite
       //------------------------------------------------------------------------------------------------------
-      const bool useQuantiles = quantile_low != 0 && quantile_high != 1;
-
       std::vector<GLfloat> attrib_values;
-      if (useQuantiles)
-      { attrib_values.reserve(num_points_total); }
+      if (_lines_have_color_attribute())
+      { attrib_values.resize(num_points_total); }
 
       _reset_color_attribute_min_max();
 
@@ -109,7 +108,7 @@ namespace bk
       {
           const unsigned int floatsPerVertex = _floats_per_vertex();
 
-          #pragma omp parallel for
+          #pragma omp parallel for schedule(dynamic, 1)
           for (unsigned int i = 0; i < num_lines; ++i)
           {
               const bk::Line<3>& currentLine = *(linesBegin + i);
@@ -120,43 +119,38 @@ namespace bk
               {
                   const bool filter_valid = filter != nullptr ? filter->eval(currentLine, k) : true;
 
-                  const GLfloat att = _lines_have_color_attribute() ? currentLine.point_attribute_value_of_type<double>(color_attribute_name, k) : 0;
+                  GLfloat att = !filter_valid ? _invalid_attribute_value() : _lines_have_color_attribute() ? currentLine.point_attribute_value_of_type<double>(color_attribute_name, k) : 0;
 
                   if (_lines_have_color_attribute())
-                  {
-                      if (useQuantiles)
-                      {
-                          #pragma omp critical
-                          { attrib_values.push_back(att); }
-                      }
-                      else
-                      {
-                          #pragma omp critical
-                          { _update_attribute_min_max(att); }
-                      }
-                  }
+                  { attrib_values[cumulative_num_points[i] + k] = att; }
 
-                  if (filter_valid)
-                  {
-                      cnt_v += floatsPerVertex - 1;
-
-                      if (_lines_have_color_attribute() || color_by_attribute_is_enabled())
-                      { vbodata[cnt_v++] = att; }
-                  }
+                  cnt_v += floatsPerVertex - 1;
+                  vbodata[cnt_v++] = att;
               } // for num_points
           } // for num_lines
 
           _unmap_vbo();
 
-          if (useQuantiles)
+          if (_lines_have_color_attribute())
           {
               std::sort(attrib_values.begin(), attrib_values.end());
-              _update_attribute_min_max(bk::quantile(attrib_values.begin(), attrib_values.end(), quantile_low));
-              _update_attribute_min_max(bk::quantile(attrib_values.begin(), attrib_values.end(), quantile_high));
-          }
+              attrib_values.erase(std::remove_if(attrib_values.begin(), attrib_values.end(), [&](GLfloat x)
+              { return x == _invalid_attribute_value(); }), attrib_values.end());
 
-          _finalize_set_color_attribute();
-          _init_colorbar(color_attribute_name, custom_colorbar_title);
+              if (quantile_low != 0 && quantile_high != 1)
+              {
+                  _update_attribute_min_max(bk::quantile(attrib_values.begin(), attrib_values.end(), quantile_low));
+                  _update_attribute_min_max(bk::quantile(attrib_values.begin(), attrib_values.end(), quantile_high));
+              }
+              else
+              {
+                  _update_attribute_min_max(attrib_values.front());
+                  _update_attribute_min_max(attrib_values.back());
+              }
+
+              _finalize_set_color_attribute();
+              _init_colorbar(color_attribute_name, custom_colorbar_title);
+          }
 
           init_shader();
           init_lineao_shader();
@@ -229,66 +223,38 @@ namespace bk
               const bool filter_valid = filter != nullptr ? filter->eval(currentLine, k) : true;
               const auto& pt = currentLine.geometry().point(k);
 
-              const GLfloat att = _lines_have_color_attribute() ? currentLine.point_attribute_value_of_type<double>(color_attribute_name, k) : 0;
+              GLfloat att = _lines_have_color_attribute() ? currentLine.point_attribute_value_of_type<double>(color_attribute_name, k) : 0;
+              if (!filter_valid)
+              { att = _invalid_attribute_value(); }
 
               if (_lines_have_color_attribute())
               {
-                  //if (useQuantiles)
-                  //{
-                  //    #pragma omp critical
-                  //    { attrib_values.push_back(att); }
-                  //}
-                  //else
+                  if (att != _invalid_attribute_value())
                   {
                       #pragma omp critical
                       { _update_attribute_min_max(att); }
                   }
               }
 
-              if (!filter_valid)
+              if (k == 0 || k == num_points - 1)
               {
-                  if (k == 0 || k == num_points - 1)
-                  {
-                      // insert first and last point twice for line adjacency
-                      indices[cnt_i++] = std::numeric_limits<GLuint>::max();
-                  }
-
-                  indices[cnt_i++] = std::numeric_limits<GLuint>::max();
+                  // insert first and last point twice for line adjacency
+                  indices[cnt_i++] = vert_id;
               }
-              else
-              {
-                  if (k == 0 || k == num_points - 1)
-                  {
-                      // insert first and last point twice for line adjacency
-                      indices[cnt_i++] = vert_id;
-                  }
 
-                  indices[cnt_i++] = vert_id++;
+              indices[cnt_i++] = vert_id++;
 
-                  vertices[cnt_v++] = pt[0];
-                  vertices[cnt_v++] = pt[1];
-                  vertices[cnt_v++] = pt[2];
+              vertices[cnt_v++] = pt[0];
+              vertices[cnt_v++] = pt[1];
+              vertices[cnt_v++] = pt[2];
 
-                  if (_lines_have_time_attribute())
-                  { vertices[cnt_v++] = currentLine.point_attribute_value<bk::attribute_info::time()>(k); }
+              if (_lines_have_time_attribute())
+              { vertices[cnt_v++] = currentLine.point_attribute_value<bk::attribute_info::time()>(k); }
 
-                  #pragma omp critical
-                  { _add_to_center(pt[0], pt[1], pt[2]); }
+              #pragma omp critical
+              { _add_to_center(pt[0], pt[1], pt[2]); }
 
-                  if (_lines_have_color_attribute() || color_by_attribute_is_enabled())
-                  {
-                      //const GLfloat att = currentLine.point_attribute_value_of_type<double>(color_attribute_name, k);
-                      vertices[cnt_v++] = att;
-
-                      //#pragma omp critical
-                      //{ _update_attribute_min_max(att); }
-                  }
-                  //else if (color_by_attribute_is_enabled())
-                  //{
-                      // reserve color attribute space for later
-                      //vertices[cnt_v++] = 0;
-                  //}
-              }
+              vertices[cnt_v++] = att;
           } // for num_points
 
           if (i < num_lines - 1)

@@ -85,7 +85,8 @@ namespace bk::details
       BK_UBO_SPECIALIZATION_DECLARE(voxel_scale1, GL_FLOAT)
       BK_UBO_SPECIALIZATION_DECLARE(tf_center, GL_FLOAT)
       BK_UBO_SPECIALIZATION_DECLARE(tf_width, GL_FLOAT)
-      BK_UBO_SPECIALIZATION_DECLARE(threshold, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_DECLARE(threshold_lower, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_DECLARE(threshold_upper, GL_FLOAT)
   }; // class UBOSliceView
 } // namespace bk::details
 

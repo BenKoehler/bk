@@ -37,7 +37,7 @@ namespace bk
 {
   /// @{ -------------------------------------------------- BINOMIAL SMOOTHING
   template<typename Iter, typename T = typename std::iterator_traits<Iter>::value_type>
-  void smooth_binomial(Iter first, Iter last, unsigned int iterations, unsigned int kernel_size, T zero_val = T())
+  void smooth_binomial(Iter first, Iter last, unsigned int iterations, unsigned int kernel_size, T zero_val = T(), bool zero_val_boundary = false)
   {
       if (iterations == 0 || kernel_size < 2)
       { return; }
@@ -76,16 +76,30 @@ namespace bk
           read = it % 2 == 0 ? &temp0 : &temp1;
 
           #pragma omp parallel for
-          for (unsigned int i = ks / 2; i < N - ks / 2; ++i)
+          for (unsigned int i = (zero_val_boundary ? 0 : ks / 2); i < (zero_val_boundary ? N : N - ks / 2); ++i)
           {
               (*write)[i] = zero_val;
 
               for (unsigned int k = 0; k < ks; ++k)
               {
                   const int off = -static_cast<int>(ks / 2) + static_cast<int>(k);
-                  (*write)[i] += (*read)[i + off] * w[k];
+
+                  if (static_cast<int>(i) + off >= 0 && static_cast<int>(i) + off < static_cast<int>(N))
+                  { (*write)[i] += (*read)[i + off] * w[k]; }
               }
           } // for i: N
+
+          //#pragma omp parallel for
+          //for (unsigned int i = ks / 2; i < N - ks / 2; ++i)
+          //{
+          //    (*write)[i] = zero_val;
+          //
+          //    for (unsigned int k = 0; k < ks; ++k)
+          //    {
+          //        const int off = -static_cast<int>(ks / 2) + static_cast<int>(k);
+          //        (*write)[i] += (*read)[i + off] * w[k];
+          //    }
+          //} // for i: N
 
           for (unsigned int i = 0; i < ks / 2; ++i)
           { (*write)[i] = (*read)[i]; }
@@ -106,7 +120,7 @@ namespace bk
 
   /// @{ -------------------------------------------------- SMOOTH LAMBDA/MU
   template<typename Iter, typename T = typename std::iterator_traits<Iter>::value_type>
-  void smooth_lambda_mu(Iter first, Iter last, unsigned int iterations, unsigned int kernel_size, double lambda, double mu, T zero_val = T())
+  void smooth_lambda_mu(Iter first, Iter last, unsigned int iterations, unsigned int kernel_size, double lambda, double mu, T zero_val = T(), bool zero_val_boundary = false)
   {
       if (iterations == 0 || kernel_size < 1 || (lambda == 0 && mu == 0))
       { return; }
@@ -133,19 +147,24 @@ namespace bk
           const double w = (it % 2 == 0 ? lambda : mu);
 
           #pragma omp parallel for
-          for (unsigned int i = ks / 2; i < N - ks / 2; ++i)
+          for (unsigned int i = (zero_val_boundary ? 0 : ks / 2); i < (zero_val_boundary ? N : N - ks / 2); ++i)
           {
               T mean = zero_val;
+
               for (unsigned int k = 0; k < ks / 2; ++k)
               {
                   const int off = -static_cast<int>(ks / 2) + static_cast<int>(k);
-                  mean += (*read)[i + off];
+
+                  if (static_cast<int>(i) + off >= 0)
+                  { mean += (*read)[i + off]; }
               }
 
               for (unsigned int k = ks / 2 + 1; k < ks; ++k)
               {
                   const int off = -static_cast<int>(ks / 2) + static_cast<int>(k);
-                  mean += (*read)[i + off];
+
+                  if (static_cast<int>(i) + off < static_cast<int>(N))
+                  { mean += (*read)[i + off]; }
               }
 
               mean /= (ks - 1);
@@ -155,6 +174,31 @@ namespace bk
 
               (*write)[i] = (*read)[i] + diff;
           } // for i: N
+
+          //#pragma omp parallel for
+          //for (unsigned int i = ks / 2; i < N - ks / 2; ++i)
+          //{
+          //    T mean = zero_val;
+          //
+          //    for (unsigned int k = 0; k < ks / 2; ++k)
+          //    {
+          //        const int off = -static_cast<int>(ks / 2) + static_cast<int>(k);
+          //        mean += (*read)[i + off];
+          //    }
+          //
+          //    for (unsigned int k = ks / 2 + 1; k < ks; ++k)
+          //    {
+          //        const int off = -static_cast<int>(ks / 2) + static_cast<int>(k);
+          //        mean += (*read)[i + off];
+          //    }
+          //
+          //    mean /= (ks - 1);
+          //
+          //    T diff = mean - (*read)[i];
+          //    diff *= w;
+          //
+          //    (*write)[i] = (*read)[i] + diff;
+          //} // for i: N
 
           for (unsigned int i = 0; i < ks / 2; ++i)
           { (*write)[i] = (*read)[i]; }

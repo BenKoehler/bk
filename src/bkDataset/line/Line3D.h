@@ -123,12 +123,7 @@ namespace bk
       /// @{ -------------------------------------------------- CALC CONSISTENT LOCAL COORDINATE SYSTEM
       [[maybe_unused]] bool calc_consistent_local_coordinate_systems(unsigned int binomial_smooth_iterations = 25, unsigned int binomial_smooth_kernel_size = 5)
       {
-          using mat3D_vector_type = std::vector<Mat3d>;
-          mat3D_vector_type temp;
-
-          std::any a(temp);
-          mat3D_vector_type& point_lcs = *std::any_cast<mat3D_vector_type>(std::addressof(a));
-          point_lcs.resize(this->geometry().num_points());
+          this->point_attribute_map().remove_attribute(LocalCoordinateSystemAttributeName());
 
           const unsigned int nPoints = this->geometry().num_points();
           if (nPoints == 0)
@@ -137,12 +132,16 @@ namespace bk
               return false;
           }
 
+          const Mat3d lcs0 = local_coordinate_system_at_point(0);
+
           #ifdef BK_EMIT_PROGRESS
           bk::Progress& prog = bk_progress.emplace_task(3 * nPoints, ___("Calculating consistent local coordinate system"));
           #endif
 
+          std::vector<Mat3d>& point_lcs = this->add_point_attribute_vector_of_type<Mat3d>(LocalCoordinateSystemAttributeName());
+
           // initialization: calculate lcs of first point
-          point_lcs[0] = local_coordinate_system_at_point(0);
+          point_lcs[0] = lcs0;
 
           #ifdef BK_EMIT_PROGRESS
           prog.increment(1);
@@ -197,7 +196,6 @@ namespace bk
           /*
            * smoothing
            */
-          //bk::smooth_binomial(point_lcs.begin(), point_lcs.end(), point_lcs.begin(), binomial_smooth_iterations, binomial_smooth_kernel_size, MatrixFactory::Zero_Mat_3D());
           bk::smooth_binomial(point_lcs.begin(), point_lcs.end(), binomial_smooth_iterations, binomial_smooth_kernel_size, MatrixFactory::Zero_Mat_3D());
 
           #ifdef BK_EMIT_PROGRESS
@@ -207,17 +205,13 @@ namespace bk
           #pragma omp parallel for
           for (unsigned int pointId = 0; pointId < nPoints; ++pointId)
           {
-              point_lcs[pointId].col_ref<0>().normalize_internal();
-              point_lcs[pointId].col_ref<1>().normalize_internal();
-              point_lcs[pointId].col_ref<2>().normalize_internal();
+              point_lcs[pointId].normalize_cols_internal();
 
               #ifdef BK_EMIT_PROGRESS
               #pragma omp critical
               { prog.increment(1); }
               #endif
           }
-
-          this->point_attribute_map().add_attribute(LocalCoordinateSystemAttributeName(), a);
 
           #ifdef BK_EMIT_PROGRESS
           prog.set_finished();

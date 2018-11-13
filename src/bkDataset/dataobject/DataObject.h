@@ -337,7 +337,7 @@ namespace bk
       //! @param lambda must be positive € [0,1]
       //! @param mu must be negative € [-1,lambda)
       template<typename T>
-      [[maybe_unused]] bool smooth_point_attribute_laplace_lambda_mu_of_type(unsigned long long attribute_hash, unsigned int num_iterations = 50, double lambda = 0.5, double mu = -0.5)
+      [[maybe_unused]] bool smooth_point_attribute_laplace_lambda_mu_of_type(unsigned long long attribute_hash, unsigned int num_iterations = 50, double lambda = 0.5, double mu = -0.5, T zeroVal = T())
       {
           SmoothPointValuesFilter f;
           f.set_num_iterations(num_iterations);
@@ -346,7 +346,7 @@ namespace bk
 
           auto& attribute_values = this->template point_attribute_vector_of_type<T>(attribute_hash);
           std::vector<T> copied_attribute_values(attribute_values.begin(), attribute_values.end());
-          auto smoothed_attribute_values = f.apply(*this, std::move(copied_attribute_values), T());
+          auto smoothed_attribute_values = f.apply(*this, std::move(copied_attribute_values), zeroVal);
 
           if (smoothed_attribute_values.size() == _geometry.num_points())
           {
@@ -358,17 +358,17 @@ namespace bk
       }
 
       template<typename T>
-      [[maybe_unused]] bool smooth_point_attribute_laplace_lambda_mu_of_type(std::string_view attribute_name, unsigned int num_iterations = 50, double lambda = 0.5, double mu = -0.5)
+      [[maybe_unused]] bool smooth_point_attribute_laplace_lambda_mu_of_type(std::string_view attribute_name, unsigned int num_iterations = 50, double lambda = 0.5, double mu = -0.5, T zeroVal = T())
       {
           const unsigned long long h = _point_attributes.hash(attribute_name);
-          return smooth_point_attribute_laplace_lambda_mu_of_type<T>(h, num_iterations, lambda, mu);
+          return smooth_point_attribute_laplace_lambda_mu_of_type<T>(h, num_iterations, lambda, mu, zeroVal);
       }
 
       template<unsigned long long TAttributeHash>
-      [[maybe_unused]] bool smooth_point_attribute_laplace_lambda_mu(unsigned int num_iterations = 50, double lambda = 0.5, double mu = -0.5)
+      [[maybe_unused]] bool smooth_point_attribute_laplace_lambda_mu(unsigned int num_iterations = 50, double lambda = 0.5, double mu = -0.5, attribute_info::type_of_t<TAttributeHash> zeroVal = attribute_info::type_of_t<TAttributeHash>())
       {
           using T = attribute_info::type_of_t<TAttributeHash>;
-          return smooth_point_attribute_laplace_lambda_mu_of_type<T>(TAttributeHash, num_iterations, lambda, mu);
+          return smooth_point_attribute_laplace_lambda_mu_of_type<T>(TAttributeHash, num_iterations, lambda, mu, zeroVal);
       }
       /// @}
   }; // class DataObject

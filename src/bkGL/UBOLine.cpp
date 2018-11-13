@@ -63,6 +63,7 @@ namespace bk::details
       BK_UBO_SPECIALIZATION_REGISTER(lineao_enabled, GL_INT)
       BK_UBO_SPECIALIZATION_REGISTER(lineao_anisotropic, GL_INT)
       BK_UBO_SPECIALIZATION_REGISTER(scale_attrib_to_colorbar, GL_INT)
+      BK_UBO_SPECIALIZATION_REGISTER(invalid_attrib_value, GL_FLOAT)
   }
 
   UBOLine::UBOLine(self_type&&) noexcept = default;
@@ -105,4 +106,5 @@ namespace bk::details
   BK_UBO_SPECIALIZATION_DEFINE(UBOLine, lineao_enabled, GL_INT)
   BK_UBO_SPECIALIZATION_DEFINE(UBOLine, lineao_anisotropic, GL_INT)
   BK_UBO_SPECIALIZATION_DEFINE(UBOLine, scale_attrib_to_colorbar, GL_INT)
+  BK_UBO_SPECIALIZATION_DEFINE(UBOLine, invalid_attrib_value, GL_FLOAT)
 } // namespace bk::details

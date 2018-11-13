@@ -98,6 +98,14 @@ namespace bk::attribute_info
   BK_DEFINE_ATTRIBUTE_HASH(temp4_double, double)
 
   BK_DEFINE_ATTRIBUTE_HASH(id, int)
+
+  BK_DEFINE_ATTRIBUTE_HASH(wall_shear_stress, MatXd)
+
+  BK_DEFINE_ATTRIBUTE_HASH(wall_shear_stress_vector, MatXd)
+
+  BK_DEFINE_ATTRIBUTE_HASH(wall_shear_stress_mean, double)
+
+  BK_DEFINE_ATTRIBUTE_HASH(wall_shear_stress_mean_vector, Vec3d)
 } // namespace bk::attribute_info
 
 //#undef BK_DEFINE_ATTRIBUTE_HASH
