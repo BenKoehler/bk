@@ -163,6 +163,7 @@ namespace bk
                                                               prog.increment(N);
                                                               #endif
                                                           });
+
           auto fut_set_y_boundary = bk_threadpool.enqueue([&]()
                                                           {
                                                               for (unsigned int z = 0; z < s[2]; ++z)
@@ -178,6 +179,7 @@ namespace bk
                                                               prog.increment(N);
                                                               #endif
                                                           });
+
           auto fut_set_x_boundary = bk_threadpool.enqueue([&]()
                                                           {
                                                               for (unsigned int z = 0; z < s[2]; ++z)
@@ -193,6 +195,7 @@ namespace bk
                                                               prog.increment(N);
                                                               #endif
                                                           });
+
           fut_set_inner.get();
           fut_set_z_boundary.get();
           fut_set_y_boundary.get();
@@ -399,13 +402,6 @@ namespace bk
           } // for z
 
           // correct the 0-boundary
-          //const auto scl = img.geometry().transformation().scale();
-          //#pragma omp parallel for
-          //for (int i = 0; i < static_cast<int>(mesh.geometry().num_points()); ++i)
-          //{
-          //    mesh.geometry().point(i) -= scl;
-          //}
-
           const auto p0 = img.geometry().transformation().to_world_coordinates(Vec3d(0, 0, 0));
           const auto p1 = img.geometry().transformation().to_world_coordinates(Vec3d(1, 1, 1));
           const auto correction = p1 - p0;

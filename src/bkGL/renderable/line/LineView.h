@@ -103,6 +103,9 @@ namespace bk
       { return std::numeric_limits<GLfloat>::max(); }
 
     public:
+
+      [[nodiscard]] ColorBarView& colorbarview();
+      [[nodiscard]] const ColorBarView& colorbarview() const;
       /// @}
 
       /// @{ -------------------------------------------------- GET ISL
@@ -171,6 +174,8 @@ namespace bk
       void set_colorbar_traffic_light();
       void set_colorbar_cluster();
       void set_colorbar_light_blue_to_yellow();
+
+      void set_enable_colorbar(bool b);
       /// @}
 
       /// @{ -------------------------------------------------- HELPERS: SET COLOR ATTRIBUTE

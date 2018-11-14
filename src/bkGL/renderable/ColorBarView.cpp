@@ -61,8 +61,9 @@ namespace bk
       inline static GLfloat height_in_percent = 0.066;
       inline static bk::ColorRGBA color_text = bk::ColorRGBA(1, 1, 1, 1);
       inline static bk::ColorRGBA color_text_background = bk::ColorRGBA(0, 0, 0, 0.5);
-      inline static GLfloat scale_text = 0.66;
-      inline static double boundary_width_in_screenCoords = 0.2;
+      inline static constexpr GLfloat scale_text = 0.66;
+      inline static constexpr double boundary_x_width_in_screenCoords = 0.3;
+      inline static constexpr double boundary_y_width_in_screenCoords = 0.05;
       std::string title;
       bool linear_interpolation_enabled;
       bk::Signal<std::string> s_title_changed;
@@ -414,11 +415,11 @@ namespace bk
   std::tuple<double, double, double, double> ColorBarView::_minx_maxx_miny_maxy_screen_pos() const
   {
       const double width_percent_screenCoords = 2.0 * _pdata->width_in_percent;
-      const double minx = _pdata->position_horizontal_right ? 1.0 - _pdata->boundary_width_in_screenCoords - width_percent_screenCoords : -1.0 + _pdata->boundary_width_in_screenCoords;
+      const double minx = _pdata->position_horizontal_right ? 1.0 - _pdata->boundary_x_width_in_screenCoords - width_percent_screenCoords : -1.0 + _pdata->boundary_x_width_in_screenCoords;
       const double maxx = minx + width_percent_screenCoords;
 
       constexpr double yOffScale = 2.5;
-      const double miny = -1.0 + _pdata->boundary_width_in_screenCoords + _pdata->position_vertical * _pdata->height_in_percent * yOffScale;
+      const double miny = -1.0 + _pdata->boundary_y_width_in_screenCoords + _pdata->position_vertical * _pdata->height_in_percent * yOffScale;
       const double maxy = miny + _pdata->height_in_percent;
 
       return std::make_tuple(minx, maxx, miny, maxy);

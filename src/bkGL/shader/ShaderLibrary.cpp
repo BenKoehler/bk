@@ -822,7 +822,7 @@ namespace bk::details
       return s.str();
   }
 
-  std::string ShaderLibrary::mesh::phong::details::default_frag_get_color_from_attribute()
+  std::string ShaderLibrary::mesh::phong::details::default_frag_get_color_from_attribute(bool timeDependentAttribute)
   {
       std::stringstream s;
 
@@ -830,13 +830,23 @@ namespace bk::details
 
       s << "   if (color_enabled != 0)\n";
       s << "   {\n";
-      s << "       if (attrib_frag <= " << bk::details::UBOPhong::name_min_attribute_value() << ")\n";
+      if (!timeDependentAttribute)
+      { s << "       const float attribVal = attrib_t0_frag;\n\n"; }
+      else
+      {
+          s << "       const float t = " << bk::details::UBOGlobal::name_animation_current_time() << " / " << bk::details::UBOPhong::name_temporal_resolution() << ";\n";
+          s << "       const float t0 = floor(t);\n";
+          s << "       const float tw = t - t0;\n";
+          s << "       const float attribVal = mix(attrib_t0_frag, attrib_t1_frag, tw);\n\n";
+      }
+
+      s << "       if (attribVal <= " << bk::details::UBOPhong::name_min_attribute_value() << ")\n";
       s << "       { color = ColorBar[0]; }\n";
-      s << "       else if (attrib_frag >= " << bk::details::UBOPhong::name_max_attribute_value() << ")\n";
+      s << "       else if (attribVal >= " << bk::details::UBOPhong::name_max_attribute_value() << ")\n";
       s << "       { color = ColorBar[" << bk::details::UBOPhong::name_num_colors() << "-1]; }\n";
       s << "       else\n";
       s << "       {\n";
-      s << "           const float temp = (" << bk::details::UBOPhong::name_num_colors() << " - 1) *(attrib_frag - " << bk::details::UBOPhong::name_min_attribute_value() << ") / (" << bk::details::UBOPhong::name_max_attribute_value() << " - " << bk::details::UBOPhong::name_min_attribute_value() << ");\n";
+      s << "           const float temp = (" << bk::details::UBOPhong::name_num_colors() << " - 1) *(attribVal - " << bk::details::UBOPhong::name_min_attribute_value() << ") / (" << bk::details::UBOPhong::name_max_attribute_value() << " - " << bk::details::UBOPhong::name_min_attribute_value() << ");\n";
       s << "           const uint colid0 = uint(floor(temp));\n";
       s << "           const uint colid1 = uint(ceil(temp));\n";
       s << "           const float w = temp - colid0;\n\n";
@@ -876,7 +886,7 @@ namespace bk::details
       return s.str();
   }
 
-  std::string ShaderLibrary::mesh::phong::vert_color()
+  std::string ShaderLibrary::mesh::phong::vert_color(bool timeDependentAttribute)
   {
       std::stringstream s;
 
@@ -886,19 +896,25 @@ namespace bk::details
       s << comment_region_input();
       s << "layout(location = 0) in vec3 position_in;\n";
       s << "layout(location = 1) in vec3 normal_in;\n";
-      s << "layout(location = 2) in float attrib_in;\n";
+      s << "layout(location = 2) in float attrib_t0_in;\n";
+      if (timeDependentAttribute)
+      { s << "layout(location = 3) in float attrib_t1_in;\n"; }
       s << ubo_definition_global();
 
       s << comment_region_output();
       s << "layout(location = 0) out vec3 position_frag;\n";
       s << "layout(location = 1) out vec3 normal_frag;\n";
-      s << "layout(location = 2) out float attrib_frag;\n";
+      s << "layout(location = 2) out float attrib_t0_frag;\n";
+      if (timeDependentAttribute)
+      { s << "layout(location = 3) out float attrib_t1_frag;\n"; }
 
       s << comment_region_functions();
       s << function_main_begin();
       s << "   position_frag = position_in;\n";
       s << "   normal_frag = normal_in;\n";
-      s << "   attrib_frag = attrib_in;\n";
+      s << "   attrib_t0_frag = attrib_t0_in;\n";
+      if (timeDependentAttribute)
+      { s << "   attrib_t1_frag = attrib_t1_in;\n"; }
       s << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_in, 1);\n";
       s << function_main_end();
 
@@ -930,7 +946,7 @@ namespace bk::details
       return s.str();
   }
 
-  std::string ShaderLibrary::mesh::phong::frag_color()
+  std::string ShaderLibrary::mesh::phong::frag_color(bool timeDependentAttribute)
   {
       std::stringstream s;
 
@@ -940,7 +956,9 @@ namespace bk::details
       s << comment_region_input();
       s << "layout(location = 0) in vec3 position_frag;\n";
       s << "layout(location = 1) in vec3 normal_frag;\n";
-      s << "layout(location = 2) in float attrib_frag;\n";
+      s << "layout(location = 2) in float attrib_t0_frag;\n";
+      if (timeDependentAttribute)
+      { s << "layout(location = 3) in float attrib_t1_frag;\n"; }
       s << ubo_definition_global();
       s << ubo_definition_phong();
       s << "layout(binding = 7, std430) buffer _ColorBar\n";
@@ -952,7 +970,7 @@ namespace bk::details
       s << comment_region_functions();
       s << function_camera_position();
       s << function_main_begin();
-      s << details::default_frag_get_color_from_attribute();
+      s << details::default_frag_get_color_from_attribute(timeDependentAttribute);
       s << details::default_frag(true, true, false, false);
       s << function_main_end();
 
@@ -1018,7 +1036,7 @@ namespace bk::details
       return s.str();
   }
 
-  std::string ShaderLibrary::mesh::phong::frag_ghosted_color()
+  std::string ShaderLibrary::mesh::phong::frag_ghosted_color(bool timeDependentAttribute)
   {
       std::stringstream s;
 
@@ -1028,7 +1046,9 @@ namespace bk::details
       s << comment_region_input();
       s << "layout(location = 0) in vec3 position_frag;\n";
       s << "layout(location = 1) in vec3 normal_frag;\n";
-      s << "layout(location = 2) in float attrib_frag;\n";
+      s << "layout(location = 2) in float attrib_t0_frag;\n";
+      if (timeDependentAttribute)
+      { s << "layout(location = 3) in float attrib_t1_frag;\n"; }
       s << ubo_definition_global();
       s << ubo_definition_phong();
       s << "layout(binding = 7, std430) buffer _ColorBar\n";
@@ -1041,7 +1061,7 @@ namespace bk::details
       s << comment_region_functions();
       s << function_camera_position();
       s << function_main_begin();
-      s << details::default_frag_get_color_from_attribute();
+      s << details::default_frag_get_color_from_attribute(timeDependentAttribute);
       s << details::default_frag(true, true, false, false);
       s << details::default_frag_ghosted();
       s << discard_low_alpha();
@@ -1050,7 +1070,7 @@ namespace bk::details
       return s.str();
   }
 
-  std::string ShaderLibrary::mesh::phong::frag_ghosted_color_oit()
+  std::string ShaderLibrary::mesh::phong::frag_ghosted_color_oit(bool timeDependentAttribute)
   {
       std::stringstream s;
 
@@ -1061,7 +1081,9 @@ namespace bk::details
       s << comment_region_input();
       s << "layout(location = 0) in vec3 position_frag;\n";
       s << "layout(location = 1) in vec3 normal_frag;\n";
-      s << "layout(location = 2) in float attrib_frag;\n";
+      s << "layout(location = 2) in float attrib_t0_frag;\n";
+      if (timeDependentAttribute)
+      { s << "layout(location = 3) in float attrib_t1_frag;\n"; }
       s << ubo_definition_global();
       s << ubo_definition_phong();
       s << "layout(binding = 7, std430) buffer _ColorBar\n";
@@ -1076,11 +1098,26 @@ namespace bk::details
       s << function_camera_position();
       s << function_grid_to_list_id();
       s << function_main_begin();
-      s << details::default_frag_get_color_from_attribute();
+      s << details::default_frag_get_color_from_attribute(timeDependentAttribute);
       s << details::default_frag(true, true, false, false);
       s << details::default_frag_ghosted();
-      s << "   const float color_based_alpha = (attrib_frag - " << bk::details::UBOPhong::name_min_attribute_value() << ") / (" << bk::details::UBOPhong::name_max_attribute_value() << " - " << bk::details::UBOPhong::name_min_attribute_value() << ");\n";
-      s << "   color_out.a = max(color_out.a, color_based_alpha*color_based_alpha);\n";
+
+      s << "   const float color_based_alpha_t0 = (attrib_t0_frag - " << bk::details::UBOPhong::name_min_attribute_value() << ") / (" << bk::details::UBOPhong::name_max_attribute_value() << " - " << bk::details::UBOPhong::name_min_attribute_value() << ");\n";
+
+      if (!timeDependentAttribute)
+      { s << "   const float attribVal = color_based_alpha_t0;\n\n"; }
+      else
+      {
+          s << "   const float color_based_alpha_t1 = (attrib_t1_frag - " << bk::details::UBOPhong::name_min_attribute_value() << ") / (" << bk::details::UBOPhong::name_max_attribute_value() << " - " << bk::details::UBOPhong::name_min_attribute_value() << ");\n";
+
+          s << "   const float t = " << bk::details::UBOGlobal::name_animation_current_time() << " / " << bk::details::UBOPhong::name_temporal_resolution() << ";\n";
+          s << "   const float t0 = floor(t);\n";
+          s << "   const float tw = t - t0;\n";
+          s << "   const float attribVal = mix(color_based_alpha_t0, color_based_alpha_t1, tw);\n\n";
+      }
+
+      s << "   color_out.a = max(color_out.a, attribVal * attribVal);\n";
+
       s << discard_low_alpha();
       s << oit_assign_from_color_out();
       s << function_main_end();
@@ -1094,8 +1131,8 @@ namespace bk::details
   std::string ShaderLibrary::mesh::silhouette::vert()
   { return phong::vert(); }
 
-  std::string ShaderLibrary::mesh::silhouette::vert_color()
-  { return phong::vert_color(); }
+  std::string ShaderLibrary::mesh::silhouette::vert_color(bool timeDependentAttribute)
+  { return phong::vert_color(timeDependentAttribute); }
 
   std::string ShaderLibrary::mesh::silhouette::frag()
   {
@@ -1133,7 +1170,7 @@ namespace bk::details
       return s.str();
   }
 
-  std::string ShaderLibrary::mesh::silhouette::frag_color()
+  std::string ShaderLibrary::mesh::silhouette::frag_color(bool timeDependentAttribute)
   {
       std::stringstream s;
 
@@ -1143,7 +1180,9 @@ namespace bk::details
       s << comment_region_input();
       s << "layout(location = 0) in vec3 position_frag;\n";
       s << "layout(location = 1) in vec3 normal_frag;\n";
-      s << "layout(location = 2) in float attrib_frag;\n";
+      s << "layout(location = 2) in float attrib_t0_frag;\n";
+      if (timeDependentAttribute)
+      { s << "layout(location = 3) in float attrib_t1_frag;\n"; }
       s << ubo_definition_global();
       s << ubo_definition_phong();
       s << "layout(binding = 7, std430) buffer _ColorBar\n";
@@ -1166,13 +1205,23 @@ namespace bk::details
 
       s << "    if (color_enabled != 0)\n";
       s << "    {\n";
-      s << "        if (attrib_frag <= " << bk::details::UBOPhong::name_min_attribute_value() << ")\n";
+      if (!timeDependentAttribute)
+      { s << "       const float attribVal = attrib_t0_frag;\n\n"; }
+      else
+      {
+          s << "       const float t = " << bk::details::UBOGlobal::name_animation_current_time() << " / " << bk::details::UBOPhong::name_temporal_resolution() << ";\n";
+          s << "       const float t0 = floor(t);\n";
+          s << "       const float tw = t - t0;\n";
+          s << "       const float attribVal = mix(attrib_t0_frag, attrib_t1_frag, tw);\n\n";
+      }
+
+      s << "        if (attribVal <= " << bk::details::UBOPhong::name_min_attribute_value() << ")\n";
       s << "        { color_out.rgb = ColorBar[0]; }\n";
-      s << "        else if (attrib_frag >= " << bk::details::UBOPhong::name_max_attribute_value() << ")\n";
+      s << "        else if (attribVal >= " << bk::details::UBOPhong::name_max_attribute_value() << ")\n";
       s << "        { color_out.rgb = ColorBar[" << bk::details::UBOPhong::name_num_colors() << "-1]; }\n";
       s << "        else\n";
       s << "        {\n";
-      s << "            const float temp = (" << bk::details::UBOPhong::name_num_colors() << " - 1) * (attrib_frag - " << bk::details::UBOPhong::name_min_attribute_value() << ") / (" << bk::details::UBOPhong::name_max_attribute_value() << " - " << bk::details::UBOPhong::name_min_attribute_value() << ");\n";
+      s << "            const float temp = (" << bk::details::UBOPhong::name_num_colors() << " - 1) * (attribVal - " << bk::details::UBOPhong::name_min_attribute_value() << ") / (" << bk::details::UBOPhong::name_max_attribute_value() << " - " << bk::details::UBOPhong::name_min_attribute_value() << ");\n";
       s << "            const uint colid0 = uint(floor(temp));\n";
       s << "            const uint colid1 = uint(ceil(temp));\n";
       s << "            const float w = temp - colid0;\n\n";
@@ -1249,7 +1298,7 @@ namespace bk::details
       return s.str();
   }
 
-  std::string ShaderLibrary::mesh::wireframe::geom_color()
+  std::string ShaderLibrary::mesh::wireframe::geom_color(bool timeDependentAttribute)
   {
       std::stringstream s;
 
@@ -1259,14 +1308,20 @@ namespace bk::details
       s << comment_region_input();
       s << "layout(location = 0) in vec3 position_geom[3];\n";
       s << "layout(location = 1) in vec3 normal_geom[3];\n";
-      s << "layout(location = 2) in float attrib_geom[3];\n";
+      s << "layout(location = 2) in float attrib_t0_geom[3];\n";
+      if (timeDependentAttribute)
+      { s << "layout(location = 3) in float attrib_t1_geom[3];\n"; }
       s << ubo_definition_global();
       s << "layout(triangles) in;\n";
 
       s << comment_region_output();
       s << "layout(location = 0) out vec3 position_frag;\n";
       s << "layout(location = 1) out vec3 normal_frag;\n";
-      s << "layout(location = 2) out float attrib_frag;\n\n";
+      s << "layout(location = 2) out float attrib_t0_frag;\n";
+      if (timeDependentAttribute)
+      { s << "layout(location = 3) out float attrib_t1_frag;\n"; }
+      s << "\n";
+
       s << "layout (line_strip, max_vertices = 3) out;\n";
 
       s << comment_region_functions();
@@ -1275,7 +1330,9 @@ namespace bk::details
       s << "   {\n";
       s << "       position_frag = position_geom[i];\n";
       s << "       normal_frag = normal_geom[i];\n";
-      s << "       attrib_frag = attrib_geom[i];\n";
+      s << "       attrib_t0_frag = attrib_t0_geom[i];\n";
+      if (timeDependentAttribute)
+      { s << "       attrib_t1_frag = attrib_t1_geom[i];\n"; }
       s << "       gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_geom[i], 1);\n";
       s << "       EmitVertex();\n";
       s << "   }\n";
@@ -1287,8 +1344,8 @@ namespace bk::details
   std::string ShaderLibrary::mesh::wireframe::frag()
   { return phong::frag(); }
 
-  std::string ShaderLibrary::mesh::wireframe::frag_color()
-  { return phong::frag_color(); }
+  std::string ShaderLibrary::mesh::wireframe::frag_color(bool timeDependentAttribute)
+  { return phong::frag_color(timeDependentAttribute); }
 
   //------------------------------------------------------------------------------------------------------
   // picking

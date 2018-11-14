@@ -180,34 +180,34 @@ namespace bk::details
               {
                   [[nodiscard]] static std::string default_frag(bool assignAmbient, bool assignDiffuse, bool assignSpecular, bool defineColorVec3);
                   [[nodiscard]] static std::string default_frag_ghosted();
-                  [[nodiscard]] static std::string default_frag_get_color_from_attribute();
+                  [[nodiscard]] static std::string default_frag_get_color_from_attribute(bool timeDependentAttribute);
               };
 
               [[nodiscard]] static std::string vert();
-              [[nodiscard]] static std::string vert_color();
+              [[nodiscard]] static std::string vert_color(bool timeDependentAttribute);
               [[nodiscard]] static std::string frag();
-              [[nodiscard]] static std::string frag_color();
+              [[nodiscard]] static std::string frag_color(bool timeDependentAttribute);
               [[nodiscard]] static std::string frag_ghosted();
               [[nodiscard]] static std::string frag_ghosted_oit();
-              [[nodiscard]] static std::string frag_ghosted_color();
-              [[nodiscard]] static std::string frag_ghosted_color_oit();
+              [[nodiscard]] static std::string frag_ghosted_color(bool timeDependentAttribute);
+              [[nodiscard]] static std::string frag_ghosted_color_oit(bool timeDependentAttribute);
           };
 
           struct silhouette
           {
               [[nodiscard]] static std::string vert();
-              [[nodiscard]] static std::string vert_color();
+              [[nodiscard]] static std::string vert_color(bool timeDependentAttribute);
               [[nodiscard]] static std::string frag();
-              [[nodiscard]] static std::string frag_color();
+              [[nodiscard]] static std::string frag_color(bool timeDependentAttribute);
           };
 
           struct wireframe
           {
               [[nodiscard]] static std::string vert();
               [[nodiscard]] static std::string geom();
-              [[nodiscard]] static std::string geom_color();
+              [[nodiscard]] static std::string geom_color(bool timeDependentAttribute);
               [[nodiscard]] static std::string frag();
-              [[nodiscard]] static std::string frag_color();
+              [[nodiscard]] static std::string frag_color(bool timeDependentAttribute);
           };
 
           struct picking

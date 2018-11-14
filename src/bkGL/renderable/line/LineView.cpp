@@ -76,6 +76,7 @@ namespace bk
       GLuint window_width;
       GLuint window_height;
       // ------- lineao end
+      bool colorbar_enabled;
       bool color_by_attribute_enabled;
       bool color_transparency_enabled;
       GLfloat color_alpha_correction;
@@ -131,6 +132,7 @@ namespace bk
           #endif
           window_width(1),
           window_height(1),
+          colorbar_enabled(true),
           color_by_attribute_enabled(true),
           color_transparency_enabled(false),
           //color_alpha_correction(0.25), // todo options
@@ -185,7 +187,7 @@ namespace bk
       // done in init_lines(); depends on color_and time enabled or not
       //_pdata->vao.add_default_attribute_position_3xfloat_plus_time_1xfloat();
 
-      _pdata->colorbarview.set_position_horizontal_right();
+      _pdata->colorbarview.set_position_horizontal_left();
       _pdata->colorbarview.set_position_vertical(0);
       _pdata->colorbarview.set_value_precision(1);
   }
@@ -219,6 +221,12 @@ namespace bk
 
   GLfloat LineView::color_attribute_max() const
   { return _pdata->color_attrib_max; }
+
+  ColorBarView& LineView::colorbarview()
+  { return _pdata->colorbarview; }
+
+  const ColorBarView& LineView::colorbarview() const
+  { return _pdata->colorbarview; }
   /// @}
 
   /// @{ -------------------------------------------------- GET ISL
@@ -472,6 +480,17 @@ namespace bk
   {
       _pdata->colorscale_type = ColorScaleType::LightBlueToYellow;
       _set_colorbar(bk::ColorBarRGBA::Light_Blue_Black_Yellow());
+  }
+
+  void LineView::set_enable_colorbar(bool b)
+  {
+      if (b != _pdata->colorbar_enabled)
+      {
+          _pdata->colorbar_enabled=b;
+
+          if (this->is_initialized())
+          {this->emit_signal_update_required();}
+      }
   }
   /// @}
 
@@ -1406,7 +1425,7 @@ namespace bk
       //------------------------------------------------------------------------------------------------------
       // colorbar view
       //------------------------------------------------------------------------------------------------------
-      if (_pdata->color_by_attribute_enabled && _pdata->lines_have_color_attribute)
+      if (_pdata->colorbar_enabled && _pdata->color_by_attribute_enabled && _pdata->lines_have_color_attribute)
       { _pdata->colorbarview.draw(); }
   }
 

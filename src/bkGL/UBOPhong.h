@@ -90,6 +90,7 @@ namespace bk::details
       BK_UBO_SPECIALIZATION_DECLARE(num_colors, GL_INT)
       BK_UBO_SPECIALIZATION_DECLARE(min_attribute_value, GL_FLOAT)
       BK_UBO_SPECIALIZATION_DECLARE(max_attribute_value, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_DECLARE(temporal_resolution, GL_FLOAT)
   }; // class UBOPhong
 } // namespace bk::details
 

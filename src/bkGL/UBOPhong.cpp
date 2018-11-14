@@ -54,6 +54,7 @@ namespace bk::details
       BK_UBO_SPECIALIZATION_REGISTER(num_colors, GL_INT)
       BK_UBO_SPECIALIZATION_REGISTER(min_attribute_value, GL_FLOAT)
       BK_UBO_SPECIALIZATION_REGISTER(max_attribute_value, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_REGISTER(temporal_resolution, GL_FLOAT)
   }
 
   UBOPhong::UBOPhong(self_type&&) noexcept = default;
@@ -87,4 +88,5 @@ namespace bk::details
   BK_UBO_SPECIALIZATION_DEFINE(UBOPhong, num_colors, GL_INT)
   BK_UBO_SPECIALIZATION_DEFINE(UBOPhong, min_attribute_value, GL_FLOAT)
   BK_UBO_SPECIALIZATION_DEFINE(UBOPhong, max_attribute_value, GL_FLOAT)
+  BK_UBO_SPECIALIZATION_DEFINE(UBOPhong, temporal_resolution, GL_FLOAT)
 } // namespace bk::details

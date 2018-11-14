@@ -37,12 +37,19 @@ namespace bk
 {
   // ------ forward declaration -------
   class ColorRGBA;
+
   class ColorBarRGBA;
 
+  class ColorBarView;
+
   class IBO;
+
   class VAO;
+
   class VBO;
+
   class Shader;
+
   class SSBO;
 
   namespace details
@@ -58,10 +65,6 @@ namespace bk
       //====================================================================================================
       using self_type = TriangularMesh3DView;
       using base_type = details::AbstractSceneRenderable;
-    public:
-      using value_type = GLfloat;
-      using size_type = GLuint;
-      using color_type = ColorRGBA;
 
       friend class TriangularMesh3DCenterlineExtractionView;
 
@@ -70,6 +73,7 @@ namespace bk
       //====================================================================================================
     protected:
       class Impl;
+
       bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
@@ -101,41 +105,43 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- GET SHININESS
-      [[nodiscard]] auto shininess() const -> value_type;
+      [[nodiscard]] GLfloat shininess() const;
       /// @}
 
       /// @{ -------------------------------------------------- GET GHOSTED VIEW PARAMS
-      [[nodiscard]] auto ghosted_view_cutoff() const -> value_type;
-      [[nodiscard]] auto ghosted_view_falloff() const -> value_type;
+      [[nodiscard]] GLfloat ghosted_view_cutoff() const;
+      [[nodiscard]] GLfloat ghosted_view_falloff() const;
       /// @}
 
       /// @{ -------------------------------------------------- GET SILHOUETTE WIDTH
-      [[nodiscard]] auto silhouette_width() const -> value_type;
+      [[nodiscard]] GLfloat silhouette_width() const;
       /// @}
 
       /// @{ -------------------------------------------------- GET COLOR
-      [[nodiscard]] const color_type& color() const;
+      [[nodiscard]] const ColorRGBA& color() const;
       /// @}
 
       /// @{ -------------------------------------------------- GET CENTER
-      [[nodiscard]] virtual auto center() const -> Vec3<value_type> override;
+      [[nodiscard]] virtual Vec3<GLfloat> center() const override;
+      /// @}
+
+      /// @{ -------------------------------------------------- GET COLOR ATTRIBUTE
+      [[nodiscard]] bool color_attribute_is_time_dependent() const;
+
+      [[nodiscard]] GLfloat color_attribute_min_value() const;
+      [[nodiscard]] GLfloat color_attribute_max_value() const;
+
+      [[nodiscard]] ColorBarView& colorbarview();
+      [[nodiscard]] const ColorBarView& colorbarview() const;
       /// @}
 
       /// @{ -------------------------------------------------- IS INITIALIZED
       [[nodiscard]] virtual bool is_initialized() const override;
       /// @}
 
-      /// @{ -------------------------------------------------- GET INTERNALS
     private:
-      [[nodiscard]] IBO& ibo();
-      [[nodiscard]] VAO& vao();
-      [[nodiscard]] VBO& vbo();
-      [[nodiscard]] Shader& shader();
-      [[nodiscard]] SSBO& ssbo();
-      [[nodiscard]] details::UBOPhong& ubo();
-      [[nodiscard]] GLsizei sizeInd() const;
+      [[nodiscard]] unsigned int _floats_per_vertex() const;
     public:
-      /// @}
 
       //====================================================================================================
       //===== SETTER
@@ -148,24 +154,24 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- SET SHININESS
-      void set_shininess(value_type shininess);
+      void set_shininess(GLfloat shininess);
       /// @}
 
       /// @{ -------------------------------------------------- SET GHOSTED VIEW PARAMS
-      void set_ghosted_view_falloff(value_type falloff);
-      void set_ghosted_view_cutoff(value_type cutoff);
+      void set_ghosted_view_falloff(GLfloat falloff);
+      void set_ghosted_view_cutoff(GLfloat cutoff);
       /// @}
 
       /// @{ -------------------------------------------------- SET SILHOUETTE WIDTH
-      void set_silhouette_width(value_type w);
+      void set_silhouette_width(GLfloat w);
       /// @}
 
       /// @{ -------------------------------------------------- SET COLOR
-  private:
+    private:
       void _update_ubo_color();
-  public:
-      void set_color(const color_type& c);
-      void set_color(color_type&& c);
+    public:
+      void set_color(const ColorRGBA& c);
+      void set_color(ColorRGBA&& c);
       void set_color(double r, double g, double b, double a = 1);
       /// @}
 
@@ -179,6 +185,13 @@ namespace bk
       void set_colorbar_magenta();
       void set_colorbar_light_blue_to_yellow();
       void set_colorbar_green_to_red();
+
+      void set_enable_colorbar(bool b);
+      /// @}
+
+      /// @{ -------------------------------------------------- SET ATTRIBUTE
+      void enable_time_dependent_attribute(GLuint numTimes, GLfloat temporalResolution);
+      void disable_time_dependent_attribute();
       /// @}
 
       /// @{ -------------------------------------------------- OPERATOR =
@@ -208,6 +221,10 @@ namespace bk
       void set_color_attribute(const TriangularMesh3D& mesh, std::string_view color_attribute_name = "");
       void clear_color_attribute();
       void set_colorbar_min_max_value(double vmin, double vmax);
+
+    private:
+      void update_attribute();
+    public:
       /// @}
 
       /// @{ -------------------------------------------------- EVENTS
