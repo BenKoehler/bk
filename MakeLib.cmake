@@ -7,13 +7,24 @@ function(_bk_make_lib name Name)
 
     target_compile_features(bk${Name} PUBLIC cxx_std_17)
 
-    target_compile_options(bk${Name} PRIVATE
-            $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:
-            -pipe -march=native
-            $<$<CONFIG:Release>:-O3 -flto -msse -msse2 -msse3 -mssse3 -msse4 -msse4.1 -msse4.2 -mmmx -m3dnow>
-            $<$<CONFIG:Debug>:-O0 -Wall -Wextra -g -ggdb>>
-            $<$<CXX_COMPILER_ID:MSVC>:
-            $<$<CONFIG:Debug>:/Od /Wall /Zi>>)
+    if (UNIX)
+        target_compile_options(bk${Name} PRIVATE
+                $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:
+                -pipe -march=native
+                $<$<CONFIG:Release>:-O3 -flto -msse -msse2 -msse3 -mssse3 -msse4 -msse4.1 -msse4.2 -mmmx -m3dnow>
+                $<$<CONFIG:Debug>:-O0 -Wall -Wextra -g -ggdb>>
+                $<$<CXX_COMPILER_ID:MSVC>:
+                $<$<CONFIG:Debug>:/Od /Wall /Zi>>)
+    else ()
+        target_compile_options(bk${Name} PRIVATE
+                $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:GNU>>:
+                -pipe -march=native
+                $<$<CONFIG:Release>: -O3 -msse -msse2 -msse3 -mssse3 -msse4 -msse4.1 -msse4.2 -mmmx -m3dnow> # todo ftlo
+                $<$<CONFIG:Debug>:-O0 -Wall -Wextra -g -ggdb>>
+                $<$<CXX_COMPILER_ID:MSVC>:
+                $<$<CONFIG:Debug>:/Od /Wall /Zi>>)
+    endif ()
+
 
     set_target_properties(bk${Name} PROPERTIES
             ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib
@@ -56,9 +67,9 @@ function(_bk_install_lib name Name NAME)
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-        install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/bk${Name}
-                DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-                FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+    install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/bk${Name}
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+            FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
 
     install(FILES
             ${CMAKE_CURRENT_SOURCE_DIR}/doc/bk${Name}/LICENSE
