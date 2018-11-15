@@ -3700,4 +3700,28 @@ namespace bk::details
 
   std::string ShaderLibrary::plot::ticks::frag()
   { return plot::axis::frag(); }
+
+  //====================================================================================================
+  //===== VECTOR VIEW
+  //====================================================================================================
+  struct vector_view
+  {
+      std::string ShaderLibrary::vert()
+      {
+          // todo
+          return "";
+      }
+
+      std::string ShaderLibrary::geom(bool useColor)
+      {
+          // todo
+          return "";
+      }
+
+      std::string ShaderLibrary::frag(bool useColor)
+      {
+          // todo
+          return "";
+      }
+  }; // struct vector_view
 } // namespace bk::details

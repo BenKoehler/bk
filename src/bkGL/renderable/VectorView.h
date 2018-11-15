@@ -98,12 +98,6 @@ namespace bk
   [[nodiscard]] GLfloat color_attribute_min() const;
   [[nodiscard]] GLfloat color_attribute_max() const;
 
-  private:
-  [[nodiscard]]  static constexpr GLfloat _invalid_attribute_value() noexcept
-  { return std::numeric_limits<GLfloat>::max(); }
-
-  public:
-
   [[nodiscard]] ColorBarView& colorbarview();
   [[nodiscard]] const ColorBarView& colorbarview() const;
   /// @}
@@ -115,22 +109,11 @@ namespace bk
 
   /// @{ -------------------------------------------------- GET HALO
   [[nodiscard]] GLfloat halo_width_in_percent() const;
-  [[nodiscard]] GLfloat halo_depth_dependent_dmax() const;
   [[nodiscard]] bool halo_is_enabled() const;
-  /// @}
-
-  /// @{ -------------------------------------------------- GET LINEAO
-  [[nodiscard]] bool lineAO_is_enabled() const;
-  [[nodiscard]] bool lineAO_is_anisotropic() const;
   /// @}
 
   /// @{ -------------------------------------------------- GET CENTER
   [[nodiscard]] virtual bk::Vec3<GLfloat> center() const override;
-  /// @}
-
-  /// @{ -------------------------------------------------- GET PARTICLE TRAILS
-  [[nodiscard]] GLfloat trail_length_in_ms() const;
-  [[nodiscard]] GLfloat trail_opaque_part_in_percent() const;
   /// @}
 
   /// @{ -------------------------------------------------- IS INITIALIZED
@@ -207,18 +190,7 @@ namespace bk
 
   /// @{ -------------------------------------------------- SET HALO
   void set_halo_width_in_percent(GLfloat p);
-  void set_halo_depth_dependent_dmax(GLfloat d);
   void set_halo_enabled(bool b);
-  /// @}
-
-  /// @{ -------------------------------------------------- SET LINEAO
-  void set_lineao_enabled(bool b);
-  void set_lineao_anisotropic(bool b);
-  /// @}
-
-  /// @{ -------------------------------------------------- SET PARTICLE TRAILS
-  void set_trail_length_in_ms(GLfloat ms);
-  void set_trail_opaque_part_in_percent(GLfloat p);
   /// @}
 
   //====================================================================================================
@@ -254,14 +226,12 @@ namespace bk
   /// @{ -------------------------------------------------- INIT
   private:
   template<typename TLinesIterator>
-  void init_lines(TLinesIterator linesBegin, TLinesIterator linesEnd, std::string_view color_attribute_name, const ScalarLineFilter* filter);
+  void init_lines(TLinesIterator linesBegin, TLinesIterator linesEnd, std::string_view color_attribute_name);
   void init_shader();
-  void init_lineao_shader();
   void init_ubo();
-  void init_lineao();
   public:
   template<typename TLinesIterator>
-  void init(TLinesIterator linesBegin, TLinesIterator linesEnd, std::string_view color_attribute_name = "", const ScalarLineFilter* filter = nullptr);
+  void init(TLinesIterator linesBegin, TLinesIterator linesEnd, std::string_view color_attribute_name = "");
   /// @}
 
   /// @{ -------------------------------------------------- EVENTS

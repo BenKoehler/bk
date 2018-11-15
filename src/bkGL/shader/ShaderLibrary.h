@@ -406,6 +406,16 @@ namespace bk::details
               [[nodiscard]] static std::string frag();
           };
       };
+
+      //====================================================================================================
+      //===== VECTOR VIEW
+      //====================================================================================================
+      struct vector_view
+      {
+          [[nodiscard]] static std::string vert(); // todo
+          [[nodiscard]] static std::string geom(bool useColor); // todo
+          [[nodiscard]] static std::string frag(bool useColor); // todo
+      }; // struct vector_view
   }; // class ShaderLibrary
 } // namespace bk::details
 
