@@ -201,37 +201,33 @@ namespace bk
   void clear_color_attribute();
   void clear_shader();
   void clear_buffers();
-  void clear_lineao_buffers_textures();
-  void clear_lineao_shader();
   public:
   void clear();
   /// @}
 
   /// @{ -------------------------------------------------- HELPERS: INIT LINES
   private:
-  void _init_lines(std::string_view color_attribute_name);
-  [[nodiscard]] bool _line_has_time_attribute(const bk::Line<3>& line) const;
-  [[nodiscard]] bool _line_has_attribute(const bk::Line<3>& line, std::string_view name) const;
+  void _init_vectors(std::string_view color_attribute_name);
   [[nodiscard]] unsigned int _floats_per_vertex() const;
-  [[nodiscard]] bool _lines_have_time_attribute() const;
-  [[nodiscard]] bool _lines_have_color_attribute() const;
+  [[nodiscard]] bool _vectors_have_time_attribute() const;
+  [[nodiscard]] bool _vectors_have_color_attribute() const;
   void _add_to_center(double x, double y, double z);
   void _update_attribute_min_max(GLfloat newAttribVal);
   void _vao_add_attributes();
-  void _init_line_buffers(const std::vector<GLfloat>& vertices, const std::vector<GLuint>& indices, unsigned int num_points_total);
+  void _init_vector_buffers(const std::vector<GLfloat>& vertices, const std::vector<GLuint>& indices, unsigned int num_points_total);
   void _init_colorbar(std::string_view color_attribute_name, std::string_view custom_colorbar_title = "");
   public:
   /// @}
 
   /// @{ -------------------------------------------------- INIT
   private:
-  template<typename TLinesIterator>
-  void init_lines(TLinesIterator linesBegin, TLinesIterator linesEnd, std::string_view color_attribute_name);
+  template<typename TVectorsIterator>
+  void init_vectors(TVectorsIterator vectorsBegin, TVectorsIterator vectorsEnd, std::string_view color_attribute_name);
   void init_shader();
   void init_ubo();
   public:
-  template<typename TLinesIterator>
-  void init(TLinesIterator linesBegin, TLinesIterator linesEnd, std::string_view color_attribute_name = "");
+  template<typename TVectorsIterator>
+  void init(TVectorsIterator vectorsBegin, TVectorsIterator vectorsEnd, std::string_view color_attribute_name = "");
   /// @}
 
   /// @{ -------------------------------------------------- EVENTS
@@ -261,6 +257,6 @@ namespace bk
 }; // class VectorView
 } // namespace bk
 
-#include <bkGL/renderable/line/VectorView.hpp>
+#include <bkGL/renderable/VectorView.hpp>
 
 #endif //BK_VECTORVIEW_H

@@ -62,12 +62,6 @@ namespace bk
       Shader shader_transparent;
       ColorBarView colorbarview;
       SSBO ssbo_colorbar;
-      // ------- lineao
-      ScreenQuad screenquad;
-      Shader shader_lineao;
-      GLuint window_width; // todo: necessary?
-      GLuint window_height;
-      // ------- lineao end
       bool colorbar_enabled;
       bool color_by_attribute_enabled;
       bool color_transparency_enabled;
@@ -87,8 +81,7 @@ namespace bk
       bk::ColorRGBA color;
       ColorScaleType colorscale_type;
       Vec3<GLfloat> center;
-      mutable bool lines_have_time_attribute;
-      mutable bool lines_have_color_attribute;
+      bool animation_is_enabled;
 
           #ifndef BK_LIB_QT_AVAILABLE
 
@@ -105,10 +98,7 @@ namespace bk
             shader_transparent(gl),
             colorbarview(gl),
             ssbo_colorbar(gl),
-            screenquad(gl),
           #endif
-          window_width(1),
-          window_height(1),
           colorbar_enabled(true),
           color_by_attribute_enabled(true),
           color_transparency_enabled(false),
@@ -128,8 +118,7 @@ namespace bk
           color(bk::ColorRGBA::Light_Blue()), // todo options
           colorscale_type(ColorScaleType::Rainbow),
           center(0, 0, 0),
-          lines_have_time_attribute(false),
-          lines_have_color_attribute(false)
+          animation_is_enabled(false)
       { /* do nothing */ }
   };
 
@@ -211,32 +200,13 @@ namespace bk
   GLfloat VectorView::halo_width_in_percent() const
   { return _pdata->halo_width_in_percent; }
 
-  GLfloat VectorView::halo_depth_dependent_dmax() const
-  { return _pdata->halo_depth_dependent_dmax; }
-
   bool VectorView::halo_is_enabled() const
   { return _pdata->halo_enabled; }
-  /// @}
-
-  /// @{ -------------------------------------------------- GET LINEAO
-  bool VectorView::lineAO_is_enabled() const
-  { return _pdata->lineao_enabled; }
-
-  bool VectorView::lineAO_is_anisotropic() const
-  { return _pdata->lineao_anisotropic; }
   /// @}
 
   /// @{ -------------------------------------------------- GET CENTER
   bk::Vec3<GLfloat> VectorView::center() const
   { return _pdata->center; }
-  /// @}
-
-  /// @{ -------------------------------------------------- GET PARTICLE TRAILS
-  GLfloat VectorView::trail_length_in_ms() const
-  { return _pdata->trail_length_in_ms; }
-
-  GLfloat VectorView::trail_opaque_part_in_percent() const
-  { return _pdata->trail_opaque_part_in_percent; }
   /// @}
 
   /// @{ -------------------------------------------------- IS INITIALIZED
@@ -300,7 +270,6 @@ namespace bk
               _pdata->ubo.release();
 
               init_shader();
-              init_lineao_shader();
               this->emit_signal_update_required();
           }
       }
@@ -344,51 +313,24 @@ namespace bk
 
           switch (_pdata->colorscale_type)
           {
-              case ColorScaleType::Heat:
-              {
-                  _pdata->colorbarview.init_heat();
+              case ColorScaleType::Heat:_pdata->colorbarview.init_heat();
                   break;
-              }
-              case ColorScaleType::Rainbow:
-              {
-                  _pdata->colorbarview.init_rainbow();
+              case ColorScaleType::Rainbow:_pdata->colorbarview.init_rainbow();
                   break;
-              }
-              case ColorScaleType::BlueToRed:
-              {
-                  _pdata->colorbarview.init_blue_to_red();
+              case ColorScaleType::BlueToRed:_pdata->colorbarview.init_blue_to_red();
                   break;
-              }
-              case ColorScaleType::Magenta:
-              {
-                  _pdata->colorbarview.init_magenta();
+              case ColorScaleType::Magenta:_pdata->colorbarview.init_magenta();
                   break;
-              }
-              case ColorScaleType::Cluster:
-              {
-                  _pdata->colorbarview.init_cluster();
+              case ColorScaleType::Cluster:_pdata->colorbarview.init_cluster();
                   break;
-              }
-              case ColorScaleType::TrafficLight:
-              {
-                  _pdata->colorbarview.init_traffic_light();
+              case ColorScaleType::TrafficLight:_pdata->colorbarview.init_traffic_light();
                   break;
-              }
-              case ColorScaleType::UniformYellow:
-              {
-                  _pdata->colorbarview.init_uniform_yellow();
+              case ColorScaleType::UniformYellow:_pdata->colorbarview.init_uniform_yellow();
                   break;
-              }
-              case ColorScaleType::GreenToRed:
-              {
-                  _pdata->colorbarview.init_green_to_white_to_red();
+              case ColorScaleType::GreenToRed:_pdata->colorbarview.init_green_to_white_to_red();
                   break;
-              }
-              case ColorScaleType::LightBlueToYellow:
-              {
-                  _pdata->colorbarview.init_light_blue_to_black_to_yellow();
+              case ColorScaleType::LightBlueToYellow:_pdata->colorbarview.init_light_blue_to_black_to_yellow();
                   break;
-              }
                   //case ColorScaleType::Gray: [[fallthrough]]
               default:
               { /* do nothing */ }
@@ -456,18 +398,15 @@ namespace bk
   {
       if (b != _pdata->colorbar_enabled)
       {
-          _pdata->colorbar_enabled=b;
+          _pdata->colorbar_enabled = b;
 
           if (this->is_initialized())
-          {this->emit_signal_update_required();}
+          { this->emit_signal_update_required(); }
       }
   }
   /// @}
 
   /// @{ -------------------------------------------------- HELPERS: SET COLOR ATTRIBUTE
-  void VectorView::_init_set_color_attribute(std::string_view color_attribute_name)
-  { _pdata->lines_have_color_attribute = !color_attribute_name.empty(); }
-
   GLfloat* VectorView::_map_vbo()
   { return _pdata->vbo.map_write_only<GLfloat>(); }
 
@@ -618,17 +557,6 @@ namespace bk
       }
   }
 
-  void VectorView::set_halo_depth_dependent_dmax(GLfloat d)
-  {
-      _pdata->halo_depth_dependent_dmax = d;
-      if (this->is_initialized())
-      {
-          _pdata->ubo.set_halo_depth_dependent_dmax(_pdata->halo_depth_dependent_dmax);
-          _pdata->ubo.release();
-          this->emit_signal_update_required();
-      }
-  }
-
   void VectorView::set_halo_enabled(bool b)
   {
       if (b != _pdata->halo_enabled)
@@ -641,71 +569,6 @@ namespace bk
               _pdata->ubo.release();
               this->emit_signal_update_required();
           }
-      }
-  }
-  /// @}
-
-  /// @{ -------------------------------------------------- SET LINEAO
-  void VectorView::set_lineao_enabled(bool b)
-  {
-      if (b != _pdata->lineao_enabled)
-      {
-          _pdata->lineao_enabled = b;
-
-          if (this->is_initialized())
-          {
-              _pdata->ubo.set_lineao_enabled(_pdata->lineao_enabled ? static_cast<GLfloat>(1) : static_cast<GLfloat>(0));
-              _pdata->ubo.release();
-
-              init_lineao();
-              set_trail_opaque_part_in_percent(_pdata->lineao_enabled ? 1 : 0.3); // todo options
-              // set_trail... emits required update
-
-              //this->emit_signal_update_required();
-          }
-      }
-  }
-
-  void VectorView::set_lineao_anisotropic(bool b)
-  {
-      if (b != _pdata->lineao_anisotropic)
-      {
-          _pdata->lineao_anisotropic = b;
-
-          if (this->is_initialized())
-          {
-              const GLint lineao_anisotropic = _pdata->lineao_anisotropic ? 1 : 0;
-              _pdata->ubo.set_lineao_anisotropic(lineao_anisotropic);
-              _pdata->ubo.release();
-
-              this->emit_signal_update_required();
-          }
-      }
-  }
-  /// @}
-
-  /// @{ -------------------------------------------------- SET PARTICLE TRAILS
-  void VectorView::set_trail_length_in_ms(GLfloat ms)
-  {
-      _pdata->trail_length_in_ms = std::max(static_cast<GLfloat>(0), ms);
-
-      if (this->is_initialized())
-      {
-          _pdata->ubo.set_trail_length_in_ms(_pdata->trail_length_in_ms);
-          _pdata->ubo.release();
-          this->emit_signal_update_required();
-      }
-  }
-
-  void VectorView::set_trail_opaque_part_in_percent(GLfloat p)
-  {
-      _pdata->trail_opaque_part_in_percent = std::max(static_cast<GLfloat>(0), std::min(static_cast<GLfloat>(1), p));
-
-      if (this->is_initialized())
-      {
-          _pdata->ubo.set_trail_opaque_part_in_percent(_pdata->trail_opaque_part_in_percent);
-          _pdata->ubo.release();
-          this->emit_signal_update_required();
       }
   }
   /// @}
@@ -755,33 +618,14 @@ namespace bk
       clear_shader();
       clear_buffers();
       clear_color_attribute();
-      clear_lineao_buffers_textures();
-      clear_lineao_shader();
 
       this->emit_signal_scene_changed();
       this->emit_signal_update_required();
   }
-
-  void VectorView::clear_lineao_buffers_textures()
-  {
-      _pdata->fbo_lineao_g.clear();
-      _pdata->fbo_lineao_mipmap0.clear();
-      _pdata->fbo_lineao_mipmap1.clear();
-      _pdata->tex_lineao_noise.clear();
-      _pdata->screenquad.clear();
-  }
-
-  void VectorView::clear_lineao_shader()
-  {
-      _pdata->shader_lineao_gbuffer.clear();
-      _pdata->shader_lineao.clear();
-      _pdata->shader_lineao_mipmap0.clear();
-      _pdata->shader_lineao_mipmap1.clear();
-  }
   /// @}
 
   /// @{ -------------------------------------------------- HELPERS: INIT LINES
-  void VectorView::_init_lines(std::string_view color_attribute_name)
+  void VectorView::_init_vectors(std::string_view color_attribute_name)
   {
       clear_buffers();
       _pdata->lines_have_time_attribute = true;
@@ -789,23 +633,9 @@ namespace bk
       this->_pdata->center.set_zero();
   }
 
-  bool VectorView::_line_has_time_attribute(const bk::Line<3>& line) const
-  {
-      const bool hasTime = line.point_attribute_map().has_attribute(bk::attribute_info::time());
-      _pdata->lines_have_time_attribute &= hasTime;
-      return _pdata->lines_have_time_attribute;
-  }
-
-  bool VectorView::_line_has_attribute(const bk::Line<3>& line, std::string_view name) const
-  {
-      const bool hasAttrib = line.point_attribute_map().has_attribute(name);
-      _pdata->lines_have_color_attribute &= hasAttrib;
-      return _pdata->lines_have_color_attribute;
-  }
-
   unsigned int VectorView::_floats_per_vertex() const
   {
-      unsigned int floatPerVertex = 4; // x y z attribute
+      unsigned int floatPerVertex = 6; // posx posy posz vecx vecy vecz
 
       if (_pdata->lines_have_time_attribute)
       { ++floatPerVertex; }
