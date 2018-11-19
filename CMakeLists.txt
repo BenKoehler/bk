@@ -270,7 +270,6 @@ set(SOURCE_FILES # BUFFER
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/AbstractRenderable.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/AbstractSceneRenderable.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/ColorBarView.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/VectorView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/ScreenQuad.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/background/AbstractBackground.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/background/GradientBackground.cpp

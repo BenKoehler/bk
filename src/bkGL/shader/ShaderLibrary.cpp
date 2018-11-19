@@ -3704,24 +3704,21 @@ namespace bk::details
   //====================================================================================================
   //===== VECTOR VIEW
   //====================================================================================================
-  struct vector_view
+  std::string ShaderLibrary::vector_view::vert()
   {
-      std::string ShaderLibrary::vert()
-      {
-          // todo
-          return "";
-      }
+      // todo
+      return "";
+  }
 
-      std::string ShaderLibrary::geom(bool useColor)
-      {
-          // todo
-          return "";
-      }
+  std::string ShaderLibrary::vector_view::geom(bool useColor)
+  {
+      // todo
+      return "";
+  }
 
-      std::string ShaderLibrary::frag(bool useColor)
-      {
-          // todo
-          return "";
-      }
-  }; // struct vector_view
+  std::string ShaderLibrary::vector_view::frag(bool useColor)
+  {
+      // todo
+      return "";
+  }
 } // namespace bk::details
