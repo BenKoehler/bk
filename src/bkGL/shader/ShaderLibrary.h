@@ -99,6 +99,7 @@ namespace bk::details
       [[nodiscard]] static std::string ubo_definition_selection_sphere();
       [[nodiscard]] static std::string ubo_definition_sliceview();
       [[nodiscard]] static std::string ubo_definition_text();
+      [[nodiscard]] static std::string ubo_definition_vectorview();
       /// @}
 
       /// @{ -------------------------------------------------- OIT
@@ -357,7 +358,6 @@ namespace bk::details
               [[nodiscard]] static std::string vert();
               [[nodiscard]] static std::string frag();
           };
-
       }; // struct segmentation
 
       //====================================================================================================
@@ -412,9 +412,10 @@ namespace bk::details
       //====================================================================================================
       struct vector_view
       {
-          [[nodiscard]] static std::string vert(); // todo
-          [[nodiscard]] static std::string geom(bool useColor); // todo
-          [[nodiscard]] static std::string frag(bool useColor); // todo
+          [[nodiscard]] static std::string vert(bool useColor, bool timeDependent);
+          [[nodiscard]] static std::string geom(bool useColor, bool timeDependent);
+          [[nodiscard]] static std::string frag_transparent(bool useColor, bool oitEnabled);
+          [[nodiscard]] static std::string frag_opaque(bool useColor);
       }; // struct vector_view
   }; // class ShaderLibrary
 } // namespace bk::details

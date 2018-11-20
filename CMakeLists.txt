@@ -271,6 +271,7 @@ set(SOURCE_FILES # BUFFER
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/AbstractSceneRenderable.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/ColorBarView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/ScreenQuad.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/VectorView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/background/AbstractBackground.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/background/GradientBackground.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/renderable/background/UniformBackground.cpp
@@ -339,6 +340,7 @@ set(SOURCE_FILES # BUFFER
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOPlotLine.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOSelectionSphere.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOSliceView.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOVectorView.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/UBOText.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/Renderer.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/bkGL/WindowGeometry.cpp

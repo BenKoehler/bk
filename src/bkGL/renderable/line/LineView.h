@@ -134,7 +134,7 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- IS INITIALIZED
-      [[nodiscard]] bool is_initialized() const;
+      [[nodiscard]] virtual bool is_initialized() const override;
       /// @}
 
       //====================================================================================================

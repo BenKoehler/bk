@@ -33,7 +33,6 @@
 #include <bkGL/buffer/IBO.h>
 #include <bkGL/buffer/SSBO.h>
 #include <bkGL/buffer/VBO.h>
-#include <bkGL/buffer/UBO.h>
 #include <bkGL/renderable/ScreenQuad.h>
 #include <bkGL/renderable/ColorBarView.h>
 #include <bkGL/renderable/EColorScaleType.h>
@@ -170,7 +169,6 @@ namespace bk
   #ifndef BK_LIB_QT_AVAILABLE
 
   LineView::LineView()
-      : base_type()
   #else
 
   LineView::LineView(bk::qt_gl_functions* gl)
@@ -612,6 +610,7 @@ namespace bk
   void LineView::set_shininess(GLfloat shininess)
   {
       _pdata->shininess = std::max(static_cast<GLfloat>(0), shininess);
+
       if (this->is_initialized())
       {
           _pdata->ubo.set_shininess(_pdata->shininess);
