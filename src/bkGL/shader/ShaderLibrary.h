@@ -412,6 +412,11 @@ namespace bk::details
       //====================================================================================================
       struct vector_view
       {
+          struct details
+          {
+              [[nodiscard]] static std::string set_color_out_rgb_to_color();
+          };
+
           [[nodiscard]] static std::string vert(bool useColor, bool timeDependent);
           [[nodiscard]] static std::string geom(bool useColor, bool timeDependent);
           [[nodiscard]] static std::string frag_transparent(bool useColor, bool oitEnabled);

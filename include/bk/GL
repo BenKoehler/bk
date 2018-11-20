@@ -68,6 +68,7 @@
 #include "bkGL/renderable/text/TextView.h"
 #include "bkGL/renderable/ColorBarView.h"
 #include "bkGL/renderable/ScreenQuad.h"
+#include "bkGL/renderable/VectorView.h"
 
 // shader
 #include "bkGL/shader/ComputeShader.h"

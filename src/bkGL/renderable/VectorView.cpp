@@ -57,7 +57,7 @@ namespace bk
       ColorBarView colorbarview;
       SSBO ssbo_colorbar;
       //
-      std::vector<std::vector<std::pair<Vec3d, double>>> values;
+      std::vector<std::vector<std::tuple<Vec3d/*pos*/, Vec3d/*vec*/, double/*attrib*/>>> values;
       bool colorbar_enabled;
       bool color_by_attribute_enabled;
       bool color_transparency_enabled;
@@ -81,6 +81,9 @@ namespace bk
       bool is_time_dependent;
       GLint num_times;
       GLfloat temporal_resolution;
+      GLfloat current_time;
+      GLint old_t0;
+      GLint old_t1;
       //
 
           #ifndef BK_LIB_QT_AVAILABLE
@@ -124,12 +127,15 @@ namespace bk
           shininess(100), // todo options
           halo_enabled(true), // todo options
           halo_width_in_percent(0.25), // todo options
-          color(bk::ColorRGBA::Yellow()), // todo options
-          colorscale_type(ColorScaleType::Heat),
+          color(bk::ColorRGBA::Light_Blue()), // todo options
+          colorscale_type(ColorScaleType::Rainbow),
           center(0, 0, 0),
           is_time_dependent(false),
           num_times(0),
-        temporal_resolution(0)
+          temporal_resolution(0),
+          current_time(0),
+          old_t0(-1),
+          old_t1(-1)
       { /* do nothing */ }
   };
 
@@ -146,7 +152,6 @@ namespace bk
         _pdata(gl)
   #endif
   {
-      _pdata->ibo.set_usage_STATIC_DRAW();
       _pdata->vbo.set_usage_STATIC_DRAW();
       _pdata->ssbo_colorbar.set_usage_STATIC_DRAW();
 
@@ -209,7 +214,6 @@ namespace bk
   //====================================================================================================
   //===== SETTER
   //====================================================================================================
-  VectorView& VectorView::operator=(const VectorView&) = default;
   VectorView& VectorView::operator=(VectorView&&) noexcept = default;
 
   void VectorView::set_line_width(GLfloat w)
@@ -235,9 +239,9 @@ namespace bk
 
       if (this->is_initialized())
       {
-          _pdata->ubo.set_linecol_r(_pdata->color[0]);
-          _pdata->ubo.set_linecol_g(_pdata->color[1]);
-          _pdata->ubo.set_linecol_b(_pdata->color[2]);
+          _pdata->ubo.set_col_r(_pdata->color[0]);
+          _pdata->ubo.set_col_g(_pdata->color[1]);
+          _pdata->ubo.set_col_b(_pdata->color[2]);
           _pdata->ubo.release();
 
           this->emit_signal_update_required();
@@ -557,6 +561,9 @@ namespace bk
       _pdata->color_attrib_max = 0;
       _pdata->colorbarview.clear();
 
+      _pdata->old_t0 = -1;
+      _pdata->old_t1 = -1;
+
       if (this->is_initialized())
       {
           _pdata->ubo.set_color_enabled(_pdata->color_by_attribute_enabled ? static_cast<GLint>(1) : static_cast<GLint>(0));
@@ -576,20 +583,19 @@ namespace bk
 
       using SL = details::ShaderLibrary::vector_view;
 
-      //const std::string vert = SL::vert(_pdata->lines_have_time_attribute, _pdata->lines_have_color_attribute, _pdata->color_by_attribute_enabled);
-      //const std::string geom = SL::geom(_pdata->lines_have_time_attribute, this->animation_is_enabled(), _pdata->lines_have_color_attribute, _pdata->color_by_attribute_enabled);
-      //const std::string frag_opaque = SL::frag_opaque(_pdata->lines_have_time_attribute, this->animation_is_enabled(), _pdata->lines_have_color_attribute, _pdata->color_by_attribute_enabled);
-      //const std::string frag_transparent = SL::frag_transparent(_pdata->lines_have_time_attribute, this->animation_is_enabled(), _pdata->lines_have_color_attribute, _pdata->color_by_attribute_enabled, this->oit_is_available());
-      //
-      //_pdata->shader_opaque.init_from_sources(vert, frag_opaque, geom);
-      //_pdata->shader_transparent.init_from_sources(vert, frag_transparent, geom);
+      const std::string vert = SL::vert(_pdata->color_by_attribute_enabled, _pdata->is_time_dependent);
+      const std::string geom = SL::geom(_pdata->color_by_attribute_enabled, _pdata->is_time_dependent);
+      const std::string frag_transparent = SL::frag_transparent(_pdata->color_by_attribute_enabled, this->oit_is_available());
+      const std::string frag_opaque = SL::frag_opaque(_pdata->color_by_attribute_enabled);
 
-      // todo
+      _pdata->shader_opaque.init_from_sources(vert, frag_opaque, geom);
+      _pdata->shader_transparent.init_from_sources(vert, frag_transparent, geom);
   }
 
   void VectorView::init_buffers(const std::vector<std::vector<std::tuple<Vec3d/*pos*/, Vec3d/*vec*/, double/*attrib*/>>>& vecs, double temporal_resolution, std::string_view color_attribute_name)
   {
       clear_buffers();
+      _pdata->values = vecs;
       _pdata->temporal_resolution = temporal_resolution;
 
       const unsigned int numVecs = vecs.size();
@@ -601,8 +607,8 @@ namespace bk
 
       const unsigned int floatsPerVertex = 7 * (_pdata->is_time_dependent ? 2 : 1); // posx posy posz vecx vecy vecz attrib
 
-      _pdata->color_attrib_min_manual = _pdata->color_attrib_min;
-      _pdata->color_attrib_max_manual = _pdata->color_attrib_max;
+      _pdata->color_attrib_min = std::numeric_limits<GLfloat>::max();
+      _pdata->color_attrib_max = -_pdata->color_attrib_min;
 
       /*
        * vbo
@@ -639,16 +645,19 @@ namespace bk
               vbodata[off++] = static_cast<GLfloat>(std::get<2>(vecs[i][1]));
           }
 
-          for (unsigned int t = 0; t < _pdata->num_times; ++t)
+          for (unsigned int t = 0; t < static_cast<unsigned int>(_pdata->num_times); ++t)
           {
               #pragma omp critical(init_vectorview)
               {
                   _pdata->center += std::get<0>(vecs[i][t]);
-                  _pdata->color_attrib_min_manual = std::min(_pdata->color_attrib_min_manual, static_cast<GLfloat>(std::get<2>(vecs[i][t])));
-                  _pdata->color_attrib_max_manual = std::max(_pdata->color_attrib_max_manual, static_cast<GLfloat>(std::get<2>(vecs[i][t])));
+                  _pdata->color_attrib_min = std::min(_pdata->color_attrib_min, static_cast<GLfloat>(std::get<2>(vecs[i][t])));
+                  _pdata->color_attrib_max = std::max(_pdata->color_attrib_max, static_cast<GLfloat>(std::get<2>(vecs[i][t])));
               }
           }
       } // for i : numVecs
+
+      _pdata->color_attrib_min_manual = _pdata->color_attrib_min;
+      _pdata->color_attrib_max_manual = _pdata->color_attrib_max;
 
       _pdata->center /= numVecs * _pdata->num_times;
       _pdata->sizeInd = numVecs;
@@ -721,7 +730,150 @@ namespace bk
       init_shader();
       init_ubo();
 
+      void set_colorbar_rainbow();
+
       this->emit_signal_scene_changed();
       this->emit_signal_update_required();
+  }
+
+  void VectorView::update_vectors()
+  {
+      if (!_pdata->is_time_dependent)
+      { return; }
+
+      const int t0 = std::floor(_pdata->current_time / _pdata->temporal_resolution);
+      const int t1 = (_pdata->old_t0 + 1) % _pdata->num_times;
+
+      if (t0 == _pdata->old_t0 && t1 == _pdata->old_t1)
+      { return; }
+
+      const unsigned int numVecs = _pdata->values.size();
+
+      //const unsigned int floatsPerVertex = 7 * (_pdata->is_time_dependent ? 2 : 1); // posx posy posz vecx vecy vecz attrib
+      constexpr unsigned int floatsPerVertex = 7 * 2; // always time-dependent at this point
+
+      GLfloat* vbodata = _pdata->vbo.map_write_only<GLfloat>();
+      if (vbodata != nullptr)
+      {
+          #pragma omp parallel for
+          for (unsigned int i = 0; i < numVecs; ++i)
+          {
+              unsigned int off = floatsPerVertex * i;
+
+              // pos t0 (3)
+              for (unsigned int v = 0; v < 3; ++v)
+              { vbodata[off++] = std::get<0>(_pdata->values[i][t0])[v]; }
+
+              // vec t0 (3)
+              for (unsigned int v = 0; v < 3; ++v)
+              { vbodata[off++] = std::get<1>(_pdata->values[i][t0])[v]; }
+
+              // attrib t0 (1)
+              vbodata[off++] = static_cast<GLfloat>(std::get<2>(_pdata->values[i][t0]));
+
+              // pos t1 (3)
+              for (unsigned int v = 0; v < 3; ++v)
+              { vbodata[off++] = std::get<0>(_pdata->values[i][t1])[v]; }
+
+              // vec t1 (3)
+              for (unsigned int v = 0; v < 3; ++v)
+              { vbodata[off++] = std::get<1>(_pdata->values[i][t1])[v]; }
+
+              // attrib t1 (1)
+              vbodata[off] = static_cast<GLfloat>(std::get<2>(_pdata->values[i][t1]));
+          } // for i : numVecs
+
+          _pdata->vbo.unmap_and_release();
+
+          _pdata->old_t0 = t0;
+          _pdata->old_t1 = t1;
+      }
+  }
+
+  void VectorView::on_oit_enabled(bool /*b*/)
+  {
+      if (this->is_initialized())
+      {
+          init_shader();
+          this->emit_signal_update_required();
+      }
+  }
+
+  void VectorView::on_animation_enabled(bool /*b*/)
+  {
+      if (this->is_initialized())
+      { update_vectors(); }
+  }
+
+  void VectorView::on_animation_time_changed(GLfloat t)
+  {
+      _pdata->current_time = t;
+
+      if (this->is_initialized())
+      { update_vectors(); }
+  }
+
+  void VectorView::draw_opaque_impl()
+  {
+      // ubo 0 must be global ubo with modelview/projection matrices
+      _pdata->ubo.bind_to_default_base();
+
+      if (_pdata->color_by_attribute_enabled)
+      { _pdata->ssbo_colorbar.bind_to_base(7); }
+
+      _pdata->vao.bind();
+
+      // either:
+      // - default animation
+      // - stopped oit animation
+      // - OIT first pass: opaque middle parts of temporally visible lines
+      _pdata->shader_opaque.bind();
+      BK_QT_GL glDrawArrays(GL_POINTS, 0, _pdata->sizeInd);
+      _pdata->shader_opaque.release();
+
+      _pdata->vao.release();
+
+      if (_pdata->color_by_attribute_enabled)
+      { _pdata->ssbo_colorbar.release_from_base(); }
+
+      _pdata->ubo.release_from_base();
+
+      //------------------------------------------------------------------------------------------------------
+      // colorbar view
+      //------------------------------------------------------------------------------------------------------
+      if (_pdata->colorbar_enabled && _pdata->color_by_attribute_enabled)
+      { _pdata->colorbarview.draw(); }
+  }
+
+  void VectorView::draw_transparent_impl()
+  {
+      if (!_pdata->color_by_attribute_enabled)
+      { return; }
+
+      // ubo 0 must be global ubo with modelview/projection matrices
+      _pdata->ubo.bind_to_default_base();
+
+      if (_pdata->color_by_attribute_enabled)
+      { _pdata->ssbo_colorbar.bind_to_base(7); }
+
+      _pdata->vao.bind();
+
+      BK_QT_GL glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+      BK_QT_GL glDepthMask(GL_FALSE);
+
+      // OIT second pass: transparent outer parts of temporally visible lines
+      _pdata->shader_transparent.bind();
+      BK_QT_GL glDrawArrays(GL_POINTS, 0, _pdata->sizeInd);
+      _pdata->shader_transparent.release();
+
+      BK_QT_GL glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+      BK_QT_GL glDepthMask(GL_TRUE);
+
+      _pdata->vao.release();
+
+      if (_pdata->color_by_attribute_enabled)
+      { _pdata->ssbo_colorbar.release_from_base(); }
+
+      _pdata->ubo.release_from_base();
   }
 } // namespace bk

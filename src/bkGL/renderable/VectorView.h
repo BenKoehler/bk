@@ -47,13 +47,14 @@ namespace bk
 
   class BKGL_EXPORT VectorView : public details::AbstractSceneRenderable
   {
-  using base_type = details::AbstractSceneRenderable;
+      using base_type = details::AbstractSceneRenderable;
 
       //====================================================================================================
       //===== MEMBERS
       //====================================================================================================
       class Impl;
-      bk::cpimpl <Impl> _pdata;
+
+      bk::cpimpl<Impl> _pdata;
 
       //====================================================================================================
       //===== CONSTRUCTORS & DESTRUCTOR
@@ -94,7 +95,7 @@ namespace bk
       //====================================================================================================
       //===== SETTER
       //====================================================================================================
-      [[maybe_unused]] VectorView& operator=(const VectorView&);
+      [[maybe_unused]] VectorView& operator=(const VectorView&) = delete;
       [[maybe_unused]] VectorView& operator=(VectorView&&) noexcept;
 
       void set_line_width(GLfloat w);
@@ -146,32 +147,22 @@ namespace bk
 
     private:
       void init_shader(); // todo
-      void init_buffers(const std::vector<std::vector<std::tuple<Vec3d/*pos*/,Vec3d/*vec*/,double/*attrib*/>>>& vecs, double temporal_resolution, std::string_view color_attribute_name = "");
+      void init_buffers(const std::vector<std::vector<std::tuple<Vec3d/*pos*/, Vec3d/*vec*/, double/*attrib*/>>>& vecs, double temporal_resolution, std::string_view color_attribute_name = "");
       void init_ubo();
     public:
-      void init(const std::vector<std::vector<std::tuple<Vec3d/*pos*/,Vec3d/*vec*/,double/*attrib*/>>>& vecs, double temporal_resolution = 0, std::string_view color_attribute_name = "");
+      void init(const std::vector<std::vector<std::tuple<Vec3d/*pos*/, Vec3d/*vec*/, double/*attrib*/>>>& vecs, double temporal_resolution = 0, std::string_view color_attribute_name = "");
 
-      virtual void on_resize(GLint w, GLint h) override;
+    private:
+      void update_vectors();
+    public:
+
       virtual void on_oit_enabled(bool b) override;
       virtual void on_animation_enabled(bool b) override;
-      virtual void on_modelview_matrix_changed(bool) override;
-      virtual void on_new_modelview_matrix(const ColMat4<GLfloat>& m) override;
-      virtual void on_new_projection_matrix(const ColMat4<GLfloat>& p) override;
-      virtual void on_visible_changed(bool b) override;
-      virtual void on_mouse_pos_changed(GLint x, GLint y) override;
-      virtual void on_mouse_button_pressed(MouseButton_ btn) override;
-      virtual void on_mouse_button_released(MouseButton_ btn) override;
-      virtual void on_key_pressed(Key_ k) override;
-      virtual void on_key_released(Key_ k) override;
-      virtual void on_mouse_wheel_up() override;
-      virtual void on_mouse_wheel_down() override;
-      virtual void on_ssaa_factor_changed(GLint ssaa_factor) override;
       virtual void on_animation_time_changed(GLfloat t) override;
 
     protected:
       virtual void draw_opaque_impl() override;
       virtual void draw_transparent_impl() override;
-
   }; // class VectorView
 } // namespace bk
 
