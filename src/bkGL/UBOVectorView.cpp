@@ -60,6 +60,9 @@ namespace bk::details
       BK_UBO_SPECIALIZATION_REGISTER(scale_attrib_to_colorbar, GL_INT)
       BK_UBO_SPECIALIZATION_REGISTER(num_times, GL_INT)
       BK_UBO_SPECIALIZATION_REGISTER(temporal_resolution, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_REGISTER(vector_scale, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_REGISTER(arrow_head_length_percent, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_REGISTER(arrow_head_width_factor, GL_FLOAT)
   }
 
   UBOVectorView::UBOVectorView(self_type&&) noexcept = default;
@@ -99,4 +102,7 @@ namespace bk::details
   BK_UBO_SPECIALIZATION_DEFINE(UBOVectorView, scale_attrib_to_colorbar, GL_INT)
   BK_UBO_SPECIALIZATION_DEFINE(UBOVectorView, num_times, GL_INT)
   BK_UBO_SPECIALIZATION_DEFINE(UBOVectorView, temporal_resolution, GL_FLOAT)
+  BK_UBO_SPECIALIZATION_DEFINE(UBOVectorView, vector_scale, GL_FLOAT)
+  BK_UBO_SPECIALIZATION_DEFINE(UBOVectorView, arrow_head_length_percent, GL_FLOAT)
+  BK_UBO_SPECIALIZATION_DEFINE(UBOVectorView, arrow_head_width_factor, GL_FLOAT)
 } // namespace bk::details

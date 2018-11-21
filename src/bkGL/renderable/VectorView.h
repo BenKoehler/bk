@@ -92,6 +92,10 @@ namespace bk
       [[nodiscard]] virtual bk::Vec3<GLfloat> center() const override;
       [[nodiscard]] virtual bool is_initialized() const override;
 
+      [[nodiscard]] GLfloat vector_scale_factor() const;
+      [[nodiscard]] GLfloat arrow_head_length_percent() const;
+      [[nodiscard]] GLfloat arrow_head_width_factor() const;
+
       //====================================================================================================
       //===== SETTER
       //====================================================================================================
@@ -135,6 +139,10 @@ namespace bk
 
       void set_halo_width_in_percent(GLfloat p);
       void set_halo_enabled(bool b);
+
+      void set_vector_scale_factor(GLfloat f);
+      void set_arrow_head_length_percent(GLfloat p);
+      void set_arrow_head_width_factor(GLfloat f);
 
       //====================================================================================================
       //===== FUNCTIONS

@@ -85,6 +85,9 @@ namespace bk
       GLint old_t0;
       GLint old_t1;
       //
+      GLfloat vector_scale_factor;
+      GLfloat arrow_head_length_percent;
+      GLfloat arrow_head_width_factor;
 
           #ifndef BK_LIB_QT_AVAILABLE
 
@@ -122,7 +125,7 @@ namespace bk
           colorbar_num_colors(0),
           sizeInd(0),
           line_width(0.25 /*mm*/), // todo options
-          isl_enabled(true), // todo options
+          isl_enabled(false), // todo options
           //shininess(75), // todo options
           shininess(100), // todo options
           halo_enabled(true), // todo options
@@ -135,7 +138,10 @@ namespace bk
           temporal_resolution(0),
           current_time(0),
           old_t0(-1),
-          old_t1(-1)
+          old_t1(-1),
+          vector_scale_factor(1),
+          arrow_head_length_percent(0.25), // todo options
+          arrow_head_width_factor(2.5) // todo options
       { /* do nothing */ }
   };
 
@@ -210,6 +216,15 @@ namespace bk
 
   bool VectorView::is_initialized() const
   { return _pdata->vao.is_initialized(); }
+
+  GLfloat VectorView::vector_scale_factor() const
+  { return _pdata->vector_scale_factor; }
+
+  GLfloat VectorView::arrow_head_length_percent() const
+  { return _pdata->arrow_head_length_percent; }
+
+  GLfloat VectorView::arrow_head_width_factor() const
+  { return _pdata->arrow_head_width_factor; }
 
   //====================================================================================================
   //===== SETTER
@@ -531,6 +546,51 @@ namespace bk
       }
   }
 
+  void VectorView::set_vector_scale_factor(GLfloat f)
+  {
+      if (f != _pdata->vector_scale_factor)
+      {
+          _pdata->vector_scale_factor = f;
+
+          if (this->is_initialized())
+          {
+              _pdata->ubo.set_vector_scale(_pdata->vector_scale_factor);
+              _pdata->ubo.release();
+              this->emit_signal_update_required();
+          }
+      }
+  }
+
+  void VectorView::set_arrow_head_length_percent(GLfloat p)
+  {
+      if (p != _pdata->arrow_head_length_percent)
+      {
+          _pdata->arrow_head_length_percent = p;
+
+          if (this->is_initialized())
+          {
+              _pdata->ubo.set_arrow_head_length_percent(_pdata->arrow_head_length_percent);
+              _pdata->ubo.release();
+              this->emit_signal_update_required();
+          }
+      }
+  }
+
+  void VectorView::set_arrow_head_width_factor(GLfloat f)
+  {
+      if (f != _pdata->arrow_head_width_factor)
+      {
+          _pdata->arrow_head_width_factor = f;
+
+          if (this->is_initialized())
+          {
+              _pdata->ubo.set_arrow_head_width_factor(_pdata->arrow_head_width_factor);
+              _pdata->ubo.release();
+              this->emit_signal_update_required();
+          }
+      }
+  }
+
   //====================================================================================================
   //===== FUNCTIONS
   //====================================================================================================
@@ -720,6 +780,9 @@ namespace bk
       _pdata->ubo.set_scale_attrib_to_colorbar(_pdata->scale_attrib_to_colorbar ? static_cast<GLint>(1) : static_cast<GLint>(0));
       _pdata->ubo.set_num_times(_pdata->num_times);
       _pdata->ubo.set_temporal_resolution(_pdata->temporal_resolution);
+      _pdata->ubo.set_vector_scale(_pdata->vector_scale_factor);
+      _pdata->ubo.set_arrow_head_length_percent(_pdata->arrow_head_length_percent);
+      _pdata->ubo.set_arrow_head_width_factor(_pdata->arrow_head_width_factor);
 
       _pdata->ubo.release();
   }
@@ -730,7 +793,7 @@ namespace bk
       init_shader();
       init_ubo();
 
-      void set_colorbar_rainbow();
+      set_colorbar_rainbow();
 
       this->emit_signal_scene_changed();
       this->emit_signal_update_required();

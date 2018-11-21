@@ -155,7 +155,7 @@ namespace bk::details
           auto x0 = deriv()->operator[](1) * rhs[2] - deriv()->operator[](2) * rhs[1];
           auto x1 = deriv()->operator[](2) * rhs[0] - deriv()->operator[](0) * rhs[2];
           auto x2 = deriv()->operator[](0) * rhs[1] - deriv()->operator[](1) * rhs[0];
-          deriv()->set(std::move(x0), std::move(x1), std::move(x2));
+          deriv()->set(x0, x1, x2);
       }
 
       // alias

@@ -96,6 +96,9 @@ namespace bk::details
       BK_UBO_SPECIALIZATION_DECLARE(scale_attrib_to_colorbar, GL_INT)
       BK_UBO_SPECIALIZATION_DECLARE(num_times, GL_INT)
       BK_UBO_SPECIALIZATION_DECLARE(temporal_resolution, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_DECLARE(vector_scale, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_DECLARE(arrow_head_length_percent, GL_FLOAT)
+      BK_UBO_SPECIALIZATION_DECLARE(arrow_head_width_factor, GL_FLOAT)
   }; // class UBOVectorView
 } // namespace bk::details
 
