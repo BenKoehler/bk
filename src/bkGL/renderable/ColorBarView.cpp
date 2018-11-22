@@ -727,6 +727,9 @@ namespace bk
 
   void ColorBarView::init_light_blue_to_black_to_yellow()
   { init(ColorBarRGBA::Light_Blue_Black_Yellow()); }
+
+  void ColorBarView::init_plasma()
+  { init(ColorBarRGBA::Plasma()); }
   /// @}
 
   /// @{ -------------------------------------------------- EVENTS

@@ -54,26 +54,21 @@ namespace bk::attribute_info
   // attributes
   //------------------------------------------------------------------------------------------------------
   BK_DEFINE_ATTRIBUTE_HASH(center_direction2d, Vec2d)
-
   BK_DEFINE_ATTRIBUTE_HASH(center_direction3d, Vec3d)
 
   BK_DEFINE_ATTRIBUTE_HASH(local_coord_sys2d, Mat2d)
-
   BK_DEFINE_ATTRIBUTE_HASH(local_coord_sys3d, Mat3d)
 
   BK_DEFINE_ATTRIBUTE_HASH(normal2d, Vec2d)
-
   BK_DEFINE_ATTRIBUTE_HASH(normal3d, Vec3d)
 
   BK_DEFINE_ATTRIBUTE_HASH(tangent2d, Vec2d)
-
   BK_DEFINE_ATTRIBUTE_HASH(tangent3d, Vec3d)
 
   BK_DEFINE_ATTRIBUTE_HASH(time, double)
 
   BK_DEFINE_ATTRIBUTE_HASH(velocity, double)
-
-  BK_DEFINE_ATTRIBUTE_HASH(forward_velocity, double)
+  BK_DEFINE_ATTRIBUTE_HASH(axial_velocity, double)
 
   BK_DEFINE_ATTRIBUTE_HASH(pressure, double)
 
@@ -88,24 +83,30 @@ namespace bk::attribute_info
   BK_DEFINE_ATTRIBUTE_HASH(radius, double)
 
   BK_DEFINE_ATTRIBUTE_HASH(temp0_double, double)
-
   BK_DEFINE_ATTRIBUTE_HASH(temp1_double, double)
-
   BK_DEFINE_ATTRIBUTE_HASH(temp2_double, double)
-
   BK_DEFINE_ATTRIBUTE_HASH(temp3_double, double)
-
   BK_DEFINE_ATTRIBUTE_HASH(temp4_double, double)
 
   BK_DEFINE_ATTRIBUTE_HASH(id, int)
 
   BK_DEFINE_ATTRIBUTE_HASH(wall_shear_stress, MatXd)
-
   BK_DEFINE_ATTRIBUTE_HASH(wall_shear_stress_vector, MatXd)
-
   BK_DEFINE_ATTRIBUTE_HASH(wall_shear_stress_mean, double)
-
   BK_DEFINE_ATTRIBUTE_HASH(wall_shear_stress_mean_vector, Vec3d)
+  BK_DEFINE_ATTRIBUTE_HASH(oscillatory_shear_index, double)
+
+  BK_DEFINE_ATTRIBUTE_HASH(axial_wall_shear_stress, MatXd)
+  BK_DEFINE_ATTRIBUTE_HASH(axial_wall_shear_stress_vector, MatXd)
+  BK_DEFINE_ATTRIBUTE_HASH(axial_wall_shear_stress_mean, double)
+  BK_DEFINE_ATTRIBUTE_HASH(axial_wall_shear_stress_mean_vector, Vec3d)
+  BK_DEFINE_ATTRIBUTE_HASH(axial_oscillatory_shear_index, double)
+
+  BK_DEFINE_ATTRIBUTE_HASH(circumferential_wall_shear_stress, MatXd)
+  BK_DEFINE_ATTRIBUTE_HASH(circumferential_wall_shear_stress_vector, MatXd)
+  BK_DEFINE_ATTRIBUTE_HASH(circumferential_wall_shear_stress_mean, double)
+  BK_DEFINE_ATTRIBUTE_HASH(circumferential_wall_shear_stress_mean_vector, Vec3d)
+  BK_DEFINE_ATTRIBUTE_HASH(circumferential_oscillatory_shear_index, double)
 } // namespace bk::attribute_info
 
 //#undef BK_DEFINE_ATTRIBUTE_HASH

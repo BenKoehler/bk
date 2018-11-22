@@ -306,25 +306,8 @@ namespace bk
       if (update_is_required())
       {
           _pdata->update_timer.start(); // reset timer
-
-          //_pdata->s_current_time_changed.mute(true);
           advance_current_time();
-          //_pdata->s_current_time_changed.mute(false);
       }
-
-      //if (_pdata->enabled && !_pdata->is_paused)
-      //{
-      //    _pdata->update_timer.stop();
-      //
-      //    if (_pdata->update_timer.time_in_milli_sec() >= _pdata->update_interval_in_ms)
-      //    {
-      //        _pdata->update_timer.start(); // reset timer
-      //
-      //        _pdata->s_current_time_changed.mute(true);
-      //        advance_current_time();
-      //        _pdata->s_current_time_changed.mute(false);
-      //    }
-      //}
   }
   /// @}
 } // namespace bk

@@ -197,7 +197,7 @@ namespace bk
       void set_color_attribute_transparency_enabled(bool b);
 
       template<typename TLinesIterator>
-      void set_color_attribute(TLinesIterator linesBegin, TLinesIterator linesEnd, std::string_view color_attribute_name, double quantile_low = 0, double quantile_high = 1, std::string_view custom_colorbar_title = "", const ScalarLineFilter* filter = nullptr);
+      void set_color_attribute(TLinesIterator linesBegin, TLinesIterator linesEnd, std::string_view color_attribute_name, double quantile_low = 0, double quantile_high = 1, const ScalarLineFilter* filter = nullptr);
       /// @}
 
       /// @{ -------------------------------------------------- SET ISL
@@ -247,7 +247,7 @@ namespace bk
       void _update_attribute_min_max(GLfloat newAttribVal);
       void _vao_add_attributes();
       void _init_line_buffers(const std::vector<GLfloat>& vertices, const std::vector<GLuint>& indices, unsigned int num_points_total);
-      void _init_colorbar(std::string_view color_attribute_name, std::string_view custom_colorbar_title = "");
+      void _init_colorbar(std::string_view color_attribute_name);
     public:
       /// @}
 

@@ -136,6 +136,9 @@ namespace bk
       void set_default_rainbow()
       { _set_default(color_type::Purple(), color_type::Light_Blue(), color_type::Green(), color_type::Yellow(), color_type::Red()); }
 
+      void set_default_plasma()
+      { _set_default(color_type::Dark_Blue(), color_type::Purple(), color_type::Pink(), color_type::Light_Red(), color_type::Orange(), color_type::Yellow()); }
+
       void set_default_gray()
       { _set_default(color_type::Black(), color_type::White()); }
 
@@ -144,7 +147,7 @@ namespace bk
 
       void set_default_white_to_green()
       { _set_default(color_type::White(), color_type::Green()); }
-      
+
       void set_default_white_to_blue()
       { _set_default(color_type::White(), color_type::Blue()); }
 
@@ -196,6 +199,13 @@ namespace bk
       {
           self_type cb;
           cb.set_default_rainbow();
+          return cb;
+      }
+
+      [[nodiscard]] static self_type Plasma()
+      {
+          self_type cb;
+          cb.set_default_plasma();
           return cb;
       }
 
@@ -261,7 +271,7 @@ namespace bk
           cb.set_default_white_to_green();
           return cb;
       }
-      
+
       [[nodiscard]] static self_type White_Blue()
       {
           self_type cb;

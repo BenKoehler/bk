@@ -24,6 +24,7 @@
 
 #include <bkGL/vao/VAO.h>
 
+#include <iostream>
 #include <sstream>
 #include <vector>
 
@@ -95,6 +96,9 @@ namespace bk
   {
       _pdata->attributes.emplace_back(_pdata->attributes.size(), type, values_are_normalized, std::move(name));
       _calc_stride();
+
+      if (_pdata->attributes.size() >= 10)
+      { std::cerr << "VAO::add_attribute - Warning! You have 10+ attributes in this VAO. Is this on purpose or did you forget to call clear_attributes() anywhere?" << std::endl; }
   }
 
   void VAO::add_default_attribute_position_2xfloat()

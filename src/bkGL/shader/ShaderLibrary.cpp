@@ -3810,10 +3810,7 @@ namespace bk::details
       }
       else
       {
-          s << "   const float temp = " << bk::details::UBOGlobal::name_animation_current_time() << " / " << bk::details::UBOVectorView::name_temporal_resolution() << ";\n";
-          //s << "   const int t0 = int(min(floor(temp), " << bk::details::UBOVectorView::name_num_times() << "-1));\n";
-          s << "   const int t0 = int(floor(temp));\n";
-          s << "   const float tw = temp - t0;\n\n";
+          s << "   const float tw = (" << bk::details::UBOGlobal::name_animation_current_time() << " / " << bk::details::UBOVectorView::name_temporal_resolution() << ") - " << bk::details::UBOVectorView::name_current_t0() << ";\n\n";
 
           s << "   position_geom = mix(position_t0_in, position_t1_in, tw);\n";
           s << "   tangent_geom = mix(tangent_t0_in, tangent_t1_in, tw);\n";
@@ -3934,82 +3931,6 @@ namespace bk::details
 
       return s.str();
   }
-
-  //std::string ShaderLibrary::vector_view::geom(bool useColor, bool timeDependent)
-  //{
-  //    std::stringstream s;
-  //
-  //    {
-  //        std::stringstream stype;
-  //        stype << "VECTORS useColor:";
-  //        stype << (useColor ? "yes" : "no");
-  //        stype << " timeDependent:";
-  //        stype << (timeDependent ? "yes" : "no");
-  //
-  //        s << comment_tag_geometry_shader(stype.str());
-  //    }
-  //
-  //    s << version();
-  //
-  //    s << comment_region_input();
-  //    s << "// points in\n";
-  //    s << "layout(location = 0) in vec3 position_geom[1];\n";
-  //    s << "layout(location = 1) in vec3 tangent_geom[1];\n";
-  //    if (useColor)
-  //    { s << "layout(location = 2) in float attrib_geom[1];\n"; }
-  //
-  //    s << ubo_definition_global();
-  //    s << ubo_definition_vectorview();
-  //    s << geom_layout_in_points();
-  //
-  //    s << comment_region_output();
-  //    s << "layout(location = 0) out vec3 position_frag;\n";
-  //    s << "layout(location = 1) out vec3 tangent_frag;\n";
-  //    s << "layout(location = 2) out float halo_percent_frag;\n";
-  //    if (useColor)
-  //    { s << "layout(location = 3) out float attrib_frag;\n"; }
-  //    s << geom_layout_out_triangle_strip(4);
-  //
-  //    s << comment_region_functions();
-  //    s << function_camera_position();
-  //    s << function_main_begin();
-  //
-  //    s << "   const vec3 camPos = camera_position();\n\n";
-  //    s << "   const vec3 camVec = position_geom[0].xyz - camPos;\n";
-  //    s << "   const vec3 ortho = normalize(cross(camVec, tangent_geom[0]));\n";
-  //
-  //    s << "   tangent_frag = normalize(tangent_geom[0]);\n";
-  //    if (useColor)
-  //    { s << "   attrib_frag = attrib_geom[0];\n"; }
-  //
-  //    // vertex 0
-  //    s << "   halo_percent_frag = -1;\n";
-  //    s << "   position_frag = position_geom[0] + " << bk::details::UBOVectorView::name_line_width() << "*ortho;";
-  //    s << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_frag, 1);\n";
-  //    s << "   EmitVertex();\n\n";
-  //
-  //    // vertex 1
-  //    s << "   halo_percent_frag = +1;\n";
-  //    s << "   position_frag = position_geom[0] - " << bk::details::UBOVectorView::name_line_width() << "*ortho;";
-  //    s << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_frag, 1);\n";
-  //    s << "   EmitVertex();\n\n";
-  //
-  //    // vertex 2
-  //    s << "   halo_percent_frag = -1;\n";
-  //    s << "   position_frag = position_geom[0] + " << bk::details::UBOVectorView::name_vector_scale() << "*tangent_geom[0] + " << bk::details::UBOVectorView::name_line_width() << "*ortho;";
-  //    s << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_frag, 1);\n";
-  //    s << "   EmitVertex();\n\n";
-  //
-  //    // vertex 3
-  //    s << "   halo_percent_frag = +1;\n";
-  //    s << "   position_frag = position_geom[0] + " << bk::details::UBOVectorView::name_vector_scale() << "*tangent_geom[0] - " << bk::details::UBOVectorView::name_line_width() << "*ortho;";
-  //    s << "   gl_Position = " << bk::details::UBOGlobal::name_modelview_projection_matrix() << " * vec4(position_frag, 1);\n";
-  //    s << "   EmitVertex();\n\n";
-  //
-  //    s << function_main_end();
-  //
-  //    return s.str();
-  //}
 
   std::string ShaderLibrary::vector_view::frag_transparent(bool useColor, bool oitEnabled)
   {

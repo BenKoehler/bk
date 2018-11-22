@@ -40,7 +40,8 @@ namespace bk
       TrafficLight = 6, //
       Cluster = 8, //
       GreenToRed = 9, //
-      LightBlueToYellow = 10
+      LightBlueToYellow = 10, //
+      Plasma = 11,
   };
 } // namespace bk
 

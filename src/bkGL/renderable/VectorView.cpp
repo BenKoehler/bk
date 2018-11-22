@@ -606,6 +606,7 @@ namespace bk
       _pdata->vao.clear();
       _pdata->ubo.clear();
       _pdata->sizeInd = 0;
+      _pdata->ssbo_colorbar.clear();
   }
 
   void VectorView::clear()
@@ -616,22 +617,12 @@ namespace bk
       _pdata->values.clear();
 
       _pdata->color_transparency_enabled = false;
-      _pdata->ssbo_colorbar.clear();
       _pdata->color_attrib_min = 0;
       _pdata->color_attrib_max = 0;
       _pdata->colorbarview.clear();
 
       _pdata->old_t0 = -1;
       _pdata->old_t1 = -1;
-
-      if (this->is_initialized())
-      {
-          _pdata->ubo.set_color_enabled(_pdata->color_by_attribute_enabled ? static_cast<GLint>(1) : static_cast<GLint>(0));
-          _pdata->ubo.set_min_value(_pdata->color_attrib_min);
-          _pdata->ubo.set_max_value(_pdata->color_attrib_max);
-          _pdata->ubo.set_color_transparency_enabled(_pdata->color_transparency_enabled ? static_cast<GLint>(1) : static_cast<GLint>(0));
-          _pdata->ubo.release();
-      }
 
       this->emit_signal_scene_changed();
       this->emit_signal_update_required();
@@ -655,6 +646,7 @@ namespace bk
   void VectorView::init_buffers(const std::vector<std::vector<std::tuple<Vec3d/*pos*/, Vec3d/*vec*/, double/*attrib*/>>>& vecs, double temporal_resolution, std::string_view color_attribute_name)
   {
       clear_buffers();
+
       _pdata->values = vecs;
       _pdata->temporal_resolution = temporal_resolution;
 
@@ -665,10 +657,12 @@ namespace bk
       _pdata->num_times = vecs[0].size();
       _pdata->is_time_dependent = _pdata->num_times > 1;
 
-      const unsigned int floatsPerVertex = 7 * (_pdata->is_time_dependent ? 2 : 1); // posx posy posz vecx vecy vecz attrib
+      const unsigned int floatsPerVertex = 7 * (_pdata->is_time_dependent ? 2 : 1); // posx posy posz vecx vecy vecz attrib (*2)
 
       _pdata->color_attrib_min = std::numeric_limits<GLfloat>::max();
       _pdata->color_attrib_max = -_pdata->color_attrib_min;
+
+      _pdata->center.set(0,0,0);
 
       /*
        * vbo
@@ -725,6 +719,8 @@ namespace bk
       /*
        * vao
        */
+      _pdata->vao.clear_attributes();
+
       if (_pdata->is_time_dependent)
       {
           _pdata->vao.add_default_attribute_position_3xfloat(); // pos t0
@@ -748,7 +744,7 @@ namespace bk
        * colorbar
        */
       if (_pdata->color_by_attribute_enabled)
-      { set_colorbar_heat(); }
+      { set_colorbar_rainbow(); }
 
       _pdata->colorbarview.set_value_range(_pdata->color_attrib_min, _pdata->color_attrib_max, false);
       _pdata->colorbarview.set_clamp_value_range(_pdata->color_attrib_min_manual, _pdata->color_attrib_max_manual);
@@ -779,6 +775,7 @@ namespace bk
       _pdata->ubo.set_color_alpha_correction(_pdata->color_alpha_correction);
       _pdata->ubo.set_scale_attrib_to_colorbar(_pdata->scale_attrib_to_colorbar ? static_cast<GLint>(1) : static_cast<GLint>(0));
       _pdata->ubo.set_num_times(_pdata->num_times);
+      _pdata->ubo.set_current_t0(static_cast<GLint>(0));
       _pdata->ubo.set_temporal_resolution(_pdata->temporal_resolution);
       _pdata->ubo.set_vector_scale(_pdata->vector_scale_factor);
       _pdata->ubo.set_arrow_head_length_percent(_pdata->arrow_head_length_percent);
@@ -804,8 +801,8 @@ namespace bk
       if (!_pdata->is_time_dependent)
       { return; }
 
-      const int t0 = std::floor(_pdata->current_time / _pdata->temporal_resolution);
-      const int t1 = (_pdata->old_t0 + 1) % _pdata->num_times;
+      const int t0 = std::min(static_cast<int>(std::floor(_pdata->current_time / _pdata->temporal_resolution)), _pdata->num_times-1);
+      const int t1 = (t0 + 1) % _pdata->num_times;
 
       if (t0 == _pdata->old_t0 && t1 == _pdata->old_t1)
       { return; }
@@ -848,9 +845,14 @@ namespace bk
 
           _pdata->vbo.unmap_and_release();
 
+          _pdata->ubo.set_current_t0(t0);
+          _pdata->ubo.release();
+
           _pdata->old_t0 = t0;
           _pdata->old_t1 = t1;
       }
+
+      this->emit_signal_update_required();
   }
 
   void VectorView::on_oit_enabled(bool /*b*/)
@@ -865,7 +867,10 @@ namespace bk
   void VectorView::on_animation_enabled(bool /*b*/)
   {
       if (this->is_initialized())
-      { update_vectors(); }
+      {
+          init_shader();
+          update_vectors();
+      }
   }
 
   void VectorView::on_animation_time_changed(GLfloat t)
@@ -873,7 +878,10 @@ namespace bk
       _pdata->current_time = t;
 
       if (this->is_initialized())
-      { update_vectors(); }
+      {
+          update_vectors();
+          this->emit_signal_update_required();
+      }
   }
 
   void VectorView::draw_opaque_impl()

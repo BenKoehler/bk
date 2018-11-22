@@ -231,6 +231,7 @@ namespace bk
       void init_traffic_light();
       void init_cluster(int nClusters = -1);
       void init_light_blue_to_black_to_yellow();
+      void init_plasma();
       /// @}
 
       /// @{ -------------------------------------------------- EVENTS

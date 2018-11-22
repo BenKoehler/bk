@@ -484,10 +484,10 @@ namespace bk
   {
       if (b != _pdata->colorbar_enabled)
       {
-          _pdata->colorbar_enabled=b;
+          _pdata->colorbar_enabled = b;
 
           if (this->is_initialized())
-          {this->emit_signal_update_required();}
+          { this->emit_signal_update_required(); }
       }
   }
   /// @}
@@ -895,15 +895,12 @@ namespace bk
       { set_colorbar_heat(); }
   }
 
-  void LineView::_init_colorbar(std::string_view color_attribute_name, std::string_view custom_colorbar_title)
+  void LineView::_init_colorbar(std::string_view color_attribute_name)
   {
       _pdata->colorbarview.set_value_range(_pdata->color_attrib_min, _pdata->color_attrib_max, false);
       _pdata->colorbarview.set_clamp_value_range(_pdata->color_attrib_min_manual, _pdata->color_attrib_max_manual);
 
-      if (custom_colorbar_title.empty())
-      { _pdata->colorbarview.set_title(___("Lines: \"@0\"", color_attribute_name)); }
-      else
-      { _pdata->colorbarview.set_title(___("@0", custom_colorbar_title)); }
+      _pdata->colorbarview.set_title(___("Lines: \"@0\"", color_attribute_name));
   }
   /// @}
 

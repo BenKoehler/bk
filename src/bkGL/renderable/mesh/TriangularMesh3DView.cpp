@@ -479,6 +479,12 @@ namespace bk
       _set_colorbar(ColorBarRGBA::Green_White_Red());
   }
 
+  void TriangularMesh3DView::set_colorbar_plasma()
+  {
+      _pdata->colorscale_type = ColorScaleType::Plasma;
+      _set_colorbar(ColorBarRGBA::Plasma());
+  }
+
   void TriangularMesh3DView::set_enable_colorbar(bool b)
   {
       if (_pdata->colorbar_enabled != b)

@@ -34,7 +34,7 @@ namespace bk
 {
   /// @{ -------------------------------------------------- SET COLOR ATTRIBUTES
   template<typename TLinesIterator>
-  void LineView::set_color_attribute(TLinesIterator linesBegin, TLinesIterator linesEnd, std::string_view color_attribute_name, double quantile_low, double quantile_high, std::string_view custom_colorbar_title, const ScalarLineFilter* filter)
+  void LineView::set_color_attribute(TLinesIterator linesBegin, TLinesIterator linesEnd, std::string_view color_attribute_name, double quantile_low, double quantile_high, const ScalarLineFilter* filter)
   {
       if (!this->is_initialized())
       { return; }
@@ -149,7 +149,7 @@ namespace bk
               }
 
               _finalize_set_color_attribute();
-              _init_colorbar(color_attribute_name, custom_colorbar_title);
+              _init_colorbar(color_attribute_name);
           }
 
           init_shader();
