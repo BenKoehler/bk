@@ -188,6 +188,11 @@ namespace bk
       void disable_zoom();
       /// @}
 
+      /// @{ -------------------------------------------------- SET ZOOM
+      void set_zoom(GLfloat zx, GLfloat zy, GLfloat zz);
+      void set_zoom(GLfloat zxyz);
+      /// @}
+
       /// @{ -------------------------------------------------- SET SCENE SCALE
       void set_scale_scene(GLfloat s);
       /// @}

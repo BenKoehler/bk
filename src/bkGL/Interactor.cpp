@@ -269,6 +269,20 @@ namespace bk
   { set_zoom_enabled(false); }
   /// @}
 
+  /// @{ -------------------------------------------------- SET ZOOM
+  void Interactor::set_zoom(GLfloat zx, GLfloat zy, GLfloat zz)
+  {
+      _pdata->scale_manual[0] = zx;
+      _pdata->scale_manual[1] = zy;
+      _pdata->scale_manual[2] = zz;
+
+      _pdata->s_require_modelview_update.emit_signal();
+  }
+
+  void Interactor::set_zoom(GLfloat zxyz)
+  { set_zoom(zxyz, zxyz, zxyz); }
+  /// @}
+
   /// @{ -------------------------------------------------- SET SCENE SCALE
   void Interactor::set_scale_scene(GLfloat s)
   {
