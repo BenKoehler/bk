@@ -182,6 +182,12 @@ namespace bk
     public:
       /// @}
 
+      /// @{ -------------------------------------------------- REMOVE DUPLICATES
+    private:
+      void remove_duplicate_images();
+    public:
+      /// @}
+
       /// @{ -------------------------------------------------- SCAN IMAGE INFOS
       void scan_image_infos();
     private:

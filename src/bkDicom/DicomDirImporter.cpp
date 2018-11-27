@@ -327,6 +327,7 @@ namespace bk
 
           if (!_pdata->files.empty() && !_pdata->info.empty())
           {
+              remove_duplicate_images();
               scan_image_infos();
               scan_image_dimensions();
               set_dataset_name_from_patient_name();
@@ -715,9 +716,14 @@ namespace bk
   {
       for (auto it = _pdata->info.begin(); it != _pdata->info.end(); ++it)
       {
-          std::sort(_pdata->files.begin() + it->id_file_start, _pdata->files.begin() + it->id_file_end, [](const DicomFileInfos& a, const DicomFileInfos& b)
+          std::stable_sort(_pdata->files.begin() + it->id_file_start, _pdata->files.begin() + it->id_file_end, [](const DicomFileInfos& a, const DicomFileInfos& b)
           {
-              return a.SliceLocation != b.SliceLocation ? a.SliceLocation < b.SliceLocation : a.AcquisitionTime != b.AcquisitionTime ? a.AcquisitionTime < b.AcquisitionTime : a.InstanceNumber < b.InstanceNumber;
+              if (a.SliceLocation != b.SliceLocation)
+              { return a.SliceLocation < b.SliceLocation; }
+              else if (a.AcquisitionTime != b.AcquisitionTime)
+              { return a.AcquisitionTime < b.AcquisitionTime; }
+              else
+              { return a.InstanceNumber < b.InstanceNumber; }
           });
       } // for files
   }
@@ -1140,6 +1146,14 @@ namespace bk
       _scandir_DICOMDIR_sort_images_by_dicomtags();
 
       return true;
+  }
+  /// @}
+
+  /// @{ -------------------------------------------------- REMOVE DUPLICATES
+  void DicomDirImporter::remove_duplicate_images()
+  {
+      _pdata->info.erase(std::unique(_pdata->info.begin(), _pdata->info.end(), [&](const DicomImageInfos& a, const DicomImageInfos& b)
+      { return a.id_file_start == b.id_file_start && a.id_file_end == b.id_file_end; }), _pdata->info.end());
   }
   /// @}
 
