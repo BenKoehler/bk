@@ -283,6 +283,20 @@ namespace bk
   { set_zoom(zxyz, zxyz, zxyz); }
   /// @}
 
+  /// @{ -------------------------------------------------- SET TRANSLATION
+  void Interactor::set_translation(GLfloat tx, GLfloat ty, GLfloat tz)
+  {
+      _pdata->translation[0] = tx;
+      _pdata->translation[1] = ty;
+      _pdata->translation[2] = tz;
+
+      _pdata->s_require_modelview_update.emit_signal();
+  }
+
+  void Interactor::set_translation(GLfloat txyz)
+  { set_translation(txyz, txyz, txyz); }
+  /// @}
+
   /// @{ -------------------------------------------------- SET SCENE SCALE
   void Interactor::set_scale_scene(GLfloat s)
   {

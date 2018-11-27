@@ -193,6 +193,11 @@ namespace bk
       void set_zoom(GLfloat zxyz);
       /// @}
 
+      /// @{ -------------------------------------------------- SET TRANSLATION
+      void set_translation(GLfloat tx, GLfloat ty, GLfloat tz);
+      void set_translation(GLfloat txyz);
+      /// @}
+
       /// @{ -------------------------------------------------- SET SCENE SCALE
       void set_scale_scene(GLfloat s);
       /// @}
