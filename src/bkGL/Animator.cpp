@@ -238,7 +238,10 @@ namespace bk
 
   /// @{ -------------------------------------------------- SET MAX TIME
   void Animator::set_max_time(GLfloat ms)
-  { _pdata->max_time = ms; }
+  {
+      _pdata->max_time = ms;
+      _pdata->s_max_time_changed.emit_signal(_pdata->max_time);
+  }
   /// @}
 
   /// @{ -------------------------------------------------- SET PARAMETERS
