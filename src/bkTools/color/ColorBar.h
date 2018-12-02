@@ -182,7 +182,7 @@ namespace bk
       { _set_default(color_type::Green(), color_type::Green(), color_type::Yellow(), color_type::Yellow(), color_type::Red(), color_type::Red()); }
 
       void set_default_cluster()
-      { _set_default(color_type::Yellow(), color_type::Green(), color_type::Red(), color_type::Blue(), color_type::Purple(), color_type::Gray(), color_type::Orange(), color_type::Light_Green(), color_type::Light_Red(), color_type::Light_Blue(), color_type::Pink(), color_type::Light_Gray(), color_type::Dark_Green(), color_type::Dark_Red(), color_type::Dark_Blue(), color_type::Dark_Gray()); }
+      { _set_default(color_type::Yellow(), color_type::Green(), color_type::Light_Blue(), color_type::Red(), color_type::Light_Gray(), color_type::Pink(), color_type::Orange(), color_type::Blue(), color_type::Purple(), color_type::Gray(), color_type::Light_Green(), color_type::Light_Red(), color_type::Dark_Green(), color_type::Dark_Red(), color_type::Dark_Gray(), color_type::Dark_Blue()); }
 
       void set_default_light_blue_to_black_to_yellow()
       { _set_default(color_type::Light_Blue(), color_type::Blue(), color_type::Dark_Blue(), color_type::Black(), color_type::Red(), color_type::Orange(), color_type::Yellow()); }
