@@ -461,7 +461,7 @@ namespace bk
           const GLfloat fw = orientation_is_horizontal() ? 1 : _pdata->window_width / _pdata->window_height;
 
           const GLfloat w = fw * _pdata->textview_label.text_pixel_width_relative();
-          const GLfloat h = _pdata->textview_label.text_pixel_height_relative();
+          //const GLfloat h = _pdata->textview_label.text_pixel_height_relative();
           //const GLfloat x = h + margin;
           const GLfloat x = margin;
           const GLfloat y = _pdata->border_width_y_in_percent + 0.5 * (1.0f - _pdata->border_width_y_in_percent - w);
