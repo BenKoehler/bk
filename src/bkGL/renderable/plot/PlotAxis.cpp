@@ -462,7 +462,8 @@ namespace bk
 
           const GLfloat w = fw * _pdata->textview_label.text_pixel_width_relative();
           const GLfloat h = _pdata->textview_label.text_pixel_height_relative();
-          const GLfloat x = h + margin;
+          //const GLfloat x = h + margin;
+          const GLfloat x = margin;
           const GLfloat y = _pdata->border_width_y_in_percent + 0.5 * (1.0f - _pdata->border_width_y_in_percent - w);
           _pdata->textview_label.set_position(x, y);
           //_pdata->textview_label.set_position(_pdata->border_width_x_in_percent + margin, 1.0f - h - margin); // top left; right next to axis
