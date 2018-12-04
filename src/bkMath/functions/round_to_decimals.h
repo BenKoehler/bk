@@ -22,20 +22,27 @@
  * SOFTWARE.
  */
 
-#include "bkMath/constants/euler.h"
-#include "bkMath/constants/pi.h"
+#pragma once
 
-#include "bkMath/functions/bernoulli_number.h"
-#include "bkMath/functions/binomial_coefficient.h"
-#include "bkMath/functions/double_factorial.h"
-#include "bkMath/functions/equals_approx.h"
-#include "bkMath/functions/factorial.h"
-#include "bkMath/functions/fract.h"
-#include "bkMath/functions/inv_factorial.h"
-#include "bkMath/functions/list_grid_id_conversion.h"
-#include "bkMath/functions/nthroot.h"
-#include "bkMath/functions/num_digits.h"
-#include "bkMath/functions/radians_degree_conversion.h"
-#include "bkMath/functions/round_to_decimals.h"
-#include "bkMath/functions/shift_to_interval.h"
-#include "bkMath/functions/sqr.h"
+#ifndef BKMATH_ROUND_TO_DECIMALS_H
+#define BKMATH_ROUND_TO_DECIMALS_H
+
+#include <cmath>
+#include <type_traits>
+
+namespace bk
+{
+  template<typename T>
+  T round_to_decimals(T x, unsigned int numDecimals)
+  {
+      if constexpr (std::is_integral_v<std::decay_t<T>>)
+      {return x;}
+      else
+      {
+          const double pot = std::pow(10, numDecimals);
+          return 1.0/pot * std::round(x * pot);
+      }
+  }
+} // namespace bk
+
+#endif //BK_ROUND_TO_DECIMALS_H
