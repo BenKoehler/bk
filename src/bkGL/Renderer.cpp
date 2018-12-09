@@ -613,6 +613,7 @@ namespace bk
 
       if (changeSize)
       {
+          _pdata->window_geometry.set(newSize[0], newSize[1]);
           _pdata->supersampler.set_factor(newSSAAFactor);
           this->resize(newSize[0], newSize[1]);
           this->draw();
@@ -623,25 +624,28 @@ namespace bk
       _pdata->supersampler.bind_fbo();
 
       constexpr const int num_values_per_pixel = 3;
-      GLubyte* buf = new GLubyte[size_ssaa[0] * size_ssaa[1] * num_values_per_pixel];
-      BK_QT_GL glReadPixels(0, 0, size_ssaa[0], size_ssaa[1], GL_RGB, GL_UNSIGNED_BYTE, buf);
+      std::vector<GLubyte> buf(size_ssaa[0] * size_ssaa[1] * num_values_per_pixel);
+      BK_QT_GL glReadPixels(0, 0, size_ssaa[0], size_ssaa[1], GL_RGB, GL_UNSIGNED_BYTE, buf.data());
 
       auto img = std::make_unique<CartesianImage<Vec<num_values_per_pixel, double>, 2>>();
-      img->set_size(newSize[0], newSize[1]);
 
-      const int ssaafac2 = ssaafac * ssaafac;
+      //------------------------------------------------------------------------------------------------------
+
+      /*img->set_size(newSize[0], newSize[1]);
+
+      const int ssaafac2 = newSSAAFactor * newSSAAFactor;
 
       #pragma omp parallel for
-      for (int y = 0; y < size_ssaa[1]; y += ssaafac)
+      for (int y = 0; y < size_ssaa[1]; y += newSSAAFactor)
       {
-          for (int x = 0; x < size_ssaa[0]; x += ssaafac)
+          for (int x = 0; x < size_ssaa[0]; x += newSSAAFactor)
           {
-              const unsigned int lid = grid_to_list_id(newSize, x / ssaafac, y / ssaafac);
+              const unsigned int lid = grid_to_list_id(newSize, x / newSSAAFactor, y / newSSAAFactor);
               (*img)[lid].set_zero();
 
-              for (int dx = 0; dx < ssaafac; ++dx)
+              for (int dx = 0; dx < newSSAAFactor; ++dx)
               {
-                  for (int dy = 0; dy < ssaafac; ++dy)
+                  for (int dy = 0; dy < newSSAAFactor; ++dy)
                   {
                       const unsigned int off = (size_ssaa[1] - 1 - (y + dy)) * size_ssaa[0] * num_values_per_pixel + (x + dx) * num_values_per_pixel;
 
@@ -652,14 +656,29 @@ namespace bk
 
               (*img)[lid] /= ssaafac2;
           } // for x
-      } // for y
+      } // for y*/
 
-      delete[] buf;
+      //------------------------------------------------------------------------------------------------------
+
+      img->set_size(size_ssaa[0], size_ssaa[1]);
+
+      #pragma omp parallel for
+      for (int y = size_ssaa[1] - 1; y >= 0; --y)
+      {
+          unsigned int cnt = (size_ssaa[1] - 1 - y) * size_ssaa[0] * num_values_per_pixel;
+
+          for (int x = 0; x < size_ssaa[0]; ++x)
+          {
+              for (unsigned int k = 0; k < num_values_per_pixel; ++k)
+              { (*img)(x, y)[k] = buf[cnt++]; }
+          } // for x
+      } // for y
 
       _bind_default_fbo();
 
       if (changeSize)
       {
+          _pdata->window_geometry.set(oldSize[0], oldSize[1]);
           _pdata->supersampler.set_factor(oldSSAAFactor);
           this->resize(oldSize[0], oldSize[1]);
           this->draw();
@@ -789,8 +808,13 @@ namespace bk
 
       #ifdef BK_LIB_PNG_AVAILABLE
 
-  void Renderer::save_screenshot(const std::string& path, int ssaafac, int sizex, int sizey)
-  { render_screenshot(ssaafac, sizex, sizey)->save_png(path); }
+  std::future<void> Renderer::save_screenshot(const std::string& path, int ssaafac, int sizex, int sizey)
+  {
+      std::unique_ptr<CartesianImage<Vec<3, double>, 2>> img = render_screenshot(ssaafac, sizex, sizey);
+
+      return bk_threadpool.enqueue([imgPtr = std::move(img), savePath = path]()
+                                   { imgPtr->save_png(savePath); });
+  }
 
   void Renderer::save_video(const std::string& path, const double fps, const double length_in_s, int ssaafac, int sizex, int sizey)
   {

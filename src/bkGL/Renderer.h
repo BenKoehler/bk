@@ -27,6 +27,8 @@
 #ifndef BKGL_RENDERER_H
 #define BKGL_RENDERER_H
 
+#include <future>
+
 #include <bk/CopyablePIMPL>
 #include <bk/Algorithm>
 #include <bk/Image>
@@ -212,7 +214,7 @@ namespace bk
       Signal<std::string, std::shared_ptr<CartesianImage<Vec<3, double>, 2>>>& signal_video_rendering_new_frame();
 
       #ifdef BK_LIB_PNG_AVAILABLE
-      void save_screenshot(const std::string& path, int ssaafac = -1, int sizex = -1, int sizey = -1);
+      [[maybe_unused]] std::future<void> save_screenshot(const std::string& path, int ssaafac = -1, int sizex = -1, int sizey = -1);
       void save_video(const std::string& path, const double fps, const double length_in_s, int ssaafac = -1, int sizex = -1, int sizey = -1);
       #endif
 
