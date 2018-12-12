@@ -38,6 +38,7 @@ namespace bk
   class ScreenQuad;
   class WindowGeometry;
   template<typename...> class Signal;
+  class FBO;
 
   namespace details
   {
@@ -118,8 +119,10 @@ namespace bk
       { return 2U; }
       /// @}
 
-      /// @{ -------------------------------------------------- GET ID OF FBO
+      /// @{ -------------------------------------------------- GET (ID OF) FBO
       [[nodiscard]] GLuint fbo_id() const;
+      [[nodiscard]] FBO& fbo();
+      [[nodiscard]] const FBO& fbo() const;
       /// @}
 
       /// @{ -------------------------------------------------- IS INITIALIZED

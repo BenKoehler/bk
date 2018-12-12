@@ -153,9 +153,15 @@ namespace bk
   { return _pdata->s_window_size_changed; }
   /// @}
 
-  /// @{ -------------------------------------------------- GET ID OF FBO
+  /// @{ -------------------------------------------------- GET (ID OF) FBO
   [[nodiscard]] GLuint SuperSampler::fbo_id() const
   { return _pdata->fbo.id(); }
+
+  [[nodiscard]] FBO& SuperSampler::fbo()
+  { return _pdata->fbo; }
+
+  [[nodiscard]] const FBO& SuperSampler::fbo() const
+  { return _pdata->fbo; }
   /// @}
 
   /// @{ -------------------------------------------------- IS INITIALIZED

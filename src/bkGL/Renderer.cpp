@@ -808,12 +808,46 @@ namespace bk
 
       #ifdef BK_LIB_PNG_AVAILABLE
 
-  std::future<void> Renderer::save_screenshot(const std::string& path, int ssaafac, int sizex, int sizey)
+  //std::future<void> Renderer::save_screenshot(const std::string& path, int ssaafac, int sizex, int sizey)
+  //{
+      //std::unique_ptr<CartesianImage<Vec<3, double>, 2>> img = render_screenshot(ssaafac, sizex, sizey);
+      //
+      //return bk_threadpool.enqueue([imgPtr = std::move(img), savePath = path]()
+      //                             { imgPtr->save_png(savePath); });
+  //}
+
+  std::future<void> Renderer::save_screenshot(const std::string& path)
   {
-      std::unique_ptr<CartesianImage<Vec<3, double>, 2>> img = render_screenshot(ssaafac, sizex, sizey);
+      const GLuint size_ssaa[2] = {_pdata->supersampler.width_upsampled(),_pdata->supersampler.height_upsampled()};
+
+      _pdata->supersampler.bind_fbo();
+
+      constexpr const int num_values_per_pixel = 3;
+      std::vector<GLubyte> buf(size_ssaa[0] * size_ssaa[1] * num_values_per_pixel);
+      BK_QT_GL glReadPixels(0, 0, size_ssaa[0], size_ssaa[1], GL_RGB, GL_UNSIGNED_BYTE, buf.data());
+
+      auto img = std::make_unique<CartesianImage<Vec<num_values_per_pixel, double>, 2>>();
+
+      img->set_size(size_ssaa[0], size_ssaa[1]);
+
+      #pragma omp parallel for
+      for (int y = static_cast<int>(size_ssaa[1]) - 1; y >= 0; --y)
+      {
+          unsigned int cnt = (size_ssaa[1] - 1 - y) * size_ssaa[0] * num_values_per_pixel;
+
+          for (int x = 0; x < static_cast<int>(size_ssaa[0]); ++x)
+          {
+              for (unsigned int k = 0; k < num_values_per_pixel; ++k)
+              { (*img)(x, y)[k] = buf[cnt++]; }
+          } // for x
+      } // for y
+
+      _pdata->supersampler.release_fbo(); // compatible with ImGui progress bar
+      //_bind_default_fbo();
 
       return bk_threadpool.enqueue([imgPtr = std::move(img), savePath = path]()
                                    { imgPtr->save_png(savePath); });
+
   }
 
   void Renderer::save_video(const std::string& path, const double fps, const double length_in_s, int ssaafac, int sizex, int sizey)
