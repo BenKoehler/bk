@@ -144,20 +144,25 @@ namespace bk
   /// @{ -------------------------------------------------- SET CURRENT
   void Progress::set_current(double c)
   {
-      _pdata->current = c;
-      _pdata->s_current_changed.emit_signal(_pdata->current);
+      if (!finished()) // already finished
+      {
+          _pdata->current = c;
+          _pdata->s_current_changed.emit_signal(_pdata->current);
 
-      if (finished())
-      { _pdata->s_finished.emit_signal(_pdata->id); }
+          if (finished())
+          { _pdata->s_finished.emit_signal(_pdata->id); }
+      }
   }
   /// @}
 
   /// @{ -------------------------------------------------- SET FINISHED
   void Progress::set_finished()
   {
-      if (_pdata->current != _pdata->max)
+      if (!finished())
       {
           _pdata->current = _pdata->max;
+
+          _pdata->s_current_changed.emit_signal(_pdata->current);
           _pdata->s_finished.emit_signal(_pdata->id);
       }
   }

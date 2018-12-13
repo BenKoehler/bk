@@ -25,10 +25,13 @@
 #include <bkGL/texture/TextureCubeMap.h>
 
 #include <climits>
+#include <future>
+#include <string>
 
 #include <bk/Image>
 #include <bkGL/texture/Texture2D.h>
 #include <bk/Matrix>
+#include <bk/ThreadPool>
 
 namespace bk
 {
@@ -194,107 +197,62 @@ namespace bk
 
   /// @{ -------------------------------------------------- VIRTUAL
   #ifdef BK_LIB_PNG_AVAILABLE
-  void TextureCubeMap::init_from_rgb_images(const std::string& x_pos_path, const std::string& x_neg_path, const std::string& y_pos_path, const std::string& y_neg_path, const std::string& z_pos_path, const std::string& z_neg_path)
+  std::vector<GLfloat> TextureCubeMap::_make_texture(std::string_view path) const
+  {
+      CartesianImage<Vec3d, 2> img; // temp image for png loading
+      img.load_png(path);
+
+      const GLuint width = img.geometry().size(0);
+      const GLuint height = img.geometry().size(1);
+      std::vector<GLfloat> tex_vals(width * height * 3, 0.0f);
+
+          #pragma omp parallel for
+      for (unsigned int y = 0; y < height; ++y)
+      {
+          unsigned int off = y * width * 3;
+
+          for (unsigned int x = 0; x < width; ++x)
+          {
+              for (unsigned int v = 0; v < 3; ++v)
+              { tex_vals[off++] = static_cast<GLfloat>(img(x, y)[v] / 255.0); }
+          }
+      }
+
+      return tex_vals;
+  }
+
+  void TextureCubeMap::init_from_rgb_images(std::string_view x_pos_path, std::string_view x_neg_path, std::string_view y_pos_path, std::string_view y_neg_path, std::string_view z_pos_path, std::string_view z_neg_path)
   {
       this->clear();
 
+      std::future<std::vector<GLfloat>> fut_x_pos = bk_threadpool.enqueue([&](){ return _make_texture(x_pos_path); });
+      std::future<std::vector<GLfloat>> fut_x_neg = bk_threadpool.enqueue([&](){ return _make_texture(x_neg_path); });
+      std::future<std::vector<GLfloat>> fut_y_pos = bk_threadpool.enqueue([&](){ return _make_texture(y_pos_path); });
+      std::future<std::vector<GLfloat>> fut_y_neg = bk_threadpool.enqueue([&](){ return _make_texture(y_neg_path); });
+      std::future<std::vector<GLfloat>> fut_z_pos = bk_threadpool.enqueue([&](){ return _make_texture(z_pos_path); });
+      std::future<std::vector<GLfloat>> fut_z_neg = bk_threadpool.enqueue([&](){ return _make_texture(z_neg_path); });
+
       CartesianImage<Vec3d, 2> img; // temp image for png loading
-      GLuint width = 0;
-      GLuint height = 0;
-      std::vector<GLfloat> tex_vals;
-
-      auto copy_tex_vals = [&]()
-      {
-          width = img.geometry().size(0);
-          height = img.geometry().size(1);
-
-          tex_vals.resize(width * height * 3);
-
-          //Vec3d minval = Vec3d::Constant(std::numeric_limits<double>::max());
-          //Vec3d maxval = Vec3d::Constant(-std::numeric_limits<double>::max());
-          //
-          //for (unsigned int i = 0; i < img.num_values(); ++i)
-          //{
-          //    for (unsigned int v = 0; v < 3; ++v)
-          //    {
-          //        minval[v] = std::min(minval[v], img[i][v]);
-          //        maxval[v] = std::max(maxval[v], img[i][v]);
-          //    }
-          //}
-
-          //const Vec3<GLfloat> range(static_cast<GLfloat>(maxval[0]) - static_cast<GLfloat>(minval[0]), static_cast<GLfloat>(maxval[1]) - static_cast<GLfloat>(minval[1]), static_cast<GLfloat>(maxval[2]) - static_cast<GLfloat>(minval[2]));
-
-          #pragma omp parallel for
-          for (unsigned int y = 0; y < height; ++y)
-          {
-              for (unsigned int x = 0; x < width; ++x)
-              {
-                  for (unsigned int v = 0; v < 3; ++v)
-                  {
-                      const unsigned int off = y * width * 3 + x * 3 + v;
-                      //tex_vals[off] = (static_cast<GLfloat>(img(x, y)[v]) - static_cast<GLfloat>(minval[v])) / range[v];
-
-                      tex_vals[off] = static_cast<GLfloat>(img(x, y)[v] / static_cast<GLfloat>(255));
-                  }
-              }
-          }
-      };
-
-      gl_clear_error();
+      img.load_png(x_pos_path);
+      const GLuint width = img.geometry().size(0);
+      const GLuint height = img.geometry().size(1);
 
       BK_QT_GL glGenTextures(1, &_id);
-      //gl_print_error("glGenTextures");
-
       bind();
-      //gl_print_error("bind");
 
-      /*
-       * x_pos
-       */
-      img.load_png(x_pos_path);
-      copy_tex_vals();
-      BK_QT_GL glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, static_cast<const GLvoid*>(tex_vals.data()));
-      //gl_print_error("GL_TEXTURE_CUBE_MAP_POSITIVE_X");
+      std::vector<GLfloat> tex_vals_x_pos = fut_x_pos.get();
+      std::vector<GLfloat> tex_vals_x_neg = fut_x_neg.get();
+      std::vector<GLfloat> tex_vals_y_pos = fut_y_pos.get();
+      std::vector<GLfloat> tex_vals_y_neg = fut_y_neg.get();
+      std::vector<GLfloat> tex_vals_z_pos = fut_z_pos.get();
+      std::vector<GLfloat> tex_vals_z_neg = fut_z_neg.get();
 
-      /*
-       * x_neg
-       */
-      img.load_png(x_neg_path);
-      copy_tex_vals();
-      BK_QT_GL glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, static_cast<const GLvoid*>(tex_vals.data()));
-      //gl_print_error("GL_TEXTURE_CUBE_MAP_NEGATIVE_X");
-
-      /*
-       * y_pos
-       */
-      img.load_png(y_pos_path);
-      copy_tex_vals();
-      BK_QT_GL glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, static_cast<const GLvoid*>(tex_vals.data()));
-      //gl_print_error("GL_TEXTURE_CUBE_MAP_POSITIVE_Y");
-
-      /*
-       * y_neg
-       */
-      img.load_png(y_neg_path);
-      copy_tex_vals();
-      BK_QT_GL glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, static_cast<const GLvoid*>(tex_vals.data()));
-      //gl_print_error("GL_TEXTURE_CUBE_MAP_NEGATIVE_Y");
-
-      /*
-       * z_pos
-       */
-      img.load_png(z_pos_path);
-      copy_tex_vals();
-      BK_QT_GL glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, static_cast<const GLvoid*>(tex_vals.data()));
-      //gl_print_error("GL_TEXTURE_CUBE_MAP_POSITIVE_Z");
-
-      /*
-       * z_neg
-       */
-      img.load_png(z_neg_path);
-      copy_tex_vals();
-      BK_QT_GL glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, static_cast<const GLvoid*>(tex_vals.data()));
-      //gl_print_error("GL_TEXTURE_CUBE_MAP_NEGATIVE_Z");
+      BK_QT_GL glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, static_cast<const GLvoid*>(tex_vals_x_pos.data()));
+      BK_QT_GL glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, static_cast<const GLvoid*>(tex_vals_x_neg.data()));
+      BK_QT_GL glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, static_cast<const GLvoid*>(tex_vals_y_pos.data()));
+      BK_QT_GL glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, static_cast<const GLvoid*>(tex_vals_y_neg.data()));
+      BK_QT_GL glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, static_cast<const GLvoid*>(tex_vals_z_pos.data()));
+      BK_QT_GL glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, static_cast<const GLvoid*>(tex_vals_z_neg.data()));
 
       /*
        * cube map texture parameters
@@ -306,6 +264,19 @@ namespace bk
       BK_QT_GL glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
       release();
+
+      tex_vals_x_pos.clear();
+      tex_vals_x_pos.shrink_to_fit();
+      tex_vals_x_neg.clear();
+      tex_vals_x_neg.shrink_to_fit();
+      tex_vals_y_pos.clear();
+      tex_vals_y_pos.shrink_to_fit();
+      tex_vals_y_neg.clear();
+      tex_vals_y_neg.shrink_to_fit();
+      tex_vals_z_pos.clear();
+      tex_vals_z_pos.shrink_to_fit();
+      tex_vals_z_neg.clear();
+      tex_vals_z_neg.shrink_to_fit();
   }
       #endif
   /// @}

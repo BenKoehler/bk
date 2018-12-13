@@ -1289,7 +1289,7 @@ namespace bk
                       }
                       else
                       {
-                          for (unsigned int i = 0; i < stride; ++i)
+                          for (unsigned int i = 0; i < std::min(N, stride); ++i) // if an rgb image is loaded from a png with rgba tag
                           { operator()(x, y)[i] = val[i]; }
 
                           if (color_type == PNG_COLOR_TYPE_RGB && N == 4) // png is rgb but image has alpha channel -> set opaque

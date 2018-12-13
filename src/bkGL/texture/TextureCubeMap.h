@@ -27,6 +27,9 @@
 #ifndef BKGL_TEXTURECUBEMAP_H
 #define BKGL_TEXTURECUBEMAP_H
 
+#include <string_view>
+#include <vector>
+
 #include <bk/CopyablePIMPL>
 #include <bkGL/AbstractBindable.h>
 
@@ -69,7 +72,7 @@ namespace bk
       //===== GETTER
       //====================================================================================================
       /// @{ -------------------------------------------------- GET TEXTURE UNIT
-      GLenum texture_unit() const;
+      [[nodiscard]] GLenum texture_unit() const;
       /// @}
 
       //====================================================================================================
@@ -81,8 +84,8 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- OPERATOR =
-      self_type& operator=(const self_type& other) = delete;
-      auto operator=(self_type&& other) noexcept -> self_type&;
+      [[maybe_unused]] self_type& operator=(const self_type& other) = delete;
+      [[maybe_unused]] auto operator=(self_type&& other) noexcept -> self_type&;
       /// @}
 
       //====================================================================================================
@@ -96,7 +99,11 @@ namespace bk
 
       /// @{ -------------------------------------------------- INIT
       #ifdef BK_LIB_PNG_AVAILABLE
-      void init_from_rgb_images(const std::string& x_pos_path, const std::string& x_neg_path, const std::string& y_pos_path, const std::string& y_neg_path, const std::string& z_pos_path, const std::string& z_neg_path);
+    private:
+      [[nodiscard]] std::vector<GLfloat> _make_texture(std::string_view path) const;
+    public:
+
+      void init_from_rgb_images(std::string_view x_pos_path, std::string_view x_neg_path, std::string_view y_pos_path, std::string_view y_neg_path, std::string_view z_pos_path, std::string_view z_neg_path);
       #endif
       /// @}
 

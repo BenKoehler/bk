@@ -2536,10 +2536,8 @@ namespace bk
           }
 
           #ifdef BK_EMIT_PROGRESS
-              #pragma omp critical
-          {
-              prog.increment(1);
-          }
+          #pragma omp critical
+          { prog.increment(1); }
           #endif
       }
 
