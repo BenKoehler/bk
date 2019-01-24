@@ -24,6 +24,7 @@
 
 #include <bkGL/buffer/Buffer.h>
 
+#include <iostream>
 #include <iterator>
 
 namespace bk
@@ -290,7 +291,10 @@ namespace bk
 
   /// @{ -------------------------------------------------- (UN)MAP
   void Buffer::unmap()
-  { BK_QT_GL glUnmapBuffer(_pdata->target); }
+  {
+      if (!BK_QT_GL glUnmapBuffer(_pdata->target))
+      { std::cerr << "glUnmapBuffer returned false!" << std::endl; }
+  }
 
   void Buffer::unmap_and_release()
   {
