@@ -693,11 +693,13 @@ namespace bk::string_utils
   std::vector<std::string> split(const std::string& s, std::string_view split_string, bool case_sensitive)
   {
       using size_type = std::string::size_type;
+
       const size_type len = s.size();
       const size_type len_pattern = split_string.size();
+
       std::vector<std::string> strvec;
       size_type i = 0;
-      size_type temp = i;
+      size_type indexOfLastFoundPattern = i;
 
       while (len_pattern < len && i <= len - len_pattern)
       {
@@ -712,15 +714,15 @@ namespace bk::string_utils
               continue;
           }
 
-          if (temp != i)
-          { strvec.push_back(sub_string(s, temp, i - temp)); }
+          if (indexOfLastFoundPattern != i)
+          { strvec.push_back(sub_string(s, indexOfLastFoundPattern, i - indexOfLastFoundPattern)); }
 
           i += len_pattern;
-          temp = i;
+          indexOfLastFoundPattern = i;
       } // while
 
-      if (temp != i)
-      { strvec.push_back(sub_string(s, temp, i - temp)); }
+      if (!strvec.empty())
+      { strvec.push_back(sub_string(s, indexOfLastFoundPattern, s.length() - indexOfLastFoundPattern)); }
 
       return strvec;
   }
