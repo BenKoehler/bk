@@ -31,6 +31,8 @@
 #include <bkDataset/mesh/TriangularMesh.h>
 #include <bkDataset/attributes/attribute_info.h>
 
+#include <iostream> // todo remove
+
 namespace bk
 {
   template<> class TriangularMesh<3> : public details::TriangularMeshBase<3>
@@ -183,12 +185,15 @@ namespace bk
           std::vector<attribute_info::normal3d_value_type>& point_normals = normals_of_points();
           std::vector<attribute_info::normal3d_value_type>& cell_normals = normals_of_triangles();
 
-          if (!point_normals.empty() && !cell_normals.empty())
-          { return false; }
+          if (point_normals.empty() && cell_normals.empty())
+          {
+              std::cerr << "TriangularMesh::consistent_normal_orientation() - aborting! mesh has neither point nor cell normals!" << std::endl;
+              return false;
+          }
 
           const auto meshCenter = this->geometry().center();
 
-          if (point_normals.empty())
+          if (!point_normals.empty())
           {
               const unsigned int numPoints = this->geometry().num_points();
               unsigned int cntAway = 0;
@@ -220,7 +225,7 @@ namespace bk
               }
           }
 
-          if (cell_normals.empty())
+          if (!cell_normals.empty())
           {
               const unsigned int numCells = this->topology().num_cells();
               unsigned int cntAway = 0;
