@@ -111,16 +111,22 @@ namespace bk
 
   void DicomImageInfos::save(std::ofstream& file) const
   {
-      using size_type = std::uint16_t;
+      std::uint16_t ui16temp = 0;
 
-      file.write(reinterpret_cast<const char*>(&id_file_start), sizeof(size_type));
-      file.write(reinterpret_cast<const char*>(&id_file_end), sizeof(size_type));
-      file.write(reinterpret_cast<const char*>(&nDimensions), sizeof(size_type));
-      file.write(reinterpret_cast<const char*>(&Rows), sizeof(size_type));
-      file.write(reinterpret_cast<const char*>(&Columns), sizeof(size_type));
-      file.write(reinterpret_cast<const char*>(&Slices), sizeof(size_type));
-      file.write(reinterpret_cast<const char*>(&TemporalPositions), sizeof(size_type));
-      file.write(reinterpret_cast<const char*>(&NumberOfFrames), sizeof(size_type));
+      const auto _save_ui16 = [&](int x)
+      {
+          ui16temp = static_cast<std::uint16_t>(x);
+          file.write(reinterpret_cast<const char*>(&ui16temp), sizeof(std::uint16_t));
+      };
+
+      _save_ui16(id_file_start);
+      _save_ui16(id_file_end);
+      _save_ui16(nDimensions);
+      _save_ui16(Rows);
+      _save_ui16(Columns);
+      _save_ui16(Slices);
+      _save_ui16(TemporalPositions);
+      _save_ui16(NumberOfFrames);
       file.write(reinterpret_cast<const char*>(&RowSpacing), sizeof(double));
       file.write(reinterpret_cast<const char*>(&ColSpacing), sizeof(double));
       file.write(reinterpret_cast<const char*>(&SliceSpacing), sizeof(double));
@@ -128,7 +134,7 @@ namespace bk
       string_utils::write_string_to_binary_file(PatientName, file);
       string_utils::write_string_to_binary_file(PatientID, file);
       string_utils::write_string_to_binary_file(PatientSex, file);
-      file.write(reinterpret_cast<const char*>(&PatientAge), sizeof(size_type));
+      _save_ui16(PatientAge);
       file.write(reinterpret_cast<const char*>(&PatientWeight), sizeof(double));
       string_utils::write_string_to_binary_file(PatientBirthDate, file);
       string_utils::write_string_to_binary_file(SequenceName, file);
@@ -140,11 +146,11 @@ namespace bk
       string_utils::write_string_to_binary_file(StudyInstanceUID, file);
       string_utils::write_string_to_binary_file(ProtocolName, file);
       string_utils::write_string_to_binary_file(Modality, file);
-      file.write(reinterpret_cast<const char*>(&SamplesPerPixel), sizeof(size_type));
-      file.write(reinterpret_cast<const char*>(&LargestImagePixelValue), sizeof(size_type));
-      file.write(reinterpret_cast<const char*>(&BitsAllocated), sizeof(size_type));
-      file.write(reinterpret_cast<const char*>(&BitsStored), sizeof(size_type));
-      file.write(reinterpret_cast<const char*>(&HighBit), sizeof(size_type));
+      _save_ui16(SamplesPerPixel);
+      _save_ui16(LargestImagePixelValue);
+      _save_ui16(BitsAllocated);
+      _save_ui16(BitsStored);
+      _save_ui16(HighBit);
       string_utils::write_string_to_binary_file(AcquisitionDate, file);
       string_utils::write_string_to_binary_file(InstitutionName, file);
       for (unsigned int i = 0; i < 3; ++i)
@@ -173,16 +179,22 @@ namespace bk
 
   void DicomImageInfos::load(std::ifstream& file)
   {
-      using size_type = std::uint16_t;
+      std::uint16_t ui16temp = 0;
 
-      file.read(reinterpret_cast<char*>(&id_file_start), sizeof(size_type));
-      file.read(reinterpret_cast<char*>(&id_file_end), sizeof(size_type));
-      file.read(reinterpret_cast<char*>(&nDimensions), sizeof(size_type));
-      file.read(reinterpret_cast<char*>(&Rows), sizeof(size_type));
-      file.read(reinterpret_cast<char*>(&Columns), sizeof(size_type));
-      file.read(reinterpret_cast<char*>(&Slices), sizeof(size_type));
-      file.read(reinterpret_cast<char*>(&TemporalPositions), sizeof(size_type));
-      file.read(reinterpret_cast<char*>(&NumberOfFrames), sizeof(size_type));
+      const auto _load_ui16 = [&]()
+      {
+          file.read(reinterpret_cast<char*>(&ui16temp), sizeof(std::uint16_t));
+          return static_cast<int>(ui16temp);
+      };
+
+      id_file_start = _load_ui16();
+      id_file_end = _load_ui16();
+      nDimensions = _load_ui16();
+      Rows = _load_ui16();
+      Columns = _load_ui16();
+      Slices = _load_ui16();
+      TemporalPositions = _load_ui16();
+      NumberOfFrames = _load_ui16();
       file.read(reinterpret_cast<char*>(&RowSpacing), sizeof(double));
       file.read(reinterpret_cast<char*>(&ColSpacing), sizeof(double));
       file.read(reinterpret_cast<char*>(&SliceSpacing), sizeof(double));
@@ -190,7 +202,7 @@ namespace bk
       PatientName = string_utils::read_string_from_binary_file(file);
       PatientID = string_utils::read_string_from_binary_file(file);
       PatientSex = string_utils::read_string_from_binary_file(file);
-      file.read(reinterpret_cast<char*>(&PatientAge), sizeof(size_type));
+      PatientAge = _load_ui16();
       file.read(reinterpret_cast<char*>(&PatientWeight), sizeof(double));
       PatientBirthDate = string_utils::read_string_from_binary_file(file);
       SequenceName = string_utils::read_string_from_binary_file(file);
@@ -202,11 +214,11 @@ namespace bk
       StudyInstanceUID = string_utils::read_string_from_binary_file(file);
       ProtocolName = string_utils::read_string_from_binary_file(file);
       Modality = string_utils::read_string_from_binary_file(file);
-      file.read(reinterpret_cast<char*>(&SamplesPerPixel), sizeof(size_type));
-      file.read(reinterpret_cast<char*>(&LargestImagePixelValue), sizeof(size_type));
-      file.read(reinterpret_cast<char*>(&BitsAllocated), sizeof(size_type));
-      file.read(reinterpret_cast<char*>(&BitsStored), sizeof(size_type));
-      file.read(reinterpret_cast<char*>(&HighBit), sizeof(size_type));
+      SamplesPerPixel = _load_ui16();
+      LargestImagePixelValue = _load_ui16();
+      BitsAllocated = _load_ui16();
+      BitsStored = _load_ui16();
+      HighBit = _load_ui16();
       AcquisitionDate = string_utils::read_string_from_binary_file(file);
       InstitutionName = string_utils::read_string_from_binary_file(file);
       for (unsigned int i = 0; i < 3; ++i)
