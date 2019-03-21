@@ -103,15 +103,6 @@ namespace bk
             shader_transparent(gl),
             colorbarview(gl),
             ssbo_colorbar(gl),
-            fbo_lineao_g(gl),
-            fbo_lineao_mipmap0(gl),
-            fbo_lineao_mipmap1(gl),
-            tex_lineao_noise(gl),
-            screenquad(gl),
-            shader_lineao_gbuffer(gl),
-            shader_lineao_mipmap0(gl),
-            shader_lineao_mipmap1(gl),
-            shader_lineao(gl),
           #endif
           colorbar_enabled(true),
           color_by_attribute_enabled(true),
@@ -153,7 +144,7 @@ namespace bk
   VectorView::VectorView()
   #else
 
-  LineView::LineView(bk::qt_gl_functions* gl)
+  VectorView::VectorView(bk::qt_gl_functions* gl)
       : base_type(gl),
         _pdata(gl)
   #endif

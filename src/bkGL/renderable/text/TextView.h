@@ -236,7 +236,7 @@ namespace bk
       /// @}
 
       /// @{ -------------------------------------------------- INIT
-      [[maybe_unused]] static bool init_freetype(std::string_view path_to_font = BK_GL_FONT_PATH );
+      [[maybe_unused]] BK_QT_GL_STATIC bool init_freetype(std::string_view path_to_font = BK_GL_FONT_PATH );
     private:
       void init_shader();
       void init_buffers();

@@ -60,8 +60,8 @@ namespace bk
 
     FreeTypeCharacter::FreeTypeCharacter()
         #else
-    FreeTypeCharacter::FreeTypeCharacter(bk::qt_gl_functions* gl) :
-    tex(gl)
+    FreeTypeCharacter::FreeTypeCharacter(bk::qt_gl_functions* gl)
+        : tex(gl)
         #endif
     { /* do nothing */ }
 
@@ -221,7 +221,12 @@ namespace bk
 
       for (const char& c: _pdata->text)
       {
+          #ifndef BK_LIB_QT_AVAILABLE
           details::FreeTypeCharacter& character = TextView::ft_map[c];
+          #else
+          details::FreeTypeCharacter& character = TextView::ft_map.find(c)->second;
+          #endif
+
           w += static_cast<GLfloat>(character.advance >> 6);
       }
 
@@ -242,7 +247,12 @@ namespace bk
 
       for (const char& c: _pdata->text)
       {
+          #ifndef BK_LIB_QT_AVAILABLE
           details::FreeTypeCharacter& character = TextView::ft_map[c];
+          #else
+          details::FreeTypeCharacter& character = TextView::ft_map.find(c)->second;
+          #endif
+
           h = std::max(h, static_cast<GLfloat>(character.size_y));
       }
 
@@ -261,7 +271,12 @@ namespace bk
 
       for (const char& c: _pdata->text)
       {
+          #ifndef BK_LIB_QT_AVAILABLE
           details::FreeTypeCharacter& character = TextView::ft_map[c];
+          #else
+          details::FreeTypeCharacter& character = TextView::ft_map.find(c)->second;
+          #endif
+
           by = std::max(by, static_cast<GLfloat>(character.bearing_y));
       }
 
@@ -280,7 +295,12 @@ namespace bk
 
       for (const char& c: _pdata->text)
       {
+          #ifndef BK_LIB_QT_AVAILABLE
           details::FreeTypeCharacter& character = TextView::ft_map[c];
+          #else
+          details::FreeTypeCharacter& character = TextView::ft_map.find(c)->second;
+          #endif
+
           by = std::max(by, static_cast<GLfloat>(character.size_y) - static_cast<GLfloat>(character.bearing_y));
       }
 
@@ -841,7 +861,12 @@ namespace bk
       GLfloat currentAdvance = _pdata->pos[0];
       for (const char& c: _pdata->text)
       {
+          #ifndef BK_LIB_QT_AVAILABLE
           details::FreeTypeCharacter& character = TextView::ft_map[c];
+          #else
+          details::FreeTypeCharacter& character = TextView::ft_map.find(c)->second;
+          #endif
+
           currentAdvance = update_vbo_text(currentAdvance, _pdata->pos[1], character);
 
           character.tex.bind();

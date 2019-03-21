@@ -15,12 +15,16 @@ option(ENABLE_SUPERBUILD "Pull dependencies' source code if not found." ON)
 option(ENABLE_PROGRESS "Algorithms emit progress using bkProgress library" ON)
 option(GL_USE_QT "All GL classes work with Qt and require a QtOpenGLFunctions object in the constructor" OFF)
 #option(GL_USE_QT "All GL classes work with Qt and require a QtOpenGLFunctions object in the constructor" ON)
-option(BUILD_EXAMPLES "Build examples" OFF)
-#option(BUILD_EXAMPLES "Build examples" ON)
+#option(BUILD_EXAMPLES "Build examples" OFF)
+option(BUILD_EXAMPLES "Build examples" ON)
 
 if (${ENABLE_PROGRESS})
     add_definitions(-DBK_EMIT_PROGRESS)
 endif ()
+
+#if (${GL_USE_QT})
+#    add_definitions(-DBK_LIB_QT_AVAILABLE)
+#endif ()
 
 # ------------------------------------------------------------------------------------------------------------------------------------
 # dependencies (third party)
@@ -456,7 +460,7 @@ _bk_make_lib(tools Tools)
 
 target_link_libraries(bkTools PUBLIC Threads::Threads)
 if (OpenMP_CXX_FOUND)
-    target_link_libraries(bkDataset PRIVATE OpenMP::OpenMP_CXX)
+    target_link_libraries(bkTools PRIVATE OpenMP::OpenMP_CXX)
 endif ()
 
 _bk_install_lib(tools Tools TOOLS)
