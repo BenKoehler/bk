@@ -455,6 +455,9 @@ add_library(bkTools ${SOURCE_FILES})
 _bk_make_lib(tools Tools)
 
 target_link_libraries(bkTools PUBLIC Threads::Threads)
+if (OpenMP_CXX_FOUND)
+    target_link_libraries(bkDataset PRIVATE OpenMP::OpenMP_CXX)
+endif ()
 
 _bk_install_lib(tools Tools TOOLS)
 
