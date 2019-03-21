@@ -644,7 +644,9 @@ namespace bk
               }
           }
 
-          const unsigned int expected2 = imgInfo.Slices * imgInfo.TemporalPositions;
+          // const unsigned int expected2 = imgInfo.Slices * imgInfo.TemporalPositions;
+          const unsigned int expected2 = std::max(imgInfo.Slices,1) * std::max(imgInfo.TemporalPositions,1);
+          
           bool this_is_a_split_image = false;
 
           if (hasSlices && hasTemporalPositions && expectedNumFiles != expected2)
